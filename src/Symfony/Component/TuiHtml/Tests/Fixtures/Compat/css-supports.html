@@ -1,0 +1,22 @@
+<!-- covers: css.at-rules.supports -->
+<style>
+  p { display: none }
+  @supports (color: rebeccapurple) { .color { display: block } }
+  @supports (zoom: 2) { .ignored { display: block } }
+  @supports not (display: grid-lanes) { .not { display: block } }
+  @supports (display: flex) and (gap: 1ch) { .and { display: block } }
+  @supports (foo: bar) or (border: 1px solid) { .or { display: block } }
+  @supports selector(:has(> p)) { .selector { display: block } }
+  @supports font-tech(color-COLRv1) { .unknown { display: block } }
+  .nested { @supports (font-weight: bold) { display: block; font-weight: bold } }
+</style>
+<main>
+  <p class="color">supported declaration</p>
+  <p class="ignored">ignored property (hidden)</p>
+  <p class="not">not</p>
+  <p class="and">and</p>
+  <p class="or">or</p>
+  <p class="selector">selector()</p>
+  <p class="unknown">unknown function (hidden)</p>
+  <p class="nested">nested in a rule</p>
+</main>

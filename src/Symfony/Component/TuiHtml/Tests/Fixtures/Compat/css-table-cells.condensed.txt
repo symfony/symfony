@@ -1,0 +1,6 @@
+Cells without a row, like the .row of htmx: side by side in
+an anonymous row where they are cells, the navigation as
+wide as it is set; stacked on a narrow screen
+Contents    The documentation, beside the contents
+set width    takes the room left
+text   |between cells, in their row

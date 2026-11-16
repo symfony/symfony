@@ -1,0 +1,7 @@
+     ┌──────────────────────┐
+City │> Lille               │ Size > 10
+     └──────────────────────┘
+
+The suggestions are listed over this text
+
+while the field has the focus.

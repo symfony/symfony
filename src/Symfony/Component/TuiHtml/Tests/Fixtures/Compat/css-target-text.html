@@ -1,0 +1,9 @@
+<!-- covers: css.selectors.target-text -->
+<!-- variant: found target=#:~:text=quick-,brown,fox,-jumps columns=40 -->
+<!-- variant: styled target=#:~:text=lazy%20dog,-again columns=40 -->
+<style>
+  .styled::target-text { background-color: #0ea5e9; color: white; text-decoration: underline }
+</style>
+<p>The brown hen and the quick <em>brown</em> fox jumps over the lazy dog.</p>
+<p class="styled">A lazy cat, a lazy dog, and the lazy
+   dog again.</p>

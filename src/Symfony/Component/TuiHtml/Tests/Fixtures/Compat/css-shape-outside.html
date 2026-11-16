@@ -1,0 +1,27 @@
+<!-- requires: GdImage -->
+<!-- covers: css.properties.shape-outside css.properties.shape-margin css.types.basic-shape css.properties.shape-image-threshold -->
+<!-- variant: narrow columns=36 -->
+<style>
+  /* Each its own formatting context, its float kept in it: a shape apart from the others, see css-float-overhang */
+  section { display: flow-root }
+  p { margin: 0 0 1 }
+  .moon { float: left; width: 20ch; height: 10lh; background: radial-gradient(circle closest-side, #fde68a 95%, transparent); shape-outside: circle(); shape-margin: 1ch }
+  .slope { float: right; width: 16ch; height: 6lh; background: linear-gradient(to bottom left, #1e3a8a 50%, transparent 50%); shape-outside: polygon(0 0, 100% 0, 100% 100%) }
+  .badge { float: left; width: 12ch; height: 6lh; border: 1px solid cyan; padding: 0 1ch; shape-outside: inset(0 round 0 50% 50% 0) border-box }
+</style>
+<section>
+  <div class="moon"></div>
+  <p>The lines beside a round float follow its edge, closer at its top and bottom than in its middle, a column more away with shape-margin. Past its last row, they take the whole width again, like the text of a page around the picture of a planet, a moon or a face in a round frame.</p>
+</section>
+<section>
+  <div class="slope"></div>
+  <p>A float at the right cut on a slope by a polygon: each line reaches further down where the triangle is narrower, and runs over the empty half of its box.</p>
+</section>
+<section>
+  <div class="badge">Badge</div>
+  <p>An inset with round corners on its right side, in its border box: the text comes closer at its corners than beside its straight edge.</p>
+</section>
+<section>
+  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAClklEQVR4nO3dMU4DMRCF4ReUgoKaW9EjcT5OwK1yAgokKMBitNpsvFnb896Mf4kSKZovswTIOqfLx+M3dvb88nna+z2z9U73ANQ0kerqBrDVxPnPBWCtrCg0AMuygNACLIsKIgNgi4QhCWBTx5AHsClihAKwqWCEBSixQ4QHKLFCpAGwMWGkBCgxQDx4PwDPGJ58qTfA5rUNE2DRaIgJcKVREKfL61M9wNtXx4fC1wiEfQC3CgjUG6EtwFpBUHpB9AdYJgzSA2E8wDIxkNYI/gA2EYyWCFy/Cb+ff7/Ia/nSnWsD1iLfiqPbwLUBa5FvxdFt4AcokUPcmw5AiRDiyBboAZSCIOgCAHTbcA+CNkBJGCEGACCLEAcAoLsk1RQLoESAULsFMQEACoSa4gIA7gg1WxAbQKD4AORbEB8AcEfYKgcA4IqwtQV5AEjLBUB4KcoFQNgEGNS1nwP5AMguQ/kAyJoAzk0A5yaAcxPAuQngXD4Asrc65gNw6tp7SCeAc7kAyC4/QDYAwvIAOD77t+4hyAFAeOkpxQdwHv6tO2jiA5AXG4D82Q9EBiC+7ttiAhAMv/buSa7/zx2NYPB7i7MBRMPfc+9wDADR4QPqlyCiwQP33TWvuwEBhg8obgDZ4IFj50XoABAOvkX8AOSDP3paCicA+dCBdoc2cQEIDB5oe2KWP4DI0Eutz4wbDyA2cFuPUxP7AwgP3Nbr3NC2AEGGbet9cu4+gIAD3mrE2dHnbEOtbdTp6f6vgsga/fkBE+Avr0/QSA/g/UE+un+ObpD38IGkG8Aw+FIaAKah28IDsA6+FBaAffClUAAqQ7fJAygO3SYJoD50mwxApKHbaAGiDnwZDUCWgS9zAcg67LW6Acwh1/UDNUbpIHTGotMAAAAASUVORK5CYII=" alt="" style="float: left; shape-outside: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAClklEQVR4nO3dMU4DMRCF4ReUgoKaW9EjcT5OwK1yAgokKMBitNpsvFnb896Mf4kSKZovswTIOqfLx+M3dvb88nna+z2z9U73ANQ0kerqBrDVxPnPBWCtrCg0AMuygNACLIsKIgNgi4QhCWBTx5AHsClihAKwqWCEBSixQ4QHKLFCpAGwMWGkBCgxQDx4PwDPGJ58qTfA5rUNE2DRaIgJcKVREKfL61M9wNtXx4fC1wiEfQC3CgjUG6EtwFpBUHpB9AdYJgzSA2E8wDIxkNYI/gA2EYyWCFy/Cb+ff7/Ia/nSnWsD1iLfiqPbwLUBa5FvxdFt4AcokUPcmw5AiRDiyBboAZSCIOgCAHTbcA+CNkBJGCEGACCLEAcAoLsk1RQLoESAULsFMQEACoSa4gIA7gg1WxAbQKD4AORbEB8AcEfYKgcA4IqwtQV5AEjLBUB4KcoFQNgEGNS1nwP5AMguQ/kAyJoAzk0A5yaAcxPAuQngXD4Asrc65gNw6tp7SCeAc7kAyC4/QDYAwvIAOD77t+4hyAFAeOkpxQdwHv6tO2jiA5AXG4D82Q9EBiC+7ttiAhAMv/buSa7/zx2NYPB7i7MBRMPfc+9wDADR4QPqlyCiwQP33TWvuwEBhg8obgDZ4IFj50XoABAOvkX8AOSDP3paCicA+dCBdoc2cQEIDB5oe2KWP4DI0Eutz4wbDyA2cFuPUxP7AwgP3Nbr3NC2AEGGbet9cu4+gIAD3mrE2dHnbEOtbdTp6f6vgsga/fkBE+Avr0/QSA/g/UE+un+ObpD38IGkG8Aw+FIaAKah28IDsA6+FBaAffClUAAqQ7fJAygO3SYJoD50mwxApKHbaAGiDnwZDUCWgS9zAcg67LW6Acwh1/UDNUbpIHTGotMAAAAASUVORK5CYII=); shape-image-threshold: .5; shape-margin: 1ch">
+  <p>An image float, the text wrapping around its opaque pixels: a half sun at the left of the page, the lines closer to it at its top and bottom, past its last row the whole width again.</p>
+</section>

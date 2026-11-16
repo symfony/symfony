@@ -1,0 +1,15 @@
+<!-- covers: html.elements.ruby html.elements.rt html.elements.rp css.properties.ruby-position css.properties.ruby-align -->
+<!-- variant: narrow columns=24 -->
+<style>
+  .under { ruby-position: under }
+  .start { ruby-align: start }
+  rt.note { color: #9ca3af }
+  .center { text-align: center }
+  .inline rt, .inline rp { display: inline }
+</style>
+<p>Furigana: <ruby>東<rp>(</rp><rt>とう</rt><rp>)</rp>京<rp>(</rp><rt>きょう</rt><rp>)</rp></ruby> is the capital.</p>
+<p>A wide annotation: <ruby>漢<rt>kan</rt>字<rt>ji</rt></ruby>, a narrow one: <ruby>Tokyo Tower<rt class="note">landmark</rt></ruby>.</p>
+<p class="under">Under the line: <ruby>明日<rt>あした</rt></ruby> and <ruby class="start">today<rt>きょう</rt></ruby>.</p>
+<p class="center">Centered: <ruby><rb>今</rb><rb>日</rb><rt>こん</rt><rt>にち</rt></ruby> は</p>
+<p>In a link: <a href="https://example.com"><ruby>新<rt>しん</rt>聞<rt>ぶん</rt></ruby></a>, and a long text that wraps around <ruby>漢字<rt>かんじ</rt></ruby> to the next line.</p>
+<p class="inline">Displayed inline: <ruby>猫<rp>(</rp><rt>ねこ</rt><rp>)</rp></ruby></p>

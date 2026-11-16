@@ -1,0 +1,12 @@
+<!-- covers: css.properties.z-index -->
+<style>
+  .pages { display: flex; list-style: none; padding: 0 }
+  .pages a { display: block; border: 1px solid gray; padding: 0 1ch }
+  .pages li + li a { margin-left: -1px }
+  .pages .active a { position: relative; z-index: 3; border-color: blue; color: blue }
+  .pages li:first-child a { border-radius: 6px 0 0 6px } .pages li:last-child a { border-radius: 0 6px 6px 0 }
+  .round li:first-child a { position: relative; z-index: 2 }
+</style>
+<ul class="pages"><li><a>Previous</a></li><li class="active"><a>1</a></li><li><a>2</a></li><li><a>Next</a></li></ul>
+<ul class="pages round"><li><a>raised, rounded</a></li><li><a>its corners kept</a></li></ul>
+<p>The active page is drawn over its neighbors, its lines joined with theirs.</p>

@@ -1,0 +1,27 @@
+<!-- covers: css.properties.margin css.properties.margin-top css.properties.margin-bottom css.properties.margin-block css.properties.margin-left css.properties.margin-inline -->
+<style>
+  .card { border: 1px solid; max-width: 28ch; margin-bottom: 1 }
+  .badge { margin-top: -2; margin-left: 18ch; background: red; max-width: 8ch; text-align: center }
+  .one { margin: 0 }
+  .up { margin: -1 0 0; padding-left: 36ch; color: cyan }
+  .col { display: flex; flex-direction: column; margin-top: 1 }
+  .col p { margin: 0 }
+  .col .over { margin-block: -1 0; padding-left: 33ch; color: yellow }
+  .pull { margin-bottom: -1 }
+  .first { margin-top: -3 }
+  .stack { display: flex; margin-top: 1 }
+  .stack span { padding: 0 1ch; background: blue; border: 1px solid }
+  .stack span + span { margin-inline-start: -2ch }
+  .row { display: flex; column-gap: 1ch }
+  .row .b { margin-left: -3ch; color: yellow }
+</style>
+<div class="card"><p class="first">a card, its first block not pulled</p><p>second line</p></div>
+<p class="badge">NEW</p>
+<p class="one">one, under the line pulled over it</p>
+<p class="up">pulled up</p>
+<div class="col"><p class="pull">a column item, pulling the next</p><p class="over">over it</p></div>
+<div class="stack"><span>A</span><span>B</span><span>C</span></div>
+<div class="row"><span>alpha beta</span><span class="b">over</span><span>after</span></div>
+<p class="one">three, under a pulled wrapper</p>
+<div><p class="up">wrapped</p></div>
+<p>after</p>

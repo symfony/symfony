@@ -1,0 +1,21 @@
+
+no hover: the application does not track the mouse
+
+no pointer
+
+true colors, sRGB
+
+standard dynamic range
+
+no inverted colors, no preferences
+
+fast updates
+
+no scripts: (scripting: none)
+
+content scrolls both ways
+
+the terminal is the device: 40 columns and 10 rows or more,
+at least a quarter as wide as tall
+
+one flat, opaque screen

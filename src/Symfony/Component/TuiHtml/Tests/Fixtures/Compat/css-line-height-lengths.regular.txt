@@ -1,0 +1,41 @@
+
+A line height of 24px is
+a row and a half: no
+blank row between the
+lines.
+
+Nor of 1.5em, the same
+height in a font of
+16px.
+
+Nor of 1.75, the spacing
+of the prose of
+Tailwind, airy but not
+double.
+
+Nor of 28px, the 1.75
+rows of the text of
+VitePress.
+
+One of 32px is two rows:
+
+a blank row between the
+
+lines.
+
+Nor of 12pt, the line
+height of the header of
+Hacker News: points are
+lengths too.
+
+One of 24pt, 32px, two
+
+rows: a blank row
+
+between the lines.
+
+      ┌──────────────────────┐
+      │0.5in in, 2in wide, a │
+      │border of 1pt         │
+      └──────────────────────┘
+     1cm of padding, 10mm, 40Q, 3pc

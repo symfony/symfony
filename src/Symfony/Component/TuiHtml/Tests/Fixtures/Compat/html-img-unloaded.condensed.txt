@@ -1,0 +1,5 @@
+An image without a text alternative that is   ┌────────────┐
+not drawn, like a thumbnail not loaded,       │ xterm, a   │
+leaves nothing: no border around no text,     │ terminal   │
+and a figure of it and its caption is the     │ emulator   │
+box of the caption.                           └────────────┘

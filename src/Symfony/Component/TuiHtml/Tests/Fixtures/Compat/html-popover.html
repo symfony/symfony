@@ -1,0 +1,14 @@
+<!-- covers: html.global_attributes.popover html.elements.button.popovertarget html.elements.button.commandfor css.selectors.popover-open html.elements.dialog.closedby html.global_attributes.interestfor -->
+<!-- variant: hint focus=#help -->
+<!-- variant: open focus=#toggle keys=enter rows=12 -->
+<!-- variant: dialog focus=#ask keys=enter rows=12 -->
+<style>
+  #menu:popover-open { border-color: cyan }
+  #helptip { position-area: bottom span-right; margin: 0; border: none; padding: 0 1ch; background: #374151 }
+</style>
+<button id="toggle" popovertarget="menu">Menu</button> <button id="ask" commandfor="confirm" command="show-modal">Delete…</button>
+<p>The page under the popover and the dialog.</p>
+<div popover id="menu"><p>Open</p><p>Save as…</p></div>
+<dialog id="confirm" closedby="any"><p>Delete the file?</p><button commandfor="confirm" command="close">Cancel</button></dialog>
+<button id="help" interestfor="helptip">Help</button>
+<div id="helptip" popover="hint">A tooltip, shown while Help is pointed at or focused</div>

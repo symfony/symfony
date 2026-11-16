@@ -1,0 +1,16 @@
+<!-- covers: css.properties.will-change css.properties.backdrop-filter css.properties.-webkit-backdrop-filter -->
+<style>
+  .box { margin: 1 4ch; border: 1px solid }
+  .hint { will-change: transform }
+  .backdrop { backdrop-filter: blur(2px) }
+  .webkit { -webkit-backdrop-filter: blur(2px) }
+  .opacity { will-change: opacity }
+  .corner { position: absolute; bottom: 0; right: 0; color: green }
+  .fixed { position: fixed; bottom: 0; right: 0; color: green }
+</style>
+<p>What is behind is not filtered, but these make the box the containing block of the positioned elements in it:</p>
+<div class="box hint"><p>will-change: transform</p><span class="corner">A</span></div>
+<div class="box backdrop"><p>backdrop-filter</p><span class="fixed">B</span></div>
+<div class="box webkit"><p>-webkit-backdrop-filter</p><span class="corner">C</span></div>
+<p>A hint of opacity does not: D goes to the corner of the page.</p>
+<div class="box opacity"><p>will-change: opacity</p><span class="fixed">D</span></div>

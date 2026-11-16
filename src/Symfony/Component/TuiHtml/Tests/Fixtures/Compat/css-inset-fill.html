@@ -1,0 +1,18 @@
+<!-- covers: css.properties.box-shadow -->
+<style>
+  table { --stripe: transparent; border-collapse: collapse }
+  td { padding: 0 1ch; background: #fff; color: #000; box-shadow: inset 0 0 0 9999px var(--stripe) }
+  tr:nth-child(odd) td { --stripe: rgba(0, 0, 0, .1) }
+  .active td { box-shadow: inset 0 0 0 9999px #cfe2ff, inset 0 0 0 9999px red }
+  .edge { border: 1px solid; box-shadow: inset 2px 1px 0 gray, inset 0 0 0 9999px #ffc }
+</style>
+<table>
+  <tr><td>Striped</td><td>a shade over white</td></tr>
+  <tr><td>White</td><td>no stripe</td></tr>
+  <tr><td>Striped</td><td>again</td></tr>
+  <tr class="active"><td>Active</td><td>the first layer on top</td></tr>
+</table>
+<p class="edge">A shaded edge over a filled box</p>
+<p>Before a box framed from inside</p>
+<div style="padding: .75rem; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15)">A ring spread inside, like the frame of the notes of PHP.net: along the edge of the box, not over the text around it</div>
+<p>After it</p>

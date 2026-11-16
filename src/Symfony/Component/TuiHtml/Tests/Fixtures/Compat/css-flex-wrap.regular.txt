@@ -1,0 +1,39 @@
+⟨44mphp⟨0m ⟨44msymfony⟨0m ⟨44mterminal⟨0m ⟨44mwidgets⟨0m ⟨44mhtml⟨0m ⟨44mcss⟨0m ⟨44mtwig⟨0m ⟨44mcomponents⟨0m
+⟨44mthe⟨0m ⟨44mbottom⟨0m ⟨44mup⟨0m
+
+⟨44mfirst⟨0m ⟨44mline⟨0m ⟨44mat⟨0m ⟨44mthe⟨0m ⟨44mbottom:⟨0m ⟨44mwrap-reverse⟨0m ⟨44mputs⟨0m ⟨44mthe⟨0m ⟨44mlines⟨0m ⟨44mfrom⟨0m
+
+Files   Edit   Selection   View   Go   Run   Terminal   Help
+
+┌────────────┐                               ┌─────────────┐
+│            │                               │             │
+│one         │                               │stretched    │
+│            │                ┌────────────┐ │             │
+│two         │                │            │ │             │
+│            │ ┌────────────┐ │centered    │ │             │
+│three       │ │            │ │            │ │             │
+│            │ │at the      │ └────────────┘ │             │
+│four        │ │bottom      │                │             │
+│            │ │            │                │             │
+└────────────┘ └────────────┘                └─────────────┘
+
+
+                  ⟨48;2;55;65;81mcentered by align-items⟨0m
+
+
+                                             ⟨48;2;55;65;81malign-self: end⟨0m
+
+
+⟨48;2;55;65;81malign-self: stretch                                         ⟨0m
+
+
+Centered, each line in the room it leaves, like the menu of
+Rust: the second one centered too, not under the first
+
+   Install    Learn    Playground    Tools    Governance
+                     Community    Blog
+
+At the end, each line at its end
+
+          Privacy policy Report security issues Terms of use
+                                        Your privacy choices

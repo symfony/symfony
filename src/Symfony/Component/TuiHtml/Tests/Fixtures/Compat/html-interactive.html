@@ -1,0 +1,32 @@
+<!-- covers: html.elements.meter css.properties.vertical-align html.elements.dialog html.elements.details css.selectors.details-content html.global_attributes.inert css.properties.line-height css.properties.letter-spacing css.properties.overflow css.properties.overflow-x css.properties.overflow-y css.properties.overflow-inline css.properties.overflow-block -->
+<style>
+  details::details-content { border-left: 1px solid; padding-left: 1ch; color: cyan }
+  .spaced { line-height: 2; max-width: 30ch }
+  .body { line-height: 1.5; max-width: 30ch }
+  .wide { letter-spacing: 1ch; font-weight: bold }
+  .tight { letter-spacing: .1em }
+  .faq summary { list-style: none; display: flex; justify-content: space-between }
+  .faq summary::after { content: "+" }
+  .faq[open] summary::after { content: "−" }
+  .clip { overflow: hidden; max-height: 1 }
+</style>
+<main>
+  <dialog open><p>An open dialog</p></dialog>
+  <dialog><p>A closed dialog: not shown</p></dialog>
+  <dialog style="display: flex; visibility: hidden"><p>A closed dialog a page displays, hidden, like the search of Bootstrap</p><p>two</p><p>three</p></dialog>
+  <p>Right under the closed dialogs: they take no room</p>
+  <details name="faq" open><summary>First (open)</summary><p>One</p></details>
+  <details name="faq" open><summary>Second (closed: one at a time)</summary><p>Two</p></details>
+  <div inert><button>Inert: no focus, no pointer</button></div>
+  <p class="spaced">Line height two puts a blank row between the lines of this paragraph</p>
+<p class="tight">letter-spacing: .1em: ★★★★★ not spread</p>
+<p class="body">line-height: 1.5, the spacing of the text of many pages: no blank rows</p>
+  <p class="wide">SPACED</p>
+  <p class="clip">clipped<br>away</p>
+  <p>E = mc<sup>2</sup>, H<sub>2</sub>O, x<sup>n+1</sup>, a<sup>?</sup> (no superscript ?, on the line)</p>
+  <meter value="0.9" low="0.3" high="0.7" optimum="0.1" aria-label="Disk"></meter>
+  <meter value="0.5" low="0.3" high="0.7" optimum="0.1" aria-label="Load"></meter>
+  <meter value="0.2" low="0.3" high="0.7" optimum="0.1" aria-label="Cache"></meter>
+</main>
+<details class="faq"><summary>A question, its + at the end of the line</summary><p>The answer.</p></details>
+<details class="faq" open><summary>An open one: −</summary><p>Its answer.</p></details>

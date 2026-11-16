@@ -1,0 +1,21 @@
+<!-- covers: css.properties.writing-mode css.properties.text-orientation -->
+<!-- variant: narrow columns=24 -->
+<style>
+  .rl { writing-mode: vertical-rl; height: 5; border: 1px solid; padding-inline-start: 1 }
+  .lr { writing-mode: vertical-lr; text-orientation: upright; block-size: 12ch; inline-size: 5; color: #22d3ee }
+  .sideways { writing-mode: sideways-rl; height: 3; background: #1e3a8a }
+  .back { writing-mode: horizontal-tb }
+  .invalid { writing-mode: diagonal }
+</style>
+<p class="rl">縦書きの文章です。右から左へ。</p>
+<p class="lr">Latin text, left to right</p>
+<p class="sideways">Sideways is upright</p>
+<div class="rl"><p class="back">Back to rows: horizontal-tb</p></div>
+<p class="invalid">An invalid mode is horizontal</p>
+<div style="height: 4"><p style="writing-mode: vertical-rl">As tall as its parent: four rows</p></div>
+<div style="writing-mode: vertical-rl; height: 4; border: 1px solid"><p>第一の段落です。</p><p>第二の段落。</p><p>Latin</p></div>
+<div style="writing-mode: vertical-rl; display: flex; height: 6; border: 1px solid"><p>一二</p><p>三四</p></div>
+<div style="writing-mode: vertical-rl; display: flex; flex-direction: column; height: 4; border: 1px solid"><p>一二</p><p>三四</p></div>
+<div style="writing-mode: vertical-rl; display: grid; grid-template-columns: 3 4; grid-template-rows: 2ch auto; column-gap: 1; border: 1px solid"><p>一二</p><p>三四五六</p><p>abc</p><p style="grid-column: 2; grid-row: 3">右</p></div>
+<div style="writing-mode: vertical-rl; display: grid; grid-template-columns: 1fr 2fr; height: 9; row-gap: 1; border: 1px solid"><p>一二三四</p><p>abcdefghijkl</p><p>Latin</p></div>
+<div style="writing-mode: vertical-lr; display: grid; grid-template-areas: 'a b' 'c c'; gap: 0 1; border: 1px solid"><p style="grid-area: c">CCC</p><p style="grid-area: a">AA</p><p style="grid-area: b">BB</p></div>

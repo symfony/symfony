@@ -1,0 +1,21 @@
+<!-- covers: html.elements.iframe -->
+<!-- variant: narrow columns=30 -->
+<style>
+  p { color: #ef4444 }
+  .bold { font-weight: bold }
+  .tall { height: 4 }
+</style>
+<p>The page: red paragraphs</p>
+<iframe title="A nested document" width="240" height="96" srcdoc="
+  <style>
+    body { margin: 0 }
+    p { color: #22c55e }
+  </style>
+  <p>Inside: green, its own rules</p>
+  <p class='bold'>Not bold: .bold is the page's</p>
+  <p>Four</p><p>Five</p><p>Six, scrolled</p>
+"></iframe>
+<p class="bold">After the frame: bold and red</p>
+<iframe class="tall" srcdoc="<p>A height from the page</p><iframe srcdoc='<p>A frame in a frame</p>' height=48></iframe>"></iframe>
+<iframe width="120" height="48" srcdoc="<style>body { margin: 0 } @media (max-width: 20ch) { .wide { display: none } }</style><p class='wide'>Not shown</p><p>15 columns: narrow</p>"></iframe>
+<p>A src is not loaded: <iframe src="https://example.com" title="Example"></iframe>.</p>

@@ -1,0 +1,34 @@
+row a  row b
+column a
+
+column b
+gap a    gap b
+one                two
+                          centered
+                                                  at the end
+this cell never gives way, whatever the widththis one
+                                             shrinks when
+                                             the row is too
+                                             narrow
+┌─────────────┐┌───────────────────────────────────────────┐
+│0.5          ││1.5: three times as wide                   │
+└─────────────┘└───────────────────────────────────────────┘
+┌─────────────┐┌────────────────────────────┐
+│0.25         ││0.5: the last quarter left  │
+│             ││free                        │
+└─────────────┘└────────────────────────────┘
+  A centered hero, its actions centered by justify-content
+                           alone
+                ┌───────────┐  ┌──────────┐
+                │⟨4mGet started⟨0m│  │⟨4mLearn more⟨0m│
+                └───────────┘  └──────────┘
+⟨42m        ⟨0m⟨100m            ⟨0m
+             [ Alone ] [ in a centered block ]
+                                 ┌─────────────────────────┐
+                                 │⟨4ma boxed link on the right⟨0m│
+                                 └─────────────────────────┘
+┌──────────────────────────────────┐┌──────────────────────┐
+│width: 0%, growing                ││min-width: max-content│
+└──────────────────────────────────┘└──────────────────────┘
+flex-direction on a block: no row,
+its blocks stacked

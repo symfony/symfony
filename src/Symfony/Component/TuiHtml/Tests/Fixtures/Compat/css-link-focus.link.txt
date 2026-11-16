@@ -1,0 +1,5 @@
+
+Read ⟨4;30;43mthe docs⟨0m or ⟨4mthe blog⟨0m: the link with the focus takes the
+:focus styles of the page.
+
+[ After ]

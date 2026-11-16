@@ -1,0 +1,20 @@
+Words   with   two   more   columns
+between   them.
+
+Spaced,   ⟨3mbut not in here,⟨0m   then
+spaced.
+
+Normal, ⟨3mthree    more    in    here,⟨0m
+then normal.
+
+A justified paragraph wraps over several
+lines,  and its last line is centered by
+            text-align-last.
+
+A left-aligned paragraph whose last line
+                 goes to the right edge.
+
+kept    spaces,
+and the line break
+
+collapsed spaces on one line that does …

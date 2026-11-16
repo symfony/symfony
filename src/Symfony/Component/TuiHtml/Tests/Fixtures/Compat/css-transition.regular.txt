@@ -1,0 +1,5 @@
+
+A focused button starts from its old colors: the first frame
+of a transition.
+
+⟨38;2;156;163;175m[ Save ]⟨0m ⟨38;2;156;163;175m[ Later ]⟨0m

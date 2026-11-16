@@ -1,0 +1,12 @@
+
+Alone in its item, a padded link wraps inside its padding:
+
+  ⟨4mSyntax⟨0m
+  ⟨4mFormal⟨0m
+  ⟨4mdefinition⟨0m
+  ⟨4mBrowser⟨0m
+  ⟨4mcompatibility⟨0m
+
+Beside a separator, it stays in the line:
+
+⟨4m Docs ⟨0m / ⟨4m Installation ⟨0m

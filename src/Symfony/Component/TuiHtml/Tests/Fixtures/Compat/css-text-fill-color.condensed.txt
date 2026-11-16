@@ -1,0 +1,6 @@
+⟨31m┌──────────────────────────────────────────────────────────┐⟨0m
+⟨31m│⟨0m⟨38;2;0;255;0mLime text in a red border and outline⟨0m                     ⟨31m│⟨0m
+⟨31m│⟨0m⟨38;2;0;255;0mInherited: lime too⟨0m                                       ⟨31m│⟨0m
+⟨31m└──────────────────────────────────────────────────────────┘⟨0m
+⟨34mcurrentcolor: blue⟨0m
+⟨33mWithout color: yellow⟨0m

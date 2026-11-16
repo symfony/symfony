@@ -1,0 +1,18 @@
+<!-- covers: css.types.color.named-color css.types.color.currentcolor -->
+<!-- variant: forced forced-colors -->
+<style>
+  .purple { color: rebeccapurple }
+  .goldenrod { color: LightGoldenrodYellow; background-color: darkslategray }
+  .ansi { color: blue }
+  .current { color: orange; border: 1px solid currentcolor }
+  .current-bg { color: teal; background-color: currentColor }
+  .no-color { border-color: currentcolor; border-style: solid }
+</style>
+<main>
+  <p class="purple">rebeccapurple (true color)</p>
+  <p class="goldenrod">lightgoldenrodyellow on darkslategray</p>
+  <p class="ansi">blue keeps the terminal ANSI blue</p>
+  <div class="current">border in currentcolor (orange)</div>
+  <p class="current-bg">teal background from currentcolor</p>
+  <div class="no-color">currentcolor without a color: default border color</div>
+</main>

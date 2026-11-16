@@ -1,0 +1,20 @@
+<!-- covers: html.elements.div html.elements.section html.elements.main html.elements.aside html.elements.header html.elements.footer html.elements.nav html.elements.article html.elements.search html.elements.menu html.elements.body html.elements.tui-columns html.elements.tui-column html.global_attributes.class html.global_attributes.id html.global_attributes.hidden html.global_attributes.data_attributes html.global_attributes.lang html.global_attributes.dir -->
+<style>
+  header, footer { color: cyan }
+  [data-kind="note"] { font-style: italic }
+  [lang="fr"] { color: yellow }
+  [dir="rtl"] { text-align: right }
+</style>
+<header>header</header>
+<nav>nav</nav>
+<main>
+  <article><section><div class="box" id="box">div in section in article</div></section></article>
+  <aside data-kind="note">aside</aside>
+  <search>search</search>
+  <menu><li>menu item</li></menu>
+  <p lang="fr">bonjour</p>
+  <p dir="rtl">right to left</p>
+  <p hidden>hidden</p>
+  <tui-columns><tui-column>left column</tui-column><tui-column>right column</tui-column></tui-columns>
+</main>
+<footer>footer, siblings wrapped in a body</footer>

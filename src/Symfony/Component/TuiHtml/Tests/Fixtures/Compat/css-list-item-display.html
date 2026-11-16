@@ -1,0 +1,10 @@
+<!-- covers: html.elements.li css.properties.display -->
+<style>
+  ul { padding-left: 2ch; margin: 0 0 1 }
+  .block { display: block }
+  .row { display: flex; justify-content: space-between; width: 30ch }
+  .badge { background: blue; color: white; padding: 0 1ch }
+</style>
+<ul><li>A list item has a marker</li><li class="block">a block has none, like a list group</li></ul>
+<ul><li class="row">Inbox <span class="badge">14</span></li><li class="row">Sent <span class="badge">3</span></li></ul>
+<ul><li><p>The first block of an item carries its marker</p><p>not the next one</p></li></ul>

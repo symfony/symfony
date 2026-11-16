@@ -1,0 +1,17 @@
+
+┌─────────────┐
+│Lines break a│
+│nywhere in wo│
+│rds          │
+└─────────────┘
+
+┌─────────────┐
+│Lines break  │
+│at spaces,   │
+│strict       │
+└─────────────┘
+
+┌─────────────┐
+│Kept   spaces│
+│, anywhere   │
+└─────────────┘

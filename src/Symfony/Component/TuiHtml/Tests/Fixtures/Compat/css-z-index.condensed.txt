@@ -1,0 +1,14 @@
+⟨48;2;30;58;138mThe text of the page, over a n⟨0megative z-index:
+⟨48;2;30;58;138mits background shows behind th⟨0m⟨48;2;127;29;29me le⟨0mtters,
+⟨48;2;30;58;138m                              ⟨0m⟨48;2;127;29;29m    ⟨0m
+⟨48;2;30;58;138m              ⟨0m⟨48;2;180;83;9mrelative z 3: over the  ⟨0m⟨48;2;6;95;70mr the one above⟨0m
+    ⟨48;2;127;29;29m          ⟨0m⟨48;2;180;83;9mnext                    ⟨0m
+
+
+  ⟨48;2;146;64;14mz-index 2, over the one after it  ⟨0m⟨48;2;76;29;149mfore: its end ⟨0m
+
+
+⟨48;2;30;58;138mcard z 1, it⟨0m⟨48;2;127;29;29ms text over its ⟨0m⟨48;2;30;58;138m  ⟨0m
+⟨48;2;30;58;138msh⟨0m⟨48;2;185;28;28mbadge z⟨0m⟨48;2;6;95;70msibling z 2, over the badge⟨0m
+⟨48;2;30;58;138m            ⟨0m⟨48;2;127;29;29m                ⟨0m⟨48;2;30;58;138m  ⟨0m
+            ⟨48;2;127;29;29m                ⟨0m

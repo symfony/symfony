@@ -1,0 +1,12 @@
+┌──────────────────────────────────────────────────────────┐
+│⟨90mTitle⟨0m       Analytical Engine                             │
+│⟨90mAuthor⟨0m      Ada                                           │
+└──────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────┐
+│⟨90mTitle⟨0m       Calculus                                      │
+│⟨90mAuthor⟨0m      Ada                                           │
+└──────────────────────────────────────────────────────────┘
+
+The rows of a collapsed table displayed as blocks are cards,
+like those of EasyAdmin on a narrow screen.

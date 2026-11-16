@@ -1,0 +1,15 @@
+<!-- covers: css.properties.text-shadow -->
+<!-- variant: narrow columns=20 -->
+<style>
+  p { margin: 0 0 1; max-width: 30ch }
+  .drop { text-shadow: 1ch 1em #888 }
+  .left { text-shadow: -1ch 0 red }
+  .up { text-shadow: 2ch -1em blue, 1ch 1em red }
+  .blur { text-shadow: 0 0 4px gold }
+</style>
+<h1 class="drop">Shadowed title</h1>
+<p class="drop">A drop shadow, one cell right and one row down, wrapping over two lines here.</p>
+<p class="left">To the left</p>
+<p class="up">Two shadows, the first one over the other, <a href="#x">with a link</a>.</p>
+<p class="blur">Only blurred: not drawn.</p>
+<p style="text-shadow: 1ch 0 #ef4444, -1ch 0 #3b82f6, 0 1lh #22c55e">Three shadows around the text: red on the right, blue on the left, green below</p>

@@ -1,0 +1,15 @@
+<!-- covers: css.properties.grid-template css.properties.grid css.properties.grid-row css.properties.grid-column -->
+<!-- variant: narrow columns=40 -->
+<style>
+  .page { display: grid; grid-template: "head head" auto "nav main" 3 / 12ch 1fr; gap: 0 1ch }
+  .page > * { border: 1px solid }
+  header { grid-area: head } nav { grid-area: nav } main { grid-area: main }
+  .tags { display: grid; grid: auto-flow dense / repeat(3, 1fr); gap: 0 1ch; margin-top: 1 }
+  .tags span { background: #374151 }
+  .tags .wide { grid-column: span 2 }
+  .header { display: grid; grid-template-columns: auto auto 1fr; gap: 0 2ch; margin-top: 1 }
+  .header .below { grid-row-start: 2; grid-column: span 2 / span 2 } .header .back { grid-row: auto; grid-column: auto }
+</style>
+<div class="page"><header>Header</header><nav>Nav</nav><main>Main, 3 rows high</main></div>
+<div class="tags"><span>one</span><span class="wide">two, wide</span><span class="wide">three, wide</span><span>four fills the gap</span></div>
+<div class="header"><b>Logo</b><span class="below back">back in row 1</span><i>Search</i></div>

@@ -1,0 +1,18 @@
+<!-- covers: css.properties.grid-auto-flow css.properties.grid-auto-columns css.properties.grid -->
+<!-- variant: narrow columns=30 -->
+<style>
+  .g { display: grid; gap: 0 1ch; margin-bottom: 1 }
+  .g p { border: 1px solid }
+  .column { grid-template-rows: auto auto; grid-auto-flow: column }
+  .sized { grid: auto auto / auto-flow 10ch }
+  .dense { grid-template-rows: auto auto; grid-auto-flow: column dense } .dense .tall { grid-row: span 2 }
+  .row { grid-template-columns: repeat(3, auto); grid-auto-flow: row }
+  .cycle-columns { grid-template-rows: auto; grid-auto-flow: column; grid-auto-columns: 6ch 12ch }
+  .cycle-rows { grid-template-columns: 20ch; grid-template-rows: 5; grid-auto-rows: 1 4 }
+</style>
+<div class="g column"><p>one</p><p>two</p><p>three</p><p>four</p><p>five</p></div>
+<div class="g sized"><p>10ch</p><p>wide</p><p>implicit</p><p>columns</p></div>
+<div class="g dense"><p>a</p><p class="tall">spans two rows</p><p>b</p><p>c</p></div>
+<div class="g row"><p>row</p><p>after</p><p>row</p><p>as</p><p>before</p></div>
+<div class="g cycle-columns"><p>6ch</p><p>then 12ch</p><p>6ch</p><p>12ch again</p></div>
+<div class="g cycle-rows"><p>the explicit row, 5 tall</p><p>at least 1</p><p>at least 4</p><p>1 again</p></div>

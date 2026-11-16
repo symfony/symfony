@@ -1,0 +1,35 @@
+<!-- covers: css.properties.background-image css.types.angle css.types.angle-percentage css.types.image css.types.gradient css.types.gradient.linear-gradient css.types.gradient.radial-gradient css.types.gradient.conic-gradient css.types.gradient.repeating-linear-gradient css.types.gradient.repeating-radial-gradient css.types.gradient.repeating-conic-gradient -->
+<!-- variant: palette colors=256 -->
+<!-- variant: basic colors=16 -->
+<!-- variant: forced forced-colors -->
+<style>
+  .banner { background: linear-gradient(to right, #1e3a8a, #7c3aed 60%, #db2777); color: #ffffff; padding: 0 1ch; margin-bottom: 1 }
+  .card { background-image: linear-gradient(160deg, #0f172a, #334155); border: 1px solid #64748b; padding: 0 1ch; height: 5; margin-bottom: 1 }
+  .card mark { background: #fbbf24; color: #000000 }
+  .glow { background: radial-gradient(#f59e0b, #7c2d12 70%, #000000); height: 5; width: 30ch }
+  .stripes { background: repeating-linear-gradient(to right, #1e3a8a 0 2ch, #fbbf24 2ch 4ch); color: #ffffff; margin-top: 1 }
+  .rings { background: repeating-radial-gradient(#ffffff, #000000 2ch, #ffffff 4ch); height: 5; width: 30ch; margin-top: 1 }
+  .ticks { background: repeating-conic-gradient(#ffffff 0 10deg, #000000 10deg 20deg); height: 5; width: 30ch; margin-top: 1 }
+  .spot { background: radial-gradient(circle closest-side at 20% 50%, #fbbf24, #1e3a8a); height: 5; width: 30ch; margin-top: 1 }
+  .corner { background: radial-gradient(8ch 3 at right bottom, #f472b6, #111827); height: 5; width: 30ch; margin-top: 1 }
+  .wheel { background: conic-gradient(from 90deg at 30% 50%, #ef4444, #eab308 90deg, #22c55e 180deg, #3b82f6 75%, #ef4444); height: 5; width: 30ch; margin-top: 1 }
+  .oklch { background: linear-gradient(to right in oklch, #ef4444, #3b82f6); color: #ffffff; margin-top: 1 }
+  .panel { background: #1e3a8a; padding: 0 1ch; margin-top: 1 }
+  .fade { background: linear-gradient(to right, #f472b6, transparent); color: #ffffff }
+  .veil { background: linear-gradient(to right, #ffffff80 50%, transparent 50%); color: #000000 }
+  .hues { background: linear-gradient(in hsl longer hue 90deg, #ef4444, #3b82f6); color: #000000 }
+</style>
+<p class="banner">A banner: three colors from left to right</p>
+<div class="card"><p>A card, its gradient going down and to the right; <mark>this</mark> keeps its own background.</p></div>
+<div class="glow"><p>A radial glow</p></div>
+<p>After the glow.</p>
+<p class="stripes">Repeating stripes, 2 columns each</p>
+<div class="rings"><p>Repeating rings</p></div>
+<div class="spot"><p>A circle at 20%</p></div>
+<div class="corner"><p>Radii at a corner</p></div>
+<div class="wheel"><p>A conic wheel</p></div>
+<p class="oklch">in oklch: through the hues between them</p>
+<p class="hues">in hsl longer hue: around the wheel the long way</p>
+<div class="ticks"><p>Repeating rays</p></div>
+<div class="panel"><p class="fade">Fading to transparent: the panel shows</p><p class="veil">Half a white veil over it, then none</p></div>
+<div style="height: 6; background: linear-gradient(to bottom, #1e3a8a 0 calc(100% - 2rem), #000000 100%); color: #ffffff">A stop at calc(100% - 2rem): the color to two rows from the end, then the fade</div>

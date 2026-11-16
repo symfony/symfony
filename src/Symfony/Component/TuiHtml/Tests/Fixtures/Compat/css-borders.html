@@ -1,0 +1,33 @@
+<!-- covers: css.properties.border-top-color css.properties.border-top-width css.properties.border-top-style css.properties.border-right-color css.properties.border-right-width css.properties.border-right-style css.properties.border-bottom-color css.properties.border-bottom-width css.properties.border-bottom-style css.properties.border-left-color css.properties.border-left-width css.properties.border-left-style css.properties.border-block-color css.properties.border-block-width css.properties.border-block-style css.properties.border-inline-color css.properties.border-inline-width css.properties.border-inline-style css.properties.border-block-start-color css.properties.border-block-start-width css.properties.border-block-start-style css.properties.border-block-end-color css.properties.border-block-end-width css.properties.border-block-end-style css.properties.border-inline-start-color css.properties.border-inline-start-width css.properties.border-inline-start-style css.properties.border-inline-end-color css.properties.border-inline-end-width css.properties.border-inline-end-style css.types.line-style -->
+<!-- variant: narrow columns=30 -->
+<!-- variant: forced forced-colors -->
+<style>
+  div { margin-bottom: 1 }
+  .dashed { border: 1px dashed }
+  .dotted { border: 1px dotted green }
+  .thick { border: thick solid }
+  .sides { border: 1px solid; border-color: red green blue yellow }
+  .two { border: 1px solid; border-color: red blue }
+  .one-side { border: 1px solid gray; border-top-color: cyan; border-bottom-width: 0 }
+  .logical { border: 1px solid; border-inline-start-color: magenta; border-block-end-color: yellow; border-inline-end-style: none }
+  .longhands { border-left-width: 1px; border-left-style: solid; border-right-width: thin; border-right-style: dotted; border-block-start-width: 1px; border-block-start-style: solid; border-block-end-style: solid; border-block-end-width: 1px }
+  .rest { border-top: 1px solid red; border-right-color: blue; border-inline-color: green; border-block-color: red; border-block-width: 1px; border-inline-width: 1px; border-block-style: solid; border-inline-style: solid; border-inline-start-width: 1px; border-inline-end-width: 1px; border-block-start-color: red; border-block-end-width: 1px; border-top-style: solid; border-top-width: 1px; border-bottom-color: blue; border-bottom-style: solid; border-left-color: red; border-right-width: 1px; border-inline-start-style: solid; border-block-start-style: solid; border-inline-end-color: blue }
+  .double-top { border: 1px solid; border-top-style: double; border-bottom: 1px dashed }
+  .heavy-side { border: 1px solid; border-inline-width: thick }
+  .four { border: 1px solid; border-style: double dotted solid dashed }
+</style>
+<div class="dashed">dashed</div>
+<div class="dotted">dotted, green</div>
+<div class="thick">thick: heavy lines</div>
+<div class="sides">red top, green right, blue bottom, yellow left</div>
+<div class="two">red top and bottom, blue sides</div>
+<div class="one-side">cyan top, no bottom</div>
+<div class="logical">magenta start, yellow end, no inline end</div>
+<div class="longhands">longhands, dotted</div>
+<div class="double-top">double top, solid sides, dashed bottom</div>
+<div class="heavy-side">thick sides: heavy, with their corners</div>
+<div class="four">four styles, by side</div>
+<div class="rest">every side longhand</div>
+<div style="border-bottom: 1px solid transparent">a transparent bottom: room, no line</div>
+<div style="border: 1px solid; border-left-color: transparent">a transparent left side</div>
+<div style="border: 1px solid transparent; border-bottom-color: red">transparent but a red bottom</div>

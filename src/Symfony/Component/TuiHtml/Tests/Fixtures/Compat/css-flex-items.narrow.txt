@@ -1,0 +1,16 @@
+⟨1;4;34m[Home]⟨0m  ⟨4;34m[Docs]⟨0m  text run  span
+
+a paragraph lays    ⟨100mtext⟨0m ⟨100mspans⟨0m
+out items too:      ⟨100m    ⟨0m ⟨100m     ⟨0m
+
+⟨100mphp⟨0m ⟨100mtui⟨0m ⟨100mcss⟨0m
+its own items ⟨100mdisplay: inherit⟨0m
+⟨1mflex⟨0m⟨3monly when narrow⟨0m
+a block   ⟨1mone⟨0m line, [ OK ] too
+when      ⟨1m   ⟨0m
+wide:     ⟨1m   ⟨0m
+spaced as written: ⟨1mbold⟨0m ! ⟨3mx⟨0m ⟨3my⟨0m
+    an inline flex column, its
+▲   ::before an item over its
+118 text, like the arrow over
+    the score of lobste.rs

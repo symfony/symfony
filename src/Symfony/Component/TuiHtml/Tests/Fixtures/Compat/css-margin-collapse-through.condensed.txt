@@ -1,0 +1,17 @@
+
+The margins of a paragraph in an item without any collapse
+through it with those around, like browsers: one line apart.
+
+• First item, a paragraph
+
+• Second item, a paragraph
+
+Two blocks deep, still one line apart.
+
+┌──────────────────────────────────────────────────────────┐
+│                                                          │
+│A border keeps them inside its box.                       │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+
+The end.

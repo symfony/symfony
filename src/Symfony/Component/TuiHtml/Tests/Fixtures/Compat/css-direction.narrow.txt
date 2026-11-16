@@ -1,0 +1,49 @@
+
+  and English inside ,הפי םויה
+
+          רשק רוצ  תודוא  ישאר
+──────────────────────────────
+
+      ┌──────────────────────┐
+      │padding on the :הרעה  │
+      │          start side  │
+      └──────────────────────┘
+┌────┐ ┌────────────┐ ┌──────┐
+│שולש│ │  the ,םייתש│ │   דחא│
+│    │ │ wide column│ │      │
+└────┘ └────────────┘ └──────┘
+     beside its box ,תיוות [x]
+┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐
+╎ ףוס                     ⟨33mשדח⟨0m╎
+└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘
+
+  "by dir="auto ,ﻢﻟﺎﻌﻟﺎﺑ ﺎﺒﺣﺮﻣ
+
+Hello, by dir="auto"
+
+                         ﻝﻭﺃ⟨33m •⟨0m
+    a longer item that ,ﻲﻧﺎﺛ⟨33m •⟨0m
+ wraps onto a second line in
+             a narrow screen
+
+⟨36m                      ﻝﻭﺄﻟﺍ⟨0m⟨33m .1⟨0m
+
+   (⟨1mמ"עמ⟨0m ללוכ) ח"ש 25.50 :ריחמ
+                           [1]
+
+Isolated: the user ﻥﺎﻳﺇ wrote
+3 posts; not isolated: 3 ﻥﺎﻳﺇ
+posts.
+
+world, from its first םולש
+letter
+
+Embedded: abc, def;
+overridden: fed ,cba.
+
+       > ⟨2mﺎﻨﻫ ﺚﺤﺑﺍ⟨0m
+                       [ ﺚﺤﺑ ]
+
+                   [ ﺔﺣﺎﻔﺗ ▾ ]
+
+under the select

@@ -1,0 +1,12 @@
+
+┌────────────────────────────┐
+│    Padded by --double(2ch) │
+└────────────────────────────┘
+
+⟨90m Default argument, cyan in the dark⟨0m
+
+⟨90m    Four columns, yellow⟨0m
+
+⟨90mThe parameter hides the custom property of the element: cyan⟨0m
+
+A wrong type: not red

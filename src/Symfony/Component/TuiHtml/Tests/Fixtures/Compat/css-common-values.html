@@ -1,0 +1,41 @@
+<!-- covers: css.properties.display css.properties.white-space css.properties.text-align css.properties.vertical-align css.properties.anchor-name css.properties.-webkit-line-clamp -->
+<style>
+  .two { display: inline flex; gap: 1ch }
+  .item { display: list-item }
+  .clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden; width: 20ch }
+  .spaces { white-space: break-spaces }
+  .pair { white-space: preserve nowrap }
+  .center { text-align: -webkit-center }
+  .nudge { vertical-align: 2px }
+  .anchors { anchor-name: --a, --b }
+</style>
+<div class="two"><span>inline flex:</span><span>a row</span></div>
+<p class="item">display: list-item is a block</p>
+<p class="clamp">The line clamp idiom of -webkit-box, cut after one line</p>
+<p class="spaces">break-spaces   keeps   spaces</p>
+<p class="pair">preserve nowrap is pre:   spaces   kept,   a line too long for the screen still breaks</p>
+<p class="center">-webkit-center</p>
+<p>A <span class="nudge">lifted</span> word stays on the line</p>
+<p class="anchors">anchor-name: a list</p>
+<style>
+  .bounded { width: min(100%, 24ch); border: 1px solid }
+  .floor { width: max(25%, 20ch); border: 1px solid }
+  .between { width: clamp(10ch, 50%, 26ch); border: 1px solid }
+  p:-webkit-any(.any) { font-weight: bold }
+  .link { color: -webkit-link }
+  .thick { text-decoration: underline dotted 2px }
+</style>
+<div class="bounded">min(100%, 24ch)</div>
+<div class="floor">max(25%, 20ch)</div>
+<div class="between">clamp(10ch, 50%, 26ch)</div>
+<p class="any">:-webkit-any() is :is()</p>
+<p class="link">-webkit-link</p>
+<p class="thick">A thickness is accepted</p>
+<style>
+  .menu a { display: block; padding: 0 1ch } .menu a.active { font-weight: bold }
+  .stat b { display: block }
+  .chip { display: inline-block }
+</style>
+<nav class="menu"><a href="#" class="active">Overview</a><a href="#">Jobs</a><a href="#">Logs</a></nav>
+<p class="stat">CPU <b>42%</b> busy</p>
+<p>An <span class="chip">inline-block</span> stays on the line</p>

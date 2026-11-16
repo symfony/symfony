@@ -1,0 +1,23 @@
+<!-- covers: css.properties.margin css.properties.margin-top css.properties.margin-bottom css.properties.margin-block -->
+<style>
+  main { background: gray }
+  p { margin: 1 0; background: blue }
+  .two { margin-top: 2 }
+  .column { display: flex; flex-direction: column }
+  .column > p { margin: 1 0 }
+  .outer { margin: 2 0 }
+  .outer > p { margin: 1 0 }
+  .boxed { margin: 2 0; border: 1px solid }
+  .boxed > p { margin: 1 0 }
+</style>
+<main>
+  <p>one</p>
+  <p>one row between: the margins collapse</p>
+  <p class="two">two rows: the larger one stays</p>
+  <div class="outer"><p>parent 2 and child 1: 2 rows above, not 3</p></div>
+  <div class="boxed"><p>a border keeps them apart</p></div>
+  <div class="column">
+    <p>in a flex column</p>
+    <p>margins add up</p>
+  </div>
+</main>

@@ -1,0 +1,44 @@
+<!-- covers: css.types.calc css.types.min css.types.max css.types.clamp css.types.round css.types.mod css.types.rem css.types.abs css.types.sign css.types.pow css.types.sqrt css.types.hypot css.types.exp css.types.log css.types.sin css.types.cos css.types.tan css.types.asin css.types.acos css.types.atan css.types.atan2 css.types.calc-constant css.types.integer css.types.number css.types.dimension css.types.calc-keyword -->
+<!-- variant: narrow columns=40 -->
+<!-- variant: hidpi dppx=2 -->
+<style>
+  .calc { padding-left: calc(2ch + 16px) }
+  .min { max-width: min(20ch, 50) }
+  .max { padding-left: max(1ch, calc(8px * 3)) }
+  .clamp { padding-left: clamp(1ch, 10, 4ch) }
+  .percent { padding-left: calc(50% + 1ch) }
+  .round { padding-left: round(up, 9px, 2) }
+  .mod { padding-left: calc(mod(-7, 3) + rem(7, 4)) }
+  .abs { padding-left: calc(abs(-2) * sign(5)) }
+  .pow { padding-left: calc(pow(2, 2) + sqrt(4) - hypot(3, 4) + 3) }
+  .exp { padding-left: calc(log(exp(2)) + log(100, 10)) }
+  .trig { padding-left: calc(10 * sin(30deg) + 4 * cos(0.5turn) + tan(45deg) * 2) }
+  .inverse { color: hsl(from red calc(h + atan2(1, 1) * 2 + asin(0) + acos(1) + atan(0)) s l) }
+  .constant { padding-left: calc(round(pi) + 0 * e) }
+  .infinite { max-width: calc(infinity * 1ch); padding-left: sqrt(-1) }
+  .channels { color: hsl(calc(45 * 2) calc(50% + 50%) 50% / calc(0.5 + 0.5)) }
+  .rgb { color: rgb(calc(100% - 10%) 0 max(10, 200)) }
+  .hue { color: hsl(calc(30deg + 0.25turn) 100% 50%) }
+  p.wide { display: none }
+  @media (min-width: calc(40ch + 10)) { p.wide { display: block } }
+</style>
+<main>
+  <p class="calc">padding-left calc(2ch + 16px): 4 columns</p>
+  <p class="min">max-width min(20ch, 50) wraps at twenty columns</p>
+  <p class="max">padding-left max(1ch, calc(8px * 3)): 3 columns</p>
+  <p class="clamp">padding-left clamp(1ch, 10, 4ch): 4 columns</p>
+  <p class="percent">calc() mixing a percentage and a length: half the width, and a column</p>
+  <p class="round">round(up, 9px, 2): 2 columns, 9px rounded up to 2</p>
+  <p class="mod">mod(-7, 3) + rem(7, 4): 5 columns</p>
+  <p class="abs">abs(-2) * sign(5): 2 columns</p>
+  <p class="pow">pow, sqrt and hypot: 4 columns</p>
+  <p class="exp">log(exp(2)) + log(100, 10): 4 columns</p>
+  <p class="trig">sin, cos and tan of angles: 3 columns</p>
+  <p class="inverse">atan2(1, 1) * 2: red turned by 90deg</p>
+  <p class="constant">round(pi): 3 columns</p>
+  <p class="infinite">infinity is clamped, NaN is 0</p>
+  <p class="channels">math in plain hsl() channels: a hue of 90</p>
+  <p class="hue">a hue of angles: 30deg + 0.25turn, green</p>
+  <p class="rgb">and in rgb() channels: 230 0 200</p>
+  <p class="wide">shown from 51 columns, calc() in a media query</p>
+</main>

@@ -1,0 +1,10 @@
+<!-- covers: css.at-rules.starting-style -->
+<!-- variant: open keys=f6,enter -->
+<style>
+  [popover] { color: #ffffff; background-color: #1f2937; transition: color 300ms, background-color 300ms }
+  @starting-style { [popover]:popover-open { color: #374151; background-color: #111827 } }
+  p { color: #e5e7eb; transition: color 1s; @starting-style { color: #4b5563 } }
+</style>
+<p>Shown: its transitions start from its starting style, the first frame here.</p>
+<button popovertarget="tip" autofocus>Tip</button>
+<div id="tip" popover>Fading in</div>

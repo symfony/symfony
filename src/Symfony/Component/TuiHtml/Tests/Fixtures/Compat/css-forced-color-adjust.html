@@ -1,0 +1,10 @@
+<!-- covers: css.properties.forced-color-adjust -->
+<!-- variant: forced forced-colors -->
+<style>
+  p { color: red }
+  .swatch { forced-color-adjust: none; background: blue; color: yellow }
+  .swatch span { color: lime }
+</style>
+<p>Red, without color when colors are forced</p>
+<div class="swatch">A swatch keeps its colors <span>and so does what is inside</span></div>
+<p style="forced-color-adjust: preserve-parent-color">preserve-parent-color: like auto</p>

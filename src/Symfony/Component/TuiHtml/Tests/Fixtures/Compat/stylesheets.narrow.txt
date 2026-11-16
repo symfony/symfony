@@ -1,0 +1,7 @@
+
+⟨32mstyled by a linked stylesheet⟨0m
+
+styled by a linked stylesheet for wide
+terminals
+
+⟨3mstyled by an imported stylesheet⟨0m

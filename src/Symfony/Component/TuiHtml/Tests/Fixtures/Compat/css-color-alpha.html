@@ -1,0 +1,16 @@
+<!-- covers: css.types.color.rgb css.types.color.hsl css.types.color.rgb_hexadecimal_notation css.types.color.transparent -->
+<!-- variant: light scheme=light -->
+<style>
+  .page { background: #1e3a8a; padding: 0 1ch }
+  .glass { background: rgba(255, 255, 255, .25) }
+  .tint { background: hsl(0 100% 50% / 40%) }
+  .muted { color: #ffffff99 }
+  .ghost { color: transparent }
+</style>
+<div class="page">
+  <p class="glass">a white glass over blue</p>
+  <section><p class="tint">a red tint, through a section without background</p></section>
+  <p class="muted">text at 60%, blended over the blue</p>
+  <p>after the <span class="ghost">invisible</span> word</p>
+</div>
+<p class="glass">the same glass over the terminal</p>

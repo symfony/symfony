@@ -1,0 +1,25 @@
+<!-- covers: css.selectors.focus css.selectors.focus-visible css.selectors.focus-within css.selectors.hover css.selectors.active css.selectors.disabled css.selectors.enabled css.selectors.checked css.selectors.state css.selectors.pseudo-element html.global_attributes.autofocus -->
+<!-- variant: focus-second focus=#second -->
+<!-- variant: hover hover=#hovered -->
+<style>
+  input:focus { border: 1px solid green }
+  input:focus-visible { font-weight: bold }
+  .group:focus-within { border: 1px double cyan }
+  #hovered:hover { color: magenta }
+  p:active { color: red }
+  p:checked { color: red }
+  p:loading { color: red }
+  input:disabled { text-decoration: line-through }
+  input:enabled { color: white }
+  select::selected { color: yellow }
+  select::selected:focus { color: green }
+</style>
+<main>
+  <section class="group">
+    <input id="first" aria-label="First" value="first" autofocus>
+  </section>
+  <input id="second" aria-label="Second" value="second">
+  <input id="third" aria-label="Third" value="disabled" disabled>
+  <p id="hovered">hover me</p>
+  <select aria-label="Pick" id="pick" size="2"><option>one</option><option>two</option></select>
+</main>

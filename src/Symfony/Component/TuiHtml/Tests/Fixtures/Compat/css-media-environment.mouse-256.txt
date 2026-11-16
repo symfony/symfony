@@ -1,0 +1,19 @@
+
+a mouse: hover and a fine pointer
+
+standard dynamic range
+
+no inverted colors, no preferences
+
+fast updates
+
+a 256-color palette
+
+no scripts: (scripting: none)
+
+content scrolls both ways
+
+the terminal is the device: 40 columns and 10 rows or more,
+at least a quarter as wide as tall
+
+one flat, opaque screen

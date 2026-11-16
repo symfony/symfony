@@ -1,0 +1,17 @@
+<!-- covers: css.selectors.target css.properties.scroll-padding css.properties.scroll-padding-top css.properties.scroll-padding-bottom css.properties.scroll-padding-block css.properties.scroll-padding-block-start css.properties.scroll-padding-block-end css.properties.scroll-margin css.properties.scroll-margin-top css.properties.scroll-margin-bottom css.properties.scroll-margin-block css.properties.scroll-margin-block-start css.properties.scroll-margin-block-end -->
+<!-- variant: targeted target=#usage rows=12 -->
+<!-- variant: keyboard focus=nav>p keys=tab rows=12 -->
+<!-- variant: followed focus=nav>p keys=tab,enter rows=12 -->
+<style>
+  nav a { color: #60a5fa; text-decoration: underline }
+  .page { overflow: auto; max-height: 7; border: 1px solid; scroll-padding-block: 1 0 }
+  h2 { scroll-margin-block-start: 0 }
+  h2:target { color: #fbbf24 }
+  h2:target::before { content: "▸ " }
+  section:has(:target) { background: #1f2937 }
+</style>
+<nav><p>Contents: <a href="#install">Install</a> · <a href="#usage">Usage</a></p></nav>
+<div class="page">
+  <section><h2 id="install">Install</h2><p>composer require symfony/tui</p></section>
+  <section><h2 id="usage">Usage</h2><p>Build a view from HTML, then mount it.</p><p>Style it with CSS.</p></section>
+</div>

@@ -1,0 +1,17 @@
+<!-- covers: html.elements.input.type_checkbox html.elements.input.type_radio -->
+<!-- variant: focus-remember focus=#remember -->
+<style>
+  input:checked::box { color: green }
+  .checkbox { display: inline-block }
+</style>
+<form>
+  <label><input type="checkbox" id="remember" checked> Remember me</label>
+  <label><input type="checkbox" id="news"> Newsletter</label>
+  <label><input type="checkbox" id="locked" disabled> Locked</label>
+  <label><input type="radio" name="size" value="s"> Small</label>
+  <label><input type="radio" name="size" value="l" checked> Large</label>
+  <p>Wrapped in inline elements: <span class="wrap"><input type="checkbox"> opt in</span> and <b><input type="radio" name="w"> this</b></p>
+  <div><label class="checkbox"><input type="checkbox"> I agree to the <a href="#terms">terms</a>, a label displayed inline-block</label></div>
+</form>
+<p><input type="radio" name="together" aria-label="one"><input type="radio" name="together" aria-label="two"> radios written together, a column apart</p>
+<label><input type="checkbox" aria-label="first"><input type="checkbox"> boxes written together in a label, its gap between them</label>

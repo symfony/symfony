@@ -1,0 +1,18 @@
+<!-- covers: css.properties.orphans css.properties.widows css.properties.box-decoration-break css.properties.break-inside css.properties.column-count -->
+<!-- variant: narrow columns=40 -->
+<style>
+  div { columns: 2; column-gap: 2ch; margin-bottom: 1 }
+  p { margin: 0 }
+  .lines p { orphans: 3; widows: 3 }
+  .one p { orphans: 1; widows: 1 }
+  .slice section, .clone section { border: 1px solid; padding: 0 1ch }
+  .clone section { box-decoration-break: clone }
+  .nested section { margin: 0 }
+  .nested .keep { break-inside: avoid; color: #22c55e }
+  .media input { width: 20ch }
+</style>
+<div class="lines"><p>Three lines at least stay at the bottom of a column and at the top of the next, else the text block moves on.</p><p>A second block follows it.</p></div>
+<div class="one"><p>One line is enough at the bottom of a column and at the top of the next one.</p><p>Then another.</p></div>
+<div class="slice"><section><p>A box sliced across the columns has its top edge in the first piece only and its bottom edge in the last.</p></section></div>
+<div class="clone"><section><p>A box cloned across the columns has its edges drawn around each of its pieces, top and bottom alike.</p></section></div>
+<div class="nested"><section><p>Before.</p><p class="keep">A nested block that avoids breaks is kept whole in one column.</p><p>After it.</p></section></div>

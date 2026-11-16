@@ -1,0 +1,4 @@
+
+A native button, then buttons the page draws itself:
+
+⟨7;37;48;2;37;99;235m[ Native ]⟨0m ⟨37;48;2;25;135;84mTinted⟨0m ⟨38;2;5;44;101;48;2;231;241;255mAccordion item, flat          ⟨0m

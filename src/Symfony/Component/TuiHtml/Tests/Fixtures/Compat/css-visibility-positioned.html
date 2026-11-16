@@ -1,0 +1,14 @@
+<!-- covers: css.properties.visibility css.properties.opacity css.properties.position -->
+<style>
+  .scroller { position: relative; display: flex; width: 40ch }
+  .chevron { position: absolute; top: 0; padding: 0 1ch; background: white; color: black }
+  .left { left: 0 }
+  .right { right: 0 }
+  .hidden { visibility: hidden }
+  .clear { opacity: 0 }
+  .crumbs { padding: 0 2ch }
+</style>
+<p>Hidden or transparent, a positioned element draws nothing over the text under it, like the chevrons of the breadcrumbs of GitHub Docs:</p>
+<div class="scroller"><button class="chevron left hidden">&lt;</button><div class="crumbs">Home / Get started / Journey</div><button class="chevron right clear">&gt;</button></div>
+<p>Shown, it does:</p>
+<div class="scroller"><button class="chevron left">&lt;</button><div class="crumbs">Home / Get started / Journey</div></div>

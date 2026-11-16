@@ -1,0 +1,13 @@
+
+┌────────────────────────────┐
+│  Padded by 2 columns: no   │
+│  notch                     │
+└────────────────────────────┘
+
+    ⟨36mNo title bar: its fallback, 4 columns⟨0m
+
+An unknown variable without fallback: invalid at
+computed-value time, the color inherited, not the green
+before it
+
+⟨33mIts fallback (yellow)⟨0m

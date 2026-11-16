@@ -1,0 +1,15 @@
+<!-- covers: css.selectors.scroll-button -->
+<!-- variant: down click=4:2 -->
+<!-- variant: end click=4:2,4:2,4:2,4:2,4:2,4:2 -->
+<!-- variant: right click=9:28 -->
+<style>
+  .list { height: 6; overflow-y: auto; border: 1px solid; max-width: 30ch }
+  .list::scroll-button(up) { content: "▲ up"; color: cyan }
+  .list::scroll-button(down) { content: "▼ down"; color: cyan }
+  .row { overflow-x: auto; white-space: nowrap; max-width: 30ch; border: 1px solid }
+  .row::scroll-button(*) { color: yellow }
+  .row::scroll-button(inline-start) { content: "‹" }
+  .row::scroll-button(inline-end) { content: "›" }
+</style>
+<div class="list"><p>one</p><p>two</p><p>three</p><p>four</p><p>five</p><p>six</p><p>seven</p><p>eight</p></div>
+<div class="row"><p>A long row of words that does not fit in the box and scrolls sideways</p></div>

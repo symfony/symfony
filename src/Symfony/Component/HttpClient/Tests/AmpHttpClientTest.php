@@ -71,6 +71,12 @@ class AmpHttpClientTest extends HttpClientTestCase
         parent::testTimeoutOnDestruct();
     }
 
+    #[Group('transient-on-windows')]
+    public function testBackpressureAllowsOutOfOrderResponseConsumption()
+    {
+        parent::testBackpressureAllowsOutOfOrderResponseConsumption();
+    }
+
     #[TestWith(['/body', false])]
     #[TestWith(['/chunked', false])]
     #[TestWith(['/body', true])]

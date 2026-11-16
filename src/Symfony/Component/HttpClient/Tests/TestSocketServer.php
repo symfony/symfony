@@ -50,13 +50,19 @@ class TestSocketServer
         $process->start();
         self::$processes[$port] = [$path, $process];
         register_shutdown_function([$process, 'stop']);
-        $deadline = hrtime(true) / 1E9 + 10;
+        // A loaded CI runner, like the Windows one, can take several seconds to start a process
+        $started = hrtime(true) / 1E9;
+        $deadline = $started + 30;
 
         while (!$socket = @fsockopen('127.0.0.1', $port)) {
             if (!$process->isRunning() || $deadline < hrtime(true) / 1E9) {
+                $elapsed = hrtime(true) / 1E9 - $started;
+                $message = $process->isRunning()
+                    ? \sprintf('Script "%s" did not listen on port %d after %.1fs.', $script, $port, $elapsed)
+                    : \sprintf('Script "%s" exited with code %d after %.1fs without listening on port %d.', $script, $process->getExitCode(), $elapsed, $port);
                 $process->stop(0);
 
-                throw new \RuntimeException(\sprintf('Script "%s" did not listen on port %d.', $script, $port).rtrim("\n".$process->getOutput().$process->getErrorOutput()));
+                throw new \RuntimeException($message.rtrim("\n".$process->getOutput().$process->getErrorOutput()));
             }
 
             usleep(50000);

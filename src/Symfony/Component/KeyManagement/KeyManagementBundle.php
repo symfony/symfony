@@ -497,7 +497,7 @@ class KeyManagementBundle extends AbstractBundle
         // listener extends one the DoctrineBridge owns: loading it without that package around is
         // a fatal error, not a false answer from class_exists().
         if (
-            ContainerBuilder::willBeAvailable('symfony/doctrine-bridge', AbstractSchemaListener::class, ['symfony/doctrine-orm-key-management'])
+            ContainerBuilder::willBeAvailable('symfony/doctrine-bridge', AbstractSchemaListener::class, ['symfony/doctrine-orm-key-management', 'symfony/key-management'])
             && ContainerBuilder::willBeAvailable('symfony/doctrine-orm-key-management', DataKeyStoreSchemaListener::class, ['symfony/key-management'])
         ) {
             $container->register('key_management.store.schema_listener', DataKeyStoreSchemaListener::class)

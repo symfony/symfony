@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class CheckboxTypeTest extends BaseTypeTestCase
@@ -187,6 +188,29 @@ class CheckboxTypeTest extends BaseTypeTestCase
             ['false'],
             ['0'],
         ];
+    }
+
+    public function testMissingCheckboxIsSubmittedWithItsFirstFalseValue()
+    {
+        $form = $this->factory->createBuilder(FormType::class, ['checkbox' => true])
+            ->add('checkbox', static::TESTED_TYPE, ['false_values' => ['0']])
+            ->getForm();
+
+        $form->submit([]);
+
+        $this->assertTrue($form->get('checkbox')->isSynchronized());
+        $this->assertFalse($form->get('checkbox')->getData());
+    }
+
+    public function testMissingCheckboxIsLeftUntouchedWhenMissingFieldsAreNotCleared()
+    {
+        $form = $this->factory->createBuilder(FormType::class, ['checkbox' => true])
+            ->add('checkbox', static::TESTED_TYPE, ['false_values' => ['0']])
+            ->getForm();
+
+        $form->submit([], false);
+
+        $this->assertTrue($form->get('checkbox')->getData());
     }
 
     public function testDontAllowNonArrayFalseValues()

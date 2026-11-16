@@ -55,6 +55,7 @@ class NativeRequestHandler implements RequestHandlerInterface
         $name = $form->getName();
         $method = $form->getConfig()->getMethod();
         $missingData = $this->missingDataHandler->missingData;
+        $synthesisedFields = [];
 
         if ($method !== self::getRequestMethod()) {
             return;
@@ -74,7 +75,7 @@ class NativeRequestHandler implements RequestHandlerInterface
                     return;
                 }
 
-                $data = $this->missingDataHandler->handle($form, $queryData);
+                $data = $queryData;
             }
         } else {
             // Mark the form with an error if the uploaded size was too large
@@ -114,8 +115,9 @@ class NativeRequestHandler implements RequestHandlerInterface
                 return;
             }
 
-            if ('PATCH' !== $method) {
-                $params = $this->missingDataHandler->handle($form, $params);
+            if ('' === $name && 'PATCH' !== $method) {
+                // Unchecked checkboxes count as present fields when deciding whether a form with an empty name is submitted
+                $synthesisedFields = $this->missingDataHandler->handle($form, $params);
             }
 
             if (\is_array($params) && \is_array($files)) {
@@ -126,7 +128,7 @@ class NativeRequestHandler implements RequestHandlerInterface
         }
 
         // Don't auto-submit the form unless at least one field is present.
-        if ('' === $name && !array_intersect_key($data, $form->all())) {
+        if ('' === $name && !array_intersect_key($data + $synthesisedFields, $form->all())) {
             return;
         }
 

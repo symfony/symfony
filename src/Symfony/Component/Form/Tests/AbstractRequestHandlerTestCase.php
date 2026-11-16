@@ -23,6 +23,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Forms;
@@ -213,6 +215,130 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
 
         $this->assertTrue($form->isSubmitted());
         $this->assertSame([], $form->get('displayedColumns')->getData());
+    }
+
+    #[DataProvider('methodExceptPatchProvider')]
+    public function testMissingCheckboxIsNotExtraDataWhenItsParentIsReplacedOnSubmit($method)
+    {
+        $builder = $this->factory->createNamedBuilder('form', FormType::class, null, ['method' => $method])
+            ->add('type', TextType::class)
+            ->add('details', FormType::class);
+        $builder->get('details')
+            ->add('checkbox', CheckboxType::class)
+            ->add('custom', CheckboxType::class, ['false_values' => ['0']]);
+        $builder->get('type')->addEventListener(FormEvents::POST_SUBMIT, static function (FormEvent $event): void {
+            $event->getForm()->getParent()
+                ->add('details', FormType::class)
+                ->get('details')->add('text', TextType::class);
+        });
+        $form = $builder->getForm();
+
+        $this->setRequestData($method, [
+            'form' => ['type' => 'text', 'details' => ['text' => 'value']],
+        ]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertFalse($form->get('details')->has('checkbox'));
+        $this->assertSame([], $form->get('details')->getExtraData());
+        $this->assertSame(['text' => 'value'], $form->get('details')->getData());
+    }
+
+    #[DataProvider('methodExceptPatchProvider')]
+    public function testSubmitMissingCheckboxWithNonNullFalseValue($method)
+    {
+        $form = $this->factory->createNamed('form', FormType::class, ['checkbox' => true], ['method' => $method])
+            ->add('text', TextType::class)
+            ->add('checkbox', CheckboxType::class, ['false_values' => ['0']]);
+
+        $this->setRequestData($method, ['form' => ['text' => 'value']]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertTrue($form->get('checkbox')->isSynchronized());
+        $this->assertFalse($form->get('checkbox')->getData());
+    }
+
+    #[DataProvider('methodExceptPatchProvider')]
+    public function testSubmitExpandedChoiceWithoutSelectionUsesEmptyData($method)
+    {
+        $form = $this->factory->createNamed('form', FormType::class, null, ['method' => $method])
+            ->add('text', TextType::class)
+            ->add('choice', ChoiceType::class, [
+                'choices' => ['foo' => 'foo', 'bar' => 'bar'],
+                'expanded' => true,
+                'multiple' => true,
+                'empty_data' => ['bar'],
+            ]);
+
+        $this->setRequestData($method, ['form' => ['text' => 'value']]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertSame(['bar'], $form->get('choice')->getData());
+    }
+
+    #[DataProvider('methodExceptGetAndPatchProvider')]
+    public function testSubmitUnnamedFormHoldingOnlyUncheckedCheckboxes($method)
+    {
+        $form = $this->factory->createNamed('', FormType::class, ['checkbox' => true], ['method' => $method])
+            ->add('checkbox', CheckboxType::class);
+
+        $this->setRequestData($method, []);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertSame(['checkbox' => false], $form->getData());
+    }
+
+    #[DataProvider('methodExceptGetAndPatchProvider')]
+    public function testDoNotSubmitUnnamedFormHoldingOnlyCheckboxesOfACollectionWithAllowDelete($method)
+    {
+        $form = $this->factory->createNamed('', FormType::class, ['items' => [true, true]], ['method' => $method])
+            ->add('items', CollectionType::class, [
+                'entry_type' => CheckboxType::class,
+                'allow_delete' => true,
+            ]);
+
+        $this->setRequestData($method, []);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertFalse($form->isSubmitted());
+        $this->assertSame(['items' => [true, true]], $form->getData());
+    }
+
+    #[DataProvider('methodExceptGetAndPatchProvider')]
+    public function testMissingCheckboxIsNotExtraDataWhenItsParentIsReplacedOnSubmitInUnnamedForm($method)
+    {
+        $builder = $this->factory->createNamedBuilder('', FormType::class, null, ['method' => $method])
+            ->add('type', TextType::class)
+            ->add('details', FormType::class);
+        $builder->get('details')->add('checkbox', CheckboxType::class);
+        $builder->get('type')->addEventListener(FormEvents::POST_SUBMIT, static function (FormEvent $event): void {
+            $event->getForm()->getParent()
+                ->add('details', FormType::class)
+                ->get('details')->add('text', TextType::class);
+        });
+        $form = $builder->getForm();
+
+        $this->setRequestData($method, ['type' => 'text', 'details' => ['text' => 'value']]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertSame([], $form->get('details')->getExtraData());
+    }
+
+    public static function methodExceptGetAndPatchProvider(): array
+    {
+        return [
+            ['POST'],
+            ['PUT'],
+            ['DELETE'],
+        ];
     }
 
     public static function methodExceptPatchProvider(): array

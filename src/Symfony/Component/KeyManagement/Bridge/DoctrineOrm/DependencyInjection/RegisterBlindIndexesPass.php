@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection;
 
+use Doctrine\ORM\Mapping\Embeddable;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\MappedSuperclass;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
@@ -18,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\KeyManagement\BlindIndex;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\BlindIndexed;
+use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Repository\BlindIndexResolver;
 use Symfony\Component\KeyManagement\StoredKeyBlindIndex;
 
 /**
@@ -45,16 +49,49 @@ use Symfony\Component\KeyManagement\StoredKeyBlindIndex;
  * The listener is removed when no index is registered, so that a flush does not walk its entities
  * for nothing.
  *
+ * It also registers the resolver that {@see \Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Repository\BlindIndexRepositoryTrait}
+ * gets, with the map of indexed properties that {@see self::autoconfigure()} collects when the
+ * container is compiled.
+ *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
  * @experimental
  */
 final class RegisterBlindIndexesPass implements CompilerPassInterface
 {
+    public const string BLIND_INDEX_TAG = 'key_management.blind_indexed_property';
+
     public function __construct(
         private readonly string $listenerId = 'key_management.blind_index_listener',
         private readonly string $tag = 'key_management.blind_index',
     ) {
+    }
+
+    /**
+     * Tags each property carrying a blind index with the source property and the index name.
+     *
+     * The tag feeds the map the repository resolver gets when the container is compiled, so that
+     * findBy() and findOneBy() can rewrite a criterion on the source property to its tag column.
+     */
+    public static function autoconfigure(ChildDefinition $definition, Entity|Embeddable|MappedSuperclass $mapping, \ReflectionClass $class): void
+    {
+        for ($reflection = $class; $reflection; $reflection = $reflection->getParentClass()) {
+            foreach ($reflection->getProperties() as $property) {
+                if ($property->class !== $reflection->name) {
+                    continue;
+                }
+
+                foreach ($property->getAttributes(BlindIndexed::class) as $attribute) {
+                    $attribute = $attribute->newInstance();
+
+                    $definition->addResourceTag(self::BLIND_INDEX_TAG, [
+                        'property' => $attribute->property,
+                        'column' => $property->name,
+                        'index' => $attribute->index,
+                    ]);
+                }
+            }
+        }
     }
 
     public function process(ContainerBuilder $container): void
@@ -96,8 +133,37 @@ final class RegisterBlindIndexesPass implements CompilerPassInterface
             return;
         }
 
-        $container->getDefinition($this->listenerId)
-            ->setArgument(0, ServiceLocatorTagPass::register($container, array_map(static fn (string $id): Reference => new Reference($id), $indexes)));
+        $locator = ServiceLocatorTagPass::register($container, array_map(static fn (string $id): Reference => new Reference($id), $indexes));
+
+        $container->getDefinition($this->listenerId)->setArgument(0, $locator);
+
+        $container->register('key_management.blind_index_resolver', BlindIndexResolver::class)
+            ->setArguments([$this->fieldsBySourceProperty($container), $locator])
+            ->setPublic(false);
+        $container->setAlias(BlindIndexResolver::class, 'key_management.blind_index_resolver');
+    }
+
+    /**
+     * @return array<class-string, array<string, array<string, string>>> The tag column and the index name of each indexed property, by entity class and source property
+     */
+    private function fieldsBySourceProperty(ContainerBuilder $container): array
+    {
+        $fields = [];
+
+        foreach ($container->findTaggedResourceIds(self::BLIND_INDEX_TAG, false) as $id => $tags) {
+            $class = $container->getDefinition($id)->getClass();
+
+            if (!\is_string($class)) {
+                continue;
+            }
+
+            // the map is injected as an argument, where the container resolves its parameters
+            foreach ($tags as $attributes) {
+                $fields[$class][$attributes['property']][$attributes['column']] = $attributes['index'];
+            }
+        }
+
+        return $fields;
     }
 
     private function bindName(ContainerBuilder $container, string $id, string $name): void
@@ -105,10 +171,10 @@ final class RegisterBlindIndexesPass implements CompilerPassInterface
         $definition = $container->getDefinition($id);
         $class = $container->getParameterBag()->resolveValue($definition->getClass());
 
-        // a child definition receives its arguments from its parent later on, and the two indexes
-        // of the component are the two whose "$name" argument this knows how to fill: anything
-        // else is an index of the application's own, which derives its tags however it chooses
-        if ($definition instanceof ChildDefinition || !\in_array($class, [BlindIndex::class, StoredKeyBlindIndex::class], true)) {
+        // the class of a child definition may come from its parent, in which case it names an index
+        // of the application's own, which derives its tags however it chooses; the two indexes of
+        // the component are the two whose "$name" argument this knows how to fill
+        if (!\in_array($class, [BlindIndex::class, StoredKeyBlindIndex::class], true)) {
             return;
         }
 

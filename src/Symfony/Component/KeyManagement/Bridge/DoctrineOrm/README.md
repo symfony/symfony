@@ -163,7 +163,36 @@ private string $emailIndex = '';
 Its second argument names the index, which is also what the tags are derived
 under, so two columns holding an address have an index each.
 
-The query side is unchanged, since it has no entity to read the attribute on:
+The query side can keep naming the source property, with a repository using
+`BlindIndexRepositoryTrait`:
+
+```php
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Repository\BlindIndexRepositoryTrait;
+
+final class UserRepository extends ServiceEntityRepository
+{
+    use BlindIndexRepositoryTrait;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, User::class);
+    }
+}
+
+$repository->findOneBy(['email' => $email]);
+```
+
+The trait rewrites the criterion to `emailIndex` and the tag of the value, for
+`findBy()`, `findOneBy()` and `matching()`. The criteria of `matching()` can use
+equality, inequality, `IN`, `NIN` and null; ordering and partial comparisons are
+refused, since a tag preserves neither. DQL and the query builder are not
+covered. The container injects the resolver through a `#[Required]` setter, so
+the repository must be autowired. A property indexed by more than one blind
+index is refused, since the criterion does not say which tag to search.
+
+Without the trait, the call site computes the tag itself:
 
 ```php
 $repository->findOneBy(['emailIndex' => $index->of($email)]);

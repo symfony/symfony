@@ -314,6 +314,12 @@ class KeyManagementBundle extends AbstractBundle
             }
         }
 
+        if (class_exists(RegisterBlindIndexesPass::class)) {
+            foreach ([Entity::class, Embeddable::class, MappedSuperclass::class] as $mapping) {
+                $container->registerAttributeForAutoconfiguration($mapping, RegisterBlindIndexesPass::autoconfigure(...));
+            }
+        }
+
         $clients = $config['clients'];
 
         $defaultName = $config['default_client'] ?? (1 === \count($clients) ? array_key_first($clients) : null);

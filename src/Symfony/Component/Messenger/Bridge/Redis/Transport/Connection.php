@@ -1032,6 +1032,8 @@ class Connection
     public function close(): void
     {
         $this->redis = null;
+        $this->lastPendingMessageId = '0';
+        $this->inflightIds = [];
     }
 
     /**

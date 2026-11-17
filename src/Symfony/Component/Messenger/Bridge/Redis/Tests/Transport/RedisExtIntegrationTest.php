@@ -720,6 +720,22 @@ class RedisExtIntegrationTest extends TestCase
         $this->assertEquals(new DummyMessage('Hi'), $received[0]->getMessage());
     }
 
+    public function testPendingMessagesAreReadAgainAfterClosing()
+    {
+        $transport = new RedisTransport($this->connection, new Serializer());
+
+        $transport->send(new Envelope(new DummyMessage('Hi')));
+        $transport->send(new Envelope(new DummyMessage('Bye')));
+
+        $received = iterator_to_array($transport->get());
+        $this->assertEquals(new DummyMessage('Hi'), $received[0]->getMessage());
+
+        $transport->close();
+
+        $received = iterator_to_array($transport->get());
+        $this->assertEquals(new DummyMessage('Hi'), $received[0]->getMessage());
+    }
+
     private function getConnectionGroup(Connection $connection): string
     {
         $property = (new \ReflectionClass(Connection::class))->getProperty('group');

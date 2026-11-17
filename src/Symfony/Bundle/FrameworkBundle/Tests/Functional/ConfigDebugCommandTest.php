@@ -283,6 +283,39 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('vault_test_secret: from_loader', $tester->getDisplay());
     }
 
+    public function testDumpWithMarkupAndInvalidUtf8()
+    {
+        try {
+            StatefulEnvVarLoader::setEnvVar('TEST_VAULT_SECRET', '<info>val</info></error>');
+            $application = $this->createApplication(true);
+
+            $tester = new CommandTester($application->find('debug:config'));
+            $ret = $tester->execute(['name' => 'foo', '--resolve-env' => true, '--format' => 'yaml'], ['decorated' => true]);
+
+            $this->assertSame(0, $ret);
+            $this->assertStringContainsString('vault_test_secret: \'<info>val</info></error>\'', $tester->getDisplay());
+
+            $ret = $tester->execute(['name' => 'foo', 'path' => 'vault_test_secret', '--resolve-env' => true], ['decorated' => true]);
+
+            $this->assertSame(0, $ret);
+            $this->assertStringContainsString(\PHP_EOL."'<info>val</info></error>'".\PHP_EOL, $tester->getDisplay());
+
+            $ret = $tester->execute(['name' => 'foo', '--resolve-env' => true, '--format' => 'json'], ['decorated' => true]);
+
+            $this->assertSame(0, $ret);
+            $this->assertStringContainsString('"vault_test_secret": "<info>val</info></error>"', $tester->getDisplay());
+
+            StatefulEnvVarLoader::setEnvVar('TEST_VAULT_SECRET', "bad\xFF");
+            $tester = new CommandTester($this->createApplication(true)->find('debug:config'));
+            $ret = $tester->execute(['name' => 'foo', '--resolve-env' => true, '--format' => 'json']);
+
+            $this->assertSame(0, $ret);
+            $this->assertStringContainsString("\"vault_test_secret\": \"bad\u{FFFD}\"", $tester->getDisplay());
+        } finally {
+            StatefulEnvVarLoader::reset();
+        }
+    }
+
     private function createCommandTester(bool $debug): CommandTester
     {
         $command = $this->createApplication($debug)->find('debug:config');

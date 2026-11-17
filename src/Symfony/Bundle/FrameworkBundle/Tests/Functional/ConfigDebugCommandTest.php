@@ -22,6 +22,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Yaml\Yaml;
 
 #[Group('functional')]
 class ConfigDebugCommandTest extends AbstractWebTestCase
@@ -98,6 +99,29 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
         $this->assertJson($tester->getDisplay());
+    }
+
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function testDumpBundleOptionPrintsTitleOnlyForTxt(bool $debug)
+    {
+        $tester = $this->createCommandTester($debug);
+
+        $ret = $tester->execute(['name' => 'framework', 'path' => 'session', '--format' => 'json']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertJson($tester->getDisplay());
+        $this->assertSame('session.storage.factory.native', json_decode($tester->getDisplay(), true)['storage_factory_id']);
+
+        $ret = $tester->execute(['name' => 'framework', 'path' => 'session', '--format' => 'yaml']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertSame('session.storage.factory.native', Yaml::parse($tester->getDisplay())['storage_factory_id']);
+
+        $ret = $tester->execute(['name' => 'framework', 'path' => 'session']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('Current configuration for "framework.session"', $tester->getDisplay());
     }
 
     #[TestWith([true])]
@@ -281,6 +305,39 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
         $this->assertSame(0, $ret);
         $this->assertStringContainsString('vault_test_secret: from_loader', $tester->getDisplay());
+    }
+
+    public function testDumpWithMarkupAndInvalidUtf8()
+    {
+        try {
+            StatefulEnvVarLoader::setEnvVar('TEST_VAULT_SECRET', '<info>val</info></error>');
+            $application = $this->createApplication(true);
+
+            $tester = new CommandTester($application->find('debug:config'));
+            $ret = $tester->execute(['name' => 'foo', '--resolve-env' => true, '--format' => 'yaml'], ['decorated' => true]);
+
+            $this->assertSame(0, $ret);
+            $this->assertStringContainsString('vault_test_secret: \'<info>val</info></error>\'', $tester->getDisplay());
+
+            $ret = $tester->execute(['name' => 'foo', 'path' => 'vault_test_secret', '--resolve-env' => true], ['decorated' => true]);
+
+            $this->assertSame(0, $ret);
+            $this->assertStringContainsString(\PHP_EOL."'<info>val</info></error>'".\PHP_EOL, $tester->getDisplay());
+
+            $ret = $tester->execute(['name' => 'foo', '--resolve-env' => true, '--format' => 'json'], ['decorated' => true]);
+
+            $this->assertSame(0, $ret);
+            $this->assertStringContainsString('"vault_test_secret": "<info>val</info></error>"', $tester->getDisplay());
+
+            StatefulEnvVarLoader::setEnvVar('TEST_VAULT_SECRET', "bad\xFF");
+            $tester = new CommandTester($this->createApplication(true)->find('debug:config'));
+            $ret = $tester->execute(['name' => 'foo', '--resolve-env' => true, '--format' => 'json']);
+
+            $this->assertSame(0, $ret);
+            $this->assertStringContainsString("\"vault_test_secret\": \"bad\u{FFFD}\"", $tester->getDisplay());
+        } finally {
+            StatefulEnvVarLoader::reset();
+        }
     }
 
     private function createCommandTester(bool $debug): CommandTester

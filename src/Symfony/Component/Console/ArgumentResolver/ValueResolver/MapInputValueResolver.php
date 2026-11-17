@@ -69,11 +69,12 @@ final class MapInputValueResolver implements ValueResolverInterface
                 continue;
             }
 
-            $instance->$name = match (true) {
-                $spec instanceof Argument => $this->resolveArgumentSpec($spec, $mapInput->getClass()->getProperty($name), $input),
-                $spec instanceof Option => $this->resolveOptionSpec($spec, $mapInput->getClass()->getProperty($name), $input),
+            $property = $mapInput->getClass()->getProperty($name);
+            $property->setValue($instance, match (true) {
+                $spec instanceof Argument => $this->resolveArgumentSpec($spec, $property, $input),
+                $spec instanceof Option => $this->resolveOptionSpec($spec, $property, $input),
                 $spec instanceof MapInput => $this->resolveMapInput($spec, $input),
-            };
+            });
         }
 
         return $instance;

@@ -176,12 +176,12 @@ final class MapInput
                 if ($spec->isRequired() && \in_array($value, [null, []], true)) {
                     continue;
                 }
-                $instance->$name = $this->resolveValue($spec->typeName, $value, $spec->default);
+                $this->class->getProperty($name)->setValue($instance, $this->resolveValue($spec->typeName, $value, $spec->default));
             } elseif ($spec instanceof Option) {
                 $value = $input->getOption($spec->name);
-                $instance->$name = $this->resolveValue($spec->typeName, $value, $spec->default);
+                $this->class->getProperty($name)->setValue($instance, $this->resolveValue($spec->typeName, $value, $spec->default));
             } elseif ($spec instanceof self) {
-                $instance->$name = $spec->createInstance($input);
+                $this->class->getProperty($name)->setValue($instance, $spec->createInstance($input));
             }
         }
 

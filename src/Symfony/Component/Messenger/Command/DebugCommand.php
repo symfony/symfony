@@ -16,6 +16,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -68,21 +69,21 @@ class DebugCommand extends Command
         }
 
         foreach ($mapping as $bus => $handlersByMessage) {
-            $io->section($bus);
+            $io->section(OutputFormatter::escape($bus));
 
             $tableRows = [];
             foreach ($handlersByMessage as $message => $handlers) {
                 if ($description = self::getClassDescription($message)) {
-                    $tableRows[] = [\sprintf('<comment>%s</>', $description)];
+                    $tableRows[] = [\sprintf('<comment>%s</>', OutputFormatter::escape($description))];
                 }
 
-                $tableRows[] = [\sprintf('<fg=cyan>%s</fg=cyan>', $message)];
+                $tableRows[] = [\sprintf('<fg=cyan>%s</fg=cyan>', OutputFormatter::escape($message))];
                 foreach ($handlers as $handler) {
                     $tableRows[] = [
-                        \sprintf('    handled by <info>%s</>', $handler[0]).$this->formatConditions($handler[1], $handler[0]),
+                        \sprintf('    handled by <info>%s</>', OutputFormatter::escape($handler[0])).OutputFormatter::escape($this->formatConditions($handler[1], $handler[0])),
                     ];
                     if ($handlerDescription = self::getClassDescription($handler[0])) {
-                        $tableRows[] = [\sprintf('               <comment>%s</>', $handlerDescription)];
+                        $tableRows[] = [\sprintf('               <comment>%s</>', OutputFormatter::escape($handlerDescription))];
                     }
                 }
                 $tableRows[] = [''];

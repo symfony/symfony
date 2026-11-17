@@ -208,13 +208,12 @@ class DebugCommand extends Command
 
     private function displayGeneralText(SymfonyStyle $io, ?string $filter = null): void
     {
-        $decorated = $io->isDecorated();
         $types = ['functions', 'filters', 'tests', 'globals'];
         foreach ($types as $index => $type) {
             $items = [];
             foreach ($this->twig->{'get'.ucfirst($type)}() as $name => $entity) {
                 if (!$filter || str_contains($name, $filter)) {
-                    $items[$name] = $name.$this->getPrettyMetadata($type, $entity, $decorated);
+                    $items[$name] = $name.$this->getPrettyMetadata($type, $entity);
                 }
             }
 
@@ -348,7 +347,7 @@ class DebugCommand extends Command
         return null;
     }
 
-    private function getPrettyMetadata(string $type, mixed $entity, bool $decorated): ?string
+    private function getPrettyMetadata(string $type, mixed $entity): ?string
     {
         if ('tests' === $type) {
             return '';
@@ -360,7 +359,7 @@ class DebugCommand extends Command
                 return '(unknown?)';
             }
         } catch (\UnexpectedValueException $e) {
-            return \sprintf(' <error>%s</error>', $decorated ? OutputFormatter::escape($e->getMessage()) : $e->getMessage());
+            return \sprintf(' <error>%s</error>', OutputFormatter::escape($e->getMessage()));
         }
 
         if ('globals' === $type) {
@@ -370,15 +369,15 @@ class DebugCommand extends Command
 
             $description = substr(@json_encode($meta), 0, 50);
 
-            return \sprintf(' = %s', $decorated ? OutputFormatter::escape($description) : $description);
+            return \sprintf(' = %s', OutputFormatter::escape($description));
         }
 
         if ('functions' === $type) {
-            return '('.implode(', ', $meta).')';
+            return '('.OutputFormatter::escape(implode(', ', $meta)).')';
         }
 
         if ('filters' === $type) {
-            return $meta ? '('.implode(', ', $meta).')' : '';
+            return $meta ? '('.OutputFormatter::escape(implode(', ', $meta)).')' : '';
         }
 
         return null;

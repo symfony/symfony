@@ -149,6 +149,18 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertSame(Command::SUCCESS, $res);
     }
 
+    public function testDebugMessagesWithMarkup()
+    {
+        $tester = $this->createCommandTester(['<info>key.extracted</info></error>' => '<info>extracted</info></error>'], ['<info>key.loaded</info></error>' => '<info>loaded</info></error>']);
+        $res = $tester->execute(['locale' => 'fr']);
+
+        $this->assertSame(TranslationDebugCommand::EXIT_CODE_MISSING | TranslationDebugCommand::EXIT_CODE_UNUSED | TranslationDebugCommand::EXIT_CODE_FALLBACK, $res);
+        $display = $tester->getDisplay();
+        $this->assertStringContainsString('<info>key.extracted</info></error>', $display);
+        $this->assertStringContainsString('<info>key.loaded</info></error>', $display);
+        $this->assertSame(2, substr_count($display, '<info>loaded</info></error>'));
+    }
+
     protected function setUp(): void
     {
         $this->fs = new Filesystem();

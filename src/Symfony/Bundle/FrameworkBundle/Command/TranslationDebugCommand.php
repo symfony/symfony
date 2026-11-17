@@ -16,6 +16,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -187,9 +188,9 @@ class TranslationDebugCommand extends Command
         $fallbackCatalogues = $this->loadFallbackCatalogues($locale, $transPaths);
 
         // Display header line
-        $headers = ['State', 'Domain', 'Id', \sprintf('Message Preview (%s)', $locale)];
+        $headers = ['State', 'Domain', 'Id', \sprintf('Message Preview (%s)', OutputFormatter::escape($locale))];
         foreach ($fallbackCatalogues as $fallbackCatalogue) {
-            $headers[] = \sprintf('Fallback Message Preview (%s)', $fallbackCatalogue->getLocale());
+            $headers[] = \sprintf('Fallback Message Preview (%s)', OutputFormatter::escape($fallbackCatalogue->getLocale()));
         }
         $rows = [];
         // Iterate all message ids and determine their state
@@ -230,9 +231,9 @@ class TranslationDebugCommand extends Command
                     }
                 }
 
-                $row = [$this->formatStates($states), $domain, $this->formatId($messageId), $this->sanitizeString($value)];
+                $row = [$this->formatStates($states), OutputFormatter::escape($domain), $this->formatId($messageId), OutputFormatter::escape($this->sanitizeString($value))];
                 foreach ($fallbackCatalogues as $fallbackCatalogue) {
-                    $row[] = $this->sanitizeString($fallbackCatalogue->get($messageId, $domain));
+                    $row[] = OutputFormatter::escape($this->sanitizeString($fallbackCatalogue->get($messageId, $domain)));
                 }
 
                 $rows[] = $row;
@@ -311,7 +312,7 @@ class TranslationDebugCommand extends Command
 
     private function formatId(string $id): string
     {
-        return \sprintf('<fg=cyan;options=bold>%s</>', $id);
+        return \sprintf('<fg=cyan;options=bold>%s</>', OutputFormatter::escape($id));
     }
 
     private function sanitizeString(string $string, int $length = 40): string

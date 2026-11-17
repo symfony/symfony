@@ -14,7 +14,9 @@ namespace Symfony\Component\Messenger\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Dumper;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
@@ -80,11 +82,11 @@ abstract class AbstractFailedMessagesCommand extends Command
         $lastMessageDecodingFailed = MessageDecodingFailedException::class === $messageClass || $envelope->last(MessageDecodingFailedStamp::class);
 
         $rows = [
-            ['Class', $messageClass],
+            ['Class', OutputFormatter::escape($messageClass)],
         ];
 
         if (null !== $id = $this->getMessageId($envelope)) {
-            $rows[] = ['Message Id', $id];
+            $rows[] = ['Message Id', OutputFormatter::escape((string) $id)];
         }
 
         if (!$sentToFailureTransportStamp = $envelope->last(SentToFailureTransportStamp::class)) {
@@ -92,10 +94,10 @@ abstract class AbstractFailedMessagesCommand extends Command
         } else {
             $rows = array_merge($rows, [
                 ['Failed at', $envelope->last(RedeliveryStamp::class)?->getRedeliveredAt()->format('Y-m-d H:i:s') ?? ''],
-                ['Error', $lastErrorDetailsStamp?->getExceptionMessage() ?? ''],
-                ['Error Code', $lastErrorDetailsStamp?->getExceptionCode() ?? ''],
-                ['Error Class', $lastErrorDetailsStamp?->getExceptionClass() ?? '(unknown)'],
-                ['Transport', $sentToFailureTransportStamp->getOriginalReceiverName()],
+                ['Error', OutputFormatter::escape($lastErrorDetailsStamp?->getExceptionMessage() ?? '')],
+                ['Error Code', OutputFormatter::escape((string) ($lastErrorDetailsStamp?->getExceptionCode() ?? ''))],
+                ['Error Class', OutputFormatter::escape($lastErrorDetailsStamp?->getExceptionClass() ?? '(unknown)')],
+                ['Transport', OutputFormatter::escape((string) $sentToFailureTransportStamp->getOriginalReceiverName())],
             ]);
         }
 
@@ -114,10 +116,10 @@ abstract class AbstractFailedMessagesCommand extends Command
                 $errorIo->error('The message could not be decoded. See below an APPROXIMATIVE representation of the class.');
             }
             $dump = new Dumper($io, null, $this->createCloner());
-            $io->writeln($dump($envelope->getMessage()));
+            $io->writeln($dump($envelope->getMessage()), OutputInterface::OUTPUT_RAW);
             $io->title('Exception:');
             $flattenException = $lastErrorDetailsStamp?->getFlattenException();
-            $io->writeln(null === $flattenException ? '(no data)' : $dump($flattenException));
+            $io->writeln(null === $flattenException ? '(no data)' : $dump($flattenException), OutputInterface::OUTPUT_RAW);
         } else {
             if ($lastMessageDecodingFailed) {
                 $errorIo->error('The message could not be decoded.');
@@ -179,9 +181,9 @@ abstract class AbstractFailedMessagesCommand extends Command
         $failureTransportsCount = \count($failureTransports);
         if ($failureTransportsCount > 1) {
             $io->writeln([
-                \sprintf('> Loading messages from the <info>global</info> failure transport <info>%s</info>.', $failureTransportName),
+                \sprintf('> Loading messages from the <info>global</info> failure transport <info>%s</info>.', OutputFormatter::escape((string) $failureTransportName)),
                 '> To use a different failure transport, pass <info>--transport=</info>.',
-                \sprintf('> Available failure transports are: <info>%s</info>', implode(', ', $failureTransports)),
+                \sprintf('> Available failure transports are: <info>%s</info>', implode(', ', array_map(OutputFormatter::escape(...), $failureTransports))),
                 "\n",
             ]);
         }

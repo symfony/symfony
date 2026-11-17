@@ -44,7 +44,7 @@ jobs:
         run: |
           $env:Path = 'c:\php;' + $env:Path
           mkdir c:\php && cd c:\php
-          iwr -MaximumRetryCount 5 -RetryIntervalSec 10 -outf php.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.1-Win32-vs17-x86.zip
+          iwr -MaximumRetryCount 5 -RetryIntervalSec 10 -outf php.zip https://github.com/symfony-tools/binary-utils/releases/download/v0.1/php-8.4.1-Win32-vs17-x86.zip
           7z x php.zip -y >nul
           Copy php.ini-development php.ini
           "memory_limit=-1" >> php.ini
@@ -146,14 +146,14 @@ jobs:
         run: |
           $env:Path = 'c:\php;' + $env:Path
           mkdir c:\php && cd c:\php
-          iwr -MaximumRetryCount 5 -RetryIntervalSec 10 -outf php.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.1-Win32-vs17-x86.zip
+          iwr -MaximumRetryCount 5 -RetryIntervalSec 10 -outf php.zip https://github.com/symfony-tools/binary-utils/releases/download/v0.1/php-8.4.1-Win32-vs17-x86.zip
           7z x php.zip -y >nul
           cd ext
-          iwr -MaximumRetryCount 5 -RetryIntervalSec 10 -outf php_apcu.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.24-8.4-ts-vs17-x86.zip
+          iwr -MaximumRetryCount 5 -RetryIntervalSec 10 -outf php_apcu.zip https://github.com/symfony-tools/binary-utils/releases/download/v0.1/php_apcu-5.1.24-8.4-ts-vs17-x86.zip
           7z x php_apcu.zip -y >nul
-          iwr -MaximumRetryCount 5 -RetryIntervalSec 10 -outf php_igbinary.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_igbinary-3.2.16-8.4-ts-vs17-x86.zip
+          iwr -MaximumRetryCount 5 -RetryIntervalSec 10 -outf php_igbinary.zip https://github.com/symfony-tools/binary-utils/releases/download/v0.1/php_igbinary-3.2.16-8.4-ts-vs17-x86.zip
           7z x php_igbinary.zip -y >nul
-          iwr -MaximumRetryCount 5 -RetryIntervalSec 10 -outf php_redis.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-6.2.0-8.4-ts-vs17-x86.zip
+          iwr -MaximumRetryCount 5 -RetryIntervalSec 10 -outf php_redis.zip https://github.com/symfony-tools/binary-utils/releases/download/v0.1/php_redis-6.2.0-8.4-ts-vs17-x86.zip
           7z x php_redis.zip -y >nul
           cd ..
           Copy php.ini-development php.ini

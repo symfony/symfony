@@ -148,6 +148,7 @@ class MarkdownWidget extends AbstractWidget
         // Parse markdown to AST
         $document = $this->parser->parse($this->text);
         self::trimPartialClosingFence($document, $this->text);
+        self::removeHtmlComments($document, $this->text);
 
         // Render AST to styled lines
         $renderedLines = $this->renderDocument($document, $contentColumns);
@@ -655,6 +656,60 @@ class MarkdownWidget extends AbstractWidget
         // The text must end with that line: a closing fence or a line break after it means it is code
         if ('' !== $lastLine && \strlen($lastLine) < $node->getLength() && str_repeat($node->getChar(), \strlen($lastLine)) === $lastLine && \strlen($lastLine) === \strlen($text) - \strlen(rtrim($text, $node->getChar()))) {
             $node->setLiteral(substr($literal, 0, -\strlen($lastLine)));
+        }
+    }
+
+    /**
+     * Remove HTML comments, which are not meant to be shown.
+     *
+     * A block holding only comments is detached, so it leaves no blank line. Other HTML is kept as text, without its comments.
+     */
+    private static function removeHtmlComments(Document $document, string $text): void
+    {
+        if (!str_contains($text, '<!--')) {
+            return;
+        }
+
+        $nodes = [];
+        foreach ($document->iterator() as $node) {
+            if (($node instanceof HtmlBlock && HtmlBlock::TYPE_1_CODE_CONTAINER !== $node->getType() && str_contains($node->getLiteral(), '<!--')) || ($node instanceof HtmlInline && str_starts_with($node->getLiteral(), '<!--'))) {
+                $nodes[] = $node;
+            }
+        }
+
+        foreach ($nodes as $node) {
+            if ($node instanceof HtmlBlock) {
+                // Only a block that starts with a comment runs to its end when the comment is unclosed, as in CommonMark, so a streamed comment stays hidden
+                $pattern = HtmlBlock::TYPE_2_COMMENT === $node->getType() ? '/<!--.*?(?:-->|\z)/s' : '/<!--.*?-->/s';
+                $html = trim(preg_replace($pattern, '', $node->getLiteral()));
+                if ('' !== $html) {
+                    $node->setLiteral($html);
+
+                    continue;
+                }
+
+                // A container left empty would render as an extra blank line or list marker
+                $parent = $node->parent();
+                $node->detach();
+                while (($parent instanceof BlockQuote || $parent instanceof ListItem || $parent instanceof ListBlock) && null === $parent->firstChild()) {
+                    $node = $parent;
+                    $parent = $node->parent();
+                    $node->detach();
+                }
+
+                continue;
+            }
+
+            // Drop the space after the comment when there is one before it, so "a <!-- c --> b" renders as "a b"
+            $previous = $node->previous();
+            while ($previous instanceof Text && '' === $previous->getLiteral()) {
+                $previous = $previous->previous();
+            }
+            $next = $node->next();
+            $node->detach();
+            if ($next instanceof Text && (null === $previous || ($previous instanceof Text && preg_match('/[ \t]$/', $previous->getLiteral())))) {
+                $next->setLiteral(ltrim($next->getLiteral(), " \t"));
+            }
         }
     }
 

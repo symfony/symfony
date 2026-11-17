@@ -185,7 +185,10 @@ final class FixedWindowLimiter implements LimiterInterface
             $rateLimit->markRefunded();
             $this->storage->save($window);
 
-            return new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp((int) ceil($now)), true, $this->limit, $this->resetAt($window, $now), 0, null, $this->id);
+            $availableTokens = $window->getAvailableTokens($now);
+            $retryAfter = $availableTokens > 0 ? \DateTimeImmutable::createFromTimestamp((int) ceil($now)) : $this->resetAt($window, $now);
+
+            return new RateLimit($availableTokens, $retryAfter, true, $this->limit, $this->resetAt($window, $now), 0, null, $this->id);
         } finally {
             $this->lock?->release();
         }

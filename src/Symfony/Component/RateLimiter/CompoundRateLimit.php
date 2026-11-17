@@ -32,6 +32,10 @@ final class CompoundRateLimit extends RateLimit
             $rateLimit->isAccepted(),
             $rateLimit->getLimit(),
             $resetAt ?? $rateLimit->getResetAt(),
+            $rateLimit->getConsumedTokens(),
+            $rateLimit->getHitTime(),
+            $rateLimit->getLimiterId(),
+            $rateLimit->isRefunded(),
         );
     }
 

@@ -144,10 +144,13 @@ final class TokenBucketLimiter implements LimiterInterface
                 return $rateLimit;
             }
 
+            $hitTime = $rateLimit->getHitTime();
+            if ($bucket->getTimer() > $hitTime) {
+                return $rateLimit;
+            }
             $bucket->configure($this->maxBurst, $this->rate);
 
             $now = microtime(true);
-            $hitTime = $rateLimit->getHitTime();
             $timer = $bucket->getTimer();
 
             // count the tokens the bucket gave back on its own since the hit, using the bucket's own refill schedule

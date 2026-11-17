@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\ResolveNoPreloadPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class ResolveNoPreloadPassTest extends TestCase
@@ -49,5 +50,34 @@ class ResolveNoPreloadPassTest extends TestCase
         $this->assertFalse($container->getDefinition('common_dep')->hasTag('container.no_preload'));
         $this->assertTrue($container->getDefinition('not_preloaded')->hasTag('container.no_preload'));
         $this->assertTrue($container->getDefinition('not_preloaded_dep')->hasTag('container.no_preload'));
+    }
+
+    public function testProcessLongChainOfPrivateServices()
+    {
+        $container = new class extends ContainerBuilder {
+            public int $maxDepth = 0;
+
+            public function getDefinition(string $id): Definition
+            {
+                $this->maxDepth = max($this->maxDepth, \count(debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS)));
+
+                return parent::getDefinition($id);
+            }
+        };
+
+        $container->register('entry_point')
+            ->setPublic(true)
+            ->addArgument(new Reference('dep_1'));
+
+        for ($i = 1; $i < 1000; ++$i) {
+            $container->register('dep_'.$i)
+                ->addArgument(new Reference('dep_'.($i + 1)));
+        }
+        $container->register('dep_1000');
+
+        (new ResolveNoPreloadPass())->process($container);
+
+        $this->assertLessThan(\count(debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS)) + 20, $container->maxDepth);
+        $this->assertFalse($container->getDefinition('dep_1000')->hasTag('container.no_preload'));
     }
 }

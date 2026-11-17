@@ -7,7 +7,8 @@ CHANGELOG
  * Add the `IterableToArrayCollection` transform for the ObjectMapper component
  * Throw a `ConstraintDefinitionException` when a field checked by `UniqueEntity` holds an array or is a to-many association
  * Allow using closures with the `#[MapEntity]` attribute
- * Deprecate `DoctrineCloseConnectionMiddleware`, `DoctrineOpenTransactionLoggerMiddleware` and `DoctrinePingConnectionMiddleware`, use `DoctrineDbalCloseConnectionMiddleware`, `DoctrineDbalOpenTransactionLoggerMiddleware` and `DoctrineDbalPingConnectionMiddleware` instead
+ * Deprecate `DoctrineCloseConnectionMiddleware` and `DoctrineOpenTransactionLoggerMiddleware`, use `DoctrineDbalCloseConnectionMiddleware` and `DoctrineDbalOpenTransactionLoggerMiddleware` instead
+ * Add `DoctrineDbalPingConnectionMiddleware` to ping DBAL connections without requiring the ORM
  * Add `DoctrineDbalTransactionMiddleware` to wrap all handlers in a single DBAL transaction without requiring the ORM
  * Map `DatePoint` properties to the `date_point` Doctrine type, so schema tools detect them without an explicit `type`
  * Load a list of entities into `array`-typed controller and command arguments with `#[MapEntity]`, using `findBy()`

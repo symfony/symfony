@@ -31,8 +31,11 @@ use Symfony\Component\Tui\Style\Style;
  * In multiselect mode, Space toggles the highlighted item and Enter confirms
  * all checked items.
  *
- * Item `label`, `description`, and `value` are rendered to the terminal
- * as-is and are not sanitized. See {@see TextWidget} for the raw-passthrough
+ * Consecutive items with the same `group` get a heading with its name,
+ * styled by the "group" element.
+ *
+ * Item `label`, `description`, `group`, and `value` are rendered to the
+ * terminal as-is and are not sanitized. See {@see TextWidget} for the raw-passthrough
  * contract: never pass untrusted bytes here; sanitize upstream via
  * {@see Util\StringUtils::stripControlBytes()}.
  *
@@ -57,7 +60,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
     private int $lastRenderRows = 0;
 
     /**
-     * @param list<array{value: string, label: string, description?: string, checked?: bool}> $items
+     * @param list<array{value: string, label: string, description?: string, checked?: bool, group?: string}> $items
      */
     public function __construct(
         private array $items,
@@ -90,7 +93,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
     }
 
     /**
-     * @param list<array{value: string, label: string, description?: string, checked?: bool}> $items
+     * @param list<array{value: string, label: string, description?: string, checked?: bool, group?: string}> $items
      *
      * @return $this
      */
@@ -103,6 +106,22 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
         $this->invalidate();
 
         return $this;
+    }
+
+    /**
+     * @return list<array{value: string, label: string, description?: string, checked?: bool, group?: string}>
+     */
+    public function getItems(): array
+    {
+        return $this->items;
+    }
+
+    /**
+     * Returns the index of the highlighted item among the items the filter shows.
+     */
+    public function getSelectedIndex(): int
+    {
+        return $this->selectedIndex;
     }
 
     /**
@@ -144,7 +163,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
     /**
      * Get the currently selected item.
      *
-     * @return array{value: string, label: string, description?: string, checked?: bool}|null
+     * @return array{value: string, label: string, description?: string, checked?: bool, group?: string}|null
      */
     public function getSelectedItem(): ?array
     {
@@ -152,7 +171,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
     }
 
     /**
-     * @return list<array{value: string, label: string, description?: string, checked?: bool}>
+     * @return list<array{value: string, label: string, description?: string, checked?: bool, group?: string}>
      */
     public function getSelectedItems(): array
     {
@@ -403,10 +422,17 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
         $labelColumnWidth = min(30, $maxLabelWidth);
 
         $rowsByIndex = [];
+        $headed = [];
         for ($i = $startIndex; $i < $endIndex; ++$i) {
             $item = $this->getFilteredItem($i);
             $description = isset($item['description']) ? $this->normalizeDescription($item['description']) : null;
             $rowsByIndex[$i] = $this->renderItemRows($item, $i === $this->selectedIndex, $description, $columns, $labelColumnWidth);
+            // The first item of a group carries its heading, which is not an item: it scrolls with it
+            $group = $item['group'] ?? null;
+            if (null !== $group && $group !== (0 === $i ? null : $this->getFilteredItem($i - 1)['group'] ?? null)) {
+                array_unshift($rowsByIndex[$i], $this->applyElement('group', AnsiUtils::truncateToWidth($group, $columns, '…')));
+                $headed[$i] = true;
+            }
         }
 
         $total = \count($this->filteredItemIndices);
@@ -456,6 +482,11 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
         for ($i = $start; $i < $end; ++$i) {
             $rows = $rowsByIndex[$i];
             if ($i === $start && $clamp > 0) {
+                // The heading of its group goes first, the arrow and the label start staying visible
+                if (isset($headed[$i])) {
+                    $rows = \array_slice($rows, 1);
+                    --$clamp;
+                }
                 $rows = \array_slice($rows, 0, \count($rows) - $clamp);
             }
             // The prefix is wider than very narrow widgets, so clamp every
@@ -473,7 +504,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
      * their side-by-side columns. Continuation rows keep the arrow only on
      * the first physical row and align under each column.
      *
-     * @param array{value: string, label: string, description?: string, checked?: bool} $item
+     * @param array{value: string, label: string, description?: string, checked?: bool, group?: string} $item
      *
      * @return list<string>
      */
@@ -695,7 +726,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
     }
 
     /**
-     * @return array{value: string, label: string, description?: string, checked?: bool}|null
+     * @return array{value: string, label: string, description?: string, checked?: bool, group?: string}|null
      */
     private function getFilteredItem(int $index): ?array
     {

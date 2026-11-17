@@ -87,6 +87,7 @@ final class DefaultStyleSheet
             SelectListWidget::class.'::selected' => new Style()->withBold(),
             SelectListWidget::class.'::selected:focus' => new Style()->withBold(),
             SelectListWidget::class.'::description' => new Style()->withColor('gray'),
+            SelectListWidget::class.'::group' => new Style()->withColor('gray'),
             SelectListWidget::class.'::scroll-info' => new Style()->withColor('gray'),
             SelectListWidget::class.'::no-match' => new Style()->withColor('yellow'),
 

@@ -26,7 +26,7 @@ use Symfony\Component\Tui\Widget\SelectListWidget;
 class SelectionChangeEvent extends AbstractEvent
 {
     /**
-     * @param array{value: string, label: string, description?: string, checked?: bool} $item
+     * @param array{value: string, label: string, description?: string, checked?: bool, group?: string} $item
      */
     public function __construct(
         SelectListWidget $target,
@@ -38,7 +38,7 @@ class SelectionChangeEvent extends AbstractEvent
     /**
      * Get the full highlighted item array.
      *
-     * @return array{value: string, label: string, description?: string, checked?: bool}
+     * @return array{value: string, label: string, description?: string, checked?: bool, group?: string}
      */
     public function getItem(): array
     {

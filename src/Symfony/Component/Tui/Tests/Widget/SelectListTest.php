@@ -389,6 +389,48 @@ class SelectListTest extends TestCase
         $this->assertSame(['→ abcde', '  fgh', '  abcde', '  fgh'], array_map(AnsiUtils::stripAnsiCodes(...), $list->render(new RenderContext(9, 24))), 'A longer one wraps.');
     }
 
+    public function testGroupsHaveAHeading()
+    {
+        $list = new SelectListWidget([
+            ['value' => 'a', 'label' => 'Apple', 'group' => 'Fruits'],
+            ['value' => 'b', 'label' => 'Banana', 'group' => 'Fruits'],
+            ['value' => 'c', 'label' => 'Carrot', 'group' => 'Vegetables'],
+            ['value' => 'd', 'label' => 'Dates'],
+        ], 10);
+        $lines = array_map(static fn (string $line) => rtrim(AnsiUtils::stripAnsiCodes($line)), $list->render(new RenderContext(30, 24)));
+
+        $this->assertSame(['Fruits', '→ Apple', '  Banana', 'Vegetables', '  Carrot', '  Dates'], $lines);
+        $this->assertStringContainsString("\x1b[90mFruits", $list->render(new RenderContext(30, 24))[0], 'Gray by default.');
+
+        $list->handleInput("\x1b[B"); // Down: the headings are not items
+        $this->assertSame(1, $list->getSelectedIndex());
+        $this->assertSame('b', $list->getSelectedItem()['value']);
+    }
+
+    public function testInOneRowTheSelectedItemWinsOverItsHeading()
+    {
+        $list = new SelectListWidget([['value' => 'a', 'label' => 'Apple', 'group' => 'Fruits'], ['value' => 'b', 'label' => 'Banana']], 5);
+
+        $this->assertSame(['→ Apple'], array_map(static fn (string $line) => rtrim(AnsiUtils::stripAnsiCodes($line)), $list->render(new RenderContext(30, 1))));
+    }
+
+    public function testAGroupHeadingIsCutToTheWidth()
+    {
+        $list = new SelectListWidget([['value' => 'a', 'label' => 'A', 'group' => str_repeat('g', 20)]], 5);
+
+        $this->assertSame(10, AnsiUtils::visibleWidth($list->render(new RenderContext(10, 24))[0]));
+    }
+
+    public function testTheItemsAndTheSelectedIndex()
+    {
+        $items = [['value' => 'a', 'label' => 'A'], ['value' => 'b', 'label' => 'B']];
+        $list = new SelectListWidget($items, 5);
+        $this->assertSame($items, $list->getItems());
+        $this->assertSame(0, $list->getSelectedIndex());
+        $list->setSelectedIndex(1);
+        $this->assertSame(1, $list->getSelectedIndex());
+    }
+
     private function createTestList(bool $multiselect = false): SelectListWidget
     {
         $items = [

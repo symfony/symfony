@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-11-17T13:19:29Z
+
+Instead of undeprecating it under its current name (which does not describe that behavior), we should rather introduce an ORM middleware responsible for resetting closed managers, where the name reflects it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-17T13:28:12Z
+
+A new middleware would mostly be a rename. A dedicated one could skip the ping. It could also reset a closed manager when the connection is not connected, which the current middleware doesn't do. That's not worth asking everybody with `doctrine_ping_connection` in their config to change it IMHO. And a new middleware would go to 8.3 anyway, while 8.2 needs this deprecation reverted since nothing replaces it yet.

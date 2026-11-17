@@ -23,6 +23,7 @@ use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\TemplateType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -86,7 +87,9 @@ final class CollectionDenormalizer implements DenormalizerInterface, Denormalize
             $path = ($context['deserialization_path'] ?? false) ? \sprintf('%s[%s]', $context['deserialization_path'], $key) : "[$key]";
 
             if ($keyType instanceof Type && !$keyType->accepts($key)) {
-                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $keyType, get_debug_type($key)), $key, [(string) $keyType], $path, true);
+                $expectedKeyTypes = $keyType instanceof UnionType ? array_map('strval', $keyType->getTypes()) : [(string) $keyType];
+
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $keyType, get_debug_type($key)), $key, $expectedKeyTypes, $path, true);
             }
 
             if ($valueType instanceof Type && !$valueType->accepts($value)) {

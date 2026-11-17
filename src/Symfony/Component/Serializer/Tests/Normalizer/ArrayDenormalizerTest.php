@@ -100,7 +100,7 @@ class ArrayDenormalizerTest extends TestCase
     }
 
     #[DataProvider('provideUnionKeyTypesWithMembersThatMatchNoKey')]
-    public function testDenormalizeChecksUnionKeyAgainstItsIntAndStringMembers(Type $keyType, string $expectedType)
+    public function testDenormalizeChecksUnionKeyAgainstItsIntAndStringMembers(Type $keyType, string $expectedType, array $expectedTypes)
     {
         $nestedDenormalizer = $this->createStub(DenormalizerInterface::class);
         $nestedDenormalizer->method('denormalize')->willReturnArgument(0);
@@ -110,17 +110,20 @@ class ArrayDenormalizerTest extends TestCase
 
         $this->assertSame([3 => 'a'], $denormalizer->denormalize([3 => 'a'], 'string[]', null, ['key_type' => $keyType]));
 
-        $this->expectException(NotNormalizableValueException::class);
-        $this->expectExceptionMessage(\sprintf('The type of the key "s" must be "%s" ("string" given).', $expectedType));
-
-        $denormalizer->denormalize(['s' => 'a'], 'string[]', null, ['key_type' => $keyType]);
+        try {
+            $denormalizer->denormalize(['s' => 'a'], 'string[]', null, ['key_type' => $keyType]);
+            $this->fail('A key that no member accepts must be rejected.');
+        } catch (NotNormalizableValueException $e) {
+            $this->assertSame(\sprintf('The type of the key "s" must be "%s" ("string" given).', $expectedType), $e->getMessage());
+            $this->assertSame($expectedTypes, $e->getExpectedTypes());
+        }
     }
 
     public static function provideUnionKeyTypesWithMembersThatMatchNoKey(): iterable
     {
-        yield '?int' => [Type::nullable(Type::int()), 'int|null'];
-        yield 'int|object' => [Type::union(Type::int(), Type::object(\stdClass::class)), 'int|stdClass'];
-        yield 'int|bool' => [Type::union(Type::int(), Type::bool()), 'bool|int'];
+        yield '?int' => [Type::nullable(Type::int()), 'int|null', ['int', 'null']];
+        yield 'int|object' => [Type::union(Type::int(), Type::object(\stdClass::class)), 'int|stdClass', ['int', 'stdClass']];
+        yield 'int|bool' => [Type::union(Type::int(), Type::bool()), 'bool|int', ['bool', 'int']];
     }
 
     #[DataProvider('provideKeyTypesThatMatchNoKey')]

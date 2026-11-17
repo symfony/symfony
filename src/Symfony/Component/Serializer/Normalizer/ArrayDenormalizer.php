@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\TemplateType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 
 /**
  * Denormalizes arrays of objects.
@@ -94,7 +95,9 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
             }
 
             if (null !== $keyType && !$keyType->accepts($key)) {
-                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $keyType, get_debug_type($key)), $key, [(string) $keyType], $subContext['deserialization_path'], true);
+                $expectedKeyTypes = $keyType instanceof UnionType ? array_map('strval', $keyType->getTypes()) : [(string) $keyType];
+
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $keyType, get_debug_type($key)), $key, $expectedKeyTypes, $subContext['deserialization_path'], true);
             }
 
             $data[$key] = $this->denormalizer->denormalize($value, $type, $format, $subContext);

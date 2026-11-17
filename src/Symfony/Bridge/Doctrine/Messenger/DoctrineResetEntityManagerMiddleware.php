@@ -1,0 +1,55 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Bridge\Doctrine\Messenger;
+
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
+use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\Middleware\StackInterface;
+use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
+
+/**
+ * Resets closed entity managers before handling a message consumed by a worker.
+ */
+class DoctrineResetEntityManagerMiddleware implements MiddlewareInterface
+{
+    public function __construct(
+        private readonly ManagerRegistry $managerRegistry,
+        private readonly ?string $entityManagerName = null,
+    ) {
+    }
+
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
+    {
+        if (null !== $envelope->last(ConsumedByWorkerStamp::class)) {
+            $names = null === $this->entityManagerName
+                ? array_keys($this->managerRegistry->getManagerNames())
+                : [$this->entityManagerName];
+
+            foreach ($names as $name) {
+                try {
+                    $manager = $this->managerRegistry->getManager($name);
+                } catch (\InvalidArgumentException $e) {
+                    throw new UnrecoverableMessageHandlingException($e->getMessage(), 0, $e);
+                }
+
+                if ($manager instanceof EntityManagerInterface && !$manager->isOpen()) {
+                    $this->managerRegistry->resetManager($name);
+                }
+            }
+        }
+
+        return $stack->next()->handle($envelope, $stack);
+    }
+}

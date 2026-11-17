@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * Checks if a password has been leaked in a data breach using haveibeenpwned.com's API.
  * Use a k-anonymity model to protect the password being searched for.
  *
- * @see https://haveibeenpwned.com/API/v2#SearchingPwnedPasswordsByRange
+ * @see https://haveibeenpwned.com/API/v3#SearchingPwnedPasswordsByRange
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

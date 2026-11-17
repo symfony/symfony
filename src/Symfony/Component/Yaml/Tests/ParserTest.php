@@ -4223,6 +4223,95 @@ class ParserTest extends TestCase
         $this->assertLessThan(10 * 1024 * 1024, MemoryUsageRecorder::$memoryUsage - $memoryUsage);
     }
 
+    public function testParseDeeplyNestedCompactSequenceAndMappings()
+    {
+        $yaml = "root:\n";
+        for ($i = 0; $i < 60; ++$i) {
+            $indent = str_repeat('  ', $i + 1);
+            $yaml .= $indent."-\n".$indent."  level: $i\n".$indent."  child:\n";
+        }
+        $leafIndent = str_repeat('  ', 62);
+        for ($i = 0; $i < 1000; ++$i) {
+            $yaml .= $leafIndent."item_$i: value_$i\n";
+        }
+
+        $data = (new Parser(128))->parse($yaml);
+        $cursor = $data['root'];
+        for ($i = 0; $i < 60; ++$i) {
+            $this->assertSame($i, $cursor[0]['level']);
+            $cursor = $cursor[0]['child'];
+        }
+
+        $this->assertSame('value_999', $cursor['item_999']);
+    }
+
+    public function testCommentAtAncestorIndentationDoesNotLeakIntoNestedBlockScalar()
+    {
+        $yaml = <<<'YAML'
+            root:
+              - nested:
+                  - item:
+                      scalar: |
+                          line1
+                          line2
+                # comment at ancestor indent
+                      next_key: ok
+            YAML;
+
+        $this->assertSame([
+            'root' => [
+                [
+                    'nested' => [
+                        [
+                            'item' => [
+                                'scalar' => "line1\nline2\n",
+                                'next_key' => 'ok',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], $this->parser->parse($yaml));
+    }
+
+    public function testDedentToIntermediateAncestorAndTrailingSiblings()
+    {
+        $yaml = <<<'YAML'
+            a:
+              b:
+                - k1: 1
+                  k2:
+                    c: 2
+                - k1: 3
+              sibling: 4
+            YAML;
+
+        $this->assertSame([
+            'a' => [
+                'b' => [
+                    ['k1' => 1, 'k2' => ['c' => 2]],
+                    ['k1' => 3],
+                ],
+                'sibling' => 4,
+            ],
+        ], $this->parser->parse($yaml));
+    }
+
+    public function testInvalidIntermediateDedentThrowsIndentationProblem()
+    {
+        $yaml = <<<'YAML'
+            a:
+                b:
+                    c: 1
+                  bad: 2
+            YAML;
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Indentation problem at line 4 (near "  bad: 2").');
+
+        $this->parser->parse($yaml);
+    }
+
     public function testParseHandlesTrailingNewlinesAfterDocumentEndMarker()
     {
         $yaml = "---\nfoo: bar\n...\n\n";
@@ -4346,7 +4435,7 @@ class MemoryUsageRecorder
 {
     public static int $memoryUsage;
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
         self::$memoryUsage = memory_get_usage();
     }

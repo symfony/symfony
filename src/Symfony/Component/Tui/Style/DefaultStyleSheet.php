@@ -75,6 +75,8 @@ final class DefaultStyleSheet
 
             // InputWidget
             InputWidget::class.'::cursor' => new Style(cursorShape: CursorShape::Block),
+            InputWidget::class.'::placeholder' => new Style()->withColor('gray'),
+            InputWidget::class.'::suggestion' => new Style()->withColor('gray'),
 
             // EditorWidget
             EditorWidget::class.'::cursor' => new Style(cursorShape: CursorShape::Block),

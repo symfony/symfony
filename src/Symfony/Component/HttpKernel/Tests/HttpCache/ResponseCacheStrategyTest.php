@@ -19,6 +19,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\ResponseCacheStrategy;
 
+/**
+ * @group time-sensitive
+ */
 class ResponseCacheStrategyTest extends TestCase
 {
     public function testMinimumSharedMaxAgeWins()
@@ -81,7 +84,7 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy = new ResponseCacheStrategy();
 
         $response1 = new Response();
-        $response1->setExpires(new \DateTime('+ 1 hour'));
+        $response1->setExpires(\DateTimeImmutable::createFromFormat('U', time() + 3600));
         $response1->setPublic();
         $cacheStrategy->add($response1);
 
@@ -102,7 +105,7 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy = new ResponseCacheStrategy();
 
         $response1 = new Response();
-        $response1->setExpires(new \DateTime('+ 1 hour', new \DateTimeZone('UTC')));
+        $response1->setExpires(\DateTimeImmutable::createFromFormat('U', time() + 3600));
         $response1->setPublic();
         $cacheStrategy->add($response1);
 
@@ -112,7 +115,7 @@ class ResponseCacheStrategyTest extends TestCase
 
         $this->assertSame('3600', $response->headers->getCacheControlDirective('max-age'));
         $this->assertNull($response->headers->getCacheControlDirective('s-maxage'));
-        $this->assertSame((new \DateTime('+ 1 hour', new \DateTimeZone('UTC')))->format('D, d M Y H:i:s').' GMT', $response->headers->get('Expires'));
+        $this->assertSame(\DateTimeImmutable::createFromFormat('U', time() + 3600)->format('D, d M Y H:i:s').' GMT', $response->headers->get('Expires'));
     }
 
     public function testMaxAgeAndSharedMaxAgeUpdatedFromExpiresHeader()
@@ -120,7 +123,7 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy = new ResponseCacheStrategy();
 
         $response1 = new Response();
-        $response1->setExpires(new \DateTime('+ 1 day', new \DateTimeZone('UTC')));
+        $response1->setExpires(\DateTimeImmutable::createFromFormat('U', time() + 86400));
         $response1->setPublic();
         $cacheStrategy->add($response1);
 
@@ -131,7 +134,7 @@ class ResponseCacheStrategyTest extends TestCase
 
         $this->assertSame('3600', $response->headers->getCacheControlDirective('max-age'));
         $this->assertSame('86400', $response->headers->getCacheControlDirective('s-maxage'));
-        $this->assertSame((new \DateTime('+ 1 hour', new \DateTimeZone('UTC')))->format('D, d M Y H:i:s').' GMT', $response->headers->get('Expires'));
+        $this->assertSame(\DateTimeImmutable::createFromFormat('U', time() + 3600)->format('D, d M Y H:i:s').' GMT', $response->headers->get('Expires'));
     }
 
     public function testMainResponseNotCacheableWhenEmbeddedResponseRequiresValidation()
@@ -274,7 +277,7 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy->add($embeddedResponse);
         $cacheStrategy->update($mainResponse);
 
-        $this->assertEqualsWithDelta(60, (int) $mainResponse->headers->getCacheControlDirective('s-maxage'), 1);
+        $this->assertSame('60', $mainResponse->headers->getCacheControlDirective('s-maxage'));
     }
 
     public function testResponseIsExpirableButNotValidateableWhenMainResponseCombinesExpirationAndValidation()
@@ -297,8 +300,6 @@ class ResponseCacheStrategyTest extends TestCase
     }
 
     /**
-     * @group time-sensitive
-     *
      * @dataProvider cacheControlMergingProvider
      */
     public function testCacheControlMerging(array $expects, array $main, array $surrogates)

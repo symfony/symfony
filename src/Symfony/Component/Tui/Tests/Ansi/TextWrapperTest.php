@@ -412,8 +412,13 @@ class TextWrapperTest extends TestCase
     public function testStrikethroughIsTurnedOffAtLineEndAndOnAgainOnTheNextLine()
     {
         $this->assertSame(["aaaa \e[9mstrike\e[29m", "\e[9mme\e[29m next"], TextWrapper::wrapTextWithAnsi("aaaa \e[9mstrike me\e[29m next", 12));
-        // The background goes on to the padding, as it does without strikethrough
-        $this->assertSame(["\e[41;9mstrike\e[29m", "\e[9;41mme\e[0m"], TextWrapper::wrapTextWithAnsi("\e[41;9mstrike me\e[0m", 6));
+        $this->assertSame(["\e[41;9mstrike\e[29m\e[49m", "\e[9;41mme\e[0m"], TextWrapper::wrapTextWithAnsi("\e[41;9mstrike me\e[0m", 6));
+    }
+
+    public function testBackgroundIsTurnedOffAtLineEndAndOnAgainOnTheNextLine()
+    {
+        $this->assertSame(["\e[41mred bg\e[49m", "\e[41mme\e[49m"], TextWrapper::wrapTextWithAnsi("\e[41mred bg me\e[49m", 8));
+        $this->assertSame(["\e[41mab\e[49m", "\e[41mcd\e[49m"], TextWrapper::wrapTextWithAnsi("\e[41mab\ncd\e[49m", 8));
     }
 
     public function testInverseIsTurnedOffAtLineEndAndOnAgainOnTheNextLine()

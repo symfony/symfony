@@ -280,6 +280,20 @@ class MarkdownTest extends TestCase
         $this->assertSame('', $cells[27]['style'], 'The next cell is not bold');
     }
 
+    public function testWrappedCodeBackgroundDoesNotGoOnIntoThePadding()
+    {
+        $md = new MarkdownWidget('see `code text that wraps` end');
+        $tui = new Tui(new StyleSheet([MarkdownWidget::class.'::code' => new Style()->withBackground('blue')]), new VirtualTerminal(30, 24));
+        $tui->add($md);
+        $md->setStyle(Style::padding([0, 1]));
+
+        $this->assertSame([
+            " see \e[44mcode\e[49m     ",
+            " \e[44mtext that\e[49m    ",
+            " \e[44mwraps\e[49m end    ",
+        ], $this->renderThroughRenderer($md, 14, 24));
+    }
+
     public function testWrappedTableCellBackgroundDoesNotLeakIntoTheRestOfTheRow()
     {
         $md = new MarkdownWidget("| a | b |\n|---|---|\n| `code text that wraps a lot here` | x |");

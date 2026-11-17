@@ -255,6 +255,17 @@ class TextTest extends TestCase
         $this->assertSame([" \e[7minverse\e[27m  ", " \e[7mme\e[27m       "], $this->renderWidget($widget, 10, 5));
     }
 
+    public function testBackgroundThatWrapsDoesNotGoOnIntoThePadding()
+    {
+        $widget = (new TextWidget("a \e[41mb c d\e[49m e"))->setStyle(Style::padding([0, 1])->withBackground('blue'));
+
+        $this->assertSame([
+            "\e[44m a \e[41mb\e[49m\e[44m  \e[49m",
+            "\e[44m \e[41mc d\e[49m\e[44m  \e[49m",
+            "\e[44m e    \e[49m",
+        ], $this->renderWidget($widget, 6, 5));
+    }
+
     /**
      * Render a widget through the Renderer pipeline to get full chrome applied.
      *

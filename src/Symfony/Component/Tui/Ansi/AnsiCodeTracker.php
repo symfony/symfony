@@ -159,7 +159,7 @@ final class AnsiCodeTracker
     }
 
     /**
-     * Get the codes that turn off the underline, strikethrough, inverse and a hyperlink at line end, as they bleed into the padding.
+     * Get the codes that turn off the underline, strikethrough, inverse, background and a hyperlink at line end, as they bleed into the padding.
      */
     public function getLineEndReset(): string
     {
@@ -167,6 +167,7 @@ final class AnsiCodeTracker
         return ($this->underline || $this->doubleUnderline ? "\x1b[24m" : '')
             .($this->strikethrough ? "\x1b[29m" : '')
             .($this->inverse ? "\x1b[27m" : '')
+            .(null !== $this->bgColor ? "\x1b[49m" : '')
             .(null !== $this->link ? "\x1b]8;;\x07" : '');
     }
 

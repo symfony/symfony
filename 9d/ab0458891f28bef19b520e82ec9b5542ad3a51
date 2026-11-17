@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-17T16:18:30Z
+
+I added a test case for a closed comment inside `<script>`. The existing `script` case also passes without the `TYPE_1_CODE_CONTAINER` check, because its comment is never closed.
+
+---------------------------------------------------------------------------
+
+by phcorp at 2026-11-17T16:26:27Z
+
+Thanks! Confirmed: your case fails without the `TYPE_1_CODE_CONTAINER` check and passes with it, while the unclosed `script` case passes either way.

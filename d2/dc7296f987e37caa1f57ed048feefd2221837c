@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by phcorp at 2026-11-17T16:26:13Z
+
+Good catch. I measured it, and inverse bleeds just like strikethrough did. I added a commit that turns it off at line end with `\e[27m`, and the next line opens it again:
+
+```php
+(new Renderer())->renderWidget((new TextWidget("\e[7minverse me\e[27m"))->setStyle(Style::padding([0, 1])), new RenderContext(10, 5));
+// before: " \e[7minverse  ", " \e[7mme\e[27m       "
+// after:  " \e[7minverse\e[27m  ", " \e[7mme\e[27m       "
+```
+
+A reverse style set on the widget itself (`Style::withReverse()`) is unaffected. That style is applied around each whole padded line after wrapping, and it is applied again after an inline reset, so the padding stays inverse. The tests pass without changes.
+
+About the background: an inline `\e[41m` bleeds the same way. It even overrides the widget's own background in the padding: `"a \e[41mb c d\e[49m e"` in a widget with a blue background at width 6 gives `"\e[48;2;0;0;255m a \e[41mb  \e[49m"`, so the padding turns red. I tried adding `\e[49m` to `getLineEndReset()`:
+- The renderer then restores the widget background in the padding.
+- The only tests that fail are the two this PR ported from pi, which assert the background is kept.
+- No built-in theme sets a background, and the only callers of `wrapTextWithAnsi()` outside tests are `TextWidget` and `MarkdownWidget`.
+
+pi keeps the background on purpose ("preserves background"). In pi the background usually comes from the text itself, while here it comes from the widget style. I've left it as it was in this PR. If you'd rather close it too, I can add it here or in a separate PR. WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-17T16:33:41Z
+
+Thanks! I squashed your two commits into one. For the background, a separate PR is welcome, so that this one stays as reviewed.

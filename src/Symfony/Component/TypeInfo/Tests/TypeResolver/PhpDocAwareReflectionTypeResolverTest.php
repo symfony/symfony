@@ -55,6 +55,9 @@ class PhpDocAwareReflectionTypeResolverTest extends TestCase
         yield [Type::arrayShape(["it's" => Type::int(), 'quoted key' => Type::int()]), $reflection->getProperty('arrayShapeWithQuotedKeys')];
         yield [Type::arrayShape(["it's" => Type::int(), 'quoted key' => Type::int()]), $reflection->getProperty('aliasedArrayShapeWithQuotedKeys')];
         yield [Type::literal('literal'), $reflection->getProperty('literal')];
+        yield 'refined @var with a description' => [Type::intRange(1, null), $reflection->getProperty('describedRefinement')];
+        yield 'refined @param' => [Type::intRange(1, null), $reflection->getMethod('getRefinedCount')->getParameters()[0]];
+        yield 'refined @return with a description' => [Type::intRange(1, null), $reflection->getMethod('getRefinedCount')];
 
         $reflection = new \ReflectionClass(DummyUsingTraitInDifferentNs::class);
 

@@ -96,15 +96,15 @@ final class PhpDocAwareReflectionTypeResolver implements TypeResolverInterface
                 $tagValue = $tag->value;
 
                 if ('@var' === $tagName && $tagValue instanceof VarTagValueNode) {
-                    return (string) $tagValue;
+                    return (string) $tagValue->type;
                 }
 
                 if ('@param' === $tagName && $tagValue instanceof ParamTagValueNode && '$'.$subject->getName() === $tagValue->parameterName) {
-                    return (string) $tagValue;
+                    return (string) $tagValue->type;
                 }
 
                 if ('@return' === $tagName && $tagValue instanceof ReturnTagValueNode) {
-                    return (string) $tagValue;
+                    return (string) $tagValue->type;
                 }
             }
         }

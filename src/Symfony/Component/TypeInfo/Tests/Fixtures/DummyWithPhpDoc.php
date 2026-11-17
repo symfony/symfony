@@ -44,6 +44,11 @@ final class DummyWithPhpDoc
     public mixed $literal;
 
     /**
+     * @var positive-int Number of items
+     */
+    public mixed $describedRefinement;
+
+    /**
      * @param bool $promoted
      * @param bool $promotedVarAndParam
      */
@@ -66,6 +71,16 @@ final class DummyWithPhpDoc
      * @return Dummy
      */
     public function getNextDummy(mixed $dummy): mixed
+    {
+        throw new \BadMethodCallException(sprintf('"%s" is not implemented.', __METHOD__));
+    }
+
+    /**
+     * @param positive-int $count
+     *
+     * @return positive-int Number of items
+     */
+    public function getRefinedCount(mixed $count): mixed
     {
         throw new \BadMethodCallException(sprintf('"%s" is not implemented.', __METHOD__));
     }

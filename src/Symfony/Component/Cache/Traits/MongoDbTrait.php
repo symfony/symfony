@@ -178,7 +178,7 @@ trait MongoDbTrait
 
     protected function doHave(string $id): bool
     {
-        return 0 < $this->collection->countDocuments(
+        return null !== $this->collection->findOne(
             [
                 '_id' => ['$eq' => $id],
                 '$or' => [
@@ -186,7 +186,7 @@ trait MongoDbTrait
                     ['expires_at' => ['$gt' => $this->createUtcDateTime()]],
                 ],
             ],
-            ['limit' => 1]
+            ['projection' => ['_id' => 1]]
         );
     }
 

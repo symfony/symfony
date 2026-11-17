@@ -99,7 +99,7 @@ class MongoDbTagAwareAdapter extends AbstractTagAwareAdapter implements Pruneabl
             }
         }
 
-        $this->collection->bulkWrite($operations);
+        $this->collection->bulkWrite($operations, ['ordered' => false]);
 
         return $failed ?? [];
     }

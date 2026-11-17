@@ -222,24 +222,17 @@ class CommandTest extends TestCase
 
     #[BackupGlobals(true)]
     #[DataProvider('provideInvalidInvocationMetadata')]
-    public function testProcessedHelpInvocationFallsBackToCurrentPhp(?string $launcher, ?string $script)
+    public function testProcessedHelpInvocationFallsBackToPhp(?string $launcher, ?string $script)
     {
-        $_SERVER['PHP_SELF'] = 'bin/console';
+        $_SERVER['PHP_SELF'] = __FILE__;
         $_SERVER['SCRIPT_FILENAME'] = __FILE__;
         $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = $launcher;
         $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = $script;
 
         $command = new Command('cache:clear');
         $command->setHelp('%command.invocation%');
-        $help = (new OutputFormatter())->format($command->getProcessedHelp());
-        $binary = preg_match('{\A[a-zA-Z0-9_./:@+-]+\z}', \PHP_BINARY) ? \PHP_BINARY : escapeshellarg(\PHP_BINARY);
-        $phpArguments = 'phpdbg' === \PHP_SAPI ? ' -qrr' : '';
-        $expected = [$binary.$phpArguments.' bin/console cache:clear'];
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $expected = [\PHP_BINARY.$phpArguments.' bin/console cache:clear', '"'.\PHP_BINARY.'"'.$phpArguments.' bin/console cache:clear'];
-        }
 
-        $this->assertContains($help, $expected);
+        $this->assertSame('php '.__FILE__.' cache:clear', (new OutputFormatter())->format($command->getProcessedHelp()));
     }
 
     public static function provideInvalidInvocationMetadata(): iterable

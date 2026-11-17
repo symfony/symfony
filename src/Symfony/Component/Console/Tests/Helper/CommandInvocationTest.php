@@ -77,25 +77,76 @@ class CommandInvocationTest extends TestCase
         $this->assertSame('symfony console', CommandInvocation::format(new Command()));
     }
 
-    public function testPhpdbgInvocationIncludesRunFlags()
+    public function testExecutableScriptRunsWithoutPhp()
     {
-        if ('phpdbg' !== \PHP_SAPI) {
-            $this->markTestSkipped('This test requires phpdbg.');
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Scripts cannot be made executable on Windows.');
         }
 
-        $_SERVER['PHP_SELF'] = 'bin/console';
-        unset($_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'], $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT']);
+        $script = tempnam(sys_get_temp_dir(), 'console-invocation-');
+        chmod($script, 0o755);
 
-        $this->assertStringEndsWith(' -qrr bin/console cache:clear', CommandInvocation::format('cache:clear'));
+        try {
+            $_SERVER['PHP_SELF'] = $script;
+            unset($_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'], $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT']);
+
+            $this->assertSame($script.' cache:clear', CommandInvocation::format('cache:clear'));
+        } finally {
+            unlink($script);
+        }
+    }
+
+    public function testNonExecutableScriptRunsWithPhp()
+    {
+        $script = tempnam(sys_get_temp_dir(), 'console-invocation-');
+        chmod($script, 0o644);
+
+        try {
+            $_SERVER['PHP_SELF'] = $script;
+            unset($_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'], $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT']);
+
+            $this->assertSame('php '.$script.' cache:clear', CommandInvocation::format('cache:clear'));
+        } finally {
+            unlink($script);
+        }
+    }
+
+    public function testExecutableScriptWithoutDirectoryRunsWithPhp()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Scripts cannot be made executable on Windows.');
+        }
+
+        $script = tempnam(sys_get_temp_dir(), 'console-invocation-');
+        chmod($script, 0o755);
+        $cwd = getcwd();
+        chdir(\dirname($script));
+
+        try {
+            $_SERVER['PHP_SELF'] = basename($script);
+            unset($_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'], $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT']);
+
+            $this->assertSame('php '.basename($script).' cache:clear', CommandInvocation::format('cache:clear'));
+        } finally {
+            chdir($cwd);
+            unlink($script);
+        }
     }
 
     public function testFallbackScriptForStandaloneCallers()
     {
-        $_SERVER['PHP_SELF'] = 'tools/render-importmap.php';
-        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
-        unset($_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'], $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT']);
+        $script = tempnam(sys_get_temp_dir(), 'console-invocation-');
+        chmod($script, 0o755);
 
-        $this->assertStringEndsWith(' bin/console importmap:install', CommandInvocation::format('importmap:install', 'bin/console'));
+        try {
+            $_SERVER['PHP_SELF'] = $script;
+            $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+            unset($_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'], $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT']);
+
+            $this->assertSame('php bin/console importmap:install', CommandInvocation::format('importmap:install', 'bin/console'));
+        } finally {
+            unlink($script);
+        }
     }
 
     public function testLauncherTakesPrecedenceOverTheFallbackScript()

@@ -92,6 +92,36 @@ class MessageListenerTest extends TestCase
         yield 'Some defaults, add if set (not unique header)' => [$initialHeaders, $defaultHeaders, $expectedHeaders, $rules];
 
         $initialHeaders = (new Headers())
+            ->add(new UnstructuredHeader('foo', 'bar'))
+        ;
+        $defaultHeaders = (new Headers())
+            ->add(new UnstructuredHeader('foo', "headers.getHeaderBody('foo') ~ ' baz'"))
+            ->add(new UnstructuredHeader('bar', "headers.getHeaderBody('bar') ~ ' baz'"))
+            ->add(new UnstructuredHeader('baz', 'qux'))
+        ;
+        $expectedHeaders = (new Headers())
+            ->add(new UnstructuredHeader('foo', 'bar baz'))
+            ->add(new UnstructuredHeader('bar', ' baz'))
+            ->add(new UnstructuredHeader('baz', 'qux'))
+        ;
+        $rules = [
+            'foo' => MessageListener::HEADER_EXPRESSION,
+            'bar' => MessageListener::HEADER_EXPRESSION,
+            'baz' => MessageListener::HEADER_EXPRESSION,
+        ];
+        yield 'Some defaults, default is to evaluate the expression' => [$initialHeaders, $defaultHeaders, $expectedHeaders, $rules];
+
+        $initialHeaders = (new Headers())
+            ->add(new UnstructuredHeader('subject', 'bar'))
+        ;
+        $defaultHeaders = (new Headers())
+            ->add(new UnstructuredHeader('subject', "headers.getHeaderBody('subject') ~ ' baz'"))
+        ;
+        $expectedHeaders = (new Headers())
+            ->add(new UnstructuredHeader('subject', 'bar baz'));
+        yield 'subject, evaluate the expression' => [$initialHeaders, $defaultHeaders, $expectedHeaders];
+
+        $initialHeaders = (new Headers())
             ->add(new MailboxListHeader('bcc', [new Address('bcc-initial@example.com')]))
         ;
         $defaultHeaders = (new Headers())

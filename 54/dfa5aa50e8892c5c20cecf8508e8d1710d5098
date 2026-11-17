@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-17T15:56:05Z
+
+Thanks for the PR. I moved it to 7.4: 6.4 only gets fixes for bugs that common apps hit, and this one needs a big graph plus Xdebug. In our functional test apps, the deepest chain is 18 services, while Xdebug's default limit needs about 100.
+
+I also made the test fail without the fix. Plain PHP has no recursion limit, so the test now checks the stack depth.

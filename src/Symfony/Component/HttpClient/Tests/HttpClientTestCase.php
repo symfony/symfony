@@ -375,9 +375,10 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
     public function testTransferAfterPauseCountsTowardMaxDuration()
     {
         $client = $this->getHttpClient(__FUNCTION__);
-        $response = $client->request('GET', 'http://localhost:8057/timeout-header', ['max_duration' => 1]);
+        $response = $client->request('GET', 'http://localhost:8057/timeout-long', ['max_duration' => 1.5]);
 
-        $response->getInfo('pause_handler')(0.8);
+        // The headers come after 1s, which is less than max_duration but far more than the 0.1s left after the pause
+        $response->getInfo('pause_handler')(1.4);
 
         try {
             $response->getStatusCode();
@@ -385,6 +386,9 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         } catch (TransportException $e) {
             $this->assertNotInstanceOf(TimeoutException::class, $e);
         }
+
+        // The test server handles requests one by one, so wait until the 1s sleep is over before the next test
+        $this->assertSame(200, $client->request('GET', 'http://localhost:8057/')->getStatusCode());
     }
 
     /**

@@ -97,7 +97,7 @@ final class MapInput
                 continue;
             }
 
-            $instance->$name = $spec->resolveValue($input);
+            $this->class->getProperty($name)->setValue($instance, $spec->resolveValue($input));
         }
 
         return $instance;

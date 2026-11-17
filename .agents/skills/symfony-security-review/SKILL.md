@@ -179,7 +179,7 @@ Output a table, highest severity first:
 - **Low**: DoS / resource exhaustion / defense-in-depth only.
 - **Not a finding**: excluded by a decision boundary (say which one).
 
-When a finding moves on to `security-triage`, Critical and High both map to its
+When a finding goes to the security team, Critical and High both map to the
 `high` label; Medium and Low map to `medium` and `low`.
 
 For each real finding, state whether a **hardening regression test** is required so

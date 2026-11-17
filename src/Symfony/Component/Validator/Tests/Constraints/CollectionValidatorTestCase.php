@@ -29,6 +29,19 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
     abstract protected function prepareTestData(array $contents);
 
+    public function testCustomInvalidTypeMessage()
+    {
+        $constraint = new Collection(['foo' => new NotNull()], invalidTypeMessage: 'Expected {{ type }}, got {{ value }}.');
+
+        $this->validate('invalid', $constraint);
+
+        $this->buildViolation('Expected {{ type }}, got {{ value }}.')
+            ->setParameter('{{ type }}', 'array|(Traversable&ArrayAccess)')
+            ->setParameter('{{ value }}', '"invalid"')
+            ->setCode(Collection::INVALID_TYPE_ERROR)
+            ->assertRaised();
+    }
+
     public function testNullIsValid()
     {
         $this->validate(null, new Collection(fields: [

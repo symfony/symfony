@@ -26,6 +26,19 @@ class AllValidatorTest extends ConstraintValidatorTestCase
         return new AllValidator();
     }
 
+    public function testCustomInvalidTypeMessage()
+    {
+        $constraint = new All(new NotNull(), invalidTypeMessage: 'Expected {{ type }}, got {{ value }}.');
+
+        $this->validate('invalid', $constraint);
+
+        $this->buildViolation('Expected {{ type }}, got {{ value }}.')
+            ->setParameter('{{ type }}', 'iterable')
+            ->setParameter('{{ value }}', '"invalid"')
+            ->setCode(All::INVALID_TYPE_ERROR)
+            ->assertRaised();
+    }
+
     public function testNullIsValid()
     {
         $this->validate(null, new All(new Range(min: 4)));

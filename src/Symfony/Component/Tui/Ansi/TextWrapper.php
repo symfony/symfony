@@ -167,7 +167,7 @@ final class TextWrapper
         $tracker = new AnsiCodeTracker();
 
         foreach ($inputLines as $inputLine) {
-            // The previous line gets the underline reset, like a wrapped line
+            // The previous line gets the line end reset, like a wrapped line
             if ($result && '' !== $lineEndReset = $tracker->getLineEndReset()) {
                 $result[array_key_last($result)] .= $lineEndReset;
             }
@@ -218,10 +218,8 @@ final class TextWrapper
             // Token itself is too long - break it character by character
             if ($tokenVisibleLength > $width && !$isWhitespace) {
                 if ('' !== $currentLine) {
-                    if ('' !== $lineEndReset = $tracker->getLineEndReset()) {
-                        $currentLine .= $lineEndReset;
-                    }
-                    $wrapped[] = rtrim($currentLine);
+                    // Trim before adding the reset, which would keep the trailing spaces from being trimmed
+                    $wrapped[] = rtrim($currentLine).$tracker->getLineEndReset();
                     $currentLine = '';
                     $currentVisibleLength = 0;
                 }
@@ -250,7 +248,7 @@ final class TextWrapper
                     $ending = str_replace([' ', "\t"], '', $tokenText);
                 }
 
-                // Trim trailing whitespace, then add underline reset
+                // Trim trailing whitespace, then add the line end reset
                 $lineToWrap = rtrim($currentLine).$ending;
                 if ('' !== $lineEndReset = $tracker->getLineEndReset()) {
                     $lineToWrap .= $lineEndReset;
@@ -527,7 +525,7 @@ final class TextWrapper
                     $tracker->processText($m[0]);
                     $pendingAnsi = substr($pendingAnsi, \strlen($m[0]));
                 }
-                // Add specific reset for underline only (preserves background)
+                // Add the line end reset, which keeps the background
                 if ('' !== $lineEndReset = $tracker->getLineEndReset()) {
                     $currentLine .= $lineEndReset;
                 }

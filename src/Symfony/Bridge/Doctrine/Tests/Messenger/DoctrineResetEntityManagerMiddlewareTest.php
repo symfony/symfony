@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Messenger;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineResetEntityManagerMiddleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
@@ -74,7 +75,7 @@ class DoctrineResetEntityManagerMiddlewareTest extends MiddlewareTestCase
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->method('getManagerNames')->willReturn(['default' => 'doctrine.odm.default_manager']);
-        $registry->method('getManager')->with('default')->willReturn(new \stdClass());
+        $registry->method('getManager')->with('default')->willReturn($this->createStub(ObjectManager::class));
         $registry->expects($this->never())->method('resetManager');
 
         (new DoctrineResetEntityManagerMiddleware($registry))

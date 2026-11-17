@@ -248,6 +248,13 @@ class TextTest extends TestCase
         $this->assertCount(1, $truncatedLines);
     }
 
+    public function testInverseThatWrapsDoesNotGoOnIntoThePadding()
+    {
+        $widget = (new TextWidget("\e[7minverse me\e[27m"))->setStyle(Style::padding([0, 1]));
+
+        $this->assertSame([" \e[7minverse\e[27m  ", " \e[7mme\e[27m       "], $this->renderWidget($widget, 10, 5));
+    }
+
     /**
      * Render a widget through the Renderer pipeline to get full chrome applied.
      *

@@ -235,6 +235,17 @@ class MarkdownTest extends TestCase
         $this->assertStringContainsString("\x1b[9mgone", $line);
     }
 
+    public function testStrikethroughThatWrapsDoesNotGoOnIntoThePadding()
+    {
+        $md = $this->createMarkdown('~~strikethrough text that wraps~~')->setStyle(Style::padding([0, 1])->withBackground('blue'));
+
+        $this->assertSame([
+            "\x1b[44m \x1b[9mstrikethroug\x1b[29m \x1b[49m",
+            "\x1b[44m \x1b[9mh text that\x1b[29m  \x1b[49m",
+            "\x1b[44m \x1b[9mwraps\x1b[29m\x1b[44m        \x1b[49m",
+        ], $this->renderThroughRenderer($md, 14, 24));
+    }
+
     #[DataProvider('blockStyleAfterInlineStyleProvider')]
     public function testBlockStyleIsRestoredAfterAnInlineStyle(string $markdown, string $char, string $blockStyle)
     {

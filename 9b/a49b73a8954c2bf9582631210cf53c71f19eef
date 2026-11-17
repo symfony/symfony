@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-17T15:56:57Z
+
+Thanks for the PR! I pushed a fix for the low-deps job. The released Console versions put style codes between the escaped tags of a decorated table, so the `debug:translation` test now runs without decoration. I also dropped the `(string)` cast, which was only there for Psalm. And I added a few assertions, so that each escape has a test that fails without it.

@@ -29,7 +29,7 @@ use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 /*
 Tests for HTTP2 Push need a recent version of both PHP and curl. This docker command should run them:
 docker run -it --rm -v $(pwd):/app -v /path/to/vulcain:/usr/local/bin/vulcain -w /app php:7.3-alpine ./phpunit src/Symfony/Component/HttpClient --filter Push
-The vulcain binary can be found at https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz - see https://github.com/dunglas/vulcain for source
+The vulcain binary can be found at https://github.com/symfony-tools/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz - see https://github.com/dunglas/vulcain for source
 */
 
 abstract class HttpClientTestCase extends BaseHttpClientTestCase

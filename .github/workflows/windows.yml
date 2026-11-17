@@ -43,12 +43,12 @@ jobs:
         run: |
           $env:Path = 'c:\php;' + $env:Path
           mkdir c:\php && cd c:\php
-          iwr -outf php-7.2.5-Win32-VC15-x86.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-7.2.5-Win32-VC15-x86.zip
+          iwr -outf php-7.2.5-Win32-VC15-x86.zip https://github.com/symfony-tools/binary-utils/releases/download/v0.1/php-7.2.5-Win32-VC15-x86.zip
           7z x php-7.2.5-Win32-VC15-x86.zip -y >nul
           cd ext
-          iwr -outf php_apcu-5.1.19-7.2-ts-vc15-x86.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.19-7.2-ts-vc15-x86.zip
+          iwr -outf php_apcu-5.1.19-7.2-ts-vc15-x86.zip https://github.com/symfony-tools/binary-utils/releases/download/v0.1/php_apcu-5.1.19-7.2-ts-vc15-x86.zip
           7z x php_apcu-5.1.19-7.2-ts-vc15-x86.zip -y >nul
-          iwr -outf php_redis-5.3.2-7.2-ts-vc15-x86.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-5.3.2-7.2-ts-vc15-x86.zip
+          iwr -outf php_redis-5.3.2-7.2-ts-vc15-x86.zip https://github.com/symfony-tools/binary-utils/releases/download/v0.1/php_redis-5.3.2-7.2-ts-vc15-x86.zip
           7z x php_redis-5.3.2-7.2-ts-vc15-x86.zip -y >nul
           cd ..
           Copy php.ini-development php.ini-min

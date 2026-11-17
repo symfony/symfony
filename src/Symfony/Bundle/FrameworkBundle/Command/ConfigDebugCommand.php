@@ -19,6 +19,7 @@ use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -109,15 +110,15 @@ class ConfigDebugCommand extends AbstractConfigCommand
         if (null === $path = $input->getArgument('path')) {
             if ('txt' === $input->getOption('format')) {
                 $io->title(
-                    \sprintf('Current configuration for %s', $name === $extensionAlias ? \sprintf('extension with alias "%s"', $extensionAlias) : \sprintf('"%s"', $name))
+                    \sprintf('Current configuration for %s', OutputFormatter::escape($name === $extensionAlias ? \sprintf('extension with alias "%s"', $extensionAlias) : \sprintf('"%s"', $name)))
                 );
 
                 if ($docUrl = $this->getDocUrl($extension, $container)) {
-                    $io->comment(\sprintf('Documentation at %s', $docUrl));
+                    $io->comment(\sprintf('Documentation at %s', OutputFormatter::escape($docUrl)));
                 }
             }
 
-            $io->writeln($this->convertToFormat([$extensionAlias => $config], $format));
+            $io->writeln($this->convertToFormat([$extensionAlias => $config], $format), OutputInterface::OUTPUT_RAW);
 
             return 0;
         }
@@ -130,9 +131,9 @@ class ConfigDebugCommand extends AbstractConfigCommand
             return 1;
         }
 
-        $io->title(\sprintf('Current configuration for "%s.%s"', $extensionAlias, $path));
+        $io->title(\sprintf('Current configuration for "%s.%s"', OutputFormatter::escape($extensionAlias), OutputFormatter::escape($path)));
 
-        $io->writeln($this->convertToFormat($config, $format));
+        $io->writeln($this->convertToFormat($config, $format), OutputInterface::OUTPUT_RAW);
 
         return 0;
     }
@@ -141,7 +142,7 @@ class ConfigDebugCommand extends AbstractConfigCommand
     {
         return match ($format) {
             'txt', 'yaml' => Yaml::dump($config, 10),
-            'json' => json_encode($config, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE),
+            'json' => json_encode($config, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_INVALID_UTF8_SUBSTITUTE),
             default => throw new InvalidArgumentException(\sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
         };
     }

@@ -219,6 +219,22 @@ class DebugCommandTest extends TestCase
         $this->assertSame($expectedSuggestions, $tester->complete($input));
     }
 
+    public function testOutputWithMarkup()
+    {
+        $command = new DebugCommand([
+            'bus<info>' => [
+                DummyCommand::class => [['handler<info>', ['option' => 'val</error>']]],
+            ],
+        ]);
+
+        $tester = new CommandTester($command);
+        $tester->execute([], ['decorated' => false]);
+        $display = $tester->getDisplay(true);
+
+        $this->assertStringContainsString('bus<info>', $display);
+        $this->assertStringContainsString('handled by handler<info> (when option=val</error>)', $display);
+    }
+
     public static function provideCompletionSuggestions(): iterable
     {
         yield 'bus' => [

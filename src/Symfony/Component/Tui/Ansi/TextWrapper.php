@@ -525,7 +525,7 @@ final class TextWrapper
                     $tracker->processText($m[0]);
                     $pendingAnsi = substr($pendingAnsi, \strlen($m[0]));
                 }
-                // Add the line end reset, which keeps the background
+                // Turn off the styles that would bleed into the padding
                 if ('' !== $lineEndReset = $tracker->getLineEndReset()) {
                     $currentLine .= $lineEndReset;
                 }

@@ -324,13 +324,19 @@ class AnsiCodeTrackerTest extends TestCase
         $this->assertSame('', $this->tracker->getLineEndReset());
     }
 
-    public function testGetLineEndResetTurnsOffStrikethroughOnly()
+    public function testGetLineEndResetTurnsOffStrikethroughAndBackground()
     {
         $this->tracker->process("\x1b[41;9m");
-        $this->assertSame("\x1b[29m", $this->tracker->getLineEndReset());
+        $this->assertSame("\x1b[29m\x1b[49m", $this->tracker->getLineEndReset());
         $this->assertSame("\x1b[9;41m", $this->tracker->getActiveCodes());
 
         $this->tracker->process("\x1b[29m");
+        $this->assertSame("\x1b[49m", $this->tracker->getLineEndReset());
+
+        $this->tracker->process("\x1b[48;2;0;0;255m");
+        $this->assertSame("\x1b[49m", $this->tracker->getLineEndReset());
+
+        $this->tracker->process("\x1b[49m");
         $this->assertSame('', $this->tracker->getLineEndReset());
     }
 

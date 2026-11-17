@@ -24,11 +24,11 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
-                <target>Você deveria selecionar {{ limit }} opção no mínimo.|Você deveria selecionar {{ limit }} opções no mínimo.</target>
+                <target>Deve selecionar pelo menos {{ limit }} opção.|Deve selecionar pelo menos {{ limit }} opções.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
-                <target>Você deve selecionar, no máximo {{ limit }} opção.|Você deve selecionar, no máximo {{ limit }} opções.</target>
+                <target>Deve selecionar no máximo {{ limit }} opção.|Deve selecionar no máximo {{ limit }} opções.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
@@ -40,7 +40,7 @@
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
-                <target>Este campo está faltando.</target>
+                <target>Este campo está em falta.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -108,7 +108,7 @@
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL.</source>
-                <target>Este valor não é uma URL válida.</target>
+                <target>Este valor não é um URL válido.</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal.</source>
@@ -156,7 +156,7 @@
             </trans-unit>
             <trans-unit id="42">
                 <source>The size of the image could not be detected.</source>
-                <target>O tamanho da imagem não foi detectado.</target>
+                <target>O tamanho da imagem não foi detetado.</target>
             </trans-unit>
             <trans-unit id="43">
                 <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
@@ -176,11 +176,11 @@
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user's current password.</source>
-                <target>Este valor deveria ser a palvra-passe atual do usuário.</target>
+                <target>Este valor deveria ser a palavra-passe atual do utilizador.</target>
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
-                <target>Este valor deve possuir exatamente {{ limit }} caractere.|Este valor deve possuir exatamente {{ limit }} caracteres.</target>
+                <target>Este valor deve ter exatamente {{ limit }} carácter.|Este valor deve ter exatamente {{ limit }} carateres.</target>
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
@@ -404,11 +404,11 @@
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target>O nome do ficheiro é muito grande. Deveria ter {{ filename_max_length }} caractere ou menos.|O nome do ficheiro é muito grande. Deveria ter {{ filename_max_length }} caracteres ou menos.</target>
+                <target>O nome do ficheiro é demasiado longo. Deve ter {{ filename_max_length }} carácter ou menos.|O nome do ficheiro é demasiado longo. Deve ter {{ filename_max_length }} carateres ou menos.</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
-                <target>A força da palvra-passe é muito baixa. Por favor utilize uma palvra-passe mais forte.</target>
+                <target>A força da palavra-passe é demasiado baixa. Por favor, utilize uma palavra-passe mais forte.</target>
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
@@ -432,7 +432,7 @@
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target>A codificação de carateres detectada é inválida ({{ detected }}). As codificações permitidas são {{ encodings }}.</target>
+                <target>A codificação de carateres detetada é inválida ({{ detected }}). As codificações permitidas são {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
@@ -440,7 +440,7 @@
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL is missing a top-level domain.</source>
-                <target>Esta URL está faltando o domínio de nível superior.</target>
+                <target>Falta o domínio de nível superior neste URL.</target>
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
@@ -556,95 +556,95 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">Este valor não é um XML válido.</target>
+                <target>Este valor não é um XML válido.</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">Este valor não está em conformidade com o esquema XSD esperado.</target>
+                <target>Este valor não está em conformidade com o esquema XSD esperado.</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">Esta carga útil XML é demasiado grande ({{ size }} bytes): excede o limite de {{ limit }} bytes.</target>
+                <target>O conteúdo XML é demasiado grande ({{ size }} bytes): excede o limite de {{ limit }} bytes.</target>
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">Este valor não é uma expressão cron válida.</target>
+                <target>Este valor não é uma expressão cron válida.</target>
             </trans-unit>
             <trans-unit id="147">
                 <source>The referenced entity does not exist.</source>
-                <target state="needs-review-translation">A entidade referenciada não existe.</target>
+                <target>A entidade referenciada não existe.</target>
             </trans-unit>
             <trans-unit id="148" resname="This is not a valid ULID.">
                 <source>This value is not a valid ULID.</source>
-                <target state="needs-review-translation">Este valor não é um ULID válido.</target>
+                <target>Este valor não é um ULID válido.</target>
             </trans-unit>
             <trans-unit id="149">
                 <source>This file is not a valid audio file.</source>
-                <target state="needs-review-translation">Este ficheiro não é um ficheiro de áudio válido.</target>
+                <target>Este ficheiro não é um ficheiro de áudio válido.</target>
             </trans-unit>
             <trans-unit id="150">
                 <source>The audio is too short ({{ duration }} seconds). Minimum duration expected is {{ min_duration }} seconds.</source>
-                <target state="needs-review-translation">O áudio é demasiado curto ({{ duration }} segundos). A duração mínima esperada é {{ min_duration }} segundos.</target>
+                <target>O áudio é demasiado curto ({{ duration }} segundos). A duração mínima esperada é {{ min_duration }} segundos.</target>
             </trans-unit>
             <trans-unit id="151">
                 <source>The audio is too long ({{ duration }} seconds). Allowed maximum duration is {{ max_duration }} seconds.</source>
-                <target state="needs-review-translation">O áudio é demasiado longo ({{ duration }} segundos). A duração máxima permitida é {{ max_duration }} segundos.</target>
+                <target>O áudio é demasiado longo ({{ duration }} segundos). A duração máxima permitida é {{ max_duration }} segundos.</target>
             </trans-unit>
             <trans-unit id="152">
                 <source>The duration of the audio could not be detected.</source>
-                <target state="needs-review-translation">Não foi possível detetar a duração do áudio.</target>
+                <target>Não foi possível detetar a duração do áudio.</target>
             </trans-unit>
             <trans-unit id="153">
                 <source>The audio bitrate is too low ({{ bitrate }} bps). Minimum bitrate expected is {{ min_bitrate }} bps.</source>
-                <target state="needs-review-translation">A taxa de bits do áudio é demasiado baixa ({{ bitrate }} bps). A taxa de bits mínima esperada é {{ min_bitrate }} bps.</target>
+                <target>A taxa de bits do áudio é demasiado baixa ({{ bitrate }} bps). A taxa de bits mínima esperada é {{ min_bitrate }} bps.</target>
             </trans-unit>
             <trans-unit id="154">
                 <source>The audio bitrate is too high ({{ bitrate }} bps). Allowed maximum bitrate is {{ max_bitrate }} bps.</source>
-                <target state="needs-review-translation">A taxa de bits do áudio é demasiado alta ({{ bitrate }} bps). A taxa de bits máxima permitida é {{ max_bitrate }} bps.</target>
+                <target>A taxa de bits do áudio é demasiado alta ({{ bitrate }} bps). A taxa de bits máxima permitida é {{ max_bitrate }} bps.</target>
             </trans-unit>
             <trans-unit id="155">
                 <source>The bitrate of the audio could not be detected.</source>
-                <target state="needs-review-translation">Não foi possível detetar a taxa de bits do áudio.</target>
+                <target>Não foi possível detetar a taxa de bits do áudio.</target>
             </trans-unit>
             <trans-unit id="156">
                 <source>Unsupported audio sample rate ({{ sample_rate }} Hz).</source>
-                <target state="needs-review-translation">Taxa de amostragem de áudio ({{ sample_rate }} Hz) não suportada.</target>
+                <target>Taxa de amostragem de áudio ({{ sample_rate }} Hz) não suportada.</target>
             </trans-unit>
             <trans-unit id="157">
                 <source>The sample rate of the audio could not be detected.</source>
-                <target state="needs-review-translation">Não foi possível detetar a taxa de amostragem do áudio.</target>
+                <target>Não foi possível detetar a taxa de amostragem do áudio.</target>
             </trans-unit>
             <trans-unit id="158">
                 <source>The audio has too few channels ({{ channels }}). Minimum amount expected is {{ min_channels }}.</source>
-                <target state="needs-review-translation">O áudio tem poucos canais ({{ channels }}). A quantidade mínima esperada é {{ min_channels }}.</target>
+                <target>O áudio tem poucos canais ({{ channels }}). A quantidade mínima esperada é {{ min_channels }}.</target>
             </trans-unit>
             <trans-unit id="159">
                 <source>The audio has too many channels ({{ channels }}). Maximum amount expected is {{ max_channels }}.</source>
-                <target state="needs-review-translation">O áudio tem demasiados canais ({{ channels }}). A quantidade máxima esperada é {{ max_channels }}.</target>
+                <target>O áudio tem demasiados canais ({{ channels }}). A quantidade máxima esperada é {{ max_channels }}.</target>
             </trans-unit>
             <trans-unit id="160">
                 <source>The number of audio channels could not be detected.</source>
-                <target state="needs-review-translation">Não foi possível detetar o número de canais de áudio.</target>
+                <target>Não foi possível detetar o número de canais de áudio.</target>
             </trans-unit>
             <trans-unit id="161">
                 <source>The audio file is corrupted.</source>
-                <target state="needs-review-translation">O ficheiro de áudio está corrompido.</target>
+                <target>O ficheiro de áudio está corrompido.</target>
             </trans-unit>
             <trans-unit id="162">
                 <source>The audio contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">O áudio contém múltiplos fluxos. Apenas é permitido um fluxo.</target>
+                <target>O áudio contém múltiplos fluxos. Apenas é permitido um fluxo.</target>
             </trans-unit>
             <trans-unit id="163">
                 <source>Unsupported audio codec "{{ codec }}".</source>
-                <target state="needs-review-translation">Codec de áudio "{{ codec }}" não suportado.</target>
+                <target>Codec de áudio "{{ codec }}" não suportado.</target>
             </trans-unit>
             <trans-unit id="164">
                 <source>Unsupported audio container "{{ container }}".</source>
-                <target state="needs-review-translation">Contentor de áudio "{{ container }}" não suportado.</target>
+                <target>Contentor de áudio "{{ container }}" não suportado.</target>
             </trans-unit>
             <trans-unit id="165">
                 <source>The file does not contain any audio stream.</source>
-                <target state="needs-review-translation">O ficheiro não contém nenhum fluxo de áudio.</target>
+                <target>O ficheiro não contém nenhum fluxo de áudio.</target>
             </trans-unit>
         </body>
     </file>

@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
 class DoctrineResetEntityManagerMiddlewareTest extends MiddlewareTestCase
 {
-    public function testResetsClosedManagerBeforeHandlingWorkerMessage(): void
+    public function testResetsClosedManagerBeforeHandlingWorkerMessage()
     {
         $manager = $this->createStub(EntityManagerInterface::class);
         $manager->method('isOpen')->willReturn(false);
@@ -35,7 +35,7 @@ class DoctrineResetEntityManagerMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($this->workerEnvelope(), $this->getStackMock());
     }
 
-    public function testLeavesOpenManagersUntouched(): void
+    public function testLeavesOpenManagersUntouched()
     {
         $manager = $this->createStub(EntityManagerInterface::class);
         $manager->method('isOpen')->willReturn(true);
@@ -48,7 +48,7 @@ class DoctrineResetEntityManagerMiddlewareTest extends MiddlewareTestCase
             ->handle($this->workerEnvelope(), $this->getStackMock());
     }
 
-    public function testResetsClosedManagersWhenNoManagerNameIsSpecified(): void
+    public function testResetsClosedManagersWhenNoManagerNameIsSpecified()
     {
         $open = $this->createStub(EntityManagerInterface::class);
         $open->method('isOpen')->willReturn(true);
@@ -71,7 +71,7 @@ class DoctrineResetEntityManagerMiddlewareTest extends MiddlewareTestCase
             ->handle($this->workerEnvelope(), $this->getStackMock());
     }
 
-    public function testIgnoresNonOrmManagers(): void
+    public function testIgnoresNonOrmManagers()
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->method('getManagerNames')->willReturn(['default' => 'doctrine.odm.default_manager']);
@@ -82,7 +82,7 @@ class DoctrineResetEntityManagerMiddlewareTest extends MiddlewareTestCase
             ->handle($this->workerEnvelope(), $this->getStackMock());
     }
 
-    public function testDoesNotResetInNonWorkerContext(): void
+    public function testDoesNotResetInNonWorkerContext()
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->never())->method('getManager');
@@ -92,7 +92,7 @@ class DoctrineResetEntityManagerMiddlewareTest extends MiddlewareTestCase
             ->handle(new Envelope(new \stdClass()), $this->getStackMock());
     }
 
-    public function testUnknownManagerThrowsUnrecoverableMessageHandlingException(): void
+    public function testUnknownManagerThrowsUnrecoverableMessageHandlingException()
     {
         $registry = $this->createStub(ManagerRegistry::class);
         $registry->method('getManager')->willThrowException(new \InvalidArgumentException('Unknown manager'));

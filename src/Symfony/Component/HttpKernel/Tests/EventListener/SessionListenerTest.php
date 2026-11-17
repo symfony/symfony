@@ -600,12 +600,11 @@ class SessionListenerTest extends TestCase
 
         $response = new Response();
         $response->setPrivate();
-        $expiresHeader = gmdate('D, d M Y H:i:s', time() + 600).' GMT';
         $response->setMaxAge(600);
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
 
         $this->assertTrue($response->headers->has('expires'));
-        $this->assertSame($expiresHeader, $response->headers->get('expires'));
+        $this->assertEqualsWithDelta(time() + 600, $response->getExpires()->getTimestamp(), 1);
         $this->assertFalse($response->headers->has('max-age'));
         $this->assertSame('600', $response->headers->getCacheControlDirective('max-age'));
         $this->assertFalse($response->headers->hasCacheControlDirective('public'));
@@ -629,11 +628,10 @@ class SessionListenerTest extends TestCase
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
 
         $response = new Response();
-        $expiresHeader = gmdate('D, d M Y H:i:s', time()).' GMT';
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
 
         $this->assertTrue($response->headers->has('expires'));
-        $this->assertSame($expiresHeader, $response->headers->get('expires'));
+        $this->assertEqualsWithDelta(time(), $response->getExpires()->getTimestamp(), 1);
         $this->assertFalse($response->headers->has('max-age'));
         $this->assertSame('0', $response->headers->getCacheControlDirective('max-age'));
         $this->assertFalse($response->headers->hasCacheControlDirective('public'));

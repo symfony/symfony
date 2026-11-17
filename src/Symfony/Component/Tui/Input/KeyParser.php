@@ -131,10 +131,10 @@ final class KeyParser
         'page_up' => ["\x1b[5~", "\x1b[[5~"],
         'page_down' => ["\x1b[6~", "\x1b[[6~"],
         'clear' => ["\x1b[E", "\x1bOE"],
-        'f1' => ["\x1bOP", "\x1b[11~", "\x1b[[A"],
-        'f2' => ["\x1bOQ", "\x1b[12~", "\x1b[[B"],
+        'f1' => ["\x1bOP", "\x1b[11~", "\x1b[[A", "\x1b[P"],
+        'f2' => ["\x1bOQ", "\x1b[12~", "\x1b[[B", "\x1b[Q"],
         'f3' => ["\x1bOR", "\x1b[13~", "\x1b[[C"],
-        'f4' => ["\x1bOS", "\x1b[14~", "\x1b[[D"],
+        'f4' => ["\x1bOS", "\x1b[14~", "\x1b[[D", "\x1b[S"],
         'f5' => ["\x1b[15~", "\x1b[[E"],
         'f6' => ["\x1b[17~"],
         'f7' => ["\x1b[18~"],
@@ -242,6 +242,9 @@ final class KeyParser
         "\x1b[[C" => 'f3',
         "\x1b[[D" => 'f4',
         "\x1b[[E" => 'f5',
+        "\x1b[P" => 'f1',
+        "\x1b[Q" => 'f2',
+        "\x1b[S" => 'f4',
         "\x1b[15~" => 'f5',
         "\x1b[17~" => 'f6',
         "\x1b[18~" => 'f7',
@@ -573,7 +576,8 @@ final class KeyParser
             }
         }
 
-        if (preg_match('/^\x1b\[1;(\d+)(?::(\d+))?([PQRS])$/', $data, $match) && false !== $functionKey = array_search($match[3], self::LEGACY_FUNCTION_KEY_LETTERS, true)) {
+        // Kitty sends F3 as CSI 13~ because CSI 1;<mod> R is also a cursor position report
+        if (preg_match('/^\x1b\[1;(\d+)(?::(\d+))?([PQRS])$/', $data, $match) && ('R' !== $match[3] || !$this->kittyProtocolActive) && false !== $functionKey = array_search($match[3], self::LEGACY_FUNCTION_KEY_LETTERS, true)) {
             return [
                 'codepoint' => self::FUNCTION_KEY_CODEPOINTS[$functionKey],
                 'modifier' => (int) $match[1] - 1,

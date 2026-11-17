@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\CommandInvocation;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -151,7 +152,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
 
         $this->printPendingMessagesMessage($failureTransportName, $io);
 
-        $io->writeln(\sprintf('To retry all the messages, run <comment>%s %s</comment>', CommandInvocation::formatEscaped('messenger:consume'), $failureTransportName));
+        $io->writeln(\sprintf('To retry all the messages, run <comment>%s %s</comment>', CommandInvocation::formatEscaped('messenger:consume'), OutputFormatter::escape((string) $failureTransportName)));
 
         $shouldForce = $input->getOption('force');
         $shouldRedispatch = $input->getOption('redispatch');

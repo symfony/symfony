@@ -19,12 +19,19 @@ use Symfony\Bundle\FrameworkBundle\Command\ConfigDumpReferenceCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Asset\AssetBundle;
 use Symfony\Component\AssetMapper\AssetMapperBundle;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerBundle;
 use Symfony\Component\HttpClient\HttpClientBundle;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\JsonPath\JsonPathBundle;
 use Symfony\Component\JsonSchema\JsonSchemaBundle;
 use Symfony\Component\JsonStreamer\JsonStreamerBundle;
@@ -176,6 +183,106 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
         $this->assertStringContainsString('%env(default::SYMFONY_TRUSTED_PROXIES)%', $tester->getDisplay());
+    }
+
+    #[TestWith(['yaml', [
+        '    # <info>hint</info></error>',
+        "    value:                '<info>tag</info></error>'",
+    ]])]
+    #[TestWith(['xml', [
+        '<!-- value: <info>hint</info></error> -->',
+        '<config value="<info>tag</info></error>" />',
+    ]])]
+    public function testDumpReferenceWithMarkup(string $format, array $expectedLines)
+    {
+        $extension = new class extends Extension implements ConfigurationInterface {
+            public function getAlias(): string
+            {
+                return 'markup_test';
+            }
+
+            public function load(array $configs, ContainerBuilder $container): void
+            {
+            }
+
+            public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
+            {
+                return $this;
+            }
+
+            public function getConfigTreeBuilder(): TreeBuilder
+            {
+                $treeBuilder = new TreeBuilder('markup_test');
+                $treeBuilder->getRootNode()
+                    ->children()
+                        ->scalarNode('value')
+                            ->defaultValue('<info>tag</info></error>')
+                            ->info('<info>hint</info></error>')
+                        ->end()
+                    ->end();
+
+                return $treeBuilder;
+            }
+        };
+
+        $bundle = new class($extension) extends Bundle {
+            public function __construct(private Extension $markupExtension)
+            {
+                $this->name = 'MarkupTestBundle';
+            }
+
+            public function getContainerExtension(): Extension
+            {
+                return $this->markupExtension;
+            }
+        };
+
+        $kernel = new class($bundle) extends Kernel {
+            public function __construct(private Bundle $markupBundle)
+            {
+                parent::__construct('test', false);
+            }
+
+            public function boot(): void
+            {
+                $this->booted = true;
+                $this->container = new ContainerBuilder();
+                $this->initializeBundles();
+            }
+
+            public function registerBundles(): iterable
+            {
+                return [$this->markupBundle];
+            }
+
+            public function registerContainerConfiguration(LoaderInterface $loader): void
+            {
+            }
+
+            protected function initializeBundles(): void
+            {
+                $this->bundles = ['MarkupTestBundle' => $this->markupBundle];
+            }
+
+            protected function buildContainer(): ContainerBuilder
+            {
+                $container = new ContainerBuilder();
+                $container->registerExtension($this->markupBundle->getContainerExtension());
+
+                return $container;
+            }
+        };
+
+        $application = new Application($kernel);
+        $application->addCommand(new ConfigDumpReferenceCommand());
+
+        $tester = new CommandTester($application->find('config:dump-reference'));
+        $ret = $tester->execute(['name' => 'markup_test', '--format' => $format], ['decorated' => true]);
+
+        $this->assertSame(0, $ret);
+        foreach ($expectedLines as $expected) {
+            $this->assertStringContainsString($expected, $tester->getDisplay());
+        }
     }
 
     #[DataProvider('provideCompletionSuggestions')]

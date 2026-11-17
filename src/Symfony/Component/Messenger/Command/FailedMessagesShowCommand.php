@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\CommandInvocation;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -106,7 +107,7 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
         $rows = [];
 
         if ($filter->class) {
-            $errorIo->comment(\sprintf('Displaying only \'%s\' messages', $filter->class));
+            $errorIo->comment(\sprintf('Displaying only \'%s\' messages', OutputFormatter::escape($filter->class)));
         }
         if ($filter->failedAfter) {
             $errorIo->comment(\sprintf('Displaying only messages that failed after %s', $filter->failedAfter->format('Y-m-d H:i:s')));
@@ -120,10 +121,10 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
             $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
 
             $rows[] = [
-                FailedMessageRepository::getMessageId($envelope),
-                $envelope->getMessage()::class,
+                OutputFormatter::escape((string) FailedMessageRepository::getMessageId($envelope)),
+                OutputFormatter::escape($envelope->getMessage()::class),
                 null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s'),
-                $lastErrorDetailsStamp?->getExceptionMessage() ?? '',
+                OutputFormatter::escape($lastErrorDetailsStamp?->getExceptionMessage() ?? ''),
             ];
         }
 
@@ -143,7 +144,7 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
             $errorIo->comment(\sprintf('Showing %d message(s).', $rowsCount));
         }
 
-        $errorIo->comment(\sprintf('Run <comment>%s {id} --transport=%s -vv</comment> to see message details.', CommandInvocation::formatEscaped($this), $failedTransportName));
+        $errorIo->comment(\sprintf('Run <comment>%s {id} --transport=%s -vv</comment> to see message details.', CommandInvocation::formatEscaped($this), OutputFormatter::escape((string) $failedTransportName)));
     }
 
     private function listMessagesPerClass(string $failedTransportName, SymfonyStyle $io, ?int $max, FailedMessageFilter $filter): void
@@ -154,7 +155,7 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
             $c = $envelope->getMessage()::class;
 
             if (!isset($countPerClass[$c])) {
-                $countPerClass[$c] = [$c, 0];
+                $countPerClass[$c] = [OutputFormatter::escape($c), 0];
             }
 
             ++$countPerClass[$c][1];
@@ -179,8 +180,8 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
 
         $io->writeln([
             '',
-            \sprintf(' Run <comment>%s %s --transport=%s</comment> to retry this message.', CommandInvocation::formatEscaped('messenger:failed:retry'), $id, $failedTransportName),
-            \sprintf(' Run <comment>%s %s --transport=%s</comment> to delete it.', CommandInvocation::formatEscaped('messenger:failed:remove'), $id, $failedTransportName),
+            \sprintf(' Run <comment>%s %s --transport=%s</comment> to retry this message.', CommandInvocation::formatEscaped('messenger:failed:retry'), OutputFormatter::escape($id), OutputFormatter::escape((string) $failedTransportName)),
+            \sprintf(' Run <comment>%s %s --transport=%s</comment> to delete it.', CommandInvocation::formatEscaped('messenger:failed:remove'), OutputFormatter::escape($id), OutputFormatter::escape((string) $failedTransportName)),
         ]);
     }
 }

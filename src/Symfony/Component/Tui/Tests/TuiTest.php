@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresFunction;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
@@ -780,5 +781,62 @@ class TuiTest extends TestCase
         yield 'height change in GNU screen in Termux' => ['0.118', 'STY=1234.pts-0.localhost', 40, 12, true];
         yield 'height change in zellij in Termux' => ['0.118', 'ZELLIJ=0', 40, 12, true];
         yield 'height change elsewhere' => [null, null, 40, 12, true];
+    }
+
+    public function testExitDuringRunRestoresTheTerminal()
+    {
+        [$output, $status] = $this->runFixture('exit_during_run.php');
+
+        $this->assertSame(0, $status, $output);
+        $this->assertStringContainsString("\x1b[?2004h", $output, 'Bracketed paste was enabled.');
+
+        [, $afterExit] = explode('[exit]', $output, 2) + [1 => ''];
+        $this->assertStringContainsString("\x1b[?25h", $afterExit, 'The cursor is shown again.');
+        $this->assertStringContainsString("\x1b[?2004l", $afterExit, 'Bracketed paste is disabled again.');
+        $this->assertStringNotContainsString('[run returned]', $output);
+    }
+
+    #[RequiresFunction('pcntl_fork')]
+    public function testExitOfAForkedChildDoesNotRestoreTheTerminal()
+    {
+        [$output, $status] = $this->runFixture('exit_during_run.php', 'fork');
+
+        $this->assertSame(0, $status, $output);
+        $this->assertStringContainsString('[child exited]', $output);
+
+        [, $whileParentRuns] = explode('[fork]', explode('[child exited]', $output, 2)[0], 2) + [1 => ''];
+        $this->assertStringNotContainsString("\x1b[?25h", $whileParentRuns, 'The child leaves the terminal of its parent alone.');
+        $this->assertStringNotContainsString("\x1b[?2004l", $whileParentRuns, 'The child leaves the terminal of its parent alone.');
+    }
+
+    public function testATuiStartedAndDroppedWithoutStoppingIsCollected()
+    {
+        $tui = new Tui(null, new VirtualTerminal(40, 10));
+        $tui->add(new TextWidget('Hello'));
+        $tui->start();
+        $reference = \WeakReference::create($tui);
+
+        unset($tui);
+        gc_collect_cycles();
+
+        $this->assertNull($reference->get(), 'Neither the event loop nor the shutdown restore holds the TUI.');
+    }
+
+    /**
+     * @return array{string, int}
+     */
+    private function runFixture(string $fixture, string ...$arguments): array
+    {
+        // stderr goes to stdout, so a full stderr pipe cannot block the child while stdout is read
+        $process = proc_open([\PHP_BINARY, __DIR__.'/Fixtures/'.$fixture, ...$arguments], [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['redirect', 1],
+        ], $pipes);
+        fclose($pipes[0]);
+        $output = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+
+        return [$output, proc_close($process)];
     }
 }

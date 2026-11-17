@@ -138,11 +138,11 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
 
         switch ($format) {
             case 'yaml':
-                $io->writeln(\sprintf('# %s', $message));
+                $io->writeln(\sprintf('# %s', $message), OutputInterface::OUTPUT_RAW);
                 $dumper = new YamlReferenceDumper();
                 break;
             case 'xml':
-                $io->writeln(\sprintf('<!-- %s -->', $message));
+                $io->writeln(\sprintf('<!-- %s -->', $message), OutputInterface::OUTPUT_RAW);
                 $dumper = new XmlReferenceDumper();
                 break;
             default:
@@ -150,7 +150,7 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
                 throw new InvalidArgumentException(\sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions())));
         }
 
-        $io->writeln(null === $path ? $dumper->dump($configuration) : $dumper->dumpAtPath($configuration, $path));
+        $io->writeln(null === $path ? $dumper->dump($configuration) : $dumper->dumpAtPath($configuration, $path), OutputInterface::OUTPUT_RAW);
 
         return 0;
     }

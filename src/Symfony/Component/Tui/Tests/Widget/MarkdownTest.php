@@ -235,6 +235,17 @@ class MarkdownTest extends TestCase
         $this->assertStringContainsString("\x1b[9mgone", $line);
     }
 
+    public function testStrikethroughThatWrapsDoesNotGoOnIntoThePadding()
+    {
+        $md = $this->createMarkdown('~~strikethrough text that wraps~~')->setStyle(Style::padding([0, 1])->withBackground('blue'));
+
+        $this->assertSame([
+            "\x1b[44m \x1b[9mstrikethroug\x1b[29m \x1b[49m",
+            "\x1b[44m \x1b[9mh text that\x1b[29m  \x1b[49m",
+            "\x1b[44m \x1b[9mwraps\x1b[29m\x1b[44m        \x1b[49m",
+        ], $this->renderThroughRenderer($md, 14, 24));
+    }
+
     #[DataProvider('blockStyleAfterInlineStyleProvider')]
     public function testBlockStyleIsRestoredAfterAnInlineStyle(string $markdown, string $char, string $blockStyle)
     {
@@ -267,6 +278,20 @@ class MarkdownTest extends TestCase
         $this->assertSame('', $cells[24]['style'], 'The padding is not bold');
         $this->assertSame('', $cells[25]['style'], 'The border is not bold');
         $this->assertSame('', $cells[27]['style'], 'The next cell is not bold');
+    }
+
+    public function testWrappedCodeBackgroundDoesNotGoOnIntoThePadding()
+    {
+        $md = new MarkdownWidget('see `code text that wraps` end');
+        $tui = new Tui(new StyleSheet([MarkdownWidget::class.'::code' => new Style()->withBackground('blue')]), new VirtualTerminal(30, 24));
+        $tui->add($md);
+        $md->setStyle(Style::padding([0, 1]));
+
+        $this->assertSame([
+            " see \e[44mcode\e[49m     ",
+            " \e[44mtext that\e[49m    ",
+            " \e[44mwraps\e[49m end    ",
+        ], $this->renderThroughRenderer($md, 14, 24));
     }
 
     public function testWrappedTableCellBackgroundDoesNotLeakIntoTheRestOfTheRow()
@@ -357,6 +382,48 @@ class MarkdownTest extends TestCase
         yield 'nested list in a loose list item' => ["- a\n\n  - b\n  - c", ['• a', '', '  • b', '  • c']];
         yield 'paragraphs in a tight list item' => ["- a\n  b", ['• a', '  b']];
         yield 'nested list in a tight list item' => ["- a\n  - b", ['• a', '  • b']];
+    }
+
+    #[DataProvider('htmlCommentProvider')]
+    public function testHtmlCommentsAreHidden(string $markdown, string $withoutComments)
+    {
+        $render = static fn (string $text): array => array_map(rtrim(...), array_map(AnsiUtils::stripAnsiCodes(...), (new MarkdownWidget($text))->render(new RenderContext(60, 24))));
+
+        $this->assertSame($render($withoutComments), $render($markdown));
+    }
+
+    public static function htmlCommentProvider(): iterable
+    {
+        yield 'block and inline' => ["## [1.0.0]\n\n<!-- release-notes:start -->\nFixed a bug.\n\nSee <!-- todo: link --> the docs.", "## [1.0.0]\n\nFixed a bug.\n\nSee the docs."];
+        yield 'comment-only blocks' => ["<!-- start -->\n\n## [1.0.0]\n\n<!-- a -->\n\n- item\n\n<!-- b -->\n\n## [0.9.0]\n\n<!-- end -->", "## [1.0.0]\n\n- item\n\n## [0.9.0]"];
+        yield 'multi-line' => ["<!--\nmulti\nline\n-->\ntext", 'text'];
+        yield 'unclosed while streaming' => ["text\n\n<!-- streaming", 'text'];
+        yield 'in blockquotes and list items' => ["> q\n>\n> <!-- c -->\n>\n> r\n\n- a\n\n  <!-- c -->\n\n  b\n- <!-- c --> item", "> q\n>\n> r\n\n- a\n\n  b\n- item"];
+        yield 'blockquote holding only a comment' => ["a\n\n> <!-- c -->\n\nb", "a\n\nb"];
+        yield 'in a heading' => ['# <!-- c --> Title', '# Title'];
+        yield 'inline, no space after' => ['a <!-- c -->b', 'a b'];
+        yield 'inline, no space before' => ['a<!-- c --> b', 'a b'];
+        yield 'two inline comments' => ['a <!-- x --> <!-- y --> b', 'a b'];
+        yield 'list item holding only a comment' => ["1. a\n2. <!-- c -->\n3. b", "1. a\n2. b"];
+        yield 'loose list item holding only a comment' => ["- a\n\n- <!-- c -->\n\n- b", "- a\n\n- b"];
+    }
+
+    #[DataProvider('htmlWithCommentProvider')]
+    public function testHtmlIsKeptWithoutItsComments(string $markdown, array $expected)
+    {
+        $lines = (new MarkdownWidget($markdown))->render(new RenderContext(60, 24));
+
+        $this->assertSame($expected, array_map(rtrim(...), array_map(AnsiUtils::stripAnsiCodes(...), $lines)));
+    }
+
+    public static function htmlWithCommentProvider(): iterable
+    {
+        yield 'inline tag' => ['with <tag> markers', ['with <tag> markers']];
+        yield 'text after a comment' => ['<!-- c --> trailing text', ['trailing text']];
+        yield 'HTML block' => ["<div>\n<!-- c -->a</div>", ['<div>', 'a</div>']];
+        yield 'unclosed comment in an attribute' => ["<div title=\"<!--\">\nhello\n</div>", ['<div title="<!--">', 'hello', '</div>']];
+        yield 'script' => ["<script>\nif (a <!--b) x();\n</script>", ['<script>', 'if (a <!--b) x();', '</script>']];
+        yield 'comment in a script' => ["<script>\nx = '<!-- c -->';\n</script>", ['<script>', "x = '<!-- c -->';", '</script>']];
     }
 
     /**

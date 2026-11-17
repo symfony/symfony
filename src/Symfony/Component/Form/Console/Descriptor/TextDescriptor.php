@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Console\Descriptor;
 
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
@@ -85,7 +86,7 @@ class TextDescriptor extends Descriptor
             'extension' => 'Extension options',
         ], $formOptions);
 
-        $this->output->title(\sprintf('%s (Block prefix: "%s")', $resolvedFormType->getInnerType()::class, $resolvedFormType->getInnerType()->getBlockPrefix()));
+        $this->output->title(\sprintf('%s (Block prefix: "%s")', $resolvedFormType->getInnerType()::class, OutputFormatter::escape($resolvedFormType->getInnerType()->getBlockPrefix())));
 
         if ($formOptions) {
             $this->output->table($tableHeaders, $this->buildTableRows($tableHeaders, $formOptions));
@@ -127,15 +128,15 @@ class TextDescriptor extends Descriptor
         ];
         $rows = [];
         foreach ($map as $label => $name) {
-            $value = \array_key_exists($name, $definition) ? $dump($definition[$name]) : '-';
+            $value = \array_key_exists($name, $definition) ? OutputFormatter::escape($dump($definition[$name])) : '-';
             if ('default' === $name && isset($definition['lazy'])) {
-                $value = "Value: $value\n\nClosure(s): ".$dump($definition['lazy']);
+                $value = "Value: $value\n\nClosure(s): ".OutputFormatter::escape($dump($definition['lazy']));
             } elseif ('nestedOptions' === $name && isset($definition['nestedOptions'])) {
                 $nestedResolver = new OptionsResolver();
                 foreach ($definition['nestedOptions'] as $nestedOption) {
                     $nestedOption($nestedResolver, $optionsResolver);
                 }
-                $value = $dump($nestedResolver->getDefinedOptions());
+                $value = OutputFormatter::escape($dump($nestedResolver->getDefinedOptions()));
             }
 
             $rows[] = ["<info>$label</info>", $value];
@@ -143,7 +144,7 @@ class TextDescriptor extends Descriptor
         }
         array_pop($rows);
 
-        $this->output->title(\sprintf('%s (%s)', $options['type']::class, $options['option']));
+        $this->output->title(\sprintf('%s (%s)', $options['type']::class, OutputFormatter::escape($options['option'])));
         $this->output->table([], $rows);
     }
 
@@ -154,11 +155,7 @@ class TextDescriptor extends Descriptor
         for ($i = 0; $i < $count; ++$i) {
             $cells = [];
             foreach (array_keys($headers) as $group) {
-                $option = $options[$group][$i] ?? null;
-                if (\is_string($option) && \in_array($option, $this->requiredOptions, true)) {
-                    $option .= ' <info>(required)</info>';
-                }
-                $cells[] = $option;
+                $cells[] = $options[$group][$i] ?? null;
             }
             $tableRows[] = $cells;
         }
@@ -168,6 +165,8 @@ class TextDescriptor extends Descriptor
 
     private function normalizeAndSortOptionsColumns(array $options): array
     {
+        $formatOption = fn (string $option): string => OutputFormatter::escape($option).(\in_array($option, $this->requiredOptions, true) ? ' <info>(required)</info>' : '');
+
         foreach ($options as $group => $opts) {
             $sorted = false;
             foreach ($opts as $class => $opt) {
@@ -189,11 +188,12 @@ class TextDescriptor extends Descriptor
 
                 sort($opt);
                 $sorted = true;
-                $options[$group] = array_merge($options[$group], $opt);
+                $options[$group] = array_merge($options[$group], array_map($formatOption, $opt));
             }
 
             if (!$sorted) {
                 sort($options[$group]);
+                $options[$group] = array_map($formatOption, $options[$group]);
             }
         }
 

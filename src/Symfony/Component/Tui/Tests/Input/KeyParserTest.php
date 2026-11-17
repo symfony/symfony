@@ -517,7 +517,6 @@ class KeyParserTest extends TestCase
     {
         yield 'ctrl+f1' => ["\x1b[1;5P", 'ctrl+f1'];
         yield 'shift+f2' => ["\x1b[1;2Q", 'shift+f2'];
-        yield 'alt+f3' => ["\x1b[1;3R", 'alt+f3'];
         yield 'shift+ctrl+f4' => ["\x1b[1;6S", 'shift+ctrl+f4'];
         yield 'ctrl+f3 (CSI ~)' => ["\x1b[13;5~", 'ctrl+f3'];
         yield 'ctrl+f5' => ["\x1b[15;5~", 'ctrl+f5'];
@@ -554,6 +553,59 @@ class KeyParserTest extends TestCase
         $this->assertFalse($this->parser->matches("\x1b[1;5:3P", 'ctrl+f1'));
         $this->assertFalse($this->parser->isKeyRelease('foo:3P'));
         $this->assertFalse($this->parser->isKeyRepeat('foo:2S'));
+    }
+
+    #[DataProvider('csiFunctionKeyProvider')]
+    public function testCsiFunctionKey(bool $kittyProtocolActive, string $sequence, string $keyId)
+    {
+        $this->parser->setKittyProtocolActive($kittyProtocolActive);
+
+        $this->assertSame($keyId, $this->parser->parse($sequence)['key']);
+        $this->assertTrue($this->parser->matches($sequence, $keyId));
+    }
+
+    /**
+     * @return iterable<string, array{bool, string, string}>
+     */
+    public static function csiFunctionKeyProvider(): iterable
+    {
+        foreach (['legacy' => false, 'kitty' => true] as $mode => $kittyProtocolActive) {
+            yield "f1 ($mode)" => [$kittyProtocolActive, "\x1b[P", 'f1'];
+            yield "f2 ($mode)" => [$kittyProtocolActive, "\x1b[Q", 'f2'];
+            yield "f3 ($mode)" => [$kittyProtocolActive, "\x1b[13~", 'f3'];
+            yield "f3 SS3 ($mode)" => [$kittyProtocolActive, "\x1bOR", 'f3'];
+            yield "f4 ($mode)" => [$kittyProtocolActive, "\x1b[S", 'f4'];
+            yield "shift+f4 ($mode)" => [$kittyProtocolActive, "\x1b[1;2S", 'shift+f4'];
+            yield "shift+f10 ($mode)" => [$kittyProtocolActive, "\x1b[21;2~", 'shift+f10'];
+        }
+    }
+
+    public function testModifiedCsiFunctionKeyDoesNotMatchTheUnmodifiedKey()
+    {
+        $this->assertFalse($this->parser->matches("\x1b[1;5P", 'f1'));
+
+        $this->parser->setKittyProtocolActive(true);
+
+        $this->assertFalse($this->parser->matches("\x1b[1;5P", 'f1'));
+        $this->assertTrue($this->parser->isKeyRelease("\x1b[1;1:3P"));
+        $this->assertTrue($this->parser->isKeyRepeat("\x1b[1;1:2S"));
+    }
+
+    public function testCursorPositionReportIsNotF3WithTheKittyProtocol()
+    {
+        $this->parser->setKittyProtocolActive(true);
+
+        $this->assertNull($this->parser->parse("\x1b[1;5R"));
+        $this->assertFalse($this->parser->matches("\x1b[1;5R", 'ctrl+f3'));
+        $this->assertNull($this->parser->parse("\x1b[1;3R"));
+
+        // Legacy terminals like xterm report a modified F3 that way
+        $this->parser->setKittyProtocolActive(false);
+
+        $this->assertSame('ctrl+f3', $this->parser->parse("\x1b[1;5R")['key']);
+        $this->assertTrue($this->parser->matches("\x1b[1;5R", 'ctrl+f3'));
+        $this->assertSame('alt+f3', $this->parser->parse("\x1b[1;3R")['key']);
+        $this->assertTrue($this->parser->matches("\x1b[1;3R", 'alt+f3'));
     }
 
     public function testFunctionKeyWithUnnameableModifierIsNotReported()

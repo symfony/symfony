@@ -798,6 +798,37 @@ class FailedMessagesShowCommandTest extends TestCase
         $tester->execute(['--failed-after' => 'last thursdayish']);
     }
 
+    public function testMarkupInFailureDetailsAndTransportName()
+    {
+        $envelope = new Envelope((object) ['payload' => '<info>val</info></error>'], [
+            new TransportMessageIdStamp('id<info>'),
+            new SentToFailureTransportStamp('async<info>'),
+            new RedeliveryStamp(0),
+            ErrorDetailsStamp::create(new \RuntimeException('Failed with <info>markup</info> and </error>')),
+        ]);
+
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->willReturn([$envelope]);
+        $receiver->expects($this->once())->method('find')->with('id<info>')->willReturn($envelope);
+
+        $command = new FailedMessagesShowCommand('failure<info>', new ServiceLocator(['failure<info>' => static fn () => $receiver]));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--class-filter' => 'stdClass'], ['decorated' => false]);
+        $display = $tester->getDisplay(true);
+        $this->assertStringContainsString('id<info>', $display);
+        $this->assertStringContainsString('Failed with <info>markup</info> and </error>', $display);
+        $this->assertStringContainsString('messenger:failed:show {id} --transport=failure<info> -vv to see message details.', $display);
+
+        $tester->execute(['id' => 'id<info>'], ['decorated' => false, 'verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE]);
+        $display = $tester->getDisplay(true);
+        $this->assertMatchesRegularExpression('/Error +Failed with <info>markup<\/info> and <\/error>/', $display);
+        $this->assertStringContainsString('message: "Failed with <info>markup</info> and </error>"', $display);
+        $this->assertStringContainsString('async<info>', $display);
+        $this->assertStringContainsString('<info>val</info></error>', $display);
+        $this->assertStringContainsString('messenger:failed:retry id<info> --transport=failure<info>', $display);
+    }
+
     private function createFailedEnvelope(int $id, string $failedAt, string $error): Envelope
     {
         return new Envelope(new \stdClass(), [

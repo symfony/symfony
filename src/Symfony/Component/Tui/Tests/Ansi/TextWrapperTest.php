@@ -409,6 +409,29 @@ class TextWrapperTest extends TestCase
         $this->assertSame(["ab \e[4mcd\e[24m"], TextWrapper::wrapTextWithAnsi("ab \e[4mcd\e[24m ", 5));
     }
 
+    public function testStrikethroughIsTurnedOffAtLineEndAndOnAgainOnTheNextLine()
+    {
+        $this->assertSame(["aaaa \e[9mstrike\e[29m", "\e[9mme\e[29m next"], TextWrapper::wrapTextWithAnsi("aaaa \e[9mstrike me\e[29m next", 12));
+        $this->assertSame(["\e[41;9mstrike\e[29m\e[49m", "\e[9;41mme\e[0m"], TextWrapper::wrapTextWithAnsi("\e[41;9mstrike me\e[0m", 6));
+    }
+
+    public function testBackgroundIsTurnedOffAtLineEndAndOnAgainOnTheNextLine()
+    {
+        $this->assertSame(["\e[41mred bg\e[49m", "\e[41mme\e[49m"], TextWrapper::wrapTextWithAnsi("\e[41mred bg me\e[49m", 8));
+        $this->assertSame(["\e[41mab\e[49m", "\e[41mcd\e[49m"], TextWrapper::wrapTextWithAnsi("\e[41mab\ncd\e[49m", 8));
+    }
+
+    public function testInverseIsTurnedOffAtLineEndAndOnAgainOnTheNextLine()
+    {
+        $this->assertSame(["\e[7minverse\e[27m", "\e[7mme\e[27m"], TextWrapper::wrapTextWithAnsi("\e[7minverse me\e[27m", 8));
+    }
+
+    public function testLineBeforeALongWordIsTrimmedBeforeTheLineEndReset()
+    {
+        $this->assertSame(["aaa\e[4m\e[24m", "\e[4mabcdefghi\e[24m", "\e[4mj\e[24m"], TextWrapper::wrapTextWithAnsi("aaa\e[4m    abcdefghij\e[24m", 9));
+        $this->assertSame(["aaa\e[9m\e[29m", "\e[9mabcdefghi\e[29m", "\e[9mj\e[29m"], TextWrapper::wrapTextWithAnsi("aaa\e[9m    abcdefghij\e[29m", 9));
+    }
+
     public function testStyleStartingInWhitespaceAtWrapGoesOnWithNextWord()
     {
         $this->assertSame(["ab\e[1m", "\e[1mef\e[22m"], TextWrapper::wrapTextWithAnsi("ab \e[1m ef\e[22m", 3));

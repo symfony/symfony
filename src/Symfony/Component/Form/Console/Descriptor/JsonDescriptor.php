@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Console\Descriptor;
 
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -114,7 +115,7 @@ class JsonDescriptor extends Descriptor
     {
         $flags = $options['json_encoding'] ?? 0;
 
-        $this->output->write(json_encode($data, $flags | \JSON_PRETTY_PRINT)."\n");
+        $this->output->write(json_encode($data, $flags | \JSON_PRETTY_PRINT | \JSON_INVALID_UTF8_SUBSTITUTE)."\n", false, OutputInterface::OUTPUT_RAW);
     }
 
     private function sortOptions(array &$options): void

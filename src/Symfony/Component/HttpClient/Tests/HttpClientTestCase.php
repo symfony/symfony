@@ -39,7 +39,7 @@ use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 /*
 Tests for HTTP2 Push need a recent version of both PHP and curl. This docker command should run them:
 docker run -it --rm -v $(pwd):/app -v /path/to/vulcain:/usr/local/bin/vulcain -w /app php:7.3-alpine ./phpunit src/Symfony/Component/HttpClient --filter Push
-The vulcain binary can be found at https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz - see https://github.com/dunglas/vulcain for source
+The vulcain binary can be found at https://github.com/symfony-tools/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz - see https://github.com/dunglas/vulcain for source
 */
 
 abstract class HttpClientTestCase extends BaseHttpClientTestCase
@@ -665,9 +665,10 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
     public function testTransferAfterPauseCountsTowardMaxDuration()
     {
         $client = $this->getHttpClient(__FUNCTION__);
-        $response = $client->request('GET', 'http://localhost:'.self::port().'/timeout-header', ['max_duration' => 1]);
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/timeout-long', ['max_duration' => 1.5]);
 
-        $response->getInfo('pause_handler')(0.8);
+        // The headers come after 1s, which is less than max_duration but far more than the 0.1s left after the pause
+        $response->getInfo('pause_handler')(1.4);
 
         try {
             $response->getStatusCode();
@@ -675,6 +676,9 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         } catch (TransportException $e) {
             $this->assertNotInstanceOf(TimeoutException::class, $e);
         }
+
+        // The test server handles requests one by one, so wait until the 1s sleep is over before the next test
+        $this->assertSame(200, $client->request('GET', 'http://localhost:'.self::port().'/')->getStatusCode());
     }
 
     #[Group('transient-on-windows')]

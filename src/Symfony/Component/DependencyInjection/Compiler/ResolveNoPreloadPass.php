@@ -27,6 +27,7 @@ class ResolveNoPreloadPass extends AbstractRecursivePass
     protected bool $skipScalars = true;
 
     private array $resolvedIds = [];
+    private array $pendingIds = [];
 
     public function process(ContainerBuilder $container): void
     {
@@ -36,18 +37,23 @@ class ResolveNoPreloadPass extends AbstractRecursivePass
             foreach ($container->getDefinitions() as $id => $definition) {
                 if ($definition->isPublic() && !isset($this->resolvedIds[$id])) {
                     $this->resolvedIds[$id] = true;
-                    $this->processValue($definition, true);
+                    $this->pendingIds[] = $id;
                 }
             }
 
             foreach ($container->getAliases() as $alias) {
                 if ($alias->isPublic() && !isset($this->resolvedIds[$id = (string) $alias]) && $container->hasDefinition($id)) {
                     $this->resolvedIds[$id] = true;
-                    $this->processValue($container->getDefinition($id), true);
+                    $this->pendingIds[] = $id;
                 }
+            }
+
+            while (null !== $id = array_pop($this->pendingIds)) {
+                $this->processValue($container->getDefinition($id), true);
             }
         } finally {
             $this->resolvedIds = [];
+            $this->pendingIds = [];
             $this->container = null;
         }
 
@@ -67,7 +73,7 @@ class ResolveNoPreloadPass extends AbstractRecursivePass
 
             if (!isset($this->resolvedIds[$id]) && $definition->isPrivate()) {
                 $this->resolvedIds[$id] = true;
-                $this->processValue($definition, true);
+                $this->pendingIds[] = $id;
             }
 
             return $value;

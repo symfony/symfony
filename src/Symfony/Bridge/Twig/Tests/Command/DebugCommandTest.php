@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\Command;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Command\DebugCommand;
 use Symfony\Component\Console\Application;
@@ -21,6 +22,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Twig\Environment;
 use Twig\Loader\ChainLoader;
 use Twig\Loader\FilesystemLoader;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 class DebugCommandTest extends TestCase
 {
@@ -256,11 +259,13 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('[OK]', $tester->getDisplay());
     }
 
-    public function testWithGlobals()
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function testWithGlobals(bool $decorated)
     {
         $message = '<error>foo</error>';
         $tester = $this->createCommandTester([], [], null, false, ['message' => $message]);
-        $tester->execute([], ['decorated' => true]);
+        $tester->execute([], ['decorated' => $decorated]);
         $display = $tester->getDisplay();
         $this->assertStringContainsString(json_encode($message), $display);
     }
@@ -273,6 +278,19 @@ class DebugCommandTest extends TestCase
         $display = $tester->getDisplay();
         $display = json_decode($display, true);
         $this->assertSame($globals, $display['globals']);
+    }
+
+    public function testWithMarkupInDefaultValues()
+    {
+        $environment = new Environment(new FilesystemLoader());
+        $environment->addFunction(new TwigFunction('markup', [self::class, 'markup']));
+        $environment->addFilter(new TwigFilter('markup', [self::class, 'markup']));
+
+        $tester = new CommandTester(new DebugCommand($environment));
+        $tester->execute(['--filter' => 'markup'], ['decorated' => false]);
+
+        $this->assertStringContainsString(' * markup(value, tag = "<info>")', $tester->getDisplay());
+        $this->assertStringContainsString(' * markup(tag = "<info>")', $tester->getDisplay());
     }
 
     public function testPathsJsonWithDecoratedOutput()
@@ -372,6 +390,11 @@ class DebugCommandTest extends TestCase
     {
         yield 'name' => [['email'], []];
         yield 'option --format' => [['--format', ''], ['txt', 'json']];
+    }
+
+    public static function markup(string $value, string $tag = '<info>'): string
+    {
+        return $value.$tag;
     }
 
     private function createCommandTester(array $paths = [], array $bundleMetadata = [], ?string $defaultPath = null, bool $useChainLoader = false, array $globals = []): CommandTester

@@ -77,6 +77,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     private bool $renderRequested = false;
     private bool $running = false;
     private bool $stopped = false;
+    private bool $restoresOnShutdown = false;
     private bool $ticking = false;
     private ?float $lastTickAt = null;
     private ?bool $lastTickBusyHint = null;
@@ -227,6 +228,25 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         });
         $this->terminal->hideCursor();
         $this->requestRender();
+
+        if (!$this->restoresOnShutdown) {
+            $this->restoresOnShutdown = true;
+            // exit() skips the finally block of run(); the weak reference lets a TUI dropped without being stopped be collected
+            $tui = \WeakReference::create($this);
+            $pid = getmypid();
+            register_shutdown_function(static function () use ($tui, $pid): void {
+                // A forked child must not restore the terminal its parent still uses
+                if (!($tui = $tui->get()) || $tui->stopped || getmypid() !== $pid) {
+                    return;
+                }
+
+                try {
+                    $tui->stop();
+                } catch (\Throwable) {
+                    // Nothing more can be done while the process exits
+                }
+            });
+        }
     }
 
     /**

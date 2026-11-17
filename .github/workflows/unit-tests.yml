@@ -253,7 +253,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.1-pcntl-sigchild.tar.bz2
+          wget -q https://github.com/symfony-tools/binary-utils/releases/download/v0.1/php-8.4.1-pcntl-sigchild.tar.bz2
           tar -xjf php-8.4.1-pcntl-sigchild.tar.bz2
           cd ..
 

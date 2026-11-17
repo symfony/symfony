@@ -19,6 +19,7 @@ use Relay\Relay;
 use Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceiver;
+use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
@@ -625,6 +626,22 @@ class RedisExtIntegrationTest extends TestCase
         $this->connection->ack($msg3[0]['id']);
 
         $this->assertNull($this->connection->get());
+    }
+
+    public function testPendingMessagesAreReadAgainAfterClosing()
+    {
+        $transport = new RedisTransport($this->connection, new Serializer());
+
+        $transport->send(new Envelope(new DummyMessage('Hi')));
+        $transport->send(new Envelope(new DummyMessage('Bye')));
+
+        $received = iterator_to_array($transport->get());
+        $this->assertEquals(new DummyMessage('Hi'), $received[0]->getMessage());
+
+        $transport->close();
+
+        $received = iterator_to_array($transport->get());
+        $this->assertEquals(new DummyMessage('Hi'), $received[0]->getMessage());
     }
 
     private function getConnectionGroup(Connection $connection): string

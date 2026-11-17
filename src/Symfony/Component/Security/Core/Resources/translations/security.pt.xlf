@@ -44,7 +44,7 @@
             </trans-unit>
             <trans-unit id="12">
                 <source>Username could not be found.</source>
-                <target>Nome de usuário não encontrado.</target>
+                <target>Nome de utilizador não encontrado.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>Account has expired.</source>
@@ -64,19 +64,19 @@
             </trans-unit>
             <trans-unit id="17">
                 <source>Too many failed login attempts, please try again later.</source>
-                <target>Muitas tentativas de login sem sucesso, por favor, tente mais tarde.</target>
+                <target>Demasiadas tentativas de início de sessão falhadas. Por favor, tente novamente mais tarde.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>Invalid or expired login link.</source>
-                <target>Ligação de login inválida ou expirada.</target>
+                <target>Ligação de início de sessão inválida ou expirada.</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
-                <target>Muitas tentativas de login sem sucesso, por favor, tente novamente novamente em 1 minuto.</target>
+                <target>Demasiadas tentativas de início de sessão falhadas. Por favor, tente novamente dentro de %minutes% minuto.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
-                <target>Muitas tentativas de login sem sucesso, por favor, tente novamente em %minutes% minutos.</target>
+                <target>Demasiadas tentativas de início de sessão falhadas. Por favor, tente novamente dentro de %minutes% minutos.</target>
             </trans-unit>
         </body>
     </file>

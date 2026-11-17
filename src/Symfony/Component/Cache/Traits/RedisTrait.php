@@ -747,8 +747,8 @@ trait RedisTrait
         if ($redis instanceof \RedisCluster || $redis instanceof RelayCluster || ($redis instanceof \Predis\ClientInterface && ($redis->getConnection() instanceof RedisCluster || $redis->getConnection() instanceof Predis2RedisCluster))) {
             // phpredis & predis don't support pipelining with RedisCluster
             // \Relay\Cluster does not support multi with pipeline mode
-            // see https://github.com/phpredis/phpredis/blob/develop/cluster.markdown#pipelining
-            // see https://github.com/nrk/predis/issues/267#issuecomment-123781423
+            // see https://github.com/phpredis/phpredis/blob/develop/cluster.md#pipelining
+            // see https://github.com/predis/predis/issues/267#issuecomment-123781423
             $results = [];
             foreach ($generator() as $command => $args) {
                 $results[] = $redis->{$command}(...$args);

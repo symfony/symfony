@@ -29,7 +29,15 @@ final class CommandInvocation
     {
         $isCli = \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true);
         $currentScript = $_SERVER['PHP_SELF'] ?? $_SERVER['argv'][0] ?? 'bin/console';
-        $invocation = $isCli ? [\PHP_BINARY, ...('phpdbg' === \PHP_SAPI ? ['-qrr'] : []), $fallbackScript ?? $currentScript] : ['php', $fallbackScript ?? 'bin/console'];
+
+        if (!$isCli) {
+            $invocation = ['php', $fallbackScript ?? 'bin/console'];
+        } elseif (null === $fallbackScript && str_contains(strtr($currentScript, \DIRECTORY_SEPARATOR, '/'), '/') && is_executable($currentScript)) {
+            $invocation = [$currentScript];
+        } else {
+            $invocation = ['php', $fallbackScript ?? $currentScript];
+        }
+
         $launcher = json_decode($_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] ?? '');
         $script = $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] ?? '';
 

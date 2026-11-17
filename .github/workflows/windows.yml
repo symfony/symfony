@@ -26,6 +26,7 @@ jobs:
       SYMFONY_DEPRECATIONS_HELPER: 'strict'
       ANSICON: '121x90 (121x90)'
       SYMFONY_PHPUNIT_DISABLE_RESULT_CACHE: '1'
+      SYMFONY_PHPUNIT_MAX_PARALLEL: '12'
 
     steps:
       - name: Setup Git

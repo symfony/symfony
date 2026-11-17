@@ -135,18 +135,7 @@ class Parser
         return $this->state ??= new ParserState();
     }
 
-    private function doParseBlock(
-        int $flags,
-        int $startLineNb,
-        int $blockIndentation,
-        int $parentIndentation,
-        bool $inUnindentedCollection = false,
-        ?string $firstLineOverride = null,
-        bool $hasContentOnStartMarkerLine = false,
-        bool $isRootNode = false,
-        ?string &$context = null,
-        bool $allowFirstLineDedent = false,
-    ): mixed {
+    private function doParseBlock(int $flags, int $startLineNb, int $blockIndentation, int $parentIndentation, bool $inUnindentedCollection = false, ?string $firstLineOverride = null, bool $hasContentOnStartMarkerLine = false, bool $isRootNode = false, ?string &$context = null, bool $allowFirstLineDedent = false): mixed {
         $prevParentIndentation = $this->parentIndentation;
         $prevBlockIndentation = $this->blockIndentation;
         $prevInUnindentedCollection = $this->blockInUnindentedCollection;

@@ -23,7 +23,7 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Component\KeyManagement\KeyLoader\KeyLoaderInterface;
 
 /**
- * Local libsodium-backed KMS suitable for development and tests.
+ * Local libsodium-backed KMS, suitable for development, tests and self-hosted production where the key material lives next to the application.
  *
  * Encryption uses XChaCha20-Poly1305-IETF AEAD with a random 24-byte nonce.
  * The wire format of a {@see Ciphertext} blob is:

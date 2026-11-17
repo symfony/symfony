@@ -798,8 +798,13 @@ class FailedMessagesShowCommandTest extends TestCase
         $tester->execute(['--failed-after' => 'last thursdayish']);
     }
 
+    #[BackupGlobals(true)]
     public function testMarkupInFailureDetailsAndTransportName()
     {
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
         $envelope = new Envelope((object) ['payload' => '<info>val</info></error>'], [
             new TransportMessageIdStamp('id<info>'),
             new SentToFailureTransportStamp('async<info>'),
@@ -818,7 +823,7 @@ class FailedMessagesShowCommandTest extends TestCase
         $display = $tester->getDisplay(true);
         $this->assertStringContainsString('id<info>', $display);
         $this->assertStringContainsString('Failed with <info>markup</info> and </error>', $display);
-        $this->assertStringContainsString('messenger:failed:show {id} --transport=failure<info> -vv to see message details.', $display);
+        $this->assertStringContainsString('Run symfony console messenger:failed:show {id} --transport=failure<info> -vv to see message details.', $display);
 
         $tester->execute(['id' => 'id<info>'], ['decorated' => false, 'verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE]);
         $display = $tester->getDisplay(true);
@@ -826,7 +831,7 @@ class FailedMessagesShowCommandTest extends TestCase
         $this->assertStringContainsString('message: "Failed with <info>markup</info> and </error>"', $display);
         $this->assertStringContainsString('async<info>', $display);
         $this->assertStringContainsString('<info>val</info></error>', $display);
-        $this->assertStringContainsString('messenger:failed:retry id<info> --transport=failure<info>', $display);
+        $this->assertStringContainsString('symfony console messenger:failed:retry id<info> --transport=failure<info>', $display);
     }
 
     private function createFailedEnvelope(int $id, string $failedAt, string $error): Envelope

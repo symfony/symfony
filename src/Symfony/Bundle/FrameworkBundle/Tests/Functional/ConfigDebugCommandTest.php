@@ -22,6 +22,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Yaml\Yaml;
 
 #[Group('functional')]
 class ConfigDebugCommandTest extends AbstractWebTestCase
@@ -98,6 +99,29 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
         $this->assertJson($tester->getDisplay());
+    }
+
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function testDumpBundleOptionPrintsTitleOnlyForTxt(bool $debug)
+    {
+        $tester = $this->createCommandTester($debug);
+
+        $ret = $tester->execute(['name' => 'framework', 'path' => 'session', '--format' => 'json']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertJson($tester->getDisplay());
+        $this->assertSame('session.storage.factory.native', json_decode($tester->getDisplay(), true)['storage_factory_id']);
+
+        $ret = $tester->execute(['name' => 'framework', 'path' => 'session', '--format' => 'yaml']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertSame('session.storage.factory.native', Yaml::parse($tester->getDisplay())['storage_factory_id']);
+
+        $ret = $tester->execute(['name' => 'framework', 'path' => 'session']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('Current configuration for "framework.session"', $tester->getDisplay());
     }
 
     #[TestWith([true])]

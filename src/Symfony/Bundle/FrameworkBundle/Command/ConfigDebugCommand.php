@@ -101,7 +101,7 @@ class ConfigDebugCommand extends AbstractConfigCommand
 
         $format = $input->getOption('format');
 
-        if (\in_array($format, ['txt', 'yml'], true) && !class_exists(Yaml::class)) {
+        if (\in_array($format, ['txt', 'yaml'], true) && !class_exists(Yaml::class)) {
             $errorIo->error('Setting the "format" option to "txt" or "yaml" requires the Symfony Yaml component. Try running "composer install symfony/yaml" or use "--format=json" instead.');
 
             return 1;
@@ -131,7 +131,9 @@ class ConfigDebugCommand extends AbstractConfigCommand
             return 1;
         }
 
-        $io->title(\sprintf('Current configuration for "%s.%s"', OutputFormatter::escape($extensionAlias), OutputFormatter::escape($path)));
+        if ('txt' === $format) {
+            $io->title(\sprintf('Current configuration for "%s.%s"', OutputFormatter::escape($extensionAlias), OutputFormatter::escape($path)));
+        }
 
         $io->writeln($this->convertToFormat($config, $format), OutputInterface::OUTPUT_RAW);
 

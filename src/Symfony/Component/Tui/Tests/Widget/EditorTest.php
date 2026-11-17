@@ -27,9 +27,188 @@ use Symfony\Component\Tui\Tui;
 use Symfony\Component\Tui\Widget\AbstractWidget;
 use Symfony\Component\Tui\Widget\ContainerWidget;
 use Symfony\Component\Tui\Widget\EditorWidget;
+use Symfony\Component\Tui\Widget\Util\KillRing;
 
 class EditorTest extends TestCase
 {
+    public function testThePlaceholderIsDrawnWhileTheTextIsEmpty()
+    {
+        $editor = (new EditorWidget())->setPlaceholder("Write\nhere");
+        $this->assertSame('Write here', $editor->getPlaceholder());
+        $lines = array_map(AnsiUtils::stripAnsiCodes(...), $editor->render(new RenderContext(20, 24)));
+        $this->assertSame('Write here', rtrim($lines[1]), 'On the first row, under the border.');
+        $this->assertStringContainsString("\x1b[90mWrite here", $editor->render(new RenderContext(20, 24))[1], 'Gray by default.');
+
+        $editor->setText('a');
+        $this->assertSame('a', rtrim(AnsiUtils::stripAnsiCodes($editor->render(new RenderContext(20, 24))[1])));
+    }
+
+    public function testAReadOnlyEditorIgnoresEdits()
+    {
+        $editor = new EditorWidget();
+        foreach (['a', 'b', "\n", 'c'] as $key) {
+            $editor->handleInput($key);
+        }
+        $editor->setReadOnly();
+        $changes = 0;
+        $editor->onChange(static function () use (&$changes) { ++$changes; });
+
+        // Typing, a new line, a paste, deleting, killing, yanking, undoing
+        foreach (['x', "\n", "\x1b[200~pasted\x1b[201~", "\x7f", "\x17", "\x15", "\x19", "\x1f", "\x1b[H", "\x1b[3~", "\x0b"] as $key) {
+            $editor->handleInput($key);
+        }
+        $this->assertSame("ab\nc", $editor->getText());
+        $this->assertSame(0, $changes);
+        $this->assertTrue($editor->isReadOnly());
+
+        $editor->setReadOnly(false);
+        $editor->handleInput("\x19"); // Yank: nothing was killed while read-only
+        $this->assertSame("ab\nc", $editor->getText());
+        $editor->handleInput("\x1f"); // Undo: the history is the one before
+        $this->assertSame("ab\n", $editor->getText());
+    }
+
+    public function testTheMaxLengthLimitsEdits()
+    {
+        $editor = (new EditorWidget())->setMaxLength(5);
+        $changes = [];
+        $editor->onChange(static function (ChangeEvent $event) use (&$changes) { $changes[] = $event->getValue(); });
+        $editor->handleInput('a');
+        $editor->handleInput("\n");
+        $editor->handleInput("\x1b[200~bcdef\x1b[201~");
+        $this->assertSame("a\nbcd", $editor->getText(), 'A paste is cut to the room left, line breaks counted.');
+        $editor->handleInput('x');
+        $editor->handleInput("\n");
+        $this->assertSame("a\nbcd", $editor->getText());
+        $this->assertSame(['a', "a\n", "a\nbcd"], $changes, 'No change for a refused edit.');
+
+        $pasted = (new EditorWidget())->setMaxLength(4);
+        $pasted->handleInput("\x1b[200~ab\x1b[201~cdef");
+        $this->assertSame('abcd', $pasted->getText(), 'Text typed after a paste in the same input is cut too.');
+        $this->assertSame(5, $editor->getMaxLength());
+
+        // A yank past the limit is refused, the history kept
+        $editor->handleInput("\x15"); // Kill to the line start: "bcd"
+        $this->assertSame("a\n", $editor->getText());
+        $editor->handleInput("\x19"); // Yank: "a\nbcd", 5 characters
+        $this->assertSame("a\nbcd", $editor->getText());
+        $editor->handleInput("\x19"); // Yank again: 8 characters
+        $this->assertSame("a\nbcd", $editor->getText());
+        $editor->handleInput("\x1f"); // Undo undoes the first yank
+        $this->assertSame("a\n", $editor->getText());
+
+        $editor->setText('longer than five');
+        $this->assertSame('longer than five', $editor->getText(), 'setText() is not limited.');
+        $editor->handleInput("\x1b[F"); // End
+        $editor->handleInput("\x7f");
+        $this->assertSame('longer than fiv', $editor->getText(), 'Deleting still works past the limit.');
+    }
+
+    public function testLinesWithoutWrappingScrollSidewaysToTheCursor()
+    {
+        $editor = (new EditorWidget())->setLineWrapping(false);
+        $editor->setText('0123456789abcdefghij');
+        $editor->handleInput("\x1b[F"); // End
+        $lines = array_map(static fn (string $line) => rtrim(AnsiUtils::stripAnsiCodes($line)), $editor->render(new RenderContext(10, 24)));
+        $this->assertCount(3, $lines, 'One row, between the borders.');
+        $this->assertSame('bcdefghij', $lines[1], 'Scrolled to the end, a column left for the cursor.');
+        $this->assertFalse($editor->isLineWrapping());
+
+        $editor->handleInput("\x1b[H"); // Home
+        $this->assertSame('0123456789', rtrim(AnsiUtils::stripAnsiCodes($editor->render(new RenderContext(10, 24))[1])));
+
+        $editor->setLineWrapping(true);
+        $this->assertCount(4, $editor->render(new RenderContext(10, 24)), 'Wrapped on two rows.');
+    }
+
+    public function testAPasteIsCutOnceClean()
+    {
+        $editor = (new EditorWidget())->setMaxLength(6);
+        // A tmux modifyOtherKeys Ctrl+J between the letters: a line break
+        $editor->handleInput("\x1b[200~ab\x1b[27;5;106~cd\x1b[201~");
+        $this->assertSame("ab\ncd", $editor->getText());
+    }
+
+    public function testTheMaxLengthCountsCharactersNotCodePoints()
+    {
+        $editor = (new EditorWidget())->setMaxLength(2);
+        $editor->handleInput("\x1b[200~👨‍👩‍👧e\u{301}x\x1b[201~");
+        $this->assertSame("👨‍👩‍👧e\u{301}", $editor->getText());
+        $editor->handleInput('y');
+        $this->assertSame("👨‍👩‍👧e\u{301}", $editor->getText());
+    }
+
+    public function testARefusedAltYKeepsTheKillRingAsItWas()
+    {
+        $killRing = new KillRing();
+        $killRing->add('longer', false);
+        $killRing->resetAction();
+        $killRing->add('ab', false);
+        $killRing->resetAction();
+        $editor = (new EditorWidget(killRing: $killRing))->setMaxLength(4);
+
+        $editor->handleInput("\x19"); // Yank "ab"
+        $editor->handleInput("\x1by"); // Alt+Y to "longer": refused
+        $this->assertSame('ab', $editor->getText());
+        $editor->handleInput("\x19"); // Yank: still the most recent kill
+        $this->assertSame('abab', $editor->getText());
+    }
+
+    public function testAltYAfterARefusedYankChangesNothing()
+    {
+        $killRing = new KillRing();
+        $killRing->add('xy', false);
+        $killRing->resetAction();
+        $killRing->add('long', false);
+        $killRing->resetAction();
+        $editor = (new EditorWidget(killRing: $killRing))->setMaxLength(2);
+
+        $editor->handleInput("\x19"); // Yank "long": refused
+        $this->assertSame('', $editor->getText());
+        $editor->handleInput("\x1by"); // Alt+Y: no yank to rotate into "xy"
+        $this->assertSame('', $editor->getText());
+    }
+
+    public function testAllLinesWithoutWrappingTakeOneRowEach()
+    {
+        $editor = (new EditorWidget())->setLineWrapping(false);
+        $editor->setText(implode("\n", array_fill(0, 5, str_repeat('x', 30))));
+
+        // Wrapped, each would take 3 rows of 10 columns
+        $this->assertCount(7, $editor->render(new RenderContext(10, 24)), 'The 5 lines between the borders.');
+    }
+
+    public function testAWideCharacterCutOnTheLeftIsDrawnAsASpace()
+    {
+        $editor = (new EditorWidget())->setLineWrapping(false)->setFramed(false);
+        $editor->setText('日本語テキストです');
+        // End: 18 columns, scrolled by 11, ス (columns 10 and 11) cut
+        $editor->handleInput("\x1b[F");
+        $line = $editor->render(new RenderContext(8, 24))[0];
+        $this->assertSame(8, AnsiUtils::visibleWidth($line));
+        $this->assertSame(' トです', rtrim(AnsiUtils::stripAnsiCodes($line)));
+    }
+
+    public function testAWideCharacterUnderTheCursorIsScrolledIntoView()
+    {
+        $editor = (new EditorWidget())->setLineWrapping(false)->setFramed(false);
+        $editor->setText('abcd中ef');
+        $editor->handleInput("\x1b[H"); // Home
+        foreach (range(1, 4) as $i) {
+            $editor->handleInput("\x1b[C"); // Right, onto 中
+        }
+        $this->assertStringContainsString('中', AnsiUtils::stripAnsiCodes($editor->render(new RenderContext(5, 24))[0]));
+    }
+
+    public function testAnEditorWithoutItsFrame()
+    {
+        $editor = (new EditorWidget())->setFramed(false)->setText("a\nb");
+        $this->assertSame(['a', 'b'], array_map(static fn (string $line) => rtrim(AnsiUtils::stripAnsiCodes($line)), $editor->render(new RenderContext(10, 24))));
+        $this->assertFalse($editor->isFramed());
+        $editor->expandVertically(true);
+        $this->assertCount(6, $editor->render(new RenderContext(10, 6)), 'The rows of the borders to the text.');
+    }
+
     public function testRenderEmpty()
     {
         $editor = new EditorWidget();

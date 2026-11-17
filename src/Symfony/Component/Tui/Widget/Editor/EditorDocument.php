@@ -597,10 +597,17 @@ final class EditorDocument
      *
      * Large pastes (>10 lines) create a marker for efficient display.
      */
-    public function handlePaste(string $content): void
+    /**
+     * @param int|null $room The characters (grapheme clusters) the text can take at most, the rest dropped; null for any
+     */
+    public function handlePaste(string $content, ?int $room = null): void
     {
         $content = str_replace(["\r\n", "\r"], "\n", StringUtils::decodeCtrlLetterKeys(StringUtils::sanitizeUtf8($content)));
         $content = StringUtils::stripControlBytes($content);
+        // Cut once clean: neither a sequence cut in two nor bytes dropped later count
+        if (null !== $room) {
+            $content = $room > 0 ? (string) grapheme_substr($content, 0, $room) : '';
+        }
 
         if ('' === $content) {
             return;
@@ -733,6 +740,33 @@ final class EditorDocument
         }
 
         return $bytes;
+    }
+
+    /**
+     * Everything an edit can change, to undo it as if it never happened, the undo history and the kill ring included.
+     *
+     * @return array{array<string>, int, int, array<mixed>, array<mixed>, int, int, array<mixed>, array<mixed>}
+     */
+    public function saveState(): array
+    {
+        return [$this->lines, $this->cursorLine, $this->cursorCol, $this->undoStack, $this->redoStack, $this->undoStackBytes, $this->pasteCount, $this->pasteMarkers, $this->killRing->saveState()];
+    }
+
+    /**
+     * @param array{array<string>, int, int, array<mixed>, array<mixed>, int, int, array<mixed>, array<mixed>} $state See saveState()
+     */
+    public function restoreState(array $state): void
+    {
+        [$this->lines, $this->cursorLine, $this->cursorCol, $this->undoStack, $this->redoStack, $this->undoStackBytes, $this->pasteCount, $this->pasteMarkers, $killRing] = $state;
+        $this->killRing->restoreState($killRing);
+    }
+
+    /**
+     * The characters (grapheme clusters) of the text, pasted contents included.
+     */
+    public function getLength(): int
+    {
+        return (int) grapheme_strlen($this->getText());
     }
 
     /**

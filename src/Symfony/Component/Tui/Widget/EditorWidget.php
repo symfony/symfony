@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Tui\Widget;
 
+use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Event\CancelEvent;
 use Symfony\Component\Tui\Event\ChangeEvent;
 use Symfony\Component\Tui\Event\SubmitEvent;
@@ -51,6 +52,15 @@ class EditorWidget extends AbstractWidget implements FocusableInterface, Vertica
     private ?int $lastMaxVisibleLines = null;
 
     private bool $submitted = false;
+    private string $placeholder = '';
+    private bool $readOnly = false;
+    private ?int $maxLength = null;
+    private bool $lineWrapping = true;
+    /** The columns scrolled past on the left, when the lines do not wrap */
+    private int $scrollLeft = 0;
+    private bool $framed = true;
+    /** @var array{array<string>, int, int, array<mixed>, array<mixed>, int, int, array<mixed>, array<mixed>}|null The document before the input being handled, to refuse an edit past the maximum length */
+    private ?array $beforeInput = null;
 
     public function __construct(
         ?Keybindings $keybindings = null,
@@ -144,6 +154,106 @@ class EditorWidget extends AbstractWidget implements FocusableInterface, Vertica
         return $this;
     }
 
+    /**
+     * Sets the hint drawn on the first row while the text is empty, styled by the "placeholder" element.
+     *
+     * @return $this
+     */
+    public function setPlaceholder(string $placeholder): static
+    {
+        $placeholder = StringUtils::stripControlBytes(StringUtils::sanitizeUtf8(str_replace(["\r\n", "\r", "\n"], ' ', $placeholder)));
+        if ($this->placeholder !== $placeholder) {
+            $this->placeholder = $placeholder;
+            $this->invalidate();
+        }
+
+        return $this;
+    }
+
+    public function getPlaceholder(): string
+    {
+        return $this->placeholder;
+    }
+
+    /**
+     * A read-only editor keeps the focus and its cursor, and ignores edits, pastes, undo and redo.
+     *
+     * @return $this
+     */
+    public function setReadOnly(bool $readOnly = true): static
+    {
+        $this->readOnly = $readOnly;
+
+        return $this;
+    }
+
+    public function isReadOnly(): bool
+    {
+        return $this->readOnly;
+    }
+
+    /**
+     * Limits the characters (grapheme clusters) an edit can bring the text to, line breaks included; null for no limit.
+     *
+     * Typed and pasted text is cut to the room left; another edit that would go past the limit, like a yank, is
+     * refused before its ChangeEvent. A text given to setText() is not limited.
+     *
+     * @return $this
+     */
+    public function setMaxLength(?int $maxLength): static
+    {
+        $this->maxLength = null !== $maxLength ? max(0, $maxLength) : null;
+
+        return $this;
+    }
+
+    public function getMaxLength(): ?int
+    {
+        return $this->maxLength;
+    }
+
+    /**
+     * Wraps long lines, the default, or keeps each line on one row, scrolled sideways to keep the cursor in view.
+     *
+     * @return $this
+     */
+    public function setLineWrapping(bool $lineWrapping): static
+    {
+        if ($this->lineWrapping !== $lineWrapping) {
+            $this->lineWrapping = $lineWrapping;
+            $this->scrollLeft = 0;
+            $this->invalidate();
+        }
+
+        return $this;
+    }
+
+    public function isLineWrapping(): bool
+    {
+        return $this->lineWrapping;
+    }
+
+    /**
+     * Draws the borders above and below the text, the default, which carry the scroll indicators; without them, the
+     * editor fits in a panel that has its own.
+     *
+     * @return $this
+     */
+    public function setFramed(bool $framed): static
+    {
+        if ($this->framed !== $framed) {
+            $this->framed = $framed;
+            $this->invalidate();
+        }
+
+        return $this;
+    }
+
+    public function isFramed(): bool
+    {
+        return $this->framed;
+    }
+
     public function isVerticallyExpanded(): bool
     {
         return $this->verticallyExpanded;
@@ -196,10 +306,30 @@ class EditorWidget extends AbstractWidget implements FocusableInterface, Vertica
             return;
         }
 
+        if (null === $this->maxLength) {
+            $this->handleKey($data);
+
+            return;
+        }
+        // An edit past the maximum length is undone before its ChangeEvent, see notifyChange(); kept, not copied
+        $this->beforeInput = $this->document->saveState();
+        try {
+            $this->handleKey($data);
+        } finally {
+            $this->beforeInput = null;
+        }
+    }
+
+    private function handleKey(string $data): void
+    {
         // Handle bracketed paste
-        if (null !== $pastedText = $this->processBracketedPaste($data)) {
-            $this->document->handlePaste($pastedText);
-            $this->notifyChange();
+        if (null !== ($pastedText = $this->processBracketedPaste($data)) && !$this->readOnly) {
+            $before = $this->document->getLines();
+            $this->document->handlePaste($pastedText, null !== $this->maxLength ? $this->maxLength - $this->document->getLength() : null);
+            // Like before a maximum length existed, a paste dispatches a change unless that length dropped all of it
+            if (null === $this->maxLength || $this->document->getLines() !== $before) {
+                $this->notifyChange();
+            }
         }
 
         // Nothing left to route once the paste bytes are peeled off, and the
@@ -235,6 +365,10 @@ class EditorWidget extends AbstractWidget implements FocusableInterface, Vertica
 
         // Copy (leave to parent)
         if ($kb->matches($data, 'copy')) {
+            return;
+        }
+
+        if ($this->readOnly && $this->isEdit($data)) {
             return;
         }
 
@@ -470,8 +604,12 @@ class EditorWidget extends AbstractWidget implements FocusableInterface, Vertica
 
         // Regular character input
         $data = $kb->getParser()->decodePrintable($data) ?? $data;
-        if (!StringUtils::hasControlChars($data)) {
+        if (!$this->readOnly && !StringUtils::hasControlChars($data)) {
             $data = StringUtils::sanitizeUtf8($data);
+            if (null !== $this->maxLength) {
+                $room = $this->maxLength - $this->document->getLength();
+                $data = $room > 0 ? (string) grapheme_substr($data, 0, $room) : '';
+            }
             if ('' === $data) {
                 return;
             }
@@ -491,7 +629,7 @@ class EditorWidget extends AbstractWidget implements FocusableInterface, Vertica
         // Calculate max visible lines based on context height or terminal
         $minVisibleLines = $this->minVisibleLines;
         if ($this->verticallyExpanded && $context->getRows() > 0) {
-            $maxDisplayRows = max(5, $context->getRows() - 2);
+            $maxDisplayRows = max(5, $context->getRows() - ($this->framed ? 2 : 0));
         } else {
             $terminalRows = $this->getContext()?->getTerminalRows() ?? 24;
             $maxDisplayRows = max(5, $minVisibleLines, (int) floor($terminalRows * 0.3));
@@ -508,10 +646,21 @@ class EditorWidget extends AbstractWidget implements FocusableInterface, Vertica
             $this->document->getLines(),
             $this->document->getCursorLine(),
             $maxDisplayRows,
-            $columns,
+            // Without wrapping, each line takes one row
+            $this->lineWrapping ? $columns : 0,
             $this->verticallyExpanded && $context->getRows() > 0,
             $minVisibleLines,
         );
+
+        // Without wrapping, the lines scroll sideways as little as it takes to keep the character under the cursor in
+        // view, wide or not, a column left for the cursor past the end of the line
+        if (!$this->lineWrapping) {
+            $line = $this->document->getLines()[$this->document->getCursorLine()] ?? '';
+            $cursor = AnsiUtils::visibleWidth(substr($line, 0, $this->document->getCursorCol()));
+            $under = grapheme_extract(substr($line, $this->document->getCursorCol()), 1);
+            $width = false !== $under && '' !== $under ? max(1, AnsiUtils::visibleWidth($under)) : 1;
+            $this->scrollLeft = max(0, min($this->scrollLeft, $cursor), $cursor + $width - max(1, $columns));
+        }
 
         // Render content
         $cursorStyle = $this->resolveElement('cursor');
@@ -526,7 +675,17 @@ class EditorWidget extends AbstractWidget implements FocusableInterface, Vertica
             $this->focused,
             $cursorStyle->getCursorShape() ?? CursorShape::Block,
             $this->resolveElement('frame'),
+            $this->lineWrapping ? null : $this->scrollLeft,
+            $this->framed,
         );
+
+        // The hint of an empty editor on its first row, the cursor on its first character
+        $first = $this->framed ? 1 : 0;
+        if ('' !== $this->placeholder && isset($result[$first]) && [''] === $this->document->getLines()) {
+            $marker = $this->focused ? AnsiUtils::cursorMarker($cursorStyle->getCursorShape() ?? CursorShape::Block) : '';
+            $hint = AnsiUtils::truncateToWidth($this->placeholder, $columns, '');
+            $result[$first] = $marker.$this->applyElement('placeholder', $hint).str_repeat(' ', max(0, $columns - AnsiUtils::visibleWidth($hint)));
+        }
 
         return $result;
     }
@@ -581,8 +740,46 @@ class EditorWidget extends AbstractWidget implements FocusableInterface, Vertica
         ];
     }
 
+    /**
+     * The characters of the text in a state of the document, see EditorDocument::saveState().
+     *
+     * @param array{array<string>, int, int, array<mixed>, array<mixed>, int, int, array<mixed>, array<mixed>} $state
+     */
+    private function lengthOf(array $state): int
+    {
+        $current = $this->document->saveState();
+        $this->document->restoreState($state);
+        try {
+            return $this->document->getLength();
+        } finally {
+            $this->document->restoreState($current);
+        }
+    }
+
+    /**
+     * Whether a key edits the text, ignored by a read-only editor.
+     */
+    private function isEdit(string $data): bool
+    {
+        $kb = $this->getKeybindings();
+        foreach (['undo', 'redo', 'yank', 'yank_pop', 'new_line', 'delete_line', 'delete_to_line_end', 'delete_to_line_start', 'delete_word_backward', 'delete_word_forward', 'delete_char_backward', 'delete_char_forward', 'insert_space'] as $action) {
+            if ($kb->matches($data, $action)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function notifyChange(): void
     {
+        // An edit past the maximum length, that typing nor pasting cut, like a yank: undone as if it never happened
+        if (null !== $this->beforeInput && null !== $this->maxLength && $this->document->getLength() > $this->maxLength && $this->document->getLength() > $this->lengthOf($this->beforeInput)) {
+            $this->document->restoreState($this->beforeInput);
+            $this->invalidate();
+
+            return;
+        }
         $this->invalidate();
         $this->dispatch(new ChangeEvent($this, $this->getText()));
     }

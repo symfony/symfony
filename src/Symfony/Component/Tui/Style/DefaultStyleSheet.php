@@ -81,6 +81,7 @@ final class DefaultStyleSheet
             // EditorWidget
             EditorWidget::class.'::cursor' => new Style(cursorShape: CursorShape::Block),
             EditorWidget::class.'::frame' => new Style()->withColor('gray'),
+            EditorWidget::class.'::placeholder' => new Style()->withColor('gray'),
 
             // SelectListWidget
             SelectListWidget::class.'::selected' => new Style()->withBold(),

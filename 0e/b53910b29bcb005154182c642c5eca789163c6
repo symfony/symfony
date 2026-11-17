@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-17T08:52:56Z
+
+Thanks! Some reviewed Validator strings still use Brazilian forms: "Você", "está faltando", "usuário", "caractere". And "palvra-passe" is a typo. Would you fix them here too? (ids 6, 7, 10, 47, 48, 104, 105, 113)
+
+---------------------------------------------------------------------------
+
+by TiagoCruz1224 at 2026-11-17T09:16:50Z
+
+Thanks for catching those! Fixed in 8b2dc9f: ids 6, 7, 10, 47, 48, 104, 105 and 113 now use European Portuguese forms, and the "palvra-passe" typo is gone.
+
+While at it, I fixed the same kind of issue in a few more places:
+- Validator 42 and 111: "detectado/detectada" → "detetado/detetada".
+- Validator 27 and Form 121: "um URL válido", so "URL" is masculine everywhere, as in 113.
+- security.pt.xlf: "usuário" → "utilizador", "login" → "início de sessão", and a doubled "novamente" in id 19.

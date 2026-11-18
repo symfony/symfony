@@ -381,6 +381,14 @@ class SelectListTest extends TestCase
         }
     }
 
+    public function testALabelThatFitsIsNotCut()
+    {
+        $list = new SelectListWidget([['value' => 'a', 'label' => 'abcdefgh'], ['value' => 'b', 'label' => 'abcdefgh']], 5);
+
+        $this->assertSame(['→ abcdefgh', '  abcdefgh'], array_map(AnsiUtils::stripAnsiCodes(...), $list->render(new RenderContext(10, 24))));
+        $this->assertSame(['→ abcde', '  fgh', '  abcde', '  fgh'], array_map(AnsiUtils::stripAnsiCodes(...), $list->render(new RenderContext(9, 24))), 'A longer one wraps.');
+    }
+
     private function createTestList(bool $multiselect = false): SelectListWidget
     {
         $items = [

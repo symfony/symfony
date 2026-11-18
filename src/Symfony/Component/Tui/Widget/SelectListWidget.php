@@ -493,7 +493,8 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
         $descriptionWidth = $columns - $descriptionStart - 2;
 
         if (!$showDescription || $descriptionWidth <= 10) {
-            $labelWidth = max(1, $columns - $prefixWidth - 2);
+            // A label that fits stays on one row, a longer one wraps two columns short of the edge
+            $labelWidth = max(1, AnsiUtils::visibleWidth($item['label']) <= $columns - $prefixWidth ? $columns - $prefixWidth : $columns - $prefixWidth - 2);
             $alignedWidth = 0;
             $descriptionRows = [];
         } else {

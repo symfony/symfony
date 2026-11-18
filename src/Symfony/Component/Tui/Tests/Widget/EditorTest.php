@@ -39,6 +39,14 @@ class EditorTest extends TestCase
         $this->assertCount(3, $lines);
     }
 
+    public function testExpandVerticallyTakesTheNamedArgumentOfItsInterface()
+    {
+        $editor = new EditorWidget();
+        $editor->expandVertically(expand: true);
+
+        $this->assertTrue($editor->isVerticallyExpanded());
+    }
+
     public function testTypeCharacter()
     {
         $editor = new EditorWidget();
@@ -167,6 +175,22 @@ class EditorTest extends TestCase
                 \sprintf('Line %d exceeds width: %d > %d', $i, $lineWidth, $width),
             );
         }
+    }
+
+    public function testMinVisibleLinesShowsEmptyRows()
+    {
+        $editor = (new EditorWidget())->setMinVisibleLines(4);
+
+        // The borders and 4 rows
+        $this->assertCount(6, $editor->render(new RenderContext(40, 24)));
+    }
+
+    public function testMinVisibleLinesCountWrappedRows()
+    {
+        $editor = (new EditorWidget())->setMinVisibleLines(3)->setText(str_repeat('x', 30));
+
+        // The borders, the 2 rows of the line and 1 empty row
+        $this->assertCount(5, $editor->render(new RenderContext(20, 24)));
     }
 
     public function testCursorMovement()

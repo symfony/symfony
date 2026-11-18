@@ -134,10 +134,10 @@ class EditorWidget extends AbstractWidget implements FocusableInterface, Vertica
     /**
      * @return $this
      */
-    public function expandVertically(bool $fill): static
+    public function expandVertically(bool $expand): static
     {
-        if ($this->verticallyExpanded !== $fill) {
-            $this->verticallyExpanded = $fill;
+        if ($this->verticallyExpanded !== $expand) {
+            $this->verticallyExpanded = $expand;
             $this->invalidate();
         }
 

@@ -1148,6 +1148,25 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertTrue($chunk->isLast());
     }
 
+    public function testProxyDoesNotReceiveTheFragment()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/#fragment', [
+            'proxy' => 'http://localhost:'.self::port(),
+        ]);
+        $this->assertSame('http://localhost:'.self::port().'/', $response->toArray()['REQUEST_URI']);
+
+        // libcurl < 7.62 removes the fragment from CURLINFO_EFFECTIVE_URL
+        $fragment = $client instanceof CurlHttpClient && 0x073E00 > curl_version()['version_number'] ? '' : '#fragment';
+        $this->assertSame('http://localhost:'.self::port().'/'.$fragment, $response->getInfo('url'));
+
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/302?location=http://localhost:'.self::port().'/%23fragment', [
+            'proxy' => 'http://localhost:'.self::port(),
+        ]);
+        $this->assertSame('http://localhost:'.self::port().'/', $response->toArray()['REQUEST_URI']);
+    }
+
     public function testRedirectToTheFirstLocation()
     {
         $client = $this->getHttpClient(__FUNCTION__);

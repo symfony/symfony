@@ -37,6 +37,14 @@ class EditorTest extends TestCase
         $this->assertCount(3, $lines);
     }
 
+    public function testExpandVerticallyTakesTheNamedArgumentOfItsInterface()
+    {
+        $editor = new EditorWidget();
+        $editor->expandVertically(expand: true);
+
+        $this->assertTrue($editor->isVerticallyExpanded());
+    }
+
     public function testTypeCharacter()
     {
         $editor = new EditorWidget();

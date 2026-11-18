@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-18T08:55:46Z
+
+I changed the minimum so that the rows of wrapped lines count toward it. With 3 minimum lines, a line that wraps to 2 rows got 2 empty rows, so the editor grew while it still had empty rows. It now gets 1.

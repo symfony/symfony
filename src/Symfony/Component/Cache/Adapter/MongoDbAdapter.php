@@ -55,7 +55,7 @@ class MongoDbAdapter extends AbstractAdapter implements PruneableInterface
             ]];
         }
 
-        $this->collection->bulkWrite($operations);
+        $this->collection->bulkWrite($operations, ['ordered' => false]);
 
         return $failed ?? [];
     }

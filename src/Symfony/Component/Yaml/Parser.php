@@ -167,6 +167,18 @@ class Parser
                 }
             }
 
+            if (!$isRootNode) {
+                while ('' === ($firstNonWhitespace = ltrim($this->currentLine, " \t")) || '#' === $firstNonWhitespace[0]) {
+                    if (!$this->moveToNextLine()) {
+                        if ($this->isCurrentLineEmpty()) {
+                            return null;
+                        }
+
+                        break;
+                    }
+                }
+            }
+
             if ($isRootNode && self::preg_match('/^(?:'.self::TAG_PATTERN.'[ \t]+)?'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', rtrim($this->currentLine)) && ($this->isNextLineIndented() || null === $this->getNextContentLineIndentation())) {
                 return $this->parseRootBlockScalar($flags);
             }
@@ -519,7 +531,7 @@ class Parser
                     $firstLineNb = $this->currentLineNb;
                     $firstLine = $this->currentLine;
 
-                    if ($firstLineNb === $this->blockStartLineNb) {
+                    if (null === $context) {
                         if (trim($firstLine) === $firstLine && $this->hasOnlyEmptyRemainingLines()) {
                             try {
                                 return Inline::parse($firstLine, $flags, $this->refs, $this->state);
@@ -768,17 +780,31 @@ class Parser
         return substr($line, $indentation);
     }
 
-    private function hasMoreLines(): bool
-    {
-        return $this->numberOfParsedLines - 1 > $this->currentLineNb;
-    }
-
     private function hasOnlyEmptyRemainingLines(): bool
     {
+        $hasComments = false;
+        $hasTabWhitespaceLine = false;
+
         while ($this->moveToNextLine()) {
-            if (!$this->isCurrentLineEmpty()) {
-                return false;
+            if ('' === trim($this->currentLine, ' ')) {
+                continue;
             }
+
+            if ('' === trim($this->currentLine, " \t")) {
+                if ($hasComments) {
+                    return false;
+                }
+
+                $hasTabWhitespaceLine = true;
+                continue;
+            }
+
+            if (!$hasTabWhitespaceLine && $this->isCurrentLineComment()) {
+                $hasComments = true;
+                continue;
+            }
+
+            return false;
         }
 
         return true;
@@ -1424,10 +1450,12 @@ class Parser
 
             $value .= $line;
 
-            if ($this->hasMoreLines()) {
-                $cursor = 0;
+            if (!$this->moveToNextLine()) {
+                break;
             }
-        } while ($this->moveToNextLine());
+
+            $cursor = 0;
+        } while (true);
 
         throw new ParseException('Unterminated quoted string. If it spans multiple lines, its continuation lines must be indented at least as deeply as where it starts.');
     }
@@ -1538,10 +1566,12 @@ class Parser
                 }
             }
 
-            if ($this->hasMoreLines()) {
-                $cursor = 0;
+            if (!$this->moveToNextLine()) {
+                break;
             }
-        } while ($this->moveToNextLine());
+
+            $cursor = 0;
+        } while (true);
 
         throw new ParseException('Malformed inline YAML string.');
     }
@@ -1559,10 +1589,12 @@ class Parser
                 return 0 < $whitespacesConsumed;
             }
 
-            if ($this->hasMoreLines()) {
-                $cursor = 0;
+            if (!$this->moveToNextLine()) {
+                break;
             }
-        } while ($this->moveToNextLine());
+
+            $cursor = 0;
+        } while (true);
 
         return 0 < $whitespacesConsumed;
     }

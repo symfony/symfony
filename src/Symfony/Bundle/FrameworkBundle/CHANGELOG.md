@@ -18,6 +18,7 @@ CHANGELOG
  * Assert each constraint of the DomCrawler and BrowserKit assertions on its own, so that their failure messages describe the failed check instead of dumping the crawler, the response or the client
  * Add the `expression_language.compiled` tag to decorate an expression language with `CompiledExpressionLanguage`
  * Register the `lint:expressions` command
+ * Translate `TranslatableInterface` messages passed to `AbstractController::addFlash()` when the translator is available
  * Add the `framework.session.isolate_attributes` option to deep-clone the values read from and passed to session attributes
  * List deprecated aliases in `debug:autowiring` only when the `--all` option is passed
  * Register the security expression functions on `controller.expression_language`

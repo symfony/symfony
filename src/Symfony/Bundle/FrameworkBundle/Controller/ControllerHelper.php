@@ -50,6 +50,8 @@ use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 /**
@@ -78,6 +80,7 @@ class ControllerHelper implements ServiceSubscriberInterface
             'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
             'parameter_bag' => '?'.ContainerBagInterface::class,
             'web_link.http_header_serializer' => '?'.HttpHeaderSerializer::class,
+            'translator' => '?'.TranslatorInterface::class,
         ];
     }
 
@@ -185,6 +188,10 @@ class ControllerHelper implements ServiceSubscriberInterface
 
         if (!$session instanceof FlashBagAwareSessionInterface) {
             throw new \LogicException(\sprintf('You cannot use the addFlash method because class "%s" doesn\'t implement "%s".', get_debug_type($session), FlashBagAwareSessionInterface::class));
+        }
+
+        if ($message instanceof TranslatableInterface && $this->container->has('translator')) {
+            $message = $message->trans($this->container->get('translator'));
         }
 
         $session->getFlashBag()->add($type, $message);

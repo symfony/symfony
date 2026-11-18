@@ -137,6 +137,22 @@ class EditorTest extends TestCase
         }
     }
 
+    public function testMinVisibleLinesShowsEmptyRows()
+    {
+        $editor = (new EditorWidget())->setMinVisibleLines(4);
+
+        // The borders and 4 rows
+        $this->assertCount(6, $editor->render(new RenderContext(40, 24)));
+    }
+
+    public function testMinVisibleLinesCountWrappedRows()
+    {
+        $editor = (new EditorWidget())->setMinVisibleLines(3)->setText(str_repeat('x', 30));
+
+        // The borders, the 2 rows of the line and 1 empty row
+        $this->assertCount(5, $editor->render(new RenderContext(20, 24)));
+    }
+
     public function testCursorMovement()
     {
         $editor = new EditorWidget();

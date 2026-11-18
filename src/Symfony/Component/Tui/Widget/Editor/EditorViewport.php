@@ -95,8 +95,11 @@ final class EditorViewport
         // Recalculate after potential scroll offset change
         $logicalLinesFitting = self::logicalLinesFitting($lines, $this->scrollOffset, $maxDisplayRows, $columns);
 
-        // Calculate visible line count
-        $visibleLineCount = $verticallyExpanded ? $logicalLinesFitting : min(max($minVisibleLines, $totalLines), $logicalLinesFitting);
+        // Once the content is shown down to its end, empty rows make up the minimum lines, as far as there is room
+        $visibleLineCount = $logicalLinesFitting;
+        if (!$verticallyExpanded && $this->scrollOffset + $logicalLinesFitting >= $totalLines) {
+            $visibleLineCount += max(0, min($minVisibleLines, $maxDisplayRows) - self::displayRows($lines, $this->scrollOffset, $columns));
+        }
 
         return [
             'scroll_offset' => $this->scrollOffset,
@@ -151,5 +154,18 @@ final class EditorViewport
         }
 
         return $offset;
+    }
+
+    /**
+     * @param string[] $lines
+     */
+    private static function displayRows(array $lines, int $fromLine, int $columns): int
+    {
+        $displayRows = 0;
+        for ($i = $fromLine, $totalLines = \count($lines); $i < $totalLines; ++$i) {
+            $displayRows += \count(TextWrapper::wrapLineIntoChunks($lines[$i], $columns));
+        }
+
+        return $displayRows;
     }
 }

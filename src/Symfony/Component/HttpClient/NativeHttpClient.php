@@ -270,6 +270,9 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 $url['authority'] = substr_replace($url['authority'], $ip, -\strlen($host) - \strlen($port), \strlen($host));
             }
 
+            // the fragment is for the client only, but the full URL is sent to proxies
+            unset($url['fragment']);
+
             return [self::createRedirectResolver($options, $url['scheme'], $authority, $proxy, $info, $onProgress), implode('', $url)];
         };
 
@@ -453,6 +456,8 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 $ip = self::dnsResolve($host, $multi, $info, $onProgress);
                 $url['authority'] = substr_replace($url['authority'], $ip, -\strlen($host) - \strlen($port), \strlen($host));
             }
+
+            unset($url['fragment']);
 
             return implode('', $url);
         };

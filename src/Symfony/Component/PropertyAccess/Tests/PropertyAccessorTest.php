@@ -1436,10 +1436,21 @@ class PropertyAccessorTest extends TestCase
     public static function setValueWithAsymmetricVisibilityDataProvider(): iterable
     {
         yield ['publicPublic', null];
-        yield ['publicProtected', \Error::class];
-        yield ['publicPrivate', \Error::class];
+        yield ['publicProtected', NoSuchPropertyException::class];
+        yield ['publicPrivate', NoSuchPropertyException::class];
         yield ['privatePrivate', NoSuchPropertyException::class];
-        yield ['virtualNoSetHook', \Error::class];
+        yield ['virtualNoSetHook', NoSuchPropertyException::class];
+    }
+
+    #[RequiresPhp('>=8.4.0')]
+    public function testSetValueWithAsymmetricVisibilityIgnoresInvalidProperty()
+    {
+        $object = new AsymmetricVisibility();
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::DO_NOT_THROW);
+
+        $propertyAccessor->setValue($object, 'publicPrivate', true);
+
+        $this->assertNull($object->publicPrivate);
     }
 
     public function testCustomPropertyPathImplementation()

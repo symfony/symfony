@@ -161,22 +161,8 @@ class Parser
             $context = null;
             $allowOverwrite = false;
 
-            while ($this->isCurrentLineEmpty()) {
-                if (!$this->moveToNextLine()) {
-                    return null;
-                }
-            }
-
-            if (!$isRootNode) {
-                while ('' === ($firstNonWhitespace = ltrim($this->currentLine, " \t")) || '#' === $firstNonWhitespace[0]) {
-                    if (!$this->moveToNextLine()) {
-                        if ($this->isCurrentLineEmpty()) {
-                            return null;
-                        }
-
-                        break;
-                    }
-                }
+            if (!$this->skipLeadingLines($isRootNode)) {
+                return null;
             }
 
             if ($isRootNode && self::preg_match('/^(?:'.self::TAG_PATTERN.'[ \t]+)?'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', rtrim($this->currentLine)) && ($this->isNextLineIndented() || null === $this->getNextContentLineIndentation())) {
@@ -185,11 +171,17 @@ class Parser
 
             // Resolves the tag and returns if end of the document
             if (null !== $tag = $this->getLineTag($this->currentLine, $flags, false)) {
-                do {
-                    if (!$this->moveToNextLine()) {
-                        return new TaggedValue($tag, '');
+                $hasContentAfterTag = false;
+                while ($this->moveToNextLine()) {
+                    if (!$this->isCurrentLineEmpty()) {
+                        $hasContentAfterTag = true;
+                        break;
                     }
-                } while ($this->isCurrentLineEmpty());
+                }
+
+                if (!$hasContentAfterTag) {
+                    return new TaggedValue($tag, '');
+                }
             }
 
             do {
@@ -778,6 +770,25 @@ class Parser
         }
 
         return substr($line, $indentation);
+    }
+
+    private function skipLeadingLines(bool $isRootNode): bool
+    {
+        while (true) {
+            if ($this->isCurrentLineEmpty()) {
+                if (!$this->moveToNextLine()) {
+                    return false;
+                }
+
+                continue;
+            }
+
+            if (!$isRootNode && ('' === ($firstNonWhitespace = ltrim($this->currentLine, " \t")) || '#' === $firstNonWhitespace[0]) && $this->moveToNextLine()) {
+                continue;
+            }
+
+            return true;
+        }
     }
 
     private function hasOnlyEmptyRemainingLines(): bool
@@ -1395,7 +1406,7 @@ class Parser
         $previousLineWasTerminatedWithBackslash = false;
         $lineNumber = 0;
 
-        do {
+        while (true) {
             if (++$lineNumber > 1) {
                 $cursor += strspn($this->currentLine, " \t", $cursor);
             }
@@ -1455,7 +1466,7 @@ class Parser
             }
 
             $cursor = 0;
-        } while (true);
+        }
 
         throw new ParseException('Unterminated quoted string. If it spans multiple lines, its continuation lines must be indented at least as deeply as where it starts.');
     }
@@ -1522,7 +1533,7 @@ class Parser
         $value = $this->currentLine[$cursor];
         ++$cursor;
 
-        do {
+        while (true) {
             $this->consumeWhitespaces($cursor);
 
             while (isset($this->currentLine[$cursor])) {
@@ -1571,7 +1582,7 @@ class Parser
             }
 
             $cursor = 0;
-        } while (true);
+        }
 
         throw new ParseException('Malformed inline YAML string.');
     }
@@ -1580,7 +1591,7 @@ class Parser
     {
         $whitespacesConsumed = 0;
 
-        do {
+        while (true) {
             $whitespaceOnlyTokenLength = strspn($this->currentLine, " \t", $cursor);
             $whitespacesConsumed += $whitespaceOnlyTokenLength;
             $cursor += $whitespaceOnlyTokenLength;
@@ -1594,7 +1605,7 @@ class Parser
             }
 
             $cursor = 0;
-        } while (true);
+        }
 
         return 0 < $whitespacesConsumed;
     }

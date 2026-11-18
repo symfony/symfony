@@ -310,9 +310,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
                 }
             }
 
-            $maxColumns = $columns - $prefixWidth - 2;
-
-            return $selectedStyle->apply($prefix.AnsiUtils::truncateToWidth($displayValue, $maxColumns, ''));
+            return $selectedStyle->apply($prefix.$this->fitLabel($displayValue, $columns - $prefixWidth));
         }
 
         // Non-selected item
@@ -336,9 +334,15 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
             }
         }
 
-        $maxColumns = $columns - $prefixWidth - 2;
+        return $prefix.$this->fitLabel($displayValue, $columns - $prefixWidth);
+    }
 
-        return $prefix.AnsiUtils::truncateToWidth($displayValue, $maxColumns, '');
+    /**
+     * A label that fits is kept whole; a longer one is cut two columns short of the edge.
+     */
+    private function fitLabel(string $label, int $columns): string
+    {
+        return AnsiUtils::visibleWidth($label) <= $columns ? $label : AnsiUtils::truncateToWidth($label, $columns - 2, '');
     }
 
     private function normalizeDescription(string $description): string

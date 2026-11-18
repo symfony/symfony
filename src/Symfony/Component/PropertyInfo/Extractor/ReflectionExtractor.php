@@ -465,7 +465,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         [$adderAccessName, $removerAccessName, $adderAndRemoverErrors] = $this->findAdderAndRemover($reflClass, $singulars);
-        if ($allowAdderRemover && null !== $adderAccessName && null !== $removerAccessName) {
+        if ($allowAdderRemover && null !== $adderAccessName && null !== $removerAccessName && !$this->isSingularWithExactMutator($reflClass, $camelized)) {
             $adderMethod = $reflClass->getMethod($adderAccessName);
             $removerMethod = $reflClass->getMethod($removerAccessName);
 
@@ -1121,5 +1121,35 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         return PropertyWriteInfo::VISIBILITY_PUBLIC;
+    }
+
+    private function isSingularWithExactMutator(\ReflectionClass $reflClass, string $camelized): bool
+    {
+        foreach ($this->mutatorPrefixes as $mutatorPrefix) {
+            if (\in_array($mutatorPrefix, $this->arrayMutatorPrefixes, true)) {
+                continue;
+            }
+
+            [$accessible] = $this->isMethodAccessible($reflClass, $mutatorPrefix.$camelized, 1);
+            if (!$accessible) {
+                continue;
+            }
+
+            return $this->hasDistinctPluralProperty($reflClass, $camelized);
+        }
+
+        return false;
+    }
+
+    private function hasDistinctPluralProperty(\ReflectionClass $reflClass, string $camelized): bool
+    {
+        foreach ($reflClass->getProperties() as $reflectionProperty) {
+            $name = $this->camelize($reflectionProperty->name);
+            if ($name !== $camelized && \in_array($camelized, $this->inflector->singularize($name), true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

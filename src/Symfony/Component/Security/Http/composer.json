@@ -26,6 +26,7 @@
         "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {
+        "egulias/email-validator": "^2.1.10|^3|^4",
         "psr/log": "^1|^2|^3",
         "symfony/cache": "^7.4.8|^8.0.8",
         "symfony/clock": "^7.4|^8.0",
@@ -33,11 +34,15 @@
         "symfony/expression-language": "^7.4|^8.0",
         "symfony/http-client": "^7.4|^8.0",
         "symfony/http-client-contracts": "^3.0",
+        "symfony/mime": "^7.4|^8.0",
         "symfony/notifier": "^7.4|^8.0",
         "symfony/rate-limiter": "^7.4|^8.0",
         "symfony/routing": "^7.4|^8.0",
         "symfony/security-csrf": "^7.4|^8.0",
         "symfony/translation": "^7.4|^8.0",
+        "symfony/twig-bridge": "^7.4|^8.0",
+        "twig/cssinliner-extra": "^3",
+        "twig/inky-extra": "^3",
         "web-token/jwt-library": "^3.3.2|^4.0"
     },
     "conflict": {

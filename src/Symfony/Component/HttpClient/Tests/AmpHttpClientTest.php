@@ -172,4 +172,9 @@ class AmpHttpClientTest extends HttpClientTestCase
 
         $this->assertFalse(@stream_socket_accept($server, 0.1));
     }
+
+    public function testProxyDoesNotReceiveTheFragment()
+    {
+        $this->markTestSkipped('A real proxy server would be needed.');
+    }
 }

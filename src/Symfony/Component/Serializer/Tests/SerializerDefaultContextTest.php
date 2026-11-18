@@ -22,7 +22,7 @@ class SerializerDefaultContextTest extends TestCase
 {
     public function testDefaultContextIsPassedToCustomNormalizerAndCanBeOverridden()
     {
-        $normalizer = $this->createMock(NormalizerInterface::class);
+        $normalizer = $this->createStub(NormalizerInterface::class);
         $normalizer->method('getSupportedTypes')->willReturn(['*' => false]);
         $normalizer->method('supportsNormalization')->willReturn(true);
         $normalizer->method('normalize')->willReturnCallback(static fn ($data, $format, $context) => $context);
@@ -35,7 +35,7 @@ class SerializerDefaultContextTest extends TestCase
 
     public function testDefaultContextIsPassedToCustomDenormalizerAndCanBeOverridden()
     {
-        $normalizer = $this->createMock(DenormalizerInterface::class);
+        $normalizer = $this->createStub(DenormalizerInterface::class);
         $normalizer->method('getSupportedTypes')->willReturn(['*' => false]);
         $normalizer->method('supportsDenormalization')->willReturn(true);
         $normalizer->method('denormalize')->willReturnCallback(static fn ($data, $type, $format, $context) => $context);
@@ -48,11 +48,11 @@ class SerializerDefaultContextTest extends TestCase
 
     public function testDefaultContextIsPassedToCustomEncoderAndDecoder()
     {
-        $encoder = $this->createMock(EncoderInterface::class);
+        $encoder = $this->createStub(EncoderInterface::class);
         $encoder->method('supportsEncoding')->willReturn(true);
         $encoder->method('encode')->willReturnCallback(static fn ($data, $format, $context) => json_encode($context));
 
-        $decoder = $this->createMock(DecoderInterface::class);
+        $decoder = $this->createStub(DecoderInterface::class);
         $decoder->method('supportsDecoding')->willReturn(true);
         $decoder->method('decode')->willReturnCallback(static fn ($data, $format, $context) => $context);
 
@@ -66,12 +66,12 @@ class SerializerDefaultContextTest extends TestCase
 
     public function testDefaultContextIsPassedThroughSerializationPipeline()
     {
-        $normalizer = $this->createMock(NormalizerInterface::class);
+        $normalizer = $this->createStub(NormalizerInterface::class);
         $normalizer->method('getSupportedTypes')->willReturn(['*' => false]);
         $normalizer->method('supportsNormalization')->willReturn(true);
         $normalizer->method('normalize')->willReturnCallback(static fn ($data, $format, $context) => $context);
 
-        $encoder = $this->createMock(EncoderInterface::class);
+        $encoder = $this->createStub(EncoderInterface::class);
         $encoder->method('supportsEncoding')->willReturn(true);
         $encoder->method('encode')->willReturnCallback(static fn ($data, $format, $context) => json_encode(['data' => $data, 'context' => $context]));
 

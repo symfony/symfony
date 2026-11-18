@@ -68,4 +68,9 @@ class AmpHttpClientTest extends HttpClientTestCase
     {
         $this->markTestSkipped('A real proxy server would be needed.');
     }
+
+    public function testProxyDoesNotReceiveTheFragment()
+    {
+        $this->markTestSkipped('A real proxy server would be needed.');
+    }
 }

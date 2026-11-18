@@ -48,6 +48,19 @@ class EditorViewportTest extends TestCase
         $this->assertSame(0, $result['scroll_offset']);
     }
 
+    public function testTheMinimumLinesAreShownPastTheContentAsFarAsThereIsRoom()
+    {
+        $this->assertSame(4, (new EditorViewport())->computeViewport([''], 0, 7, 80, false, 4)['visible_line_count']);
+        $this->assertSame(3, (new EditorViewport())->computeViewport([''], 0, 3, 80, false, 4)['visible_line_count']);
+        $this->assertSame(5, (new EditorViewport())->computeViewport(['a', 'b', 'c', 'd', 'e'], 0, 7, 80, false, 4)['visible_line_count']);
+        // A line that wraps to 3 rows leaves room for 1 empty row only
+        $this->assertSame(2, (new EditorViewport())->computeViewport([str_repeat('a', 25)], 0, 7, 10, false, 4)['visible_line_count']);
+        // Not while lines are cut off below: they are counted as such
+        $viewport = (new EditorViewport())->computeViewport([str_repeat('a', 75), str_repeat('a', 75)], 0, 10, 10, false, 5);
+        $this->assertSame(1, $viewport['visible_line_count']);
+        $this->assertSame(1, $viewport['lines_below']);
+    }
+
     public function testComputeViewportExpandedMode()
     {
         $viewport = new EditorViewport();

@@ -78,6 +78,14 @@ class ConfigurationTest extends TestCase
         ], $this->process([]));
     }
 
+    public function testSubjectHeaderOnlySupportsTheExpressionOption()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageIsOrContains('The "Subject" header only supports the "expression" option.');
+
+        $this->process(['dsn' => 'smtp://example.com', 'headers' => ['Subject' => ['invalid' => 'Foo']]]);
+    }
+
     public function testATransportCanBeGivenAsAString()
     {
         $config = $this->process(['transports' => ['main' => 'smtp://example.com']]);

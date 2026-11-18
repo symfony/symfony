@@ -39,7 +39,6 @@ class MessageListener implements EventSubscriberInterface
         'to' => self::HEADER_SET_IF_EMPTY,
         'cc' => self::HEADER_ADD,
         'bcc' => self::HEADER_ADD,
-        'subject' => self::HEADER_EXPRESSION,
     ];
 
     private array $headerRules = [];
@@ -84,7 +83,7 @@ class MessageListener implements EventSubscriberInterface
         foreach ($this->headers->all() as $name => $defaultHeader) {
             $headerRule = $this->headerRules[$name] ?? self::HEADER_SET_IF_EMPTY;
 
-            if (!$messageHeaders->has($name) && $headerRule !== self::HEADER_EXPRESSION) {
+            if (!$messageHeaders->has($name) && self::HEADER_EXPRESSION !== $headerRule) {
                 $messageHeaders->add($defaultHeader);
 
                 continue;

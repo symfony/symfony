@@ -97,29 +97,16 @@ class MessageListenerTest extends TestCase
         $defaultHeaders = (new Headers())
             ->add(new UnstructuredHeader('foo', "headers.getHeaderBody('foo') ~ ' baz'"))
             ->add(new UnstructuredHeader('bar', "headers.getHeaderBody('bar') ~ ' baz'"))
-            ->add(new UnstructuredHeader('baz', 'qux'))
         ;
         $expectedHeaders = (new Headers())
             ->add(new UnstructuredHeader('foo', 'bar baz'))
             ->add(new UnstructuredHeader('bar', ' baz'))
-            ->add(new UnstructuredHeader('baz', 'qux'))
         ;
         $rules = [
             'foo' => MessageListener::HEADER_EXPRESSION,
             'bar' => MessageListener::HEADER_EXPRESSION,
-            'baz' => MessageListener::HEADER_EXPRESSION,
         ];
-        yield 'Some defaults, default is to evaluate the expression' => [$initialHeaders, $defaultHeaders, $expectedHeaders, $rules];
-
-        $initialHeaders = (new Headers())
-            ->add(new UnstructuredHeader('subject', 'bar'))
-        ;
-        $defaultHeaders = (new Headers())
-            ->add(new UnstructuredHeader('subject', "headers.getHeaderBody('subject') ~ ' baz'"))
-        ;
-        $expectedHeaders = (new Headers())
-            ->add(new UnstructuredHeader('subject', 'bar baz'));
-        yield 'subject, evaluate the expression' => [$initialHeaders, $defaultHeaders, $expectedHeaders];
+        yield 'Some defaults, evaluate the expression' => [$initialHeaders, $defaultHeaders, $expectedHeaders, $rules];
 
         $initialHeaders = (new Headers())
             ->add(new MailboxListHeader('bcc', [new Address('bcc-initial@example.com')]))

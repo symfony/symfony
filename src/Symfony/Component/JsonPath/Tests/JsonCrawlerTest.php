@@ -843,6 +843,26 @@ class JsonCrawlerTest extends TestCase
         yield 'nested filter' => ['$.items[?$.items[?@.id == $.target] && @.id < 2].id', [0, 1]];
     }
 
+    #[DataProvider('provideAbsoluteQueriesSelectingContainers')]
+    public function testAbsoluteQuerySelectingContainerInComparison(string $path, array $expected)
+    {
+        $json = '{"object": {"x": 1}, "list": [{"x": 1}], "empty": {}, "items": [{"id": 1, "a": {"x": 1}}, {"id": 2, "a": {"x": 2}}, {"id": 3, "a": [{"x": 1}]}, {"id": 4, "a": {}}, {"id": 5, "a": []}]}';
+
+        $this->assertSame($expected, (new JsonCrawler($json))->find($path));
+        $this->assertSame($expected, (new JsonCrawler(self::createStream($json)))->find($path));
+    }
+
+    public static function provideAbsoluteQueriesSelectingContainers(): iterable
+    {
+        yield 'object' => ['$.items[?@.a == $.object].id', [1]];
+        yield 'object, absolute query first' => ['$.items[?$.object == @.a].id', [1]];
+        yield 'list of objects' => ['$.items[?@.a == $.list].id', [3]];
+        yield 'item of the same document' => ['$.items[?@.a == $.items[0].a].id', [1]];
+        yield 'not equal to an object' => ['$.items[?@.a != $.object].id', [2, 3, 4, 5]];
+        yield 'empty object' => ['$.items[?@.a == $.empty].id', [4]];
+        yield 'value() of a query with several selectors' => ['$.items[?@.a == value($[?@.missing, "object"])].id', [1]];
+    }
+
     public function testNonSingularAbsoluteQueryInComparisonThrows()
     {
         $this->expectException(JsonCrawlerException::class);

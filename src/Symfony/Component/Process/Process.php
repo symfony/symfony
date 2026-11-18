@@ -665,7 +665,8 @@ class Process implements \IteratorAggregate
      *
      * Some commands behave differently when their standard input is a pipe, even an empty one
      * (e.g. ripgrep searches it instead of the working directory). With the input disabled,
-     * they see no input at all, whatever the standard input of the current process is.
+     * they see no input at all. It has no effect when inheritStdio() is used: the process then
+     * reads the standard input of the current process.
      *
      * Like disableOutput(), it needs the null device to be readable: the process fails to start
      * when /dev/null is outside the open_basedir restriction.
@@ -696,7 +697,8 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Gives a pipe as standard input to the process again.
+     * Gives back to the process its usual standard input: a pipe, or the standard input
+     * of the current process when inheritStdio() is used.
      *
      * @return $this
      *

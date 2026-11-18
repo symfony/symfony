@@ -34,6 +34,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Tests\Fixtures\InvokableTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\PromotedInputDto;
 use Symfony\Component\Console\Tests\Fixtures\ReadonlyInputDto;
 
 class InvokableCommandTest extends TestCase
@@ -549,6 +550,26 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput(['--label' => 'admin']), $output);
 
         $this->assertSame('Bob admin', $output->fetch());
+    }
+
+    public function testMapInputWithPromotedProperties()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (OutputInterface $output, #[MapInput] PromotedInputDto $input): int {
+            $output->write($input->name.' '.$input->count);
+
+            return 0;
+        });
+
+        $this->assertFalse($command->getDefinition()->getArgument('name')->isRequired());
+
+        $command->run(new ArrayInput([]), $output = new BufferedOutput());
+
+        $this->assertSame('Bob 42', $output->fetch());
+
+        $command->run(new ArrayInput(['name' => 'Alice', '--count' => '7']), $output);
+
+        $this->assertSame('Alice 7', $output->fetch());
     }
 
     public function testHelpersInjection()

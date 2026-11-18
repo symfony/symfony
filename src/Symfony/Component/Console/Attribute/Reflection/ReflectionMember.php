@@ -73,12 +73,16 @@ class ReflectionMember
             return $this->member->isDefaultValueAvailable();
         }
 
+        if ($parameter = $this->getPromotedParameter()) {
+            return $parameter->isDefaultValueAvailable();
+        }
+
         return $this->member->hasDefaultValue();
     }
 
     public function getDefaultValue(): mixed
     {
-        $defaultValue = $this->member->getDefaultValue();
+        $defaultValue = ($this->getPromotedParameter() ?? $this->member)->getDefaultValue();
 
         if ($defaultValue instanceof \BackedEnum) {
             return $defaultValue->value;
@@ -105,5 +109,23 @@ class ReflectionMember
     public function isProperty(): bool
     {
         return $this->member instanceof \ReflectionProperty;
+    }
+
+    /**
+     * The default value of a promoted property is declared on its constructor parameter.
+     */
+    private function getPromotedParameter(): ?\ReflectionParameter
+    {
+        if (!$this->member instanceof \ReflectionProperty || !$this->member->isPromoted()) {
+            return null;
+        }
+
+        foreach ($this->member->getDeclaringClass()->getConstructor()?->getParameters() ?? [] as $parameter) {
+            if ($parameter->name === $this->member->name) {
+                return $parameter;
+            }
+        }
+
+        return null;
     }
 }

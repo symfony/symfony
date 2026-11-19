@@ -98,7 +98,7 @@ final class FixedWindowLimiter implements LimiterInterface
 
             if (0 === $tokens) {
                 $waitDuration = $window->calculateTimeForTokens(1, $now);
-                $reservation = new Reservation($now + $waitDuration, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp($availableTokens > 0 ? $second : $second + $window->calculateTimeForTokens(1, $second)), true, $this->limit, $this->resetAt($window, $now)));
+                $reservation = new Reservation($now + $waitDuration, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp($availableTokens > 0 ? $second : $second + $window->calculateTimeForTokens(1, $second)), true, $this->limit, $this->resetAt($window, $now), 0, null, $this->id));
             } elseif ($availableTokens >= $tokens) {
                 $window->add($tokens, $now);
 
@@ -107,7 +107,7 @@ final class FixedWindowLimiter implements LimiterInterface
                     $retryAfter += $window->calculateTimeForTokens(1, $second);
                 }
 
-                $reservation = new Reservation($now, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp($retryAfter), true, $this->limit, $this->resetAt($window, $now)));
+                $reservation = new Reservation($now, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp($retryAfter), true, $this->limit, $this->resetAt($window, $now), max(0, $tokens), $tokens > 0 ? $now : null, $this->id));
             } else {
                 $waitDuration = $window->calculateTimeForTokens($tokens, $now);
                 $retryAfter = \DateTimeImmutable::createFromTimestamp($second + $window->calculateTimeForTokens($tokens, $second));
@@ -115,12 +115,12 @@ final class FixedWindowLimiter implements LimiterInterface
                 // the tokens are not available yet, even when the computed wait is 0 at the end of a window
                 if (null !== $maxTime && (0.0 === $maxTime || $waitDuration > $maxTime)) {
                     // process needs to wait longer than set interval
-                    throw new MaxWaitDurationExceededException(\sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), new RateLimit($window->getAvailableTokens($now), $retryAfter, false, $this->limit, $this->resetAt($window, $now)));
+                    throw new MaxWaitDurationExceededException(\sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), new RateLimit($window->getAvailableTokens($now), $retryAfter, false, $this->limit, $this->resetAt($window, $now), 0, null, $this->id));
                 }
 
                 $window->add($tokens, $now);
 
-                $reservation = new Reservation($now + $waitDuration, new RateLimit($window->getAvailableTokens($now), $retryAfter, false, $this->limit, $this->resetAt($window, $now)));
+                $reservation = new Reservation($now + $waitDuration, new RateLimit($window->getAvailableTokens($now), $retryAfter, false, $this->limit, $this->resetAt($window, $now), 0, null, $this->id));
             }
 
             if (0 !== $tokens) {
@@ -139,6 +139,58 @@ final class FixedWindowLimiter implements LimiterInterface
             return $this->reserve($tokens, 0)->getRateLimit();
         } catch (MaxWaitDurationExceededException $e) {
             return $e->getRateLimit();
+        }
+    }
+
+    /**
+     * Gives back the tokens a consume() call took, when that call should not count.
+     *
+     * The window resets on its own at the end of its interval, so refunding a hit
+     * made in a previous window has no effect: the tokens are back already.
+     */
+    public function refund(RateLimit $rateLimit): RateLimit
+    {
+        if (!$rateLimit->isAccepted() || 0 >= $rateLimit->getConsumedTokens() || null === $rateLimit->getHitTime() || $this->id !== $rateLimit->getLimiterId() || $rateLimit->isRefunded()) {
+            return $rateLimit;
+        }
+
+        $this->lock?->acquire(true);
+
+        try {
+            $now = microtime(true);
+            $window = $this->storage->fetch($this->id);
+
+            if (!$window instanceof Window && !$window instanceof CalendarAlignedWindow) {
+                return $rateLimit;
+            }
+
+            $hitTime = $rateLimit->getHitTime();
+
+            if ($window instanceof CalendarAlignedWindow) {
+                // the hit is counted until the calendar period it belongs to ends, and the period itself tells
+                $periodStart = $window->getPeriodStart()->getTimestamp() + $window->getPeriodStart()->getMicrosecond() / 1e6;
+                $periodEnd = $window->getPeriodEnd()->getTimestamp() + $window->getPeriodEnd()->getMicrosecond() / 1e6;
+            } else {
+                // the hit is counted until the window it was made in ends, and the window start tells
+                // whether the stored window is the one the hit belongs to
+                $periodStart = $window->getTimer();
+                $periodEnd = $window->getTimer() + $window->getIntervalInSeconds();
+            }
+
+            if (!$window->getHitCount() || $hitTime < $periodStart || $hitTime >= $periodEnd || $now >= $periodEnd) {
+                return $rateLimit;
+            }
+
+            $window->add(-$rateLimit->getConsumedTokens(), $now);
+            $rateLimit->markRefunded();
+            $this->storage->save($window);
+
+            $availableTokens = $window->getAvailableTokens($now);
+            $retryAfter = $availableTokens > 0 ? \DateTimeImmutable::createFromTimestamp((int) ceil($now)) : $this->resetAt($window, $now);
+
+            return new RateLimit($availableTokens, $retryAfter, true, $this->limit, $this->resetAt($window, $now), 0, null, $this->id);
+        } finally {
+            $this->lock?->release();
         }
     }
 

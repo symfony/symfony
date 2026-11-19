@@ -84,7 +84,7 @@ final class TokenBucketLimiter implements LimiterInterface
                     $retryAfter = $bucket->getTimer() + $this->rate->calculateTimeForTokens(1);
                 }
 
-                $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp($availableTokens === $tokens ? ceil($retryAfter) : floor($retryAfter)), true, $this->maxBurst, $this->resetAt($availableTokens - $tokens, $now, $bucket->getTimer())));
+                $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp($availableTokens === $tokens ? ceil($retryAfter) : floor($retryAfter)), true, $this->maxBurst, $this->resetAt($availableTokens - $tokens, $now, $bucket->getTimer()), max(0, $tokens), $tokens > 0 ? $now : null, $this->id));
             } else {
                 // peeking with 0 tokens tells when the next token is available
                 $remainingTokens = max(1, $tokens) - $availableTokens;
@@ -92,7 +92,7 @@ final class TokenBucketLimiter implements LimiterInterface
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval
-                    $rateLimit = new RateLimit($availableTokens, \DateTimeImmutable::createFromTimestamp(ceil($now + $waitDuration)), false, $this->maxBurst, $this->resetAt($availableTokens, $now, $bucket->getTimer()));
+                    $rateLimit = new RateLimit($availableTokens, \DateTimeImmutable::createFromTimestamp(ceil($now + $waitDuration)), false, $this->maxBurst, $this->resetAt($availableTokens, $now, $bucket->getTimer()), 0, null, $this->id);
 
                     throw new MaxWaitDurationExceededException(\sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), $rateLimit);
                 }
@@ -101,7 +101,7 @@ final class TokenBucketLimiter implements LimiterInterface
                 // so no tokens are left for other processes.
                 $bucket->setTokens($availableTokens - $tokens);
 
-                $reservation = new Reservation($now + $waitDuration, new RateLimit(0, \DateTimeImmutable::createFromTimestamp(ceil($now + $waitDuration)), false, $this->maxBurst, $this->resetAt($availableTokens - $tokens, $now, $bucket->getTimer())));
+                $reservation = new Reservation($now + $waitDuration, new RateLimit(0, \DateTimeImmutable::createFromTimestamp(ceil($now + $waitDuration)), false, $this->maxBurst, $this->resetAt($availableTokens - $tokens, $now, $bucket->getTimer()), 0, null, $this->id));
             }
 
             if (0 !== $tokens) {
@@ -120,6 +120,58 @@ final class TokenBucketLimiter implements LimiterInterface
             return $this->reserve($tokens, 0)->getRateLimit();
         } catch (MaxWaitDurationExceededException $e) {
             return $e->getRateLimit();
+        }
+    }
+
+    /**
+     * Gives back the tokens a consume() call took, when that call should not count.
+     *
+     * The bucket refills on its own, so refunding tokens that have been
+     * refilled in the meantime has no effect: the tokens are back already.
+     */
+    public function refund(RateLimit $rateLimit): RateLimit
+    {
+        if (!$rateLimit->isAccepted() || 0 >= $rateLimit->getConsumedTokens() || null === $rateLimit->getHitTime() || $this->id !== $rateLimit->getLimiterId() || $rateLimit->isRefunded()) {
+            return $rateLimit;
+        }
+
+        $this->lock?->acquire(true);
+
+        try {
+            $bucket = $this->storage->fetch($this->id);
+
+            if (!$bucket instanceof TokenBucket) {
+                return $rateLimit;
+            }
+
+            $hitTime = $rateLimit->getHitTime();
+            if ($bucket->getTimer() > $hitTime) {
+                return $rateLimit;
+            }
+            $bucket->configure($this->maxBurst, $this->rate);
+
+            $now = microtime(true);
+            $timer = $bucket->getTimer();
+
+            // count the tokens the bucket gave back on its own since the hit, using the bucket's own refill schedule
+            $generatedSinceHit = max(0,
+                $this->rate->calculateNewTokensDuringInterval($now - $timer)
+                - $this->rate->calculateNewTokensDuringInterval($hitTime - $timer)
+            );
+            $tokensToRefund = $rateLimit->getConsumedTokens() - $generatedSinceHit;
+
+            if (0 >= $tokensToRefund) {
+                return $rateLimit;
+            }
+
+            $availableTokens = min($this->maxBurst, $bucket->getAvailableTokens($now) + $tokensToRefund);
+            $bucket->setTokens($availableTokens);
+            $rateLimit->markRefunded();
+            $this->storage->save($bucket);
+
+            return new RateLimit($availableTokens, \DateTimeImmutable::createFromTimestamp((int) ceil($now)), true, $this->maxBurst, $this->resetAt($availableTokens, $now, $bucket->getTimer()), 0, null, $this->id);
+        } finally {
+            $this->lock?->release();
         }
     }
 

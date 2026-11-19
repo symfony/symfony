@@ -21,6 +21,7 @@ use Symfony\Component\Yaml\Schema\SchemaResolverInterface;
  * Resolves the default JSON Schema of a YAML file, based on Symfony conventions.
  *
  * A schema declared by the document itself, through the decorated resolver, comes first.
+ * SchemaResolverInterface::NONE from the decorated resolver is returned as is, so that the document is not validated.
  * Then well-known config files (routes, services, serializer and validator mappings) validate
  * against their component schema, wherever they live, since the naming convention also applies
  * inside bundles. Finally, the bundle configuration files of this project (the packages directory

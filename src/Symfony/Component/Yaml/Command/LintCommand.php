@@ -30,6 +30,7 @@ use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Exception\RuntimeException as YamlRuntimeException;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Schema\FileHeaderSchemaResolver;
+use Symfony\Component\Yaml\Schema\FileUri;
 use Symfony\Component\Yaml\Schema\SchemaResolverInterface;
 use Symfony\Component\Yaml\Schema\SchemaValidator;
 use Symfony\Component\Yaml\Schema\SchemaValidatorInterface;
@@ -122,7 +123,9 @@ class LintCommand extends Command
                 {$schemaHelp}
 
                   <info># yaml-language-server: \$schema=schema.json</info>
-                  <info># \$schema=schema.json</info>
+                  <info># \$schema: schema.json</info>
+
+                Use <info>none</info> as the location to skip this validation for the file.
 
                 The <info>--check-schema</info> option makes this validation mandatory: it fails
                 when a schema cannot be loaded.
@@ -218,12 +221,13 @@ class LintCommand extends Command
 
         $schema = $this->schema ?? $this->schemaResolver->resolve($content, $file);
         // A document without content, such as a file with only comments, has nothing to validate.
-        if (!$schema || null === $data) {
+        // A document can opt out with "$schema: none", unless the --schema option forces a schema for all files.
+        if (!$schema || null === $data || (null === $this->schema && SchemaResolverInterface::NONE === $schema)) {
             return ['file' => $file, 'valid' => true, 'schema' => null];
         }
 
         // Unless the validation is required, a schema that is not a local file is skipped, for example a generated one that does not exist yet.
-        if (!$this->requireSchema && !is_file($schema)) {
+        if (!$this->requireSchema && !self::isLocalFile($schema)) {
             return ['file' => $file, 'valid' => true, 'schema' => null, 'unavailableSchema' => $schema];
         }
 
@@ -245,6 +249,23 @@ class LintCommand extends Command
         }
 
         return ['file' => $file, 'valid' => true, 'schema' => $schema];
+    }
+
+    /**
+     * Tells whether the schema location, a path or a URI as described by SchemaResolverInterface::resolve(), is a local file.
+     */
+    private static function isLocalFile(string $schema): bool
+    {
+        if (str_starts_with($schema, 'http://') || str_starts_with($schema, 'https://')) {
+            return false;
+        }
+
+        if (str_starts_with($schema, 'file:') && null === $schema = FileUri::toPath($schema)) {
+            return false;
+        }
+
+        // Unlike is_file(), realpath() does not go through stream wrappers, which warn on an unknown scheme and connect on ftp://.
+        return !str_contains($schema, "\0") && false !== ($path = realpath($schema)) && is_file($path);
     }
 
     private function schemaComment(array $info): string

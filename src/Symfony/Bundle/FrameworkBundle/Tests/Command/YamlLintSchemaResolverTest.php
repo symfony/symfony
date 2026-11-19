@@ -61,7 +61,17 @@ class YamlLintSchemaResolverTest extends TestCase
         $resolver = new YamlLintSchemaResolver($this->configDir, $header);
 
         // A file that would otherwise resolve to the routing schema.
-        $this->assertSame('/from-the-document.json', $resolver->resolve('# $schema=/from-the-document.json', $this->projectDir.'/config/routes.yaml'));
+        $this->assertSame('/from-the-document.json', $resolver->resolve('# $schema: /from-the-document.json', $this->projectDir.'/config/routes.yaml'));
+    }
+
+    public function testTheDecoratedResolverCanTurnTheValidationOff()
+    {
+        $header = $this->createStub(SchemaResolverInterface::class);
+        $header->method('resolve')->willReturn(SchemaResolverInterface::NONE);
+
+        $resolver = new YamlLintSchemaResolver($this->configDir, $header);
+
+        $this->assertSame(SchemaResolverInterface::NONE, $resolver->resolve('# $schema: none', $this->projectDir.'/config/routes.yaml'));
     }
 
     public function testConventionsApplyWhenTheDecoratedResolverFindsNothing()

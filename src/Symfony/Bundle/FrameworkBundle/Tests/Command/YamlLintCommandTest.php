@@ -118,7 +118,7 @@ bar';
         $schema = $this->createSchema();
 
         $tester = $this->createCommandTester();
-        $filename = $this->createFile(\sprintf("# \$schema=%s\nversion: not-an-integer", basename($schema)));
+        $filename = $this->createFile(\sprintf("# \$schema: %s\nversion: not-an-integer", basename($schema)));
 
         $tester->execute(['filename' => $filename, '--check-schema' => null], ['decorated' => false]);
 
@@ -254,6 +254,29 @@ bar';
         yield 'services' => ['config/services.yaml', 'services.schema.json'];
         yield 'serializer' => ['config/serializer/app.yaml', 'serialization.schema.json', \Symfony\Component\Serializer\Serializer::class];
         yield 'validator' => ['config/validator/app.yaml', 'validation.schema.json', \Symfony\Component\Validator\Validation::class];
+    }
+
+    public function testLintDoesNotValidateWellKnownFilesWithNoneSchemaHeader()
+    {
+        $this->skipIfJsonSchemaMissing();
+
+        $projectDir = sys_get_temp_dir().'/yml-lint-test';
+        $file = $projectDir.'/config/routes/app.yaml';
+        @mkdir(\dirname($file), 0o777, true);
+        file_put_contents($file, "# \$schema: none\n- invalid");
+        $this->files[] = $file;
+
+        try {
+            $tester = $this->createFrameworkCommandTester($projectDir);
+
+            $tester->execute(['filename' => $file, '--check-schema' => null], ['decorated' => false]);
+
+            $tester->assertCommandIsSuccessful('A "none" header turns off the routing schema');
+        } finally {
+            @unlink($file);
+            @rmdir(\dirname($file));
+            @rmdir($projectDir.'/config');
+        }
     }
 
     #[DataProvider('provideSchemaOptions')]

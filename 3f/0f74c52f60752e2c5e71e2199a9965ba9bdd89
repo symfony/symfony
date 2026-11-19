@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-19T16:18:34Z
+
+Thanks for the fix. Decoding the path is what yaml-language-server does since 1.25.0 (redhat-developer/yaml-language-server#1316), so I aligned the rest of the resolution with its [resolveSchemaRef()](https://github.com/redhat-developer/yaml-language-server/blob/bf8ebb5d5065b7c91bf21be11ca1c68777a427ca/src/languageservice/services/yamlSchemaService.ts#L512-L534).
+
+Only a location that starts with `file:`, `http://` or `https://` is now kept as is, so `foo://bar.json` is a relative path. A `#` after the first character starts a fragment, which ends at the next `#` like with `split('#', 2)`. Only the path before the fragment is decoded. Node's `path.isAbsolute()` has [a POSIX rule](https://github.com/nodejs/node/blob/ab55d75c434fff79a3e5059a71e2b21edaf8554d/lib/path.js#L1319-L1323) and [a Windows rule](https://github.com/nodejs/node/blob/ab55d75c434fff79a3e5059a71e2b21edaf8554d/lib/path.js#L487-L500), and the path is checked with the rule of the current platform, before decoding. So `C:/schema.json` is absolute only on Windows.
+
+With a fragment, the header now resolves to a `file://` URI instead of a path. In a path, a `#` decoded from `%23` couldn't be told apart from the start of the fragment, while the URI keeps it encoded. The [`none` value](https://github.com/redhat-developer/yaml-language-server/blob/bf8ebb5d5065b7c91bf21be11ca1c68777a427ca/src/languageservice/services/yamlSchemaService.ts#L536-L543) and `file:` URIs will be handled in #68280.

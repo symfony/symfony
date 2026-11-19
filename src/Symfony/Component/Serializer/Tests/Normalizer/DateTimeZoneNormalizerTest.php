@@ -71,4 +71,10 @@ class DateTimeZoneNormalizerTest extends TestCase
         $this->expectException(NotNormalizableValueException::class);
         $this->normalizer->denormalize('Jupiter/Europa', \DateTimeZone::class, null);
     }
+
+    public function testDenormalizeNullByteThrowsException()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->normalizer->denormalize("UTC\0", \DateTimeZone::class, null);
+    }
 }

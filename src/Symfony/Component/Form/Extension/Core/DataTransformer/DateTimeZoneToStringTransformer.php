@@ -69,7 +69,7 @@ class DateTimeZoneToStringTransformer implements DataTransformerInterface
 
         try {
             return new \DateTimeZone($value);
-        } catch (\Exception $e) {
+        } catch (\Exception|\ValueError $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }
     }

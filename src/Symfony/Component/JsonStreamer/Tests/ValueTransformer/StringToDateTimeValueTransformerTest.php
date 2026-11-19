@@ -58,4 +58,12 @@ class StringToDateTimeValueTransformerTest extends TestCase
             $this->assertEquals("Parsing datetime string \"0\" using format \"Y-m-d\" resulted in 1 errors: \nat position 1: Not enough data available to satisfy format", $e->getMessage());
         }
     }
+
+    public function testTransformThrowWhenDateTimeStringContainsNullByte()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Parsing datetime string \"2023-07-26\0\" using format \"Y-m-d\" failed: null bytes are not allowed.");
+
+        (new StringToDateTimeValueTransformer())->transform("2023-07-26\0", [StringToDateTimeValueTransformer::FORMAT_KEY => 'Y-m-d']);
+    }
 }

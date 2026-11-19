@@ -813,6 +813,11 @@ class TimezonesTest extends ResourceBundleTestCase
         $this->assertFalse(Timezones::exists('Etc/Unknown'));
     }
 
+    public function testExistsWithNullByte()
+    {
+        $this->assertFalse(Timezones::exists("Europe/Amsterdam\0"));
+    }
+
     public function testGetRawOffset()
     {
         // timezones free from DST changes to avoid time-based variance

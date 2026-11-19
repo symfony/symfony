@@ -40,7 +40,7 @@ final class Timezones extends ResourceBundle
                 new \DateTimeZone($timezone);
 
                 return true;
-            } catch (\Exception) {
+            } catch (\Exception|\ValueError) {
                 return false;
             }
         }

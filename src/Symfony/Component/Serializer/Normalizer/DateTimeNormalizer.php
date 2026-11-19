@@ -133,7 +133,7 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
             return $this->enforceTimezone(new $type($data, $timezone), $context);
         } catch (NotNormalizableValueException $e) {
             throw $e;
-        } catch (\Exception $e) {
+        } catch (\Exception|\ValueError $e) {
             throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $data, ['string'], $context['deserialization_path'] ?? null, false, $e->getCode(), $e);
         }
     }

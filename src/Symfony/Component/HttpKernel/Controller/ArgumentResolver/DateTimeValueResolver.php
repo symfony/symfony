@@ -62,7 +62,11 @@ final class DateTimeValueResolver implements ValueResolverInterface
         }
 
         if (null !== $format) {
-            $date = $class::createFromFormat($format, $value, $this->clock?->now()->getTimeZone());
+            try {
+                $date = $class::createFromFormat($format, $value, $this->clock?->now()->getTimeZone());
+            } catch (\ValueError) {
+                $date = false;
+            }
 
             if (($class::getLastErrors() ?: ['warning_count' => 0])['warning_count']) {
                 $date = false;

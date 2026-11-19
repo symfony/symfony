@@ -98,11 +98,23 @@ class Ask implements InteractiveAttributeInterface
             $question->setTrimmable($self->trimmable);
             $question->setTimeout($self->timeout);
 
-            if (!$self->validator && $reflection->isProperty() && 'array' !== $type->getName()) {
-                $self->validator = fn (mixed $value): mixed => $this->{$reflection->getName()} = $value;
+            $validator = $self->validator;
+
+            if (!$validator && $reflection->isProperty() && 'array' !== $type->getName()) {
+                $validator = function (mixed $value) use ($reflection, $name, $type): mixed {
+                    try {
+                        return $this->{$reflection->getName()} = $value;
+                    } catch (\TypeError $e) {
+                        throw match (true) {
+                            null === $value => new InvalidArgumentException(\sprintf('The "%s" argument requires a value.', $name)),
+                            \is_string($value) => InvalidArgumentException::fromInvalidType($name, $value, $type->getName()),
+                            default => $e,
+                        };
+                    }
+                };
             }
 
-            $question->setValidator($self->validator);
+            $question->setValidator($validator);
             $question->setMaxAttempts($self->maxAttempts);
 
             if ($self->normalizer) {
@@ -133,7 +145,7 @@ class Ask implements InteractiveAttributeInterface
             }
 
             if ($reflection->isProperty()) {
-                $this->{$reflection->getName()} = $value;
+                $this->{$reflection->getName()} ??= $value;
             } else {
                 $input->setArgument($name, $value);
             }

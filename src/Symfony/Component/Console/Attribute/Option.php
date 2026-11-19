@@ -161,6 +161,11 @@ class Option
             return null;
         }
 
+        // PHP converts a numeric string out of the int range to true for a bool|int parameter
+        if ('bool|int' === $this->typeName && \is_string($value) && is_numeric($value) && \is_float($number = $value + 0) && ($number >= \PHP_INT_MAX || $number < \PHP_INT_MIN)) {
+            throw InvalidOptionException::fromInvalidType($this->name, $value, 'int');
+        }
+
         if ('bool' !== $this->typeName) {
             return $value;
         }

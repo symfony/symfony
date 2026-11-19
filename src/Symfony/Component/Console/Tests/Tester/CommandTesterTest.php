@@ -32,6 +32,8 @@ use Symfony\Component\Console\Tests\Fixtures\InvokableWithAskArrayCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithInputTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithInteractiveAttributesTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithInteractiveHiddenQuestionAttributeTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithReadonlyAskInputCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithTypedAskInputCommand;
 
 class CommandTesterTest extends TestCase
 {
@@ -520,5 +522,35 @@ class CommandTesterTest extends TestCase
 
         self::assertStringContainsString('Enter arg1', $tester->getDisplay());
         self::assertStringContainsString('Arg1: arg1-value', $tester->getDisplay());
+    }
+
+    public function testInvokableAsksAgainOnInvalidAnswerToMapInputQuestion()
+    {
+        $tester = new CommandTester(new InvokableWithTypedAskInputCommand());
+        $tester->setInputs(['', 'Alice', 'abc', '3', 'half', '1.5']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        $display = preg_replace('/\s+/', ' ', $tester->getDisplay());
+        self::assertStringContainsString('The "name" argument requires a value.', $display);
+        self::assertStringContainsString('The value "abc" is not valid for the "count" argument. Expected a value of type "int".', $display);
+        self::assertStringContainsString('The value "half" is not valid for the "ratio" argument. Expected a value of type "float".', $display);
+        self::assertStringContainsString('Name: Alice, count: 3, ratio: 1.5', $display);
+    }
+
+    public function testInvokableWithReadonlyMapInputQuestion()
+    {
+        $tester = new CommandTester(new InvokableWithReadonlyAskInputCommand());
+        $tester->setInputs(['', 'Alice']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Name: Alice', $tester->getDisplay());
+
+        $tester->setInputs(['Bob']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Name: Bob', $tester->getDisplay());
     }
 }

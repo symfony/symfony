@@ -695,6 +695,54 @@ class CheckTypeDeclarationsPassTest extends TestCase
         putenv('ARRAY=');
     }
 
+    public function testProcessHandleEnvPlaceholderFromExtensionConfig()
+    {
+        putenv('ARRAY={"foo":"bar"}');
+
+        try {
+            $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
+                'container_param' => 'foo',
+            ]));
+
+            // the configuration of extensions is resolved with dedicated parameter bags, holding other parameters
+            $extensionBag = new EnvPlaceholderParameterBag();
+            $placeholder = $extensionBag->get('env(json:ARRAY)');
+            $container->getParameterBag()->mergeEnvPlaceholders($extensionBag);
+
+            $container
+                ->register('foobar', BarMethodCall::class)
+                ->addMethodCall('setArray', [$placeholder]);
+
+            (new CheckTypeDeclarationsPass(true))->process($container);
+
+            $this->addToAssertionCount(1);
+        } finally {
+            putenv('ARRAY=');
+        }
+    }
+
+    public function testProcessHandleSeveralEnvParameters()
+    {
+        putenv('ARRAY={"foo":"bar"}');
+        putenv('CSV=foo,bar');
+
+        try {
+            $container = new ContainerBuilder(new EnvPlaceholderParameterBag());
+
+            $container
+                ->register('foobar', BarMethodCall::class)
+                ->addMethodCall('setArray', ['%env(json:ARRAY)%'])
+                ->addMethodCall('setArray', ['%env(csv:CSV)%']);
+
+            (new CheckTypeDeclarationsPass(true))->process($container);
+
+            $this->addToAssertionCount(1);
+        } finally {
+            putenv('ARRAY=');
+            putenv('CSV=');
+        }
+    }
+
     public function testProcessHandleNotFoundEnvPlaceholder()
     {
         $container = new ContainerBuilder(new EnvPlaceholderParameterBag([

@@ -37,6 +37,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -51,6 +52,9 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Translation\Loader\ArrayLoader as TranslationArrayLoader;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Component\Translation\Translator;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\WebLink\Link;
 use Twig\Environment;
@@ -81,6 +85,7 @@ class AbstractControllerTest extends TestCase
             'security.token_storage' => '?Symfony\\Component\\Security\\Core\\Authentication\\Token\\Storage\\TokenStorageInterface',
             'security.csrf.token_manager' => '?Symfony\\Component\\Security\\Csrf\\CsrfTokenManagerInterface',
             'web_link.http_header_serializer' => '?Symfony\\Component\\WebLink\\HttpHeaderSerializer',
+            'translator' => '?Symfony\\Contracts\\Translation\\TranslatorInterface',
         ];
 
         $this->assertEquals($expectedServices, $subscribed, 'Subscribed core services in AbstractController have changed');
@@ -572,6 +577,53 @@ class AbstractControllerTest extends TestCase
         $controller->addFlash('foo', 'bar');
 
         $this->assertSame(['bar'], $flashBag->get('foo'));
+    }
+
+    public function testAddFlashTranslatesTranslatableMessage()
+    {
+        $flashBag = new FlashBag();
+        $session = new Session(new MockArraySessionStorage(), null, $flashBag);
+
+        $request = new Request();
+        $request->setSession($session);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $translator = new Translator('en');
+        $translator->addLoader('array', new TranslationArrayLoader());
+        $translator->addResource('array', ['hello' => 'Hello {name}!'], 'en', 'flashes');
+
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
+        $container->set('translator', $translator);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+        $controller->addFlash('success', new TranslatableMessage('hello', ['{name}' => 'Olivier'], 'flashes'));
+
+        $this->assertSame(['Hello Olivier!'], $flashBag->get('success'));
+    }
+
+    public function testAddFlashKeepsTranslatableMessageWithoutTranslator()
+    {
+        $flashBag = new FlashBag();
+        $session = new Session(new MockArraySessionStorage(), null, $flashBag);
+
+        $request = new Request();
+        $request->setSession($session);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
+
+        $message = new TranslatableMessage('hello');
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+        $controller->addFlash('success', $message);
+
+        $this->assertSame([$message], $flashBag->get('success'));
     }
 
     public function testCreateAccessDeniedException()

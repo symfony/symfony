@@ -1031,6 +1031,14 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'bar', [1, 2]);
     }
 
+    public function testErrorsAreJoinedWithSinglePeriods()
+    {
+        $this->expectException(NoSuchPropertyException::class);
+        $this->expectExceptionMessage('The method "addFoo" in class "Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidArgumentLength" requires 0 arguments, but should accept only 1. The method "removeFoo" in class "Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidArgumentLength" requires 2 arguments, but should accept only 1.');
+        $object = new TestAdderRemoverInvalidArgumentLength();
+        $this->propertyAccessor->setValue($object, 'foo', [1, 2]);
+    }
+
     public function testSetterNeedsPublicAccess()
     {
         $object = new TestClassSetValue(0);

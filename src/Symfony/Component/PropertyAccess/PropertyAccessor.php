@@ -550,7 +550,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 $object->$property = $value;
             } elseif (!$this->ignoreInvalidProperty) {
                 if ($mutator->hasErrors()) {
-                    throw new NoSuchPropertyException(implode('. ', $mutator->getErrors()).'.');
+                    throw new NoSuchPropertyException(implode('. ', array_map(static fn (string $error): string => rtrim($error, '.'), $mutator->getErrors())).'.');
                 }
 
                 throw new NoSuchPropertyException(\sprintf('Could not determine access type for property "%s" in class "%s".', $property, get_debug_type($object)));

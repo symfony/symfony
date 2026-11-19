@@ -707,6 +707,29 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput(['--a' => null]), new NullOutput());
     }
 
+    public function testIntUnionOptionRejectsOutOfRangeValue()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (#[Option] bool|int $limit = false) use (&$received): int {
+            $received = $limit;
+
+            return Command::SUCCESS;
+        });
+
+        $command->run(new ArrayInput(['--limit' => (string) \PHP_INT_MAX]), new NullOutput());
+
+        self::assertSame(\PHP_INT_MAX, $received);
+
+        $command->run(new ArrayInput(['--limit' => '1e3']), new NullOutput());
+
+        self::assertSame(1000, $received);
+
+        self::expectException(InvalidOptionException::class);
+        self::expectExceptionMessage('The value "9223372036854775808" is not valid for the "limit" option. Expected a value of type "int".');
+
+        $command->run(new ArrayInput(['--limit' => '9223372036854775808']), new NullOutput());
+    }
+
     public function testMapInputWithReadonlyProperties()
     {
         $command = new Command('foo');

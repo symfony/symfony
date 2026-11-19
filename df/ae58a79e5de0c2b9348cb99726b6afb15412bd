@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-19T17:51:39Z
+
+Thanks for the PR. I moved it to 7.4, since these values are an edge case and 6.4 is close to EOL, and I pushed some changes.
+
+Without ext-intl, the polyfill doesn't report integer overflows. It returns `false`, or `PHP_INT_MAX` for `9223372036854775808`. This patch turned that `false` into `0`, which is what the x86 job caught. So the old check now stays in place when ext-intl is missing, and I opened symfony/polyfill#736 to fix the polyfill.
+
+`NumberType` with `'scale' => 0` also returned `9223372036854751232` for `-9223372036854775808`, because the value was cast to float and then rounded through a string. `PHP_INT_MIN` now stays an int, like `PHP_INT_MAX`.

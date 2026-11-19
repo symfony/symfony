@@ -245,6 +245,12 @@ class IpUtils
             throw new \InvalidArgumentException('Cannot anonymize more than 4 bytes for IPv4 and 16 bytes for IPv6.');
         }
 
+        $wrappedIPv6 = false;
+        if (str_starts_with($ip, '[') && str_ends_with($ip, ']')) {
+            $wrappedIPv6 = true;
+            $ip = substr($ip, 1, -1);
+        }
+
         /*
          * If the IP contains a % symbol, then it is a local-link address with scoping according to RFC 4007
          * In that case, we only care about the part before the % symbol, as the following functions, can only work with
@@ -253,12 +259,6 @@ class IpUtils
          */
         if (str_contains($ip, '%')) {
             $ip = substr($ip, 0, strpos($ip, '%'));
-        }
-
-        $wrappedIPv6 = false;
-        if (str_starts_with($ip, '[') && str_ends_with($ip, ']')) {
-            $wrappedIPv6 = true;
-            $ip = substr($ip, 1, -1);
         }
 
         $mappedIpV4MaskGenerator = static function (string $mask, int $bytesToAnonymize) {

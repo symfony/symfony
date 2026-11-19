@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Open the profiler in an iframe overlay from the web debug toolbar
+
 8.2
 ---
 

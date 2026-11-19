@@ -763,4 +763,22 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $this->assertSame($largeInt, $result);
         $this->assertIsInt($result);
     }
+
+    public function testReverseTransformBigNumbersWithScale()
+    {
+        if (4 === \PHP_INT_SIZE) {
+            $this->markTestSkipped('This test requires a 64bit PHP.');
+        }
+
+        $this->assertSame(1234567890123.45, (new NumberToLocalizedStringTransformer(2))->reverseTransform('1234567890123.45'));
+        $this->assertSame(1234567890123.45, (new NumberToLocalizedStringTransformer(2, null, \NumberFormatter::ROUND_DOWN))->reverseTransform('1234567890123.45'));
+        $this->assertSame(60000000000000.0, (new NumberToLocalizedStringTransformer(2))->reverseTransform('60000000000000.00'));
+
+        $transformer = new NumberToLocalizedStringTransformer(0);
+
+        $this->assertSame(6000000000000000, $transformer->reverseTransform('6000000000000000'));
+        $this->assertSame(123456789012345680, $transformer->reverseTransform('123456789012345680'));
+        $this->assertSame(9223372036854774784, $transformer->reverseTransform('9223372036854774784'));
+        $this->assertSame(-9223372036854774784, $transformer->reverseTransform('-9223372036854774784'));
+    }
 }

@@ -144,6 +144,8 @@ class PercentToLocalizedStringTransformerTest extends TestCase
             [null, 1, '3.44', 0.034, \NumberFormatter::ROUND_DOWN],
             [null, 2, '37.37', 0.3737, \NumberFormatter::ROUND_DOWN],
             [null, 2, '2.01', 0.0201, \NumberFormatter::ROUND_DOWN],
+            [PercentToLocalizedStringTransformer::INTEGER, 2, '1234567890123.45', 1234567890123.45, \NumberFormatter::ROUND_DOWN],
+            [null, 2, '1234567890123.45', 12345678901.2345, \NumberFormatter::ROUND_DOWN],
             // round halves (.5) to the next even number
             [PercentToLocalizedStringTransformer::INTEGER, 0, '34.6', 35, \NumberFormatter::ROUND_HALFEVEN],
             [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 34, \NumberFormatter::ROUND_HALFEVEN],
@@ -178,6 +180,9 @@ class PercentToLocalizedStringTransformerTest extends TestCase
             [null, 1, '3.46', 0.035, \NumberFormatter::ROUND_HALFUP],
             [null, 1, '3.45', 0.035, \NumberFormatter::ROUND_HALFUP],
             [null, 1, '3.44', 0.034, \NumberFormatter::ROUND_HALFUP],
+            [PercentToLocalizedStringTransformer::INTEGER, 2, '1234567890123.45', 1234567890123.45, \NumberFormatter::ROUND_HALFUP],
+            [PercentToLocalizedStringTransformer::INTEGER, 2, '60000000000000.00', 60000000000000.0, \NumberFormatter::ROUND_HALFUP],
+            [null, 2, '1234567890123.45', 12345678901.2345, \NumberFormatter::ROUND_HALFUP],
             // round halves (.5) towards zero
             [PercentToLocalizedStringTransformer::INTEGER, 0, '34.6', 35, \NumberFormatter::ROUND_HALFDOWN],
             [PercentToLocalizedStringTransformer::INTEGER, 0, '34.5', 34, \NumberFormatter::ROUND_HALFDOWN],
@@ -217,6 +222,42 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(15, $transformer->reverseTransform('15'));
         $this->assertEquals(12, $transformer->reverseTransform('12'));
         $this->assertEquals(200, $transformer->reverseTransform('200'));
+    }
+
+    public function testReverseTransformBigInt()
+    {
+        if (4 === \PHP_INT_SIZE) {
+            $this->markTestSkipped('This test requires a 64bit PHP.');
+        }
+
+        $transformer = new PercentToLocalizedStringTransformer(0, 'integer');
+
+        $this->assertSame(\PHP_INT_MAX, $transformer->reverseTransform((string) \PHP_INT_MAX));
+        $this->assertSame(\PHP_INT_MIN, $transformer->reverseTransform((string) \PHP_INT_MIN));
+        $this->assertSame(9223372036854774785, $transformer->reverseTransform('9223372036854774785'));
+        $this->assertSame(9223372036854774784, $transformer->reverseTransform('9223372036854774784.0'));
+        $this->assertSame(-9223372036854774784, $transformer->reverseTransform('-9223372036854774784.0'));
+        $this->assertSame(12345678901234.56, (new PercentToLocalizedStringTransformer())->reverseTransform('1234567890123456'));
+        $this->assertSame(9223372036854775808.0, (new PercentToLocalizedStringTransformer(2, 'integer'))->reverseTransform('9223372036854775808.0'));
+    }
+
+    #[DataProvider('integerOverflowProvider')]
+    public function testReverseTransformDisallowsIntegerOverflow(string $value)
+    {
+        $transformer = new PercentToLocalizedStringTransformer(0, 'integer');
+
+        $this->expectException(TransformationFailedException::class);
+
+        $transformer->reverseTransform($value);
+    }
+
+    public static function integerOverflowProvider(): array
+    {
+        return [
+            ['9223372036854775807.0'],
+            ['9223372036854775808.0'],
+            ['-9223372036854775809.0'],
+        ];
     }
 
     public function testReverseTransformWithScale()

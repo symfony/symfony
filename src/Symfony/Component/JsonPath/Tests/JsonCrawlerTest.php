@@ -410,6 +410,56 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sayings of the Century', $result[0]['title']);
     }
 
+    #[DataProvider('provideComparisonsWithNothing')]
+    public function testNothingIsNotEqualToNull(string $path, array $expected)
+    {
+        $crawler = new JsonCrawler('{"items": [{"a": null}, {}, 5]}');
+
+        $this->assertSame($expected, $crawler->find($path));
+    }
+
+    public static function provideComparisonsWithNothing(): iterable
+    {
+        yield 'absolute query' => ['$.items[?$.missing == null]', []];
+        yield 'absolute query compared with a missing member' => ['$.items[?@.a == $.missing]', [[], 5]];
+        yield 'member of a primitive value' => ['$.items[?@.a == null]', [['a' => null]]];
+        yield 'member of a primitive value, not equal' => ['$.items[?@.a != null]', [[], 5]];
+        yield 'value() of a missing member' => ['$.items[?value(@.a) == null]', [['a' => null]]];
+        yield 'value() of an absolute query' => ['$.items[?value($.missing) == null]', []];
+    }
+
+    #[DataProvider('provideLessOrGreaterThanOrEqualComparisons')]
+    public function testLessOrGreaterThanOrEqualMatchesEqualValues(string $path, array $expected)
+    {
+        $crawler = new JsonCrawler('[{"id": 1, "a": [1], "b": [1]}, {"id": 2, "a": {"x": 1}, "b": {"x": 1}}, {"id": 3}, {"id": 4, "a": [1], "b": [2]}, {"id": 5, "a": 1, "b": 2}, {"id": 6, "a": "b", "b": "b"}]');
+
+        $this->assertSame($expected, $crawler->find($path));
+    }
+
+    public static function provideLessOrGreaterThanOrEqualComparisons(): iterable
+    {
+        yield 'less than or equal' => ['$[?@.a <= @.b].id', [1, 2, 3, 5, 6]];
+        yield 'greater than or equal' => ['$[?@.a >= @.b].id', [1, 2, 3, 6]];
+        yield 'less than' => ['$[?@.a < @.b].id', [5]];
+        yield 'greater than' => ['$[?@.b > @.a].id', [5]];
+    }
+
+    #[DataProvider('provideBooleanComparisons')]
+    public function testBooleansAreNotOrdered(string $path, array $expected)
+    {
+        $crawler = new JsonCrawler('[{"id": 1, "a": false}, {"id": 2, "a": true}]');
+
+        $this->assertSame($expected, $crawler->find($path));
+    }
+
+    public static function provideBooleanComparisons(): iterable
+    {
+        yield 'less than' => ['$[?@.a < true].id', []];
+        yield 'greater than' => ['$[?@.a > false].id', []];
+        yield 'less than or equal' => ['$[?@.a <= true].id', [2]];
+        yield 'greater than or equal' => ['$[?@.a >= false].id', [1]];
+    }
+
     #[DataProvider('provideNestedParenthesesFilters')]
     public function testFilterWithNestedParentheses(string $path, array $expected)
     {
@@ -556,6 +606,25 @@ class JsonCrawlerTest extends TestCase
 
         $this->assertCount(1, $result);
         $this->assertSame('Sayings of the Century', $result[0]['title']);
+    }
+
+    #[DataProvider('provideFunctionArguments')]
+    public function testFunctionArgumentIsTheSelectedNode(string $path, array $expected)
+    {
+        $crawler = new JsonCrawler('{"list": [1, 2], "items": [{"a": [1, 2]}, {"a": "abc"}]}');
+
+        $this->assertSame($expected, $crawler->find($path));
+    }
+
+    public static function provideFunctionArguments(): iterable
+    {
+        yield 'value() of an array' => ['$.items[?value(@.a) == 1]', []];
+        yield 'value() of an array compared with the array' => ['$.items[?value(@.a) == @.a]', [['a' => [1, 2]], ['a' => 'abc']]];
+        yield 'value() of an absolute query that selects an array' => ['$.items[?value($.list) == @.a]', [['a' => [1, 2]]]];
+        yield 'value() of a bracket query' => ['$.items[?value(@["a"]) == @.a]', [['a' => [1, 2]], ['a' => 'abc']]];
+        yield 'length() of a bracket query' => ['$.items[?length(@["a"]) == 3]', [['a' => 'abc']]];
+        yield 'match() of a bracket query' => ['$.items[?match(@["a"], "a.c")]', [['a' => 'abc']]];
+        yield 'search() of a bracket query' => ['$.items[?search(@["a"], "b")]', [['a' => 'abc']]];
     }
 
     public function testSearchFunctionFailsClosedOnPathologicalRegex()

@@ -30,6 +30,7 @@
         "symfony/config": "^8.2",
         "symfony/console": "^8.2",
         "symfony/dependency-injection": "^8.2",
+        "symfony/expression-language": "^7.4|^8.0",
         "symfony/http-client": "^7.4|^8.0",
         "symfony/messenger": "^7.4|^8.0",
         "symfony/process": "^7.4|^8.0",

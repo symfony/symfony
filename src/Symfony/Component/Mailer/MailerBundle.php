@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Mailer\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Mailer\EventListener\InMemoryPgpPublicKeyRepository;
 use Symfony\Component\Mailer\EventListener\InMemorySmimeCertificateRepository;
+use Symfony\Component\Mailer\EventListener\MessageListener;
 use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\Mime\Header\Headers;
@@ -109,6 +110,18 @@ class MailerBundle extends AbstractBundle
                 ->arrayNode('headers', 'header')
                     ->normalizeKeys(false)
                     ->useAttributeAsKey('name')
+                    ->validate()
+                        ->ifTrue(static function ($v): bool {
+                            $v = array_change_key_case($v);
+
+                            if (!\array_key_exists('subject', $v) || !\is_array($v['subject']['value'])) {
+                                return false;
+                            }
+
+                            return array_keys($v['subject']['value']) !== ['expression'];
+                        })
+                        ->thenInvalid('The "Subject" header only supports the "expression" option.')
+                    ->end()
                     ->prototype('array')
                         ->normalizeKeys(false)
                         ->acceptAndWrap(['string'], 'value')
@@ -417,18 +430,31 @@ class MailerBundle extends AbstractBundle
 
         if ($config['headers'] || $hasTracking) {
             $headers = new Definition(Headers::class);
+            $headerRules = MessageListener::DEFAULT_RULES;
+
             if ($hasTracking && !isset(array_change_key_case($config['headers'])['x-track'])) {
                 $headers->addMethodCall('add', [new Definition(TrackingHeader::class, [$tracking['opens'], $tracking['clicks']])]);
             }
+
             foreach ($config['headers'] as $name => $data) {
                 $value = $data['value'];
+
                 if (\in_array(strtolower($name), ['from', 'to', 'cc', 'bcc', 'reply-to'], true)) {
                     $value = (array) $value;
                 }
+
+                if ('subject' === strtolower($name) && isset($value['expression'])) {
+                    $headerRules['subject'] = MessageListener::HEADER_EXPRESSION;
+                    $value = $value['expression'];
+                }
+
                 $headers->addMethodCall('addHeader', [$name, $value]);
             }
             $messageListener = $container->getDefinition('mailer.message_listener');
-            $messageListener->setArgument(0, $headers);
+            $messageListener
+                ->setArgument(0, $headers)
+                ->setArgument(1, null)
+                ->setArgument(2, $headerRules);
         } else {
             $container->removeDefinition('mailer.message_listener');
         }

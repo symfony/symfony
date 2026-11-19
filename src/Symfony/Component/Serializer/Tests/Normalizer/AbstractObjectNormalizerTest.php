@@ -45,6 +45,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummySecondChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyString;
@@ -686,6 +687,55 @@ class AbstractObjectNormalizerTest extends TestCase
         $serializer->denormalize(['first' => ['foo' => 'a'], 'second' => ['foo' => 'b'], 'third' => ['foo' => 'c']], Dummy::class.'[]');
 
         $this->assertCount(1, $nameConverter->cacheKeys);
+    }
+
+    public function testNestedObjectsShareTheCachesOfTheNameConverter()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+        $serializer = new Serializer([new ObjectNormalizer($classMetadataFactory, $nameConverter, null, new PhpDocExtractor())]);
+
+        $data = ['baz' => 'foo0'];
+        for ($i = 1; $i < 100; ++$i) {
+            $data = ['baz' => 'foo'.$i, 'child' => $data];
+        }
+
+        $object = $serializer->denormalize($data, SerializedNameDummy::class);
+
+        for ($i = 99; $i >= 0; --$i) {
+            $this->assertSame('foo'.$i, $object->foo);
+            $object = $object->child;
+        }
+
+        $caches = \Closure::bind(function () { return [$this->denormalizeCache, $this->attributesMetadataCache]; }, $nameConverter, MetadataAwareNameConverter::class)();
+
+        foreach ($caches as $cache) {
+            $this->assertCount(1, $cache);
+        }
+    }
+
+    public function testAttributesCacheSizeLimit()
+    {
+        $createTree = function (int $depth) use (&$createTree) {
+            $node = new Dummy();
+
+            if ($depth) {
+                $node->foo = $createTree($depth - 1);
+                $node->bar = $createTree($depth - 1);
+            }
+
+            return $node;
+        };
+        $normalizer = new ObjectNormalizer();
+        $serializer = new Serializer([$normalizer]);
+
+        $data = $serializer->normalize($createTree(10));
+
+        $this->assertNull($data['bar']['foo']['bar']['foo']['bar']['foo']['bar']['foo']['bar']['foo']['bar']);
+
+        $attributesCache = \Closure::bind(function () { return $this->attributesCache; }, $normalizer, AbstractObjectNormalizer::class)();
+
+        $this->assertLessThanOrEqual(1001, \count($attributesCache));
     }
 
     public function testTypesCacheSizeLimit()

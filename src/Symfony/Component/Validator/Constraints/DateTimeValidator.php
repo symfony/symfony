@@ -37,6 +37,16 @@ class DateTimeValidator extends DateValidator
 
         $value = (string) $value;
 
+        if (str_contains($value, "\0")) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setParameter('{{ format }}', $this->formatValue($constraint->format))
+                ->setCode(DateTime::INVALID_FORMAT_ERROR)
+                ->addViolation();
+
+            return;
+        }
+
         \DateTimeImmutable::createFromFormat($constraint->format, $value);
 
         $errors = \DateTimeImmutable::getLastErrors() ?: ['error_count' => 0, 'warnings' => []];

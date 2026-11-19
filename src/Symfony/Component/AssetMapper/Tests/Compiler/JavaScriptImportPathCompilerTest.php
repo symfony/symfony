@@ -424,6 +424,71 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => 'import*as t from"@popperjs/core";',
             'expectedJavaScriptImports' => ['@popperjs/core' => ['lazy' => false, 'asset' => 'assets/vendor/@popperjs/core.js', 'add' => false]],
         ];
+
+        yield 'static_named_import_minified' => [
+            'input' => 'import{myFunction}from"./other.js";',
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'static_import_with_dollar_sign_in_names' => [
+            'input' => "import $ from './other.js';\nimport { \$on } from './subdir/foo.js';",
+            'expectedJavaScriptImports' => [
+                '/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true],
+                '/assets/subdir/foo.js' => ['lazy' => false, 'asset' => 'subdir/foo.js', 'add' => true],
+            ],
+        ];
+
+        yield 'static_import_with_comments_between_names' => [
+            'input' => <<<EOF
+                import {
+                    myFunction, // the main one
+                    /* helperFunction, */
+                } from "./other.js";
+                EOF,
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'dynamic_import_with_comment_before_module_name' => [
+            'input' => 'import(/* webpackChunkName: "other" */ "./other.js");',
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'dynamic_import_after_regex_with_quote' => [
+            'input' => <<<EOF
+                const escaped = value.replace(/"/g, '&quot;');
+                import("./other.js");
+                console.log("done");
+                EOF,
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'dynamic_import_after_regex_with_comment_marker' => [
+            'input' => <<<'EOF'
+                const trimmed = path.replace(/\/*$/, '');
+                import("./other.js");
+                EOF,
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'dynamic_import_in_template_literal_substitution' => [
+            'input' => 'const html = `<p>${(await import("./other.js")).default}</p>`;',
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'import_in_template_literal_is_ignored' => [
+            'input' => 'const help = `Use ${name} with import("./other.js")`; import("./foo.js");',
+            'expectedJavaScriptImports' => ['/assets/foo.js' => ['lazy' => true, 'asset' => 'foo.js', 'add' => true]],
+        ];
+
+        yield 'method_named_import_is_ignored' => [
+            'input' => 'loader.import("./other.js");',
+            'expectedJavaScriptImports' => [],
+        ];
+
+        yield 'dynamic_import_with_concatenation_is_ignored' => [
+            'input' => 'import("./other.js" + suffix); import(`./${name}.js`);',
+            'expectedJavaScriptImports' => [],
+        ];
     }
 
     public function testCompileFindsRelativePathsViaSourcePath()
@@ -499,6 +564,42 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $assetMapper->expects($this->once())
             ->method('getAssetFromSourcePath')
             ->willReturn($importedAsset);
+
+        $compiler = new JavaScriptImportPathCompiler($this->createStub(ImportMapConfigReader::class));
+        $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $assetMapper));
+    }
+
+    public function testImportPathsCanUpdateForSeveralImports()
+    {
+        $asset = new MappedAsset('app.js', '/path/to/assets/app.js', publicPathWithoutDigest: '/assets/js/app.js');
+
+        $assetMapper = $this->createStub(AssetMapperInterface::class);
+        $assetMapper
+            ->method('getAssetFromSourcePath')
+            ->willReturnCallback(static function ($path) {
+                return match ($path) {
+                    '/path/to/assets/other.js' => new MappedAsset('other.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/other.js'),
+                    '/path/to/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/js/subdir/foo.js'),
+                    '/path/to/assets/bar.js' => new MappedAsset('bar.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/js/vendor/bar.js'),
+                    default => null,
+                };
+            });
+
+        $input = <<<EOF
+            import './other.js';
+            import foo from './subdir/foo.js';
+            console.log('./other.js', "./bar.js");
+            export * from './bar.js';
+            import('./other.js').then(() => import("./bar.js"));
+            EOF;
+
+        $expectedOutput = <<<EOF
+            import '../other.js';
+            import foo from './subdir/foo.js';
+            console.log('./other.js', "./bar.js");
+            export * from './vendor/bar.js';
+            import('../other.js').then(() => import("./vendor/bar.js"));
+            EOF;
 
         $compiler = new JavaScriptImportPathCompiler($this->createStub(ImportMapConfigReader::class));
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $assetMapper));
@@ -789,20 +890,17 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $this->assertSame($content, $compiled);
     }
 
-    public function testCompilerThrowsExceptionOnPcreError()
+    public function testCompileDoesNotDependOnPcreLimits()
     {
         $compiler = new JavaScriptImportPathCompiler($this->createStub(ImportMapConfigReader::class));
         $content = str_repeat('foo "import *  ', 50);
         $javascriptAsset = new MappedAsset('app.js', '/project/assets/app.js', publicPathWithoutDigest: '/assets/app.js');
         $assetMapper = $this->createStub(AssetMapperInterface::class);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Failed to compile JavaScript import paths in "/project/assets/app.js". Error: "Backtrack limit exhausted".');
-
         $limit = \ini_get('pcre.backtrack_limit');
         ini_set('pcre.backtrack_limit', 10);
         try {
-            $compiler->compile($content, $javascriptAsset, $assetMapper);
+            $this->assertSame($content, $compiler->compile($content, $javascriptAsset, $assetMapper));
         } finally {
             ini_set('pcre.backtrack_limit', $limit);
         }

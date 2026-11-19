@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Tests\DependencyInjection;
 
+use Doctrine\ORM\Mapping\Entity;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -21,6 +23,8 @@ use Symfony\Component\KeyManagement\BlindIndex\AbstractBlindIndex;
 use Symfony\Component\KeyManagement\BlindIndex\Projection\Verbatim;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterBlindIndexesPass;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\BlindIndexListener;
+use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Repository\BlindIndexResolver;
+use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Tests\Fixtures\BlindIndexedEntity;
 use Symfony\Component\KeyManagement\DataKeyHandle;
 use Symfony\Component\KeyManagement\StoredKeyBlindIndex;
 
@@ -193,6 +197,70 @@ class RegisterBlindIndexesPassTest extends TestCase
         (new RegisterBlindIndexesPass())->process($container);
 
         $this->assertSame([], $container->getDefinition('app.email_index')->getArguments());
+    }
+
+    /**
+     * ResolveInstanceofConditionalsPass wraps every autoconfigured service in a child definition.
+     */
+    public function testTheNameOfAnAutoconfiguredIndexIsBound()
+    {
+        $container = $this->createContainer();
+        $definition = (new ChildDefinition('app.email_index_instanceof'))->setClass(BlindIndex::class);
+        $container->setDefinition('app.email_index', $definition);
+        $definition->addTag('key_management.blind_index', ['index' => 'email']);
+
+        (new RegisterBlindIndexesPass())->process($container);
+
+        $this->assertSame('email', $definition->getArgument('$name'));
+    }
+
+    public function testAClassIsTaggedWithTheSourceOfEachBlindIndex()
+    {
+        $definition = new ChildDefinition('');
+
+        RegisterBlindIndexesPass::autoconfigure($definition, new Entity(), new \ReflectionClass(BlindIndexedEntity::class));
+
+        $this->assertSame([
+            ['property' => 'email', 'column' => 'emailIndex', 'index' => 'email'],
+            ['property' => 'email', 'column' => 'emailDomainIndex', 'index' => 'email-domain'],
+        ], $definition->getTag('key_management.blind_indexed_property'));
+    }
+
+    public function testTheResolverMapIsBuiltFromTheIndexedProperties()
+    {
+        $container = $this->createContainer();
+        $container->register('app.email_index', BlindIndex::class)->addTag('key_management.blind_index', ['index' => 'user-email']);
+        $container->register('App\Entity\User', 'App\Entity\User')->addResourceTag('key_management.blind_indexed_property', [
+            'property' => 'email',
+            'column' => 'emailIndex',
+            'index' => 'user-email',
+        ]);
+
+        (new RegisterBlindIndexesPass())->process($container);
+
+        $resolver = $container->getDefinition('key_management.blind_index_resolver');
+        $this->assertSame(BlindIndexResolver::class, $resolver->getClass());
+        $this->assertSame(['App\Entity\User' => ['email' => ['emailIndex' => 'user-email']]], $resolver->getArgument(0));
+        $this->assertTrue($container->hasAlias(BlindIndexResolver::class));
+    }
+
+    /**
+     * The map is an argument: resolving its parameters here would resolve them twice.
+     */
+    public function testTheMapKeepsParametersForTheContainerToResolve()
+    {
+        $container = $this->createContainer();
+        $container->register('app.email_index', BlindIndex::class)->addTag('key_management.blind_index', ['index' => 'user-email']);
+        $container->register('App\Entity\User', 'App\Entity\User')->addResourceTag('key_management.blind_indexed_property', [
+            'property' => 'email',
+            'column' => 'emailIndex',
+            'index' => '%app.index_name%',
+        ]);
+
+        (new RegisterBlindIndexesPass())->process($container);
+
+        $map = $container->getDefinition('key_management.blind_index_resolver')->getArgument(0);
+        $this->assertSame('%app.index_name%', $map['App\Entity\User']['email']['emailIndex']);
     }
 
     public function testTheListenerIsRemovedWhenNoIndexIsRegistered()

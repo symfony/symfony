@@ -31,6 +31,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithHasser;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithMagicSet;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithNonAsciiStaticAccessor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithSelfReturningAccessor;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithSingularAndPlural;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithStaticConstructorAndAccessor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithStaticMutator;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDummy;
@@ -1265,5 +1266,49 @@ class ReflectionExtractorTest extends TestCase
     {
         $this->assertEquals(Type::list(Type::object(\DateTime::class)), $this->extractor->getType(MutatorPrefixesDummy::class, 'item'));
         $this->assertSame('addItem', $this->extractor->getWriteInfo(MutatorPrefixesDummy::class, 'item')->getAdderInfo()->getName());
+    }
+
+    public function testGetWriteInfoPrefersTheSetterForASingularPropertyNextToItsPluralProperty()
+    {
+        $writeInfo = $this->extractor->getWriteInfo(DummyWithSingularAndPlural::class, 'network');
+
+        $this->assertSame(PropertyWriteInfo::TYPE_METHOD, $writeInfo->getType());
+        $this->assertSame('setNetwork', $writeInfo->getName());
+    }
+
+    public function testGetWriteInfoKeepsTheAdderAndRemoverForThePluralProperty()
+    {
+        $writeInfo = $this->extractor->getWriteInfo(DummyWithSingularAndPlural::class, 'networks');
+
+        $this->assertSame(PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, $writeInfo->getType());
+        $this->assertSame('addNetwork', $writeInfo->getAdderInfo()->getName());
+        $this->assertSame('removeNetwork', $writeInfo->getRemoverInfo()->getName());
+    }
+
+    public function testGetWriteInfoKeepsTheAdderAndRemoverWhenASingularPropertyHasNoSetter()
+    {
+        $writeInfo = $this->extractor->getWriteInfo(DummyWithSingularAndPlural::class, 'tag');
+
+        $this->assertSame(PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, $writeInfo->getType());
+        $this->assertSame('addTag', $writeInfo->getAdderInfo()->getName());
+        $this->assertSame('removeTag', $writeInfo->getRemoverInfo()->getName());
+    }
+
+    public function testGetWriteInfoKeepsTheAdderAndRemoverWhenTheSingularAndPluralAreTheSame()
+    {
+        $writeInfo = $this->extractor->getWriteInfo(DummyWithSingularAndPlural::class, 'aircraft');
+
+        $this->assertSame(PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, $writeInfo->getType());
+        $this->assertSame('addAircraft', $writeInfo->getAdderInfo()->getName());
+        $this->assertSame('removeAircraft', $writeInfo->getRemoverInfo()->getName());
+    }
+
+    public function testGetWriteInfoKeepsTheAdderAndRemoverWhenNoDistinctPluralPropertyExists()
+    {
+        $writeInfo = $this->extractor->getWriteInfo(DummyWithSingularAndPlural::class, 'staff');
+
+        $this->assertSame(PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, $writeInfo->getType());
+        $this->assertSame('addStaff', $writeInfo->getAdderInfo()->getName());
+        $this->assertSame('removeStaff', $writeInfo->getRemoverInfo()->getName());
     }
 }

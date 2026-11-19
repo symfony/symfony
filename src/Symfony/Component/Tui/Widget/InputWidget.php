@@ -38,6 +38,12 @@ class InputWidget extends AbstractWidget implements FocusableInterface
     private Line $line;
     private string $prompt = '> ';
     private bool $submitted = false;
+    private string $placeholder = '';
+    private bool $readOnly = false;
+    private bool $masked = false;
+    private ?int $maxLength = null;
+    /** @var list<string> */
+    private array $suggestions = [];
 
     public function __construct(
         ?Keybindings $keybindings = null,
@@ -110,18 +116,134 @@ class InputWidget extends AbstractWidget implements FocusableInterface
         return $this;
     }
 
+    public function getPrompt(): string
+    {
+        return $this->prompt;
+    }
+
     /**
+     * Sets the hint drawn while the value is empty, styled by the "placeholder" element.
+     *
      * @return $this
      */
-    public function setValue(string $value): static
+    public function setPlaceholder(string $placeholder): static
+    {
+        $placeholder = self::singleLine($placeholder);
+        if ($this->placeholder !== $placeholder) {
+            $this->placeholder = $placeholder;
+            $this->invalidate();
+        }
+
+        return $this;
+    }
+
+    public function getPlaceholder(): string
+    {
+        return $this->placeholder;
+    }
+
+    /**
+     * A read-only input keeps the focus and its cursor, and ignores edits and pastes.
+     *
+     * @return $this
+     */
+    public function setReadOnly(bool $readOnly = true): static
+    {
+        $this->readOnly = $readOnly;
+
+        return $this;
+    }
+
+    public function isReadOnly(): bool
+    {
+        return $this->readOnly;
+    }
+
+    /**
+     * Limits the characters (grapheme clusters) typing, pasting or taking a suggestion can bring the value to; null
+     * for no limit.
+     *
+     * A value given to setValue() is not limited.
+     *
+     * @return $this
+     */
+    public function setMaxLength(?int $maxLength): static
+    {
+        $this->maxLength = null !== $maxLength ? max(0, $maxLength) : null;
+
+        return $this;
+    }
+
+    public function getMaxLength(): ?int
+    {
+        return $this->maxLength;
+    }
+
+    /**
+     * A masked input draws a bullet for each character of its value, like a password prompt.
+     *
+     * @return $this
+     */
+    public function setMasked(bool $masked = true): static
+    {
+        if ($this->masked !== $masked) {
+            $this->masked = $masked;
+            $this->invalidate();
+        }
+
+        return $this;
+    }
+
+    public function isMasked(): bool
+    {
+        return $this->masked;
+    }
+
+    /**
+     * Sets the values the input suggests: the first one that extends the value, ignoring case, is drawn after the
+     * cursor, styled by the "suggestion" element; Tab, or Right at the end of the value, replaces the value with it.
+     *
+     * @param list<string> $suggestions
+     *
+     * @return $this
+     */
+    public function setSuggestions(array $suggestions): static
+    {
+        $suggestions = array_values(array_filter(array_map(self::singleLine(...), $suggestions), static fn (string $suggestion): bool => '' !== $suggestion));
+        if ($this->suggestions !== $suggestions) {
+            $this->suggestions = $suggestions;
+            $this->invalidate();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns what the first suggestion extending the value adds to it, or null when none does or the input is masked.
+     */
+    public function getCompletion(): ?string
+    {
+        return null !== ($suggestion = $this->getSuggestion()) ? mb_substr($suggestion, mb_strlen($this->line->getText())) : null;
+    }
+
+    /**
+     * @param bool $dispatch Whether a change dispatches a ChangeEvent, like an edit by the user
+     *
+     * @return $this
+     */
+    public function setValue(string $value, bool $dispatch = false): static
     {
         $value = StringUtils::stripControlBytes(StringUtils::sanitizeUtf8($value));
         // When setting a new value, move cursor to the end of the string
         $newCursor = \strlen($value);
         if ($this->line->getText() !== $value || $this->line->getCursor() !== $newCursor) {
+            $changed = $this->line->getText() !== $value;
             $this->line->setText($value);
             $this->line->setCursor($newCursor);
             $this->invalidate();
+            if ($dispatch && $changed) {
+                $this->dispatch(new ChangeEvent($this, $value));
+            }
         }
 
         return $this;
@@ -149,7 +271,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
 
         try {
             // Handle bracketed paste mode
-            if (null !== $pastedText = $this->processBracketedPaste($data)) {
+            if (null !== ($pastedText = $this->processBracketedPaste($data)) && !$this->readOnly) {
                 $this->handlePaste($pastedText);
             }
 
@@ -178,7 +300,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
             }
 
             // Deletion (line-level, then word-level, then char-level)
-            if ($kb->matches($data, 'delete_to_line_start')) {
+            if (!$this->readOnly && $kb->matches($data, 'delete_to_line_start')) {
                 if ('' !== $this->line->deleteToStart()) {
                     $this->notifyChange();
                 }
@@ -186,7 +308,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
                 return;
             }
 
-            if ($kb->matches($data, 'delete_to_line_end')) {
+            if (!$this->readOnly && $kb->matches($data, 'delete_to_line_end')) {
                 if ('' !== $this->line->deleteToEnd()) {
                     $this->notifyChange();
                 }
@@ -194,7 +316,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
                 return;
             }
 
-            if ($kb->matches($data, 'delete_word_backward')) {
+            if (!$this->readOnly && $kb->matches($data, 'delete_word_backward')) {
                 if ('' !== $this->line->deleteWordBackward()) {
                     $this->notifyChange();
                 }
@@ -202,7 +324,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
                 return;
             }
 
-            if ($kb->matches($data, 'delete_char_backward')) {
+            if (!$this->readOnly && $kb->matches($data, 'delete_char_backward')) {
                 if ($this->line->deleteCharBackward()) {
                     $this->notifyChange();
                 }
@@ -210,10 +332,21 @@ class InputWidget extends AbstractWidget implements FocusableInterface
                 return;
             }
 
-            if ($kb->matches($data, 'delete_char_forward')) {
+            if (!$this->readOnly && $kb->matches($data, 'delete_char_forward')) {
                 if ($this->line->deleteCharForward()) {
                     $this->notifyChange();
                 }
+
+                return;
+            }
+
+            // Take the suggestion: Tab, or Right at the end of the value
+            if (!$this->readOnly && ("\t" === $data || $kb->matches($data, 'cursor_right')) && $this->line->getCursor() === \strlen($this->line->getText()) && null !== $suggestion = $this->getSuggestion()) {
+                // As written in the suggestion, cut to the maximum length like typing
+                if (null !== $this->maxLength) {
+                    $suggestion = (string) grapheme_substr($suggestion, 0, max($this->maxLength, (int) grapheme_strlen($this->line->getText())));
+                }
+                $this->setValue($suggestion, true);
 
                 return;
             }
@@ -257,7 +390,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
 
             // Regular character input
             $data = $kb->getParser()->decodePrintable($data) ?? $data;
-            if (!StringUtils::hasControlChars($data)) {
+            if (!$this->readOnly && !StringUtils::hasControlChars($data) && '' !== $data = $this->fit($data)) {
                 $this->line->insert($data);
                 $this->notifyChange();
             }
@@ -298,6 +431,12 @@ class InputWidget extends AbstractWidget implements FocusableInterface
             $bytePos += \strlen($g);
         }
 
+        // One bullet per character, the cursor where it was
+        if ($this->masked) {
+            $graphemes = array_fill(0, \count($graphemes), '•');
+            $value = implode('', $graphemes);
+        }
+
         $totalWidth = AnsiUtils::visibleWidth($value);
 
         if ($totalWidth < $availableColumns) {
@@ -335,7 +474,16 @@ class InputWidget extends AbstractWidget implements FocusableInterface
 
         $cursorStyle = $this->resolveElement('cursor');
         $marker = $this->focused ? AnsiUtils::cursorMarker($cursorStyle->getCursorShape() ?? CursorShape::Block) : '';
-        $textWithCursor = $beforeCursor.$marker.$atCursor.$afterCursor;
+        if ('' === $value && '' !== $this->placeholder) {
+            // The cursor on the first character of the hint
+            $textWithCursor = $marker.$this->applyElement('placeholder', AnsiUtils::truncateToWidth($this->placeholder, $availableColumns, ''));
+        } elseif ($cursor === \strlen($this->line->getText()) && $cursorVisibleIndex === \count($visibleGraphemes) && null !== $completion = $this->getCompletion()) {
+            // The cursor on the first character of the suggestion, drawn as far as there is room
+            $room = max(0, $availableColumns - AnsiUtils::visibleWidth($beforeCursor));
+            $textWithCursor = $beforeCursor.$marker.$this->applyElement('suggestion', AnsiUtils::truncateToWidth($completion, $room, ''));
+        } else {
+            $textWithCursor = $beforeCursor.$marker.$atCursor.$afterCursor;
+        }
 
         // Pad to width
         $visualLength = AnsiUtils::visibleWidth($textWithCursor);
@@ -448,7 +596,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
         $cleanText = StringUtils::decodeCtrlLetterKeys(StringUtils::sanitizeUtf8($text));
         // Clean pasted text - remove newlines
         $cleanText = str_replace(["\r\n", "\r", "\n"], '', $cleanText);
-        $cleanText = StringUtils::stripControlBytes($cleanText);
+        $cleanText = $this->fit(StringUtils::stripControlBytes($cleanText));
 
         if ('' === $cleanText) {
             return;
@@ -456,6 +604,45 @@ class InputWidget extends AbstractWidget implements FocusableInterface
 
         $this->line->insert($cleanText);
         $this->notifyChange();
+    }
+
+    /**
+     * Cuts what an edit inserts to the room the maximum length leaves.
+     */
+    /**
+     * The first suggestion that extends the value, ignoring case.
+     */
+    private function getSuggestion(): ?string
+    {
+        $value = $this->line->getText();
+        if ('' === $value || $this->masked) {
+            return null;
+        }
+        foreach ($this->suggestions as $suggestion) {
+            if (mb_strlen($suggestion) > mb_strlen($value) && 0 === mb_stripos($suggestion, $value)) {
+                return $suggestion;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Cuts what an edit inserts to the room the maximum length leaves, in characters (grapheme clusters).
+     */
+    private function fit(string $text): string
+    {
+        if (null === $this->maxLength) {
+            return $text;
+        }
+        $room = $this->maxLength - (int) grapheme_strlen($this->line->getText());
+
+        return $room > 0 ? (string) grapheme_substr($text, 0, $room) : '';
+    }
+
+    private static function singleLine(string $text): string
+    {
+        return StringUtils::stripControlBytes(StringUtils::sanitizeUtf8(str_replace(["\r\n", "\r", "\n"], ' ', $text)));
     }
 
     private function notifyChange(): void

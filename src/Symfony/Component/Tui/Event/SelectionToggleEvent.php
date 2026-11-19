@@ -23,8 +23,8 @@ use Symfony\Component\Tui\Widget\SelectListWidget;
 class SelectionToggleEvent extends AbstractEvent
 {
     /**
-     * @param array{value: string, label: string, description?: string, checked?: bool}       $item
-     * @param list<array{value: string, label: string, description?: string, checked?: bool}> $selectedItems
+     * @param array{value: string, label: string, description?: string, checked?: bool, group?: string}       $item
+     * @param list<array{value: string, label: string, description?: string, checked?: bool, group?: string}> $selectedItems
      */
     public function __construct(
         SelectListWidget $target,
@@ -38,7 +38,7 @@ class SelectionToggleEvent extends AbstractEvent
     /**
      * Get the toggled item.
      *
-     * @return array{value: string, label: string, description?: string, checked?: bool}
+     * @return array{value: string, label: string, description?: string, checked?: bool, group?: string}
      */
     public function getItem(): array
     {
@@ -61,7 +61,7 @@ class SelectionToggleEvent extends AbstractEvent
     /**
      * Get the currently selected item arrays after the toggle.
      *
-     * @return list<array{value: string, label: string, description?: string, checked?: bool}>
+     * @return list<array{value: string, label: string, description?: string, checked?: bool, group?: string}>
      */
     public function getSelectedItems(): array
     {

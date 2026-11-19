@@ -68,6 +68,8 @@ use Symfony\Component\Tui\Widget\Figlet\FigletRenderer;
  */
 class TextWidget extends AbstractWidget
 {
+    private string $ellipsis = '...';
+
     /**
      * @param string $text     Text content to display
      * @param bool   $truncate When true, truncate lines to fit width instead of wrapping
@@ -87,6 +89,29 @@ class TextWidget extends AbstractWidget
         $this->invalidate();
 
         return $this;
+    }
+
+    /**
+     * Truncates the lines that do not fit instead of wrapping them.
+     *
+     * @param string $ellipsis What ends a truncated line, like "…", or nothing
+     *
+     * @return $this
+     */
+    public function setTruncate(bool $truncate = true, string $ellipsis = '...'): static
+    {
+        if ($this->truncate !== $truncate || $this->ellipsis !== $ellipsis) {
+            $this->truncate = $truncate;
+            $this->ellipsis = $ellipsis;
+            $this->invalidate();
+        }
+
+        return $this;
+    }
+
+    public function isTruncated(): bool
+    {
+        return $this->truncate;
     }
 
     /**
@@ -131,7 +156,7 @@ class TextWidget extends AbstractWidget
             $lines = preg_split('/\r\n|\r|\n/', $normalizedText) ?: [$normalizedText];
             $processedLines = [];
             foreach ($lines as $line) {
-                $processedLines[] = AnsiUtils::truncateToWidth($line, $contentColumns);
+                $processedLines[] = AnsiUtils::truncateToWidth($line, $contentColumns, $this->ellipsis);
             }
         } else {
             $processedLines = TextWrapper::wrapTextWithAnsi($normalizedText, $contentColumns);

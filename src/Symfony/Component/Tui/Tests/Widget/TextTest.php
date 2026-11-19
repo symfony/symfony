@@ -130,6 +130,25 @@ class TextTest extends TestCase
         $this->assertStringContainsString('...', $lines[0]);
     }
 
+    public function testTruncationCanBeTurnedOnAndOff()
+    {
+        $text = new TextWidget('A line too long for the room');
+        $this->assertFalse($text->isTruncated());
+        $this->assertCount(3, $text->render(new RenderContext(12, 24)));
+
+        $text->setTruncate();
+        $this->assertTrue($text->isTruncated());
+        $this->assertSame(['A line to...'], array_map(AnsiUtils::stripAnsiCodes(...), $text->render(new RenderContext(12, 24))));
+
+        $text->setTruncate(true, '…');
+        $this->assertSame(['A line too …'], array_map(AnsiUtils::stripAnsiCodes(...), $text->render(new RenderContext(12, 24))));
+        $text->setTruncate(true, '');
+        $this->assertSame(['A line too l'], array_map(AnsiUtils::stripAnsiCodes(...), $text->render(new RenderContext(12, 24))));
+
+        $text->setTruncate(false);
+        $this->assertCount(3, $text->render(new RenderContext(12, 24)));
+    }
+
     #[DataProvider('crLineEndingsProvider')]
     public function testRenderSplitsLinesAtCrLineEndings(bool $truncate)
     {

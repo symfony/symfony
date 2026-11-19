@@ -14,10 +14,12 @@ namespace Symfony\Component\Yaml\Schema;
 /**
  * Resolves the schema declared in the document header, before any YAML content.
  *
- * Both the "# yaml-language-server: $schema=" and the shorter "# $schema=" forms are
- * supported. A relative location is resolved against the directory of the file.
+ * The header follows the syntax of yaml-language-server: "# yaml-language-server: $schema=<location>" or "# $schema: <location>".
+ * The "none" location, in any letter case, resolves to self::NONE so that the document is not validated.
+ * A relative location is resolved against the directory of the file.
  *
- * A location that starts with "file:", "http://" or "https://" is kept as is.
+ * A location that starts with "http://" or "https://" is kept as is.
+ * A local "file:" URI is turned into its decoded path, as yaml-language-server does, unless it has a fragment.
  * Any other location is a path whose percent-encoded characters are decoded, so a space is written "%20".
  * A "#" after the first character starts a fragment, which ends at the next "#" and is not decoded.
  * A path with a fragment is returned as a "file://" URI, because only a URI can have a fragment.
@@ -34,8 +36,21 @@ final class FileHeaderSchemaResolver implements SchemaResolverInterface
             return null;
         }
 
-        if (str_starts_with($schema, 'file:') || str_starts_with($schema, 'http://') || str_starts_with($schema, 'https://')) {
+        if (0 === strcasecmp($schema, self::NONE)) {
+            return self::NONE;
+        }
+
+        if (str_starts_with($schema, 'http://') || str_starts_with($schema, 'https://')) {
             return $schema;
+        }
+
+        if (str_starts_with($schema, 'file:')) {
+            // Only a URI can have a fragment.
+            if ('' !== (explode('#', $schema, 2)[1] ?? '') || null === $path = FileUri::toPath($schema)) {
+                return $schema;
+            }
+
+            return $path;
         }
 
         $fragment = '';
@@ -56,16 +71,34 @@ final class FileHeaderSchemaResolver implements SchemaResolverInterface
         }
 
         // In a path, a "#" decoded from "%23" is part of the file name.
-        return self::toFileUri(self::isAbsolutePath($schema) ? $schema : getcwd().'/'.$schema).'#'.$fragment;
+        return FileUri::fromPath(self::isAbsolutePath($schema) ? $schema : getcwd().'/'.$schema).'#'.$fragment;
     }
 
     /**
-     * Looks for a "$schema" declaration in the leading comment block, before any YAML content.
+     * Finds the modeline the way yaml-language-server does, in the comments before the first YAML node.
      */
     private static function matchHeader(string $content): ?string
     {
+        if (str_starts_with($content, "\u{FEFF}")) {
+            $content = substr($content, 3);
+        }
+
+        $inDocument = false;
+
         foreach (preg_split('/\R/', $content) as $line) {
-            $line = ltrim($line);
+            if (!$inDocument) {
+                // Directives, such as "%YAML 1.2", can only come before the document start marker.
+                if (str_starts_with($line, '%')) {
+                    continue;
+                }
+
+                if (preg_match('/^---(?=[ \t]|$)/', $line)) {
+                    $inDocument = true;
+                    $line = substr($line, 3);
+                }
+            }
+
+            $line = ltrim($line, " \t");
 
             if ('' === $line) {
                 continue;
@@ -76,8 +109,8 @@ final class FileHeaderSchemaResolver implements SchemaResolverInterface
                 return null;
             }
 
-            if (preg_match('/^#\s*(?:yaml-language-server:\s*)?\$schema=(\S+)/', $line, $matches)) {
-                return $matches[1];
+            if (preg_match('/^#\s+(?:yaml-language-server\s*:|\$schema:)/', $line)) {
+                return preg_match('/\$schema(?:=|:[^\S\r\n]*)(\S+)/', $line, $matches) ? $matches[1] : null;
             }
         }
 
@@ -96,24 +129,5 @@ final class FileHeaderSchemaResolver implements SchemaResolverInterface
         }
 
         return str_starts_with($path, '/');
-    }
-
-    /**
-     * Builds a "file://" URI from an absolute path, using forward slashes and percent-encoding the path segments.
-     */
-    private static function toFileUri(string $path): string
-    {
-        $path = str_replace('\\', '/', $path);
-        $drive = '';
-
-        if ('\\' === \DIRECTORY_SEPARATOR && preg_match('{^[a-zA-Z]:/}', $path, $m)) {
-            $drive = $m[0];
-            $path = substr($path, 3);
-        }
-
-        $path = $drive.implode('/', array_map('rawurlencode', explode('/', $path)));
-
-        // Windows paths ("C:/...") need an extra leading slash to form "file:///C:/...".
-        return 'file://'.(str_starts_with($path, '/') ? '' : '/').$path;
     }
 }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Yaml\Tests\Command;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresMethod;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\CI\GitlabCiReporter;
@@ -337,11 +338,55 @@ bar';
         $this->skipIfJsonSchemaMissing();
 
         $schema = $this->createSchemaFile();
-        $filename = $this->createFile(\sprintf("# \$schema=%s\nversion: not-an-integer", basename($schema)));
+        $filename = $this->createFile(\sprintf("# \$schema: %s\nversion: not-an-integer", basename($schema)));
 
         $ret = $this->createCommandTester()->execute(['filename' => $filename, '--check-schema' => null], ['decorated' => false]);
 
         $this->assertSame(1, $ret, 'lint:yaml uses the short schema header');
+    }
+
+    #[DataProvider('provideNoneSchemaHeaderOptions')]
+    public function testLintDoesNotValidateFileWithNoneSchemaHeader(array $options)
+    {
+        $this->skipIfJsonSchemaMissing();
+
+        $filename = $this->createFile("# \$schema: none\nversion: not-an-integer");
+
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['filename' => $filename] + $options, ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
+
+        $this->assertSame(0, $ret);
+        $this->assertStringContainsString('(no schema)', preg_replace('~\s*\n\s*(// )?~', ' ', $tester->getDisplay()));
+    }
+
+    public static function provideNoneSchemaHeaderOptions(): iterable
+    {
+        yield 'by default' => [[]];
+        yield 'with --check-schema' => [['--check-schema' => null]];
+    }
+
+    public function testLintValidatesFileWithNoneSchemaHeaderAgainstSchemaOption()
+    {
+        $this->skipIfJsonSchemaMissing();
+
+        $filename = $this->createFile("# \$schema: none\nversion: not-an-integer");
+
+        $ret = $this->createCommandTester()->execute(['filename' => $filename, '--schema' => $this->createSchemaFile()], ['decorated' => false]);
+
+        $this->assertSame(1, $ret, 'The --schema option applies to all files, including the ones whose header says none');
+    }
+
+    public function testLintReadsNoneSchemaOptionAsAPath()
+    {
+        $this->skipIfJsonSchemaMissing();
+
+        $filename = $this->createFile('version: 8');
+
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['filename' => $filename, '--schema' => 'none'], ['decorated' => false]);
+
+        $this->assertSame(1, $ret);
+        $this->assertStringContainsString('Unable to validate against schema "none"', $tester->getDisplay());
     }
 
     public function testLintDisplaysSchemaPerFileInVerboseMode()
@@ -404,7 +449,7 @@ bar';
 
         $valid = $this->createFile('foo: valid');
         $invalid = $this->createFile('foo: invalid');
-        $unavailable = $this->createFile("# \$schema=sf-<info>missing.json\nfoo: bar");
+        $unavailable = $this->createFile("# \$schema: sf-<info>missing.json\nfoo: bar");
 
         $application = new Application();
         $application->addCommand(new LintCommand(null, null, null, null, $validator, \dirname($unavailable)));
@@ -443,7 +488,7 @@ bar';
         $this->skipIfJsonSchemaMissing();
 
         $schema = $this->createSchemaFile();
-        $filename = $this->createFile(\sprintf("# \$schema=%s\nversion: not-an-integer", basename($schema)));
+        $filename = $this->createFile(\sprintf("# \$schema: %s\nversion: not-an-integer", basename($schema)));
 
         $ret = $this->createCommandTester()->execute(['filename' => $filename], ['decorated' => false]);
 
@@ -455,7 +500,7 @@ bar';
         $this->skipIfJsonSchemaMissing();
 
         $schema = $this->createSchemaFile();
-        $filename = $this->createFile(\sprintf("# \$schema=%s\nversion: 8", basename($schema)));
+        $filename = $this->createFile(\sprintf("# \$schema: %s\nversion: 8", basename($schema)));
 
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['filename' => $filename], ['decorated' => false]);
@@ -469,7 +514,7 @@ bar';
         $this->skipIfJsonSchemaMissing();
 
         $schema = $this->createSchemaFile();
-        $filename = $this->createFile(\sprintf("# \$schema=%s\nversion: not-an-integer", basename($schema)));
+        $filename = $this->createFile(\sprintf("# \$schema: %s\nversion: not-an-integer", basename($schema)));
 
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['filename' => $filename, '--no-check-schema' => true], ['decorated' => false]);
@@ -589,10 +634,157 @@ bar';
         $this->assertSame(0, $ret, 'lint:yaml skips a remote schema when --check-schema is not used');
     }
 
+    public function testLintSkipsSchemaWithAnUnknownSchemeByDefault()
+    {
+        $this->skipIfJsonSchemaMissing();
+
+        $filename = $this->createFile('version: 8');
+
+        // A location read on STDIN, or returned by another resolver, is not resolved against a directory.
+        $resolver = $this->createStub(SchemaResolverInterface::class);
+        $resolver->method('resolve')->willReturn('foo://bar.json');
+
+        $application = new Application();
+        $application->addCommand(new LintCommand(null, null, null, $resolver));
+        $tester = new CommandTester($application->find('lint:yaml'));
+
+        // A throwing error handler, like the debug one of FrameworkBundle, turns any warning into an aborted run.
+        set_error_handler(static fn (int $type, string $message) => throw new \ErrorException($message, 0, $type));
+
+        try {
+            $ret = $tester->execute(['filename' => $filename], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame(0, $ret);
+        $this->assertStringContainsString('foo://bar.jsonnotavailable)', preg_replace('/\s+/', '', preg_replace('~\n\s*// ~', '', $tester->getDisplay())));
+    }
+
+    public function testLintValidatesAgainstFileUriSchemaHeaderByDefault()
+    {
+        $this->skipIfJsonSchemaMissing();
+
+        $schema = $this->createSchemaFile();
+        $filename = $this->createFile(\sprintf("# \$schema: file:///%s\nversion: not-an-integer", ltrim(strtr($schema, '\\', '/'), '/')));
+
+        $ret = $this->createCommandTester()->execute(['filename' => $filename], ['decorated' => false]);
+
+        $this->assertSame(1, $ret);
+    }
+
+    public function testLintValidatesAgainstTheFragmentOfAFileUriSchemaHeaderByDefault()
+    {
+        $this->skipIfJsonSchemaMissing();
+
+        $schema = $this->createFile(json_encode([
+            'type' => 'string',
+            'definitions' => ['config' => ['type' => 'object', 'properties' => ['version' => ['type' => 'integer']]]],
+        ]));
+        $filename = $this->createFile(\sprintf("# \$schema: file:///%s#/definitions/config\nversion: not-an-integer", ltrim(strtr($schema, '\\', '/'), '/')));
+
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['filename' => $filename], ['decorated' => false]);
+
+        $this->assertSame(1, $ret);
+        $this->assertStringContainsString('version: The data (string) must match the type: integer', $tester->getDisplay());
+    }
+
+    public function testLintValidatesAgainstTheFragmentOfARelativeSchemaHeaderByDefault()
+    {
+        $this->skipIfJsonSchemaMissing();
+
+        $schema = $this->createFile(json_encode([
+            'type' => 'string',
+            'definitions' => ['config' => ['type' => 'object', 'properties' => ['version' => ['type' => 'integer']]]],
+        ]));
+        $filename = $this->createFile(\sprintf("# \$schema: %s#/definitions/config\nversion: not-an-integer", basename($schema)));
+
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['filename' => $filename], ['decorated' => false]);
+
+        $this->assertSame(1, $ret);
+        $this->assertStringContainsString('version: The data (string) must match the type: integer', $tester->getDisplay());
+    }
+
+    public function testLintDecodesFileUriSchemaHeaderByDefault()
+    {
+        $this->skipIfJsonSchemaMissing();
+
+        $dir = sys_get_temp_dir().'/framework-yml-lint-test/with space';
+        @mkdir($dir);
+        $schema = $this->createSchemaFile($dir.'/schema.json');
+        $filename = $this->createFile(\sprintf("# \$schema: file:///%s\nversion: not-an-integer", str_replace(' ', '%20', ltrim(strtr($schema, '\\', '/'), '/'))));
+
+        try {
+            $ret = $this->createCommandTester()->execute(['filename' => $filename], ['decorated' => false]);
+        } finally {
+            @unlink($schema);
+            @rmdir($dir);
+        }
+
+        $this->assertSame(1, $ret);
+    }
+
+    #[TestWith(["a\0b.json"])]
+    #[TestWith(['file:///a%00b.json'])]
+    public function testLintSkipsSchemaWithANullByteByDefault(string $schema)
+    {
+        $this->skipIfJsonSchemaMissing();
+
+        $filename = $this->createFile("# \$schema: $schema\nversion: 8");
+
+        $ret = $this->createCommandTester()->execute(['filename' => $filename], ['decorated' => false]);
+
+        $this->assertSame(0, $ret);
+    }
+
+    public function testLintSkipsFileUriSchemaOnAnotherHostByDefault()
+    {
+        $this->skipIfJsonSchemaMissing();
+
+        $schema = $this->createSchemaFile();
+        $filename = $this->createFile(\sprintf("# \$schema: file://example.com/%s\nversion: not-an-integer", ltrim(strtr($schema, '\\', '/'), '/')));
+
+        $ret = $this->createCommandTester()->execute(['filename' => $filename], ['decorated' => false]);
+
+        $this->assertSame(0, $ret);
+    }
+
+    public function testLintValidatesAgainstALocalPathWithASchemeSeparatorByDefault()
+    {
+        $this->skipIfJsonSchemaMissing();
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('A colon is not allowed in a file name on Windows.');
+        }
+
+        $dir = sys_get_temp_dir().'/framework-yml-lint-test/foo:';
+        @mkdir($dir);
+        $schema = $this->createSchemaFile($dir.'/schema.json');
+        $filename = $this->createFile('version: not-an-integer');
+
+        // As for editors, only "file:", "http://" and "https://" locations are URLs.
+        $resolver = $this->createStub(SchemaResolverInterface::class);
+        $resolver->method('resolve')->willReturn(\dirname($dir).'/foo://schema.json');
+
+        $application = new Application();
+        $application->addCommand(new LintCommand(null, null, null, $resolver));
+
+        try {
+            $ret = (new CommandTester($application->find('lint:yaml')))->execute(['filename' => $filename], ['decorated' => false]);
+        } finally {
+            @unlink($schema);
+            @rmdir($dir);
+        }
+
+        $this->assertSame(1, $ret);
+    }
+
     public function testLintOnlyChecksSyntaxByDefaultWhenNoValidatorIsSupported()
     {
         $schema = $this->createSchemaFile();
-        $filename = $this->createFile(\sprintf("# \$schema=%s\nversion: not-an-integer", basename($schema)));
+        $filename = $this->createFile(\sprintf("# \$schema: %s\nversion: not-an-integer", basename($schema)));
 
         $validator = $this->createMock(SchemaValidatorInterface::class);
         $validator->method('isSupported')->willReturn(false);

@@ -15,6 +15,7 @@ use Opis\JsonSchema\Errors\ErrorFormatter;
 use Opis\JsonSchema\Parsers\SchemaParser;
 use Opis\JsonSchema\Resolvers\SchemaResolver;
 use Opis\JsonSchema\SchemaLoader;
+use Opis\JsonSchema\Uri;
 use Opis\JsonSchema\Validator;
 use Symfony\Component\Yaml\Exception\LogicException;
 use Symfony\Component\Yaml\Exception\RuntimeException;
@@ -30,11 +31,6 @@ final class SchemaValidator implements SchemaValidatorInterface
 {
     private ?Validator $validator = null;
 
-    /**
-     * @var array<string, string> Filesystem paths already registered on the validator, keyed by schema id
-     */
-    private array $registeredFiles = [];
-
     public function isSupported(): bool
     {
         return class_exists(Validator::class);
@@ -49,7 +45,7 @@ final class SchemaValidator implements SchemaValidatorInterface
             throw new LogicException('Validating against a JSON Schema requires the "opis/json-schema" package. Try running "composer require opis/json-schema".');
         }
 
-        if (str_contains($schema, '://') && !str_starts_with($schema, 'file://')) {
+        if (str_starts_with($schema, 'http://') || str_starts_with($schema, 'https://')) {
             throw new RuntimeException(\sprintf('Cannot validate against remote schema "%s": only local schema files are supported.', $schema));
         }
 
@@ -63,19 +59,12 @@ final class SchemaValidator implements SchemaValidatorInterface
         // Disable default value application: a linter validates the actual content and must
         // not inject (then check) schema defaults, which may be null on non-nullable nodes.
         // Keep validating after the first violation, so one run reports them all.
-        $validator = $this->validator ??= new Validator(new SchemaLoader(new SchemaParser([], ['allowDefaults' => false]), new SchemaResolver(), true), 100, false);
+        $validator = $this->validator ??= new Validator(new SchemaLoader(new SchemaParser([], ['allowDefaults' => false]), (new SchemaResolver())->registerProtocol('file', self::loadFile(...)), true), 100, false);
 
-        if (is_file($schema)) {
-            // Register the file so relative and internal "$ref" resolve against its location.
-            $path = realpath($schema) ?: $schema;
-            $id = self::toFileUri($path);
-
-            if (!isset($this->registeredFiles[$id])) {
-                $validator->resolver()->registerFile($id, $path);
-                $this->registeredFiles[$id] = $path;
-            }
-
-            $schema = $id;
+        // Unlike is_file(), realpath() does not go through stream wrappers.
+        if (!str_starts_with($schema, 'file:') && !str_contains($schema, "\0") && false !== $path = realpath($schema)) {
+            // A "file://" id makes relative "$ref" resolve against the location of the file.
+            $schema = FileUri::fromPath($path);
         }
 
         try {
@@ -107,22 +96,15 @@ final class SchemaValidator implements SchemaValidatorInterface
     }
 
     /**
-     * Builds a "file://" URI from a filesystem path, using forward slashes and percent-encoding the path segments.
+     * Returns the content of a local "file://" URI, the only kind of reference that is followed.
      */
-    private static function toFileUri(string $path): string
+    private static function loadFile(Uri $uri): ?string
     {
-        $path = str_replace('\\', '/', $path);
-        $drive = '';
-
-        if ('\\' === \DIRECTORY_SEPARATOR && preg_match('{^[a-zA-Z]:/}', $path, $m)) {
-            $drive = $m[0];
-            $path = substr($path, 3);
+        if (null === $path = FileUri::toPath((string) $uri)) {
+            return null;
         }
 
-        $path = $drive.implode('/', array_map('rawurlencode', explode('/', $path)));
-
-        // Windows paths ("C:/...") need an extra leading slash to form "file:///C:/...".
-        return 'file://'.(str_starts_with($path, '/') ? '' : '/').$path;
+        return is_file($path) && false !== ($content = file_get_contents($path)) ? $content : null;
     }
 
     /**

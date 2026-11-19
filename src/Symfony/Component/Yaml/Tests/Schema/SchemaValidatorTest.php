@@ -12,6 +12,7 @@
 namespace Symfony\Component\Yaml\Tests\Schema;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Exception\RuntimeException;
 use Symfony\Component\Yaml\Schema\SchemaValidator;
@@ -97,6 +98,73 @@ class SchemaValidatorTest extends TestCase
         yield ['%percent'];
         yield ['%20'];
         yield ['-é'];
+    }
+
+    #[DataProvider('provideDirectoryNames')]
+    public function testRelativeReferenceIsResolvedAgainstTheSchemaFile(string $dirName)
+    {
+        $dir = sys_get_temp_dir().'/sf-schema-'.bin2hex(random_bytes(4)).$dirName;
+        $schema = $dir.'/schema.json';
+
+        mkdir($dir);
+        file_put_contents($schema, json_encode([
+            'type' => 'object',
+            'properties' => ['version' => ['$ref' => 'version.json']],
+        ]));
+        file_put_contents($dir.'/version.json', json_encode(['type' => 'integer']));
+
+        try {
+            $content = 'version: not-an-integer';
+            $errors = (new SchemaValidator())->validate(Yaml::parse($content), $schema, $content);
+
+            $this->assertCount(1, $errors);
+            $this->assertSame(1, $errors[0]['line']);
+        } finally {
+            @unlink($schema);
+            @unlink($dir.'/version.json');
+            @rmdir($dir);
+        }
+    }
+
+    #[TestWith(['file:///'])]
+    #[TestWith(['file://localhost/'])]
+    #[TestWith(['file://LOCALHOST/'])]
+    public function testRelativeReferenceIsResolvedAgainstAFileUriSchema(string $prefix)
+    {
+        $version = $this->createFile(json_encode(['type' => 'integer']));
+        $schema = $this->createFile(json_encode([
+            'type' => 'object',
+            'properties' => ['version' => ['$ref' => basename($version)]],
+        ]));
+
+        $content = 'version: not-an-integer';
+        $errors = (new SchemaValidator())->validate(Yaml::parse($content), $prefix.ltrim(strtr($schema, '\\', '/'), '/'), $content);
+
+        $this->assertCount(1, $errors);
+        $this->assertSame(1, $errors[0]['line']);
+    }
+
+    #[DataProvider('provideNonLocalReferences')]
+    public function testNonLocalReferenceIsNotResolved(string $reference)
+    {
+        $version = $this->createFile(json_encode(['type' => 'integer']));
+        $schema = $this->createFile(json_encode([
+            'type' => 'object',
+            'properties' => ['version' => ['$ref' => \sprintf($reference, '/'.ltrim(strtr($version, '\\', '/'), '/'))]],
+        ]));
+
+        $content = 'version: not-an-integer';
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unresolved reference');
+        (new SchemaValidator())->validate(Yaml::parse($content), $schema, $content);
+    }
+
+    public static function provideNonLocalReferences(): iterable
+    {
+        yield 'a remote url' => ['https://example.com/version.json'];
+        yield 'a file uri with a host' => ['file://example.com%s'];
+        yield 'a stream wrapper behind the file scheme' => ['file:file://%s'];
     }
 
     public function testErrorLineIsResolvedFromNestedKey()
@@ -323,12 +391,14 @@ class SchemaValidatorTest extends TestCase
         (new SchemaValidator())->validate(['name' => "\xB1\x31"], $this->createSchema());
     }
 
-    public function testUnresolvableSchemaThrowsRuntimeException()
+    #[TestWith(['/nonexistent/schema.json'])]
+    #[TestWith(["a\0b.json"])]
+    public function testUnresolvableSchemaThrowsRuntimeException(string $schema)
     {
         $content = 'version: 8';
 
         $this->expectException(RuntimeException::class);
-        (new SchemaValidator())->validate(Yaml::parse($content), '/nonexistent/schema.json', $content);
+        (new SchemaValidator())->validate(Yaml::parse($content), $schema, $content);
     }
 
     public function testAllViolationsAreReported()
@@ -341,6 +411,32 @@ class SchemaValidatorTest extends TestCase
         $this->assertCount(2, $errors);
         $this->assertSame(1, $errors[0]['line']);
         $this->assertSame(2, $errors[1]['line']);
+    }
+
+    public function testLocalPathWithASchemeSeparatorIsNotRemote()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('A colon is not allowed in a file name on Windows.');
+        }
+
+        $dir = sys_get_temp_dir().'/sf-schema-'.bin2hex(random_bytes(4));
+        mkdir($dir.'/foo:', 0o777, true);
+        file_put_contents($dir.'/foo:/schema.json', json_encode([
+            'type' => 'object',
+            'properties' => ['version' => ['type' => 'integer']],
+        ]));
+
+        try {
+            $content = 'version: not-an-integer';
+            // As for editors, only "file:", "http://" and "https://" locations are URLs.
+            $errors = (new SchemaValidator())->validate(Yaml::parse($content), $dir.'/foo://schema.json', $content);
+
+            $this->assertCount(1, $errors);
+        } finally {
+            @unlink($dir.'/foo:/schema.json');
+            @rmdir($dir.'/foo:');
+            @rmdir($dir);
+        }
     }
 
     public function testRemoteSchemaIsRejected()

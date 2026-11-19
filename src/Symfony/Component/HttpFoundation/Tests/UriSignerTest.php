@@ -48,6 +48,15 @@ class UriSignerTest extends TestCase
         $this->assertFalse($signer->check($signer->sign('http://example.com/foo', new \DateTimeImmutable('@0'))));
     }
 
+    public function testSignPreservesNetworkPath()
+    {
+        $signer = new UriSigner('foobar');
+        $signed = $signer->sign('//example.com/foo?foo=bar', new \DateTimeImmutable('2099-01-01 00:00:00'));
+
+        $this->assertStringStartsWith('//example.com/foo?', $signed);
+        $this->assertTrue($signer->check($signed));
+    }
+
     public function testCheck()
     {
         $signer = new UriSigner('foobar');

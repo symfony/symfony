@@ -139,7 +139,7 @@ class UriSigner
         ksort($params, \SORT_STRING);
         $url['query'] = http_build_query($params, '', '&');
 
-        $scheme = isset($url['scheme']) ? $url['scheme'].'://' : '';
+        $scheme = isset($url['scheme']) ? $url['scheme'].'://' : (isset($url['host']) ? '//' : '');
         $host = $url['host'] ?? '';
         $port = isset($url['port']) ? ':'.$url['port'] : '';
         $user = $url['user'] ?? '';

@@ -220,7 +220,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         }
 
         // asking PropertyInfo about attributes that the class doesn't have would fill its cache with each unknown key
-        if ((property_exists($class, $attribute) || method_exists($class, 'set'.$attribute)) && $this->propertyInfoExtractor->isWritable($class, $attribute)) {
+        if (null !== ($name = $this->getWritableAttributeName($class, $attribute)) && $this->propertyInfoExtractor->isWritable($class, $name)) {
             return true;
         }
 
@@ -229,6 +229,25 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         }
 
         return false;
+    }
+
+    /**
+     * Returns the name of the property or of the setter that the attribute refers to, as PropertyInfo lists it.
+     */
+    private function getWritableAttributeName(string $class, string $attribute): ?string
+    {
+        if (property_exists($class, $attribute)) {
+            return $attribute;
+        }
+
+        if (!method_exists($class, 'set'.$attribute)) {
+            return null;
+        }
+
+        // method names are case-insensitive, so the name is read from the method, the way ReflectionExtractor::getProperties() does
+        $name = substr((new \ReflectionMethod($class, 'set'.$attribute))->name, 3);
+
+        return property_exists($class, lcfirst($name)) || (!property_exists($class, $name) && !preg_match('/^[A-Z]{2,}/', $name)) ? lcfirst($name) : $name;
     }
 
     private function isWrittenByMethod(string $class, string $attribute): bool

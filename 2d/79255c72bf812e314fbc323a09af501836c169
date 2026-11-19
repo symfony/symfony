@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by cestercian at 2026-11-19T15:20:51Z
+
+@nicolas-grekas switched to checking for a separate plural property instead of pluralize(), so aircraft and staff with a setter plus adder/remover stay on the adder/remover, and low-deps passes with symfony/string 5.4. title has [PropertyInfo] now. will retarget to 7.4 next
+
+---------------------------------------------------------------------------
+
+by cestercian at 2026-11-19T15:28:13Z
+
+good call, pushed. it now only prefers the setter when the class has a different property that singularizes to the name (like networks for network), no pluralize() anymore. so aircraft passes on low deps too and staff stays on addStaff/removeStaff, added a test for that. also added [PropertyInfo] to the title.

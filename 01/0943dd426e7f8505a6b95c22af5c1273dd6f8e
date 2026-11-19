@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-19T17:38:22Z
+
+Thanks. I moved this to 7.4: 6.4 is close to its end of life and now only gets fixes for common cases.
+
+Note that `checkRequest()` and `#[IsSignatureValid]` check the absolute URL of the request. So a signed network-path URL still won't verify there. For links that come back as requests, you should sign the absolute URL.

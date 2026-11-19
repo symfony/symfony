@@ -967,10 +967,7 @@ final class JsonCrawler implements JsonCrawlerInterface
         $leftIsNothing = Nothing::Nothing === $left;
         $rightIsNothing = Nothing::Nothing === $right;
 
-        if (
-            $leftIsNothing && $rightIsNothing
-            || ($leftIsNothing && 0 === $right || 0 === $left && $rightIsNothing)
-        ) {
+        if ($leftIsNothing && $rightIsNothing) {
             return true;
         }
 
@@ -998,11 +995,6 @@ final class JsonCrawler implements JsonCrawlerInterface
         // objects must have identical names and equal corresponding values
         if ($left instanceof \stdClass && $right instanceof \stdClass) {
             return $this->compareObjectsDeep($left, $right);
-        }
-
-        // null (missing property) equals 0 when compared to function results
-        if (null === $left && 0 === $right || 0 === $left && null === $right) {
-            return true;
         }
 
         // different types are not equal

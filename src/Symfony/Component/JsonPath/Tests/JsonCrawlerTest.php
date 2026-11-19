@@ -1124,6 +1124,25 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame(['value2'], $result);
     }
 
+    #[DataProvider('provideComparisonsWithZero')]
+    public function testComparisonWithZero(string $path, array $expected)
+    {
+        $crawler = new JsonCrawler('[{"id": 1, "a": null}, {"id": 2, "a": 0}, {"id": 3, "a": "0"}, {"id": 4, "a": false}, {"id": 5}, {"id": 6, "a": [0]}]');
+
+        $this->assertSame($expected, $crawler->find($path));
+    }
+
+    public static function provideComparisonsWithZero(): iterable
+    {
+        yield 'equals zero' => ['$[?@.a == 0].id', [2]];
+        yield 'zero equals' => ['$[?0 == @.a].id', [2]];
+        yield 'not equals zero' => ['$[?@.a != 0].id', [1, 3, 4, 5, 6]];
+        yield 'equals null' => ['$[?@.a == null].id', [1]];
+        yield 'absent member equals zero' => ['$[?@.missing == 0].id', []];
+        yield 'length of a value without one equals zero' => ['$[?length(@.a) == 0].id', []];
+        yield 'length of a value without one does not equal zero' => ['$[?length(@.a) != 0].id', [1, 2, 3, 4, 5, 6]];
+    }
+
     public function testEmptyLengthFunction()
     {
         $crawler = new JsonCrawler('{"choices": [{"message": {"content": null}}]}');

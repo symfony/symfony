@@ -34,7 +34,7 @@ class AnsiColorModeTest extends TestCase
     {
         yield ['#606702', [
             AnsiColorMode::Ansi8->name => 100,
-            AnsiColorMode::Ansi4->name => 0,
+            AnsiColorMode::Ansi4->name => 3,
         ]];
 
         yield ['#f40502', [
@@ -54,7 +54,7 @@ class AnsiColorModeTest extends TestCase
 
         yield ['#eec7fa', [
             AnsiColorMode::Ansi8->name => 225,
-            AnsiColorMode::Ansi4->name => 7,
+            AnsiColorMode::Ansi4->name => 5,
         ]];
 
         yield ['#a8a8a8', [
@@ -71,6 +71,39 @@ class AnsiColorModeTest extends TestCase
             AnsiColorMode::Ansi8->name => 231,
             AnsiColorMode::Ansi4->name => 7,
         ]];
+    }
+
+    #[DataProvider('provideAnsi4ClosestHue')]
+    public function testAnsi4PicksClosestHue(string $colorHex, int $expected)
+    {
+        $this->assertSame((string) $expected, AnsiColorMode::Ansi4->convertFromHexToAnsiColorCode($colorHex));
+    }
+
+    public static function provideAnsi4ClosestHue(): \Generator
+    {
+        yield 'dark red' => ['#800000', 1];
+        yield 'orange' => ['#ff8000', 3];
+        yield 'olive' => ['#808000', 3];
+        yield 'dark green' => ['#006400', 2];
+        yield 'teal' => ['#008080', 6];
+        yield 'navy' => ['#000080', 4];
+        yield 'royal blue' => ['#4169e1', 4];
+        yield 'purple' => ['#800080', 5];
+        yield 'pink' => ['#ff1493', 5];
+        yield 'crimson' => ['#dc143c', 1];
+        yield 'very dark magenta' => ['#200010', 5];
+        yield 'dark grey' => ['#555555', 0];
+        yield 'darkest grey rendered white' => ['#808080', 7];
+        yield 'lightest grey rendered black' => ['#7f7f7f', 0];
+        yield 'light grey' => ['#c0c0c0', 7];
+        yield 'pastel lilac' => ['#eec7fa', 5];
+        yield 'nearly white' => ['#fffffe', 7];
+        yield 'ghost white' => ['#f8f8ff', 7];
+        yield 'floral white' => ['#fffaf0', 7];
+        yield 'nearly black' => ['#010000', 0];
+        yield 'dark editor background' => ['#202124', 0];
+        yield 'channels 31 apart rendered grey' => ['#1f0010', 0];
+        yield 'channels 32 apart rendered with their hue' => ['#200010', 5];
     }
 
     public function testColorsConversionWithoutSharp()

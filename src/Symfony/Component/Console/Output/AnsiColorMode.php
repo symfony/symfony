@@ -76,9 +76,36 @@ enum AnsiColorMode
         };
     }
 
+    /**
+     * Picks the 4-bit Ansi color with the closest hue.
+     *
+     * Greys and nearly grey colors (channels less than 32 apart) have no visible hue: they are mapped
+     * to black or white depending on their brightness.
+     * Other colors are mapped to the nearest of the 6 primary/secondary hues.
+     *
+     * Returns the index of the SGR color (30-37, 40-47). ECMA-48 only names these colors: the hues
+     * target the pure colors #ff0000, #ffff00, #00ff00, #00ffff, #0000ff and #ff00ff, while the RGB
+     * actually displayed depends on the terminal (e.g. xterm's defaults in its XTerm-col.ad file).
+     */
     private function degradeHexColorToAnsi4(int $r, int $g, int $b): int
     {
-        return round($b / 255) << 2 | (round($g / 255) << 1) | round($r / 255);
+        $max = max($r, $g, $b);
+        $delta = $max - min($r, $g, $b);
+
+        // an absolute threshold, unlike the HSV saturation, also catches near-blacks such as #010000
+        if ($delta < 32) {
+            return $max < 128 ? 0 : 7;
+        }
+
+        // hue sector (60 degrees each) between -1 and 5, both meaning magenta
+        $hue = match ($max) {
+            $r => ($g - $b) / $delta,
+            $g => ($b - $r) / $delta + 2,
+            default => ($r - $g) / $delta + 4,
+        };
+
+        // magenta, red, yellow, green, cyan, blue, magenta
+        return [5, 1, 3, 2, 6, 4, 5][(int) round($hue) + 1];
     }
 
     /**

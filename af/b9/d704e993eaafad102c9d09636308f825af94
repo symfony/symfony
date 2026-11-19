@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2026-11-18T17:15:44Z
+
+This has been fixed already in #68237, merged yesterday. Closing here, thanks for proposing. First time contrib, hope to see you again soon :)
+
+---------------------------------------------------------------------------
+
+by pawell67 at 2026-11-18T18:16:01Z
+
+Thanks for having a look! I don't think #68237 covers this one though: it fixes hydrating readonly properties, while this issue is about default values of *promoted* properties, which `ReflectionProperty::hasDefaultValue()` doesn't see. The added test still fails on the current 7.4 (which includes #68237) with "The option property "$count" … must declare a default value", and a promoted `#[Argument]` with a default silently becomes required. Could you reopen?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-19T08:17:57Z
+
+Confirmed, the new test still fails on 7.4 with #68237 in. Reopening.

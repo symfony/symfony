@@ -105,7 +105,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException($formatter->getErrorMessage(), $formatter->getErrorCode());
         }
 
-        if ($result >= \PHP_INT_MAX || $result <= -\PHP_INT_MAX) {
+        // Without ext-intl, an integer overflow is returned as false or as a clamped integer, not as an error
+        if ((\is_float($result) || !\extension_loaded('intl')) && ($result >= \PHP_INT_MAX || $result <= -\PHP_INT_MAX)) {
             throw new TransformationFailedException('I don\'t have a clear idea what infinity looks like.');
         }
 
@@ -162,7 +163,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      */
     protected function castParsedValue(int|float $value): int|float
     {
-        if (\is_int($value) && (($float = (float) $value) < \PHP_INT_MAX) && $value === (int) $float) {
+        if (\is_int($value) && (($float = (float) $value) < \PHP_INT_MAX) && $float > \PHP_INT_MIN && $value === (int) $float) {
             return $float;
         }
 

@@ -649,6 +649,25 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(\PHP_INT_MAX - 1, (int) $transformer->reverseTransform((string) (\PHP_INT_MAX - 1)));
     }
 
+    #[RequiresPhpExtension('intl')]
+    public function testReverseTransformIntegerLimits()
+    {
+        foreach ([null, 0, 2] as $scale) {
+            $transformer = new NumberToLocalizedStringTransformer($scale);
+
+            $this->assertSame(\PHP_INT_MAX, $transformer->reverseTransform((string) \PHP_INT_MAX));
+            $this->assertSame(\PHP_INT_MIN, $transformer->reverseTransform((string) \PHP_INT_MIN));
+        }
+    }
+
+    public function testReverseTransformDisallowsIntegerOverflow()
+    {
+        $this->expectException(TransformationFailedException::class);
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('99999999999999999999');
+    }
+
     public function testReverseTransformSmallInt()
     {
         $transformer = new NumberToLocalizedStringTransformer(null, true);

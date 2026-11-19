@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add `Tui::all()` to get the widgets added to the root container
+
 8.2
 ---
 

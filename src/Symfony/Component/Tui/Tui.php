@@ -161,6 +161,16 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     }
 
     /**
+     * Get all child widgets of the root container.
+     *
+     * @return AbstractWidget[]
+     */
+    public function all(): array
+    {
+        return $this->root->all();
+    }
+
+    /**
      * Find a widget by ID in the widget tree.
      */
     public function getById(string $id): AbstractWidget

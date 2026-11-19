@@ -1187,7 +1187,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return [];
         }
 
-        $this->typeContextFactory ??= new TypeContextFactory(new StringTypeResolver());
+        $this->typeContextFactory ??= new TypeContextFactory(new StringTypeResolver(null, null, [], true));
         $inheritedTemplateTypes = $this->typeContextFactory->createFromClassName($mappedClass, $genericClass->getClassName())->inheritedTemplateTypes;
         $templateTypes = [];
 
@@ -1228,7 +1228,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         // asking PropertyInfo about attributes that the class doesn't have would fill its cache with each unknown key
         if ($this->isDeclaredAttribute($currentClass, $attribute) && null !== $type = $this->propertyTypeExtractor->getType($currentClass, $attribute)) {
-            return $this->typeCache[$key] = $type;
+            return $this->typeCache[$key] = $type->withoutRefinements();
         }
 
         if ($discriminatorMapping = $this->classDiscriminatorResolver?->getMappingForClass($currentClass)) {
@@ -1238,7 +1238,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             foreach ($discriminatorMapping->getTypesMapping() as $mappedClass) {
                 if ($this->isDeclaredAttribute($mappedClass, $attribute) && null !== $type = $this->propertyTypeExtractor->getType($mappedClass, $attribute)) {
-                    return $this->typeCache[$key] = $type;
+                    return $this->typeCache[$key] = $type->withoutRefinements();
                 }
             }
         }

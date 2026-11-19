@@ -179,6 +179,7 @@ class MovedClassesKernel extends Kernel
             'serializer' => ['enabled' => true],
             'translator' => ['enabled' => true],
             'validation' => ['enabled' => true],
+            'type_info' => ['refinements' => true],
         ]);
         $c->services()->set('logger', NullLogger::class);
     }

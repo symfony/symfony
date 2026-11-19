@@ -92,6 +92,7 @@ class TemplateRouteKernel extends Kernel
             $container
                 ->loadFromExtension('framework', [
                     'secret' => '$ecret',
+                    'type_info' => ['refinements' => true],
                     'form' => ['enabled' => false],
                     'router' => ['resource' => __DIR__.'/Resources/config/'.$this->routingFile],
                 ])

@@ -24,6 +24,8 @@ use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\EnumType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\IntRangeType;
+use Symfony\Component\TypeInfo\Type\LiteralType;
 use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectShapeType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
@@ -164,6 +166,16 @@ class TypeFactoryTest extends TestCase
             new GenericType(new ObjectType(self::class), new BuiltinType(TypeIdentifier::INT)),
             Type::generic(Type::object(self::class), Type::int()),
         );
+    }
+
+    public function testCreateLiteral()
+    {
+        $this->assertEquals(new LiteralType('draft'), Type::literal('draft'));
+    }
+
+    public function testCreateIntRange()
+    {
+        $this->assertEquals(new IntRangeType(0, 10), Type::intRange(0, 10));
     }
 
     public function testCreateTemplate()

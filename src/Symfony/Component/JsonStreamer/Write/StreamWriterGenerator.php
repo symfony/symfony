@@ -69,7 +69,8 @@ final class StreamWriterGenerator
         $generateContent = function () use ($type, $options): string {
             $this->phpGenerator ??= new PhpGenerator($this->transformers);
 
-            return $this->phpGenerator->generate($this->createDataModel($type, '$data', $options), $options);
+            // refinements are stripped once where a type enters the data model, here and for each property
+            return $this->phpGenerator->generate($this->createDataModel($type->withoutRefinements(), '$data', $options), $options);
         };
 
         $this->dumper->dump($type, $path, $generateContent);
@@ -187,7 +188,7 @@ final class StreamWriterGenerator
                     $propertyAccessor = "$functionName($arguments)";
                 }
 
-                $propertiesNodes[$streamedName] = $this->createDataModel($propertyMetadata->getType(), $propertyAccessor, $options, $context);
+                $propertiesNodes[$streamedName] = $this->createDataModel($propertyMetadata->getType()->withoutRefinements(), $propertyAccessor, $options, $context);
             }
 
             if ($genericType) {

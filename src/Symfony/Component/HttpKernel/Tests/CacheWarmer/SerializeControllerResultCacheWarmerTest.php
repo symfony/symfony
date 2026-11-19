@@ -47,7 +47,7 @@ class SerializeControllerResultCacheWarmerTest extends TestCase
 
     public function testWarmUpResolvesTheReturnTypeOfTheControllersWhoseResultIsStreamedWithoutMapping()
     {
-        $warmer = new SerializeControllerResultCacheWarmer([StreamingController::class, ClassLevelStreamingController::class], $this->dir.'/types.php', TypeResolver::create());
+        $warmer = new SerializeControllerResultCacheWarmer([StreamingController::class, ClassLevelStreamingController::class], $this->dir.'/types.php', TypeResolver::create(null, true));
         $warmer->warmUp($this->dir, $this->dir);
 
         $pool = new PhpArrayAdapter($this->dir.'/types.php', new NullAdapter());
@@ -64,7 +64,7 @@ class SerializeControllerResultCacheWarmerTest extends TestCase
     #[DataProvider('provideControllers')]
     public function testTheListenerUsesTheWarmedUpType(callable $controller, mixed $controllerResult, string $expectedContent)
     {
-        $warmer = new SerializeControllerResultCacheWarmer([StreamingController::class, ClassLevelStreamingController::class], $this->dir.'/types.php', TypeResolver::create());
+        $warmer = new SerializeControllerResultCacheWarmer([StreamingController::class, ClassLevelStreamingController::class], $this->dir.'/types.php', TypeResolver::create(null, true));
         $warmer->warmUp($this->dir, $this->dir);
 
         $kernel = $this->createStub(HttpKernelInterface::class);

@@ -20,9 +20,9 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
@@ -61,15 +61,36 @@ final class CollectionDenormalizer implements DenormalizerInterface, Denormalize
         }
 
         $valueType = $context['value_type'] ?? null;
+
+        // a refined element, such as "positive-int" or "'draft'|'live'", is validated against its builtin type; the lowest symfony/type-info has no refinements to remove
+        if ($valueType instanceof Type && method_exists($valueType, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
+            $valueType = $valueType->withoutRefinements();
+        }
+
+        $keyType = $context['key_type'] ?? null;
+        if ($keyType instanceof Type) {
+            // a template key is unwrapped so that the message names its bound, and a refined one, such as "positive-int" or "'en'|'de'", is checked against its builtin type
+            while ($keyType instanceof TemplateType) {
+                $keyType = $keyType->getWrappedType();
+            }
+
+            if (method_exists($keyType, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
+                $keyType = $keyType->withoutRefinements();
+            }
+        }
+
         $elementClass = self::getElementClass($valueType);
-        $keyTypeIdentifiers = self::getKeyTypeIdentifiers($context['key_type'] ?? null);
         $collectionClass = $this->resolveCollectionClass($type);
         $collection = new $collectionClass();
 
         foreach ($data as $key => $value) {
             $path = ($context['deserialization_path'] ?? false) ? \sprintf('%s[%s]', $context['deserialization_path'], $key) : "[$key]";
 
-            self::validateKeyType($keyTypeIdentifiers, $key, $path);
+            if ($keyType instanceof Type && !$keyType->accepts($key)) {
+                $expectedKeyTypes = $keyType instanceof UnionType ? array_map('strval', $keyType->getTypes()) : [(string) $keyType];
+
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $keyType, get_debug_type($key)), $key, $expectedKeyTypes, $path, true);
+            }
 
             if ($valueType instanceof Type && !$valueType->accepts($value)) {
                 if (null === $elementClass) {
@@ -144,42 +165,5 @@ final class CollectionDenormalizer implements DenormalizerInterface, Denormalize
         }
 
         return $valueType instanceof ObjectType ? $valueType->getClassName() : null;
-    }
-
-    /**
-     * @return list<string>
-     */
-    private static function getKeyTypeIdentifiers(mixed $keyType): array
-    {
-        if (!$keyType instanceof Type) {
-            return [];
-        }
-
-        $identifiers = [];
-
-        foreach ($keyType instanceof UnionType ? $keyType->getTypes() : [$keyType] as $t) {
-            // only int and string keys can be validated this way, any other key type is left as is
-            if ($t instanceof BuiltinType && \in_array($t->getTypeIdentifier(), [TypeIdentifier::INT, TypeIdentifier::STRING], true)) {
-                $identifiers[] = $t->getTypeIdentifier()->value;
-            }
-        }
-
-        return $identifiers;
-    }
-
-    /**
-     * @param list<string> $typeIdentifiers
-     */
-    private static function validateKeyType(array $typeIdentifiers, mixed $key, string $path): void
-    {
-        foreach ($typeIdentifiers as $typeIdentifier) {
-            if (('is_'.$typeIdentifier)($key)) {
-                return;
-            }
-        }
-
-        if ($typeIdentifiers) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, implode('", "', $typeIdentifiers), get_debug_type($key)), $key, $typeIdentifiers, $path, true);
-        }
     }
 }

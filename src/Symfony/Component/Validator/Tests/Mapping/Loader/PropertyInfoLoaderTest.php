@@ -271,6 +271,69 @@ class PropertyInfoLoaderTest extends TestCase
         $this->assertSame(AutoMappingStrategy::DISABLED, $parentNoAutoMappingMetadata[0]->getAutoMappingStrategy());
     }
 
+    public function testLoadClassMetadataWithRefinedTypes()
+    {
+        if (!method_exists(Type::class, 'intRange')) {
+            $this->markTestSkipped('Refined types need symfony/type-info 8.2 or higher.');
+        }
+
+        $propertyListExtractor = $this->createStub(PropertyListExtractorInterface::class);
+        $propertyListExtractor
+            ->method('getProperties')
+            ->willReturn(['string', 'scalar', 'collection'])
+        ;
+
+        $propertyTypeExtractor = new class implements PropertyTypeExtractorInterface {
+            public function getType(string $class, string $property, array $context = []): ?Type
+            {
+                return match ($property) {
+                    'string' => Type::union(Type::literal('a'), Type::literal('b')),
+                    'scalar' => Type::union(Type::intRange(null, -1), Type::intRange(1, null)),
+                    'collection' => Type::list(Type::intRange(1, null)),
+                };
+            }
+
+            public function getTypes(string $class, string $property, array $context = []): ?array
+            {
+                return null;
+            }
+        };
+
+        $propertyAccessExtractor = $this->createStub(PropertyAccessExtractorInterface::class);
+        $propertyAccessExtractor
+            ->method('isWritable')
+            ->willReturn(true)
+        ;
+
+        $propertyInfoLoader = new PropertyInfoLoader($propertyListExtractor, $propertyTypeExtractor, $propertyAccessExtractor, '{.*}');
+        $validator = Validation::createValidatorBuilder()
+            ->enableAttributeMapping()
+            ->addLoader($propertyInfoLoader)
+            ->getValidator()
+        ;
+
+        /** @var ClassMetadata $classMetadata */
+        $classMetadata = $validator->getMetadataFor(new PropertyInfoLoaderEntity());
+
+        $stringConstraints = $classMetadata->getPropertyMetadata('string')[0]->getConstraints();
+        $this->assertInstanceOf(TypeConstraint::class, $stringConstraints[0]);
+        $this->assertSame('string', $stringConstraints[0]->type);
+
+        $scalarConstraints = $classMetadata->getPropertyMetadata('scalar')[0]->getConstraints();
+        $this->assertInstanceOf(TypeConstraint::class, $scalarConstraints[0]);
+        $this->assertSame('int', $scalarConstraints[0]->type);
+
+        $collectionConstraints = $classMetadata->getPropertyMetadata('collection')[0]->getConstraints();
+        $this->assertInstanceOf(All::class, $collectionConstraints[0]);
+        $this->assertInstanceOf(TypeConstraint::class, $collectionConstraints[0]->constraints[1]);
+        $this->assertSame('int', $collectionConstraints[0]->constraints[1]->type);
+
+        $entity = new PropertyInfoLoaderEntity();
+        $entity->scalar = 'abc';
+
+        $this->assertCount(1, $validator->validateProperty($entity, 'scalar'));
+    }
+
     #[DataProvider('regexpProvider')]
     public function testClassValidator(bool $expected, ?string $classValidatorRegexp = null)
     {

@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\TypeInfo\Refinement;
 
 class WebProfilerBundleKernel extends Kernel
 {
@@ -61,6 +62,11 @@ class WebProfilerBundleKernel extends Kernel
             'session' => ['handler_id' => null, 'storage_factory_id' => 'session.storage.factory.mock_file', 'cookie-secure' => 'auto', 'cookie-samesite' => 'lax'],
             'router' => ['utf8' => true],
         ];
+
+        // the lowest symfony/framework-bundle has no refinements to configure
+        if (class_exists(Refinement::class)) {
+            $config['type_info'] = ['refinements' => true];
+        }
 
         $container->loadFromExtension('framework', $config);
 

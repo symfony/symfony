@@ -6,3 +6,4 @@ framework:
     type_info:
         aliases:
             CustomAlias: int
+        refinements: true

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -39,5 +40,10 @@ class DefaultKernel extends Kernel
     public function getProjectDir(): string
     {
         return \dirname(__DIR__);
+    }
+
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->prependExtensionConfig('framework', ['type_info' => ['refinements' => true]]);
     }
 }

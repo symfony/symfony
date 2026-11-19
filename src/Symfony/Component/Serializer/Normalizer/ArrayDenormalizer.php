@@ -14,10 +14,10 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\Serializer\Exception\BadMethodCallException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
-use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
-use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * Denormalizes arrays of objects.
@@ -52,12 +52,13 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
 
         $type = substr($type, 0, -2);
 
-        $typeIdentifiers = [];
         if (null !== $keyType = ($context['key_type'] ?? null)) {
-            /** @var list<BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>> */
-            $keyTypes = $keyType instanceof UnionType ? $keyType->getTypes() : [$keyType];
+            // a template key is unwrapped so that the message names its bound, and a refined one, such as "positive-int" or "'en'|'de'", is checked against its builtin type
+            while ($keyType instanceof TemplateType) {
+                $keyType = $keyType->getWrappedType();
+            }
 
-            $typeIdentifiers = array_map(static fn ($t) => $t->getTypeIdentifier()->value, $keyTypes);
+            $keyType = $keyType->withoutRefinements();
         }
 
         $valueType = $context['value_type'] ?? null;
@@ -93,7 +94,11 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
                 $subContext[AbstractNormalizer::OBJECT_TO_POPULATE] = $objectsToPopulate[$key];
             }
 
-            $this->validateKeyType($typeIdentifiers, $key, $subContext['deserialization_path']);
+            if (null !== $keyType && !$keyType->accepts($key)) {
+                $expectedKeyTypes = $keyType instanceof UnionType ? array_map('strval', $keyType->getTypes()) : [(string) $keyType];
+
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $keyType, get_debug_type($key)), $key, $expectedKeyTypes, $subContext['deserialization_path'], true);
+            }
 
             $data[$key] = $this->denormalizer->denormalize($value, $type, $format, $subContext);
         }
@@ -118,23 +123,5 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
         }
 
         return true;
-    }
-
-    /**
-     * @param list<string> $typeIdentifiers
-     */
-    private function validateKeyType(array $typeIdentifiers, mixed $key, string $path): void
-    {
-        if (!$typeIdentifiers) {
-            return;
-        }
-
-        foreach ($typeIdentifiers as $typeIdentifier) {
-            if (('is_'.$typeIdentifier)($key)) {
-                return;
-            }
-        }
-
-        throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, implode('", "', $typeIdentifiers), get_debug_type($key)), $key, $typeIdentifiers, $path, true);
     }
 }

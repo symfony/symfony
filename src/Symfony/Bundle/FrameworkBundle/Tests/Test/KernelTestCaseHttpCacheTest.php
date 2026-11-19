@@ -118,6 +118,7 @@ class HttpCacheTestKernel extends Kernel
             $container->loadFromExtension('framework', [
                 'test' => true,
                 'http_cache' => $this->httpCache,
+                'type_info' => ['refinements' => true],
             ]);
 
             $container->register('http_kernel', DynamicHttpKernel::class)

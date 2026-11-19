@@ -37,6 +37,7 @@ class AttributeExtensionTest extends TestCase
             {
                 $loader->load(static function (ContainerBuilder $container) {
                     $container->setParameter('kernel.secret', 'secret');
+                    $container->loadFromExtension('framework', ['type_info' => ['refinements' => true]]);
                     $container->register(StaticExtensionWithAttributes::class, StaticExtensionWithAttributes::class)
                         ->setAutoconfigured(true);
                     $container->register(RuntimeExtensionWithAttributes::class, RuntimeExtensionWithAttributes::class)
@@ -68,6 +69,7 @@ class AttributeExtensionTest extends TestCase
             {
                 $loader->load(static function (ContainerBuilder $container) {
                     $container->setParameter('kernel.secret', 'secret');
+                    $container->loadFromExtension('framework', ['type_info' => ['refinements' => true]]);
                     $container->register(ExtensionClassWithAttributes::class, ExtensionClassWithAttributes::class)
                         ->setAutoconfigured(true);
 

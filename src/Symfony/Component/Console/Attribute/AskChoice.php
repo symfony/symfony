@@ -95,10 +95,6 @@ class AskChoice implements InteractiveAttributeInterface
             $question->setPrompt($self->prompt);
             $question->setMaxAttempts($self->maxAttempts);
 
-            if (!$self->validator && $reflection->isProperty() && !$isBackedEnum && 'array' !== $type->getName()) {
-                $self->validator = fn (mixed $value): mixed => $this->{$reflection->getName()} = $value;
-            }
-
             if ($self->validator) {
                 $question->setValidator($self->validator);
             }

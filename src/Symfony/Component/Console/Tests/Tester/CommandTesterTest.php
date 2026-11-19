@@ -37,6 +37,8 @@ use Symfony\Component\Console\Tests\Fixtures\InvokableWithInputTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithInteractiveAttributesTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithInteractiveChoiceAttributeTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithInteractiveHiddenQuestionAttributeTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithReadonlyAskChoiceInputCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithTypedAskChoiceInputCommand;
 use Symfony\Component\Console\Tests\Fixtures\MethodBasedTestCommand;
 
 class CommandTesterTest extends TestCase
@@ -652,6 +654,34 @@ class CommandTesterTest extends TestCase
         ): int => 0);
 
         $command->getDefinition();
+    }
+
+    public function testInvokableAsksAgainOnInvalidChoiceForMapInputProperty()
+    {
+        $tester = new CommandTester(new InvokableWithTypedAskChoiceInputCommand());
+        $tester->setInputs(['yellow', '1', 'abc', '3']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Value "yellow" is invalid', $tester->getDisplay());
+        self::assertStringContainsString('Value "abc" is invalid', $tester->getDisplay());
+        self::assertStringContainsString('Color: green, count: 3', $tester->getDisplay());
+    }
+
+    public function testInvokableWithReadonlyMapInputChoiceQuestion()
+    {
+        $tester = new CommandTester(new InvokableWithReadonlyAskChoiceInputCommand());
+        $tester->setInputs(['red']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Color: red', $tester->getDisplay());
+
+        $tester->setInputs(['green']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Color: green', $tester->getDisplay());
     }
 
     public function testItExecutesTheTestedCommandWithTheSameConfigAsThePreviousApiByDefault()

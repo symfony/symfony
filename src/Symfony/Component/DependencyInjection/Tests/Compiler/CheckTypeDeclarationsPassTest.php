@@ -12,14 +12,18 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
+use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeException;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Bar;
@@ -818,6 +822,28 @@ class CheckTypeDeclarationsPassTest extends TestCase
         putenv('ARRAY=');
     }
 
+    public function testProcessResolvesEnvPlaceholdersCreatedWhileLoadingAnExtension()
+    {
+        putenv('HOSTS=localhost,example.com');
+
+        $parameterBag = new EnvPlaceholderParameterBag();
+        $container = new ContainerBuilder($parameterBag);
+        // The main bag computes its placeholder prefix first; parameters added afterwards
+        // give the extension's bag a different prefix.
+        $parameterBag->getEnvPlaceholderUniquePrefix();
+        $container->setParameter('set_by_a_previous_extension', true);
+
+        $container->registerExtension(new CheckTypeDeclarationsHostsExtension());
+        $container->loadFromExtension('check_type_declarations_hosts', ['hosts' => '%env(csv:HOSTS)%']);
+
+        (new MergeExtensionConfigurationPass())->process($container);
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+
+        putenv('HOSTS');
+    }
+
     public function testProcessDoesNotResolvePercentSpansWithWhitespace()
     {
         $container = new ContainerBuilder();
@@ -1068,5 +1094,37 @@ class ServiceWithTwoInts
 {
     public function __construct(int $a, int $b)
     {
+    }
+}
+
+class CheckTypeDeclarationsHostsExtension extends Extension implements ConfigurationInterface
+{
+    public function getConfigTreeBuilder(): TreeBuilder
+    {
+        $treeBuilder = new TreeBuilder('check_type_declarations_hosts');
+        $treeBuilder->getRootNode()
+            ->children()
+                ->variableNode('hosts')->defaultNull()->end()
+            ->end();
+
+        return $treeBuilder;
+    }
+
+    public function getConfiguration(array $config, ContainerBuilder $container): ConfigurationInterface
+    {
+        return $this;
+    }
+
+    public function load(array $configs, ContainerBuilder $container): void
+    {
+        $config = $this->processConfiguration($this, $configs);
+
+        $container->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setArray', [$config['hosts']]);
+    }
+
+    public function getAlias(): string
+    {
+        return 'check_type_declarations_hosts';
     }
 }

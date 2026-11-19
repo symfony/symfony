@@ -15,6 +15,7 @@ use Symfony\Component\AssetMapper\Command\AssetMapperCompileCommand;
 use Symfony\Component\AssetMapper\Command\CompressAssetsCommand;
 use Symfony\Component\AssetMapper\Command\DebugAssetMapperCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapAuditCommand;
+use Symfony\Component\AssetMapper\Command\ImportMapExportRemoteCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapInstallCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapOutdatedCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRemoveCommand;
@@ -49,6 +50,10 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper.importmap.version_checker'),
                 param('kernel.project_dir'),
             ])
+            ->tag('console.command')
+
+        ->set('asset_mapper.importmap.command.export_remote', ImportMapExportRemoteCommand::class)
+            ->args([service('asset_mapper.importmap.config_reader'), service('asset_mapper.importmap.resolver')])
             ->tag('console.command')
 
         ->set('asset_mapper.importmap.command.remove', ImportMapRemoveCommand::class)

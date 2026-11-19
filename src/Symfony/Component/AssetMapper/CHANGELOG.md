@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add the `importmap:export-remote` command and `PackageUrlResolverInterface` to export remote packages as HTML
+
 8.2
 ---
 

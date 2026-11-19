@@ -28,6 +28,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithAccessorWithoutProperty;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithGetterSetter;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithHasser;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithMagicSet;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithNonAsciiStaticAccessor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithSelfReturningAccessor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithStaticConstructorAndAccessor;
@@ -48,6 +49,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php82Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php84DummyWithMagicSet;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\SnakeCaseDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\UnderscoreDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\VirtualProperties;
@@ -780,7 +782,18 @@ class ReflectionExtractorTest extends TestCase
             [SnakeCaseDummy::class, 'snake_property', false, true, PropertyWriteInfo::TYPE_METHOD, 'setSnakeProperty', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
             [SnakeCaseDummy::class, 'snake_method', false, true, PropertyWriteInfo::TYPE_METHOD, 'setSnake_method', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
             [SnakeCaseDummy::class, 'snake_readonly', false, false, PropertyWriteInfo::TYPE_NONE, null, null, null, null, null],
+            [DummyWithMagicSet::class, 'protected', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'protected', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [DummyWithMagicSet::class, 'private', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'private', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
         ];
+    }
+
+    public function testGetWriteInfoKeepsTheNonPublicPropertyWhenMagicSetIsDisabled()
+    {
+        $extractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC | ReflectionExtractor::ALLOW_PROTECTED | ReflectionExtractor::ALLOW_PRIVATE);
+        $writeMutator = $extractor->getWriteInfo(DummyWithMagicSet::class, 'private', ['enable_magic_methods_extraction' => ReflectionExtractor::DISALLOW_MAGIC_METHODS]);
+
+        $this->assertSame(PropertyWriteInfo::TYPE_PROPERTY, $writeMutator->getType());
+        $this->assertSame(PropertyWriteInfo::VISIBILITY_PRIVATE, $writeMutator->getVisibility());
     }
 
     public function testDisabledAdderAndRemoverReturnsError()
@@ -954,6 +967,25 @@ class ReflectionExtractorTest extends TestCase
         yield ['virtualNoSetHook', PropertyReadInfo::VISIBILITY_PUBLIC, PropertyWriteInfo::VISIBILITY_PRIVATE];
         yield ['virtualSetHookOnly', PropertyReadInfo::VISIBILITY_PUBLIC, PropertyWriteInfo::VISIBILITY_PUBLIC];
         yield ['virtualHook', PropertyReadInfo::VISIBILITY_PUBLIC, PropertyWriteInfo::VISIBILITY_PUBLIC];
+    }
+
+    #[DataProvider('provideAsymmetricVisibilityAndVirtualPropertiesWithMagicSet')]
+    #[RequiresPhp('>=8.4.0')]
+    public function testAsymmetricVisibilityAndVirtualPropertiesWithMagicSet(string $property, string $writeVisibility)
+    {
+        $extractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC | ReflectionExtractor::ALLOW_PROTECTED | ReflectionExtractor::ALLOW_PRIVATE);
+        $writeMutator = $extractor->getWriteInfo(Php84DummyWithMagicSet::class, $property);
+
+        $this->assertSame(PropertyWriteInfo::TYPE_PROPERTY, $writeMutator->getType());
+        $this->assertSame($writeVisibility, $writeMutator->getVisibility());
+    }
+
+    public static function provideAsymmetricVisibilityAndVirtualPropertiesWithMagicSet(): iterable
+    {
+        yield ['publicPrivate', PropertyWriteInfo::VISIBILITY_PRIVATE];
+        yield ['publicProtected', PropertyWriteInfo::VISIBILITY_PROTECTED];
+        yield ['protectedPrivate', PropertyWriteInfo::VISIBILITY_PUBLIC];
+        yield ['virtualNoSetHook', PropertyWriteInfo::VISIBILITY_PRIVATE];
     }
 
     #[DataProvider('typesProvider')]

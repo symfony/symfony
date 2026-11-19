@@ -549,12 +549,13 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         if ($reflClass->hasProperty($property) && ($reflClass->getProperty($property)->getModifiers() & $this->propertyReflectionFlags)) {
             $reflProperty = $reflClass->getProperty($property);
-            if (!$reflProperty->isReadOnly()) {
+            if ($reflProperty->isReadOnly()) {
+                $errors[] = [\sprintf('The property "%s" in class "%s" is a promoted readonly property.', $property, $reflClass->getName())];
+                $allowMagicSet = $allowMagicCall = false;
+            } elseif ($reflProperty->isPublic() || !$allowMagicSet || !$this->isMethodAccessible($reflClass, '__set', 2)[0]) {
+                // PHP calls __set() for non-public properties, but never for public properties, even with private(set) or protected(set)
                 return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, $this->getWriteVisibilityForProperty($reflProperty), $reflProperty->isStatic());
             }
-
-            $errors[] = [\sprintf('The property "%s" in class "%s" is a promoted readonly property.', $property, $reflClass->getName())];
-            $allowMagicSet = $allowMagicCall = false;
         }
 
         if ($allowMagicSet) {

@@ -182,8 +182,14 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         if (null !== $this->scale) {
             // shift number to maintain the correct scale during rounding
             $roundingCoef = 10 ** $this->scale;
-            // string representation to avoid rounding errors, similar to bcmul()
-            $number = (string) ($number * $roundingCoef);
+
+            // a float has 15 significant digits, so a shifted number of 1e15 or more has no decimals left to round
+            if (abs($number * $roundingCoef) >= 1e15) {
+                return 1 === $roundingCoef ? (int) $number : $number;
+            }
+
+            // keep 15 significant digits to avoid rounding errors, similar to bcmul()
+            $number = (float) \sprintf('%.15H', $number * $roundingCoef);
 
             $number = match ($this->roundingMode) {
                 \NumberFormatter::ROUND_CEILING => ceil($number),

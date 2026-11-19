@@ -144,7 +144,7 @@ class UriSigner
         $port = isset($url['port']) ? ':'.$url['port'] : '';
         $user = $url['user'] ?? '';
         $pass = isset($url['pass']) ? ':'.$url['pass'] : '';
-        $pass = ($user || $pass) ? "$pass@" : '';
+        $pass = (isset($url['user']) || isset($url['pass'])) ? "$pass@" : '';
         $path = $url['path'] ?? '';
         $query = $url['query'] ? '?'.$url['query'] : '';
         $fragment = isset($url['fragment']) ? '#'.$url['fragment'] : '';

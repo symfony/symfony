@@ -28,6 +28,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithAccessorWithoutProperty;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithGetterSetter;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithHasser;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithMagicGet;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithNonAsciiStaticAccessor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithSelfReturningAccessor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithStaticConstructorAndAccessor;
@@ -541,7 +542,27 @@ class ReflectionExtractorTest extends TestCase
             [UnderscoreDummy::class, '__', true, PropertyReadInfo::TYPE_METHOD, 'get__', PropertyReadInfo::VISIBILITY_PUBLIC, false],
             [UnderscoreDummy::class, 'foo_bar', false, null, null, null, null],
             [UnderscoreDummy::class, '_foo_', false, null, null, null, null],
+            [DummyWithMagicGet::class, 'protected', true, PropertyReadInfo::TYPE_PROPERTY, 'protected', PropertyReadInfo::VISIBILITY_PUBLIC, false],
+            [DummyWithMagicGet::class, 'private', true, PropertyReadInfo::TYPE_PROPERTY, 'private', PropertyReadInfo::VISIBILITY_PUBLIC, false],
         ];
+    }
+
+    public function testGetReadAccessorPrefersPublicPropertiesOverMagicGet()
+    {
+        $extractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC | ReflectionExtractor::ALLOW_PROTECTED | ReflectionExtractor::ALLOW_PRIVATE);
+        $readAccessor = $extractor->getReadInfo(DummyWithMagicGet::class, 'public');
+
+        $this->assertSame(PropertyReadInfo::TYPE_PROPERTY, $readAccessor->getType());
+        $this->assertTrue($readAccessor->canBeReference());
+    }
+
+    public function testGetReadAccessorKeepsTheNonPublicPropertyWhenMagicGetIsDisabled()
+    {
+        $extractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC | ReflectionExtractor::ALLOW_PROTECTED | ReflectionExtractor::ALLOW_PRIVATE);
+        $readAccessor = $extractor->getReadInfo(DummyWithMagicGet::class, 'private', ['enable_magic_methods_extraction' => ReflectionExtractor::DISALLOW_MAGIC_METHODS]);
+
+        $this->assertSame(PropertyReadInfo::TYPE_PROPERTY, $readAccessor->getType());
+        $this->assertSame(PropertyReadInfo::VISIBILITY_PRIVATE, $readAccessor->getVisibility());
     }
 
     public function testGetReadAccessorPrefersTheGetterSetterOverIsHasCanAccessors()

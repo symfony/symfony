@@ -123,7 +123,13 @@ class Argument
         $value = $input->getArgument($this->name);
 
         if (is_subclass_of($this->typeName, \BackedEnum::class) && (\is_string($value) || \is_int($value))) {
-            return $this->typeName::tryFrom($value) ?? throw InvalidArgumentException::fromEnumValue($this->name, $value, $this->suggestedValues);
+            try {
+                $enum = $this->typeName::tryFrom($value);
+            } catch (\TypeError) {
+                $enum = null;
+            }
+
+            return $enum ?? throw InvalidArgumentException::fromEnumValue($this->name, $value, $this->suggestedValues);
         }
 
         if (\is_string($value) && \in_array($this->typeName, ['int', 'float'], true) && !is_numeric($value)) {

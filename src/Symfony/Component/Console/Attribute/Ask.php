@@ -110,7 +110,19 @@ class Ask implements InteractiveAttributeInterface
             } elseif (is_subclass_of($type->getName(), \BackedEnum::class)) {
                 /** @var class-string<\BackedEnum> $backedType */
                 $backedType = $reflection->getType()->getName();
-                $question->setNormalizer(static fn (string|int $value) => $backedType::tryFrom($value) ?? throw InvalidArgumentException::fromEnumValue($reflection->getName(), $value, array_column($backedType::cases(), 'value')));
+                $question->setNormalizer(static function (string|int|null $value) use ($backedType, $reflection): ?\BackedEnum {
+                    if (null === $value) {
+                        return null;
+                    }
+
+                    try {
+                        $enum = $backedType::tryFrom($value);
+                    } catch (\TypeError) {
+                        $enum = null;
+                    }
+
+                    return $enum ?? throw InvalidArgumentException::fromEnumValue($reflection->getName(), $value, array_column($backedType::cases(), 'value'));
+                });
             }
 
             if ('array' === $type->getName()) {

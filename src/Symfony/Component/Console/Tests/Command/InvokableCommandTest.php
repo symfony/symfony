@@ -27,12 +27,15 @@ use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Tests\Fixtures\InvokableTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\PromotedInputDto;
 use Symfony\Component\Console\Tests\Fixtures\ReadonlyInputDto;
@@ -275,6 +278,178 @@ class InvokableCommandTest extends TestCase
         self::expectExceptionMessage('The value "half" is not valid for the "ratio" option. Expected a value of type "float".');
 
         $command->run(new ArrayInput(['--ratio' => 'half']), new NullOutput());
+    }
+
+    public function testIntEnumArgument()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (
+            #[Argument] IntEnum $enum,
+            #[Argument] IntEnum $enumWithDefault = IntEnum::Two,
+            #[Argument] ?IntEnum $nullableEnum = null,
+        ) use (&$received): int {
+            $received = [$enum, $enumWithDefault, $nullableEnum];
+
+            return Command::SUCCESS;
+        });
+
+        $command->run(new ArrayInput(['enum' => '1']), new NullOutput());
+        self::assertSame([IntEnum::One, IntEnum::Two, null], $received);
+
+        $command->run(new ArrayInput(['enum' => '01', 'enum-with-default' => '1.0']), new NullOutput());
+        self::assertSame([IntEnum::One, IntEnum::One, null], $received);
+    }
+
+    #[DataProvider('provideInvalidIntEnumValues')]
+    public function testIntEnumArgumentRejectsInvalidValue(string $value)
+    {
+        $command = new Command('foo');
+        $command->setCode(static fn (#[Argument] IntEnum $enum): int => Command::SUCCESS);
+
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage(\sprintf('The value "%s" is not valid for the "enum" argument. Supported values are "1", "2".', $value));
+
+        $command->run(new ArrayInput(['enum' => $value]), new NullOutput());
+    }
+
+    public function testIntEnumOption()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (
+            #[Option] IntEnum $enum = IntEnum::Two,
+            #[Option] ?IntEnum $nullableEnum = null,
+        ) use (&$received): int {
+            $received = [$enum, $nullableEnum];
+
+            return Command::SUCCESS;
+        });
+
+        $command->run(new ArrayInput([]), new NullOutput());
+        self::assertSame([IntEnum::Two, null], $received);
+
+        $command->run(new ArrayInput(['--enum' => '1.0', '--nullable-enum' => '02']), new NullOutput());
+        self::assertSame([IntEnum::One, IntEnum::Two], $received);
+    }
+
+    #[DataProvider('provideInvalidIntEnumValues')]
+    public function testIntEnumOptionRejectsInvalidValue(string $value)
+    {
+        $command = new Command('foo');
+        $command->setCode(static fn (#[Option] ?IntEnum $enum = null): int => Command::SUCCESS);
+
+        self::expectException(InvalidOptionException::class);
+        self::expectExceptionMessage(\sprintf('The value "%s" is not valid for the "enum" option. Supported values are "1", "2".', $value));
+
+        $command->run(new ArrayInput(['--enum' => $value]), new NullOutput());
+    }
+
+    public static function provideInvalidIntEnumValues(): \Generator
+    {
+        yield 'non-numeric' => ['abc'];
+        yield 'empty' => [''];
+        yield 'overflow' => ['9223372036854775808'];
+        yield 'unknown int' => ['99'];
+    }
+
+    public function testAskIntEnumArgument()
+    {
+        $invokable = new class {
+            public ?IntEnum $received = null;
+
+            public function __invoke(#[Argument] #[Ask('Pick a value')] IntEnum $enum): int
+            {
+                $this->received = $enum;
+
+                return Command::SUCCESS;
+            }
+        };
+        $command = new Command('foo');
+        $command->setCode($invokable);
+
+        $tester = new CommandTester($command);
+        $tester->setInputs(['1.0']);
+        $tester->execute([], ['interactive' => true]);
+        self::assertSame(IntEnum::One, $invokable->received);
+
+        foreach (['abc', '9223372036854775808'] as $invalid) {
+            $tester = new CommandTester($command);
+            $tester->setInputs([$invalid]);
+            try {
+                $tester->execute([], ['interactive' => true]);
+                self::fail(\sprintf('Expected InvalidArgumentException for "%s".', $invalid));
+            } catch (InvalidArgumentException $e) {
+                self::assertSame(\sprintf('The value "%s" is not valid for the "enum" argument. Supported values are "1", "2".', $invalid), $e->getMessage());
+            }
+        }
+
+        $tester = new CommandTester($command);
+        $tester->setInputs(['']);
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Not enough arguments (missing: "enum").');
+        $tester->execute([], ['interactive' => true]);
+    }
+
+    public function testAskIntEnumOnMapInputRepromptsOnInvalidInput()
+    {
+        $invokable = new class {
+            public ?IntEnum $received = null;
+
+            public function __invoke(#[MapInput] IntEnumAskInputDto $input): int
+            {
+                $this->received = $input->enum;
+
+                return Command::SUCCESS;
+            }
+        };
+        $command = new Command('foo');
+        $command->setCode($invokable);
+
+        $tester = new CommandTester($command);
+        $tester->setInputs(['abc', '2']);
+        $tester->execute([], ['interactive' => true]);
+
+        self::assertSame(IntEnum::Two, $invokable->received);
+        $display = preg_replace('/\s+/', ' ', $tester->getDisplay());
+        self::assertStringContainsString('The value "abc" is not valid for the "enum" argument. Supported values are "1", "2".', $display);
+    }
+
+    public function testNumericUnionOptionIsConvertedOrRejected()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (
+            #[Option] bool|int $limit = false,
+            #[Option] bool|float $ratio = false,
+            #[Option] bool|string $label = false,
+        ) use (&$received): int {
+            $received = [$limit, $ratio, $label];
+
+            return Command::SUCCESS;
+        });
+
+        $command->run(new ArgvInput(['foo']), new NullOutput());
+        self::assertSame([false, false, false], $received);
+
+        $command->run(new ArgvInput(['foo', '--limit', '--ratio', '--label']), new NullOutput());
+        self::assertSame([true, true, true], $received);
+
+        $command->run(new ArgvInput(['foo', '--limit=007', '--ratio=1.5', '--label=abc']), new NullOutput());
+        self::assertSame([7, 1.5, 'abc'], $received);
+
+        $command->run(new ArgvInput(['foo', '--limit=0', '--ratio=0.0']), new NullOutput());
+        self::assertSame([0, 0.0, false], $received);
+
+        foreach ([
+            [['foo', '--limit=abc'], 'The value "abc" is not valid for the "limit" option. Expected a value of type "int".'],
+            [['foo', '--limit='], 'The value "" is not valid for the "limit" option. Expected a value of type "int".'],
+            [['foo', '--ratio=half'], 'The value "half" is not valid for the "ratio" option. Expected a value of type "float".'],
+        ] as [$argv, $expectedMessage]) {
+            try {
+                $command->run(new ArgvInput($argv), new NullOutput());
+                self::fail(\sprintf('Expected InvalidOptionException for %s.', implode(' ', $argv)));
+            } catch (InvalidOptionException $e) {
+                self::assertSame($expectedMessage, $e->getMessage());
+            }
+        }
     }
 
     public function testInvalidArgumentType()
@@ -601,4 +776,17 @@ enum StringEnum: string
 {
     case Image = 'image';
     case Video = 'video';
+}
+
+enum IntEnum: int
+{
+    case One = 1;
+    case Two = 2;
+}
+
+final class IntEnumAskInputDto
+{
+    #[Argument]
+    #[Ask('Pick a value')]
+    public IntEnum $enum;
 }

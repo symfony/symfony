@@ -148,6 +148,8 @@ class IpUtilsTest extends TestCase
             ['::1:0:1', '::'], // neither mapped nor compatible: regular IPv6 anonymization applies
             ['0000:0000:0000:0000:0000:0001:0000:0001', '::'],
             ['fe80::1fc4:15d8:78db:2319%enp4s0', 'fe80::'], // IPv6 link-local with RFC4007 scoping
+            ['[fe80::1%eth0]', '[fe80::]'],
+            ['[fe80::1%25eth0]', '[fe80::]'],
         ];
     }
 

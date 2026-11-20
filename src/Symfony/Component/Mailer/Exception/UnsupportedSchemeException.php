@@ -104,6 +104,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Sendgrid\Transport\SendgridTransportFactory::class,
             'package' => 'symfony/sendgrid-mailer',
         ],
+        'sendora' => [
+            'class' => Bridge\Sendora\Transport\SendoraTransportFactory::class,
+            'package' => 'symfony/sendora-mailer',
+        ],
         'ses' => [
             'class' => Bridge\Amazon\Transport\SesTransportFactory::class,
             'package' => 'symfony/amazon-mailer',

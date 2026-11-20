@@ -1,0 +1,25 @@
+{
+    "id": "16d2bdce-4f5b-4c6d-8e7f-9a0b1c2d3e4f",
+    "attempt": 1,
+    "event": "inbound",
+    "inboundMessageId": "1b3d5f7a-9c1e-4b3d-8f7a-9c1e3b5d7f9a",
+    "serverId": "0f8a1b2c-3d4e-4f5a-8b6c-7d8e9f0a1b2c",
+    "streamId": "8a0c2e4a-6c8e-4a0c-8e4a-6c8e0a2c4e6a",
+    "receivedAt": "2026-09-15T12:00:00.000Z",
+    "envelopeRecipient": "support@example.se",
+    "mailboxHash": null,
+    "sizeBytes": 18432,
+    "attachmentCount": 1,
+    "hasText": true,
+    "hasHtml": true,
+    "authentication": {
+        "spf": "pass",
+        "spfHelo": "pass",
+        "dkim": "pass",
+        "dmarc": "pass",
+        "dmarcPolicy": null,
+        "arc": "none",
+        "checkedAt": "2026-09-15T12:00:00.000Z"
+    },
+    "parseIssue": null
+}

@@ -1,0 +1,29 @@
+{
+    "id": "d29e7f8a-0b1d-4e2f-8a3b-5c6d7e8f9a0b",
+    "attempt": 1,
+    "messageId": "5f432ffd-c005-499b-aa3a-5b8a088ea20e",
+    "recipient": "anna@example.com",
+    "occurredAt": "2026-09-15T12:00:03.000Z",
+    "serverId": "0f8a1b2c-3d4e-4f5a-8b6c-7d8e9f0a1b2c",
+    "streamId": "3d1a2b4c-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+    "broadcastId": null,
+    "tag": "invoice",
+    "metadata": {
+        "invoiceId": "2026-0912"
+    },
+    "test": false,
+    "event": "clicked",
+    "details": {
+        "automated": "unlikely",
+        "agent": null,
+        "reasons": [],
+        "client": "browser",
+        "device": "desktop",
+        "first": true,
+        "firstHuman": true,
+        "link": {
+            "index": 0,
+            "url": "https://example.se/invoices/2026-0912"
+        }
+    }
+}

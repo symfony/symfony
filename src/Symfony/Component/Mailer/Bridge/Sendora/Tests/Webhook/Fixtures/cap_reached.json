@@ -1,0 +1,12 @@
+{
+    "id": "05c1acbd-3e4a-4b5c-9d6e-8f9a0b1c2d3e",
+    "attempt": 1,
+    "scope": "account",
+    "serverId": null,
+    "cap": 50000,
+    "periodStart": "2026-09-01T00:00:00.000Z",
+    "periodEnd": "2026-10-01T00:00:00.000Z",
+    "used": 50000,
+    "occurredAt": "2026-09-29T16:05:00.000Z",
+    "event": "cap_reached"
+}

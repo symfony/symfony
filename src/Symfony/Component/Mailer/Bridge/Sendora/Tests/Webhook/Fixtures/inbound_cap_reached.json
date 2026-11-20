@@ -1,0 +1,10 @@
+{
+    "id": "38f4dfea-6b7d-4e8f-8a9b-1c2d3e4f5a6b",
+    "attempt": 1,
+    "cap": 50000,
+    "periodStart": "2026-09-01T00:00:00.000Z",
+    "periodEnd": "2026-10-01T00:00:00.000Z",
+    "used": 50000,
+    "occurredAt": "2026-09-29T16:05:00.000Z",
+    "event": "inbound_cap_reached"
+}

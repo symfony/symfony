@@ -158,6 +158,11 @@ class AssetMapperBundle extends AbstractBundle
                     ->min(0)
                     ->defaultValue(0)
                 ->end()
+                ->scalarNode('github_token')
+                    ->info('GitHub token sent to the GitHub advisory API by "importmap:audit" to raise its rate limit. It needs no scope.')
+                    ->example('%env(default::GITHUB_TOKEN)%')
+                    ->defaultNull()
+                ->end()
                 ->arrayNode('precompress')
                     ->info('Precompress assets with Brotli, Zstandard and gzip.')
                     ->canBeEnabled()
@@ -283,6 +288,10 @@ class AssetMapperBundle extends AbstractBundle
         $container
             ->getDefinition('asset_mapper.importmap.update_checker')
             ->replaceArgument(3, $config['minimum_release_age'])
+        ;
+        $container
+            ->getDefinition('asset_mapper.importmap.auditor')
+            ->replaceArgument(2, $config['github_token'])
         ;
 
         $compressors = [];

@@ -12,6 +12,7 @@
 namespace Symfony\Component\KeyManagement\Tests\Factory;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\KeyManagement\DecrypterInterface;
 use Symfony\Component\KeyManagement\Dsn;
 use Symfony\Component\KeyManagement\EncrypterInterface;
@@ -79,20 +80,29 @@ class FactoryRegistryTest extends TestCase
         $factory->method('supports')->willReturnCallback(static fn (Dsn $dsn) => 'memory' === $dsn->scheme);
         $factory->method('create')->willReturn($kms);
 
-        $lastFactoryLoaded = false;
-        $registry = new FactoryRegistry((static function () use ($factory, &$lastFactoryLoaded) {
-            yield self::nonSupporting();
-            yield $factory;
-            $lastFactoryLoaded = true;
-            yield self::nonSupporting();
+        $registry = new FactoryRegistry((static function () use ($factory) {
+            yield 0 => self::nonSupporting();
+            yield 0 => $factory;
+            yield 0 => self::nonSupporting();
         })());
 
         $this->assertTrue($registry->supports($dsn));
         $this->assertSame($kms, $registry->create($dsn));
-        $this->assertFalse($lastFactoryLoaded);
         $this->assertFalse($registry->supports(new Dsn('unknown')));
-        $this->assertTrue($lastFactoryLoaded);
         $this->assertSame($kms, $registry->create($dsn));
+    }
+
+    public function testTaggedFactoriesAreOnlyLoadedUntilAMatchIsFound()
+    {
+        $factory = $this->createStub(KmsFactoryInterface::class);
+        $factory->method('supports')->willReturn(true);
+
+        $registry = new FactoryRegistry(new RewindableGenerator(static function () use ($factory) {
+            yield $factory;
+            throw new \LogicException('The second factory should not be loaded.');
+        }, 2));
+
+        $this->assertTrue($registry->supports(new Dsn('memory')));
     }
 
     public function testSupportsReportsTrueWhenAnyFactoryMatches()

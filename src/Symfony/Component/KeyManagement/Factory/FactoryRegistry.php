@@ -29,14 +29,11 @@ use Symfony\Component\KeyManagement\Exception\UnsupportedSchemeException;
  */
 final class FactoryRegistry implements KmsFactoryInterface
 {
-    /** @var list<KmsFactoryInterface> */
-    private array $loadedFactories = [];
-
     /**
      * @param iterable<KmsFactoryInterface> $factories
      */
     public function __construct(
-        private readonly iterable $factories,
+        private iterable $factories,
     ) {
     }
 
@@ -76,24 +73,10 @@ final class FactoryRegistry implements KmsFactoryInterface
      */
     private function getFactories(): iterable
     {
-        if (!$this->factories instanceof \Generator) {
-            yield from $this->factories;
-
-            return;
+        if ($this->factories instanceof \Generator) {
+            $this->factories = iterator_to_array($this->factories, false);
         }
 
-        for ($i = 0;; ++$i) {
-            if (null === $factory = $this->loadedFactories[$i] ?? null) {
-                if ($i > 0) {
-                    $this->factories->next();
-                }
-                if (null === $factory = $this->factories->current()) {
-                    return;
-                }
-                $this->loadedFactories[] = $factory;
-            }
-
-            yield $factory;
-        }
+        return $this->factories;
     }
 }

@@ -111,8 +111,9 @@ final class JsonSchemaDumper
                     'additionalProperties' => $prototypeSchema,
                 ];
 
-                if ($node->getMinNumberOfElements()) {
-                    $schema['minProperties'] = $node->getMinNumberOfElements();
+                if ($min = $node->getMinNumberOfElements()) {
+                    $schema['minProperties'] = $min;
+                    $schema['minItems'] = $min;
                 }
 
                 // A normalization closure rewrites the input before the key-attribute
@@ -455,8 +456,9 @@ final class JsonSchemaDumper
             $this->inListItem = $inListItem;
         }
 
-        if ($node->getMinNumberOfElements()) {
-            $schema['minProperties'] = $node->getMinNumberOfElements();
+        if ($min = $node->getMinNumberOfElements()) {
+            $schema['minProperties'] = $min;
+            $schema['minItems'] = $min;
         }
 
         return $schema;

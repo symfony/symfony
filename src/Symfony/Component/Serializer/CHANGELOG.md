@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Apply serializer default context to custom normalizers, denormalizers, encoders and decoders, while keeping per-call options authoritative
  * Resolve env vars at compile time in bundle options used to build the container
  * Add the `serializer.warmup_class_provider` tag to warm metadata for classes discovered outside serializer mappings
  * Honor `SerializedName` and `SerializedPath` on properties whose names match their accessors

@@ -141,6 +141,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     final public function serialize(mixed $data, string $format, array $context = []): string
     {
+        $context += $this->defaultContext;
+
         if (!$this->supportsEncoding($format, $context)) {
             throw new UnsupportedFormatException(\sprintf('Serialization for the format "%s" is not supported.', $format));
         }
@@ -154,6 +156,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     final public function deserialize(mixed $data, string $type, string $format, array $context = []): mixed
     {
+        $context += $this->defaultContext;
+
         if (!$this->supportsDecoding($format, $context)) {
             throw new UnsupportedFormatException(\sprintf('Deserialization for the format "%s" is not supported.', $format));
         }
@@ -165,6 +169,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
+        $context += $this->defaultContext;
+
         // If a normalizer supports the given data, use it
         if ($normalizer = $this->getNormalizer($data, $format, $context)) {
             return $normalizer->normalize($data, $format, $context);
@@ -214,6 +220,17 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
         if (isset($context[DenormalizerInterface::COLLECT_EXTRA_ATTRIBUTES_ERRORS], $context['extra_attributes_exceptions'])) {
             throw new LogicException('Passing a value for "extra_attributes_exceptions" context key is not allowed.');
+        }
+
+        $context += $this->defaultContext;
+
+        // Nested denormalizers forward the collection arrays after removing
+        // the flags. Do not restore those flags from the defaults.
+        if (isset($context['not_normalizable_value_exceptions'])) {
+            unset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS]);
+        }
+        if (isset($context['extra_attributes_exceptions'])) {
+            unset($context[DenormalizerInterface::COLLECT_EXTRA_ATTRIBUTES_ERRORS]);
         }
 
         $normalizer = $this->getDenormalizer($data, $type, $format, $context);
@@ -278,11 +295,15 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
+        $context += $this->defaultContext;
+
         return null !== $this->getNormalizer($data, $format, $context);
     }
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
+        $context += $this->defaultContext;
+
         return isset(self::SCALAR_TYPES[$type]) || null !== $this->getDenormalizer($data, $type, $format, $context);
     }
 
@@ -427,21 +448,29 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     final public function encode(mixed $data, string $format, array $context = []): string
     {
+        $context += $this->defaultContext;
+
         return $this->encoder->encode($data, $format, $context);
     }
 
     final public function decode(string $data, string $format, array $context = []): mixed
     {
+        $context += $this->defaultContext;
+
         return $this->decoder->decode($data, $format, $context);
     }
 
     public function supportsEncoding(string $format, array $context = []): bool
     {
+        $context += $this->defaultContext;
+
         return $this->encoder->supportsEncoding($format, $context);
     }
 
     public function supportsDecoding(string $format, array $context = []): bool
     {
+        $context += $this->defaultContext;
+
         return $this->decoder->supportsDecoding($format, $context);
     }
 

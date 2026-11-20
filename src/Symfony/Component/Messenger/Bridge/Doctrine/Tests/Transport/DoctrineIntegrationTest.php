@@ -130,6 +130,10 @@ class DoctrineIntegrationTest extends TestCase
 
     public function testAWorkerStoppedByItsMessageLimitReleasesTheRestOfTheFetchedMessages()
     {
+        if (!method_exists(Worker::class, 'closeReceivers')) {
+            $this->markTestSkipped('The installed symfony/messenger does not close the transports when the worker stops.');
+        }
+
         $transport = new DoctrineTransport($this->connection, new PhpSerializer());
         $transport->send(new Envelope(new DummyMessage('first')));
         $transport->send(new Envelope(new DummyMessage('second')));

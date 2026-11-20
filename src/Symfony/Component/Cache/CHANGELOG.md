@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add `ZstdMarshaller` to compress values using the zstd extension
+
 8.2
 ---
 

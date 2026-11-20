@@ -1,0 +1,37 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/NullableConstraints",
+    "$defs": {
+        "NullableConstraints": {
+            "type": "object",
+            "properties": {
+                "notBlank": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "notNull": {
+                    "type": "string"
+                },
+                "notBlankAllowNull": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "minLength": 1
+                },
+                "notBlankArray": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1
+                }
+            },
+            "required": [
+                "notBlank",
+                "notNull",
+                "notBlankArray"
+            ]
+        }
+    }
+}

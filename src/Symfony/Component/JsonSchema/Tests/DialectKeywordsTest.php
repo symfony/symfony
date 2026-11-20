@@ -32,4 +32,23 @@ class DialectKeywordsTest extends TestCase
         yield 'true anyOf branch' => [['anyOf' => [['type' => 'string'], true]], ['a', 'b', null]];
         yield 'false anyOf branch' => [['anyOf' => [['type' => 'string'], false]], ['a', 'b']];
     }
+
+    #[DataProvider('provideSchemasWithoutNull')]
+    public function testWithoutNullRestrictsTheSchema(array $schema, array $expected)
+    {
+        $this->assertSame($expected, DialectKeywords::withoutNull($schema));
+    }
+
+    public static function provideSchemasWithoutNull(): iterable
+    {
+        yield 'not nullable' => [['type' => 'string'], ['type' => 'string']];
+        yield 'type union' => [['type' => ['string', 'null']], ['type' => 'string']];
+        yield 'nullable flag' => [['type' => 'string', 'nullable' => true], ['type' => 'string']];
+        yield 'anyOf branch' => [['anyOf' => [['$ref' => '#/$defs/Code'], ['type' => 'null']]], ['anyOf' => [['$ref' => '#/$defs/Code']]]];
+        yield 'true anyOf branch' => [['anyOf' => [['type' => 'string'], true]], ['anyOf' => [['type' => 'string'], ['not' => ['type' => 'null']]]]];
+        yield 'false anyOf branch' => [['anyOf' => [['type' => 'string'], false]], ['anyOf' => [['type' => 'string']]]];
+        yield 'enum' => [['enum' => ['a', null]], ['enum' => ['a']]];
+        yield 'null const' => [['const' => null], ['enum' => []]];
+        yield 'only null' => [['type' => 'null'], ['enum' => []]];
+    }
 }

@@ -70,6 +70,7 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
         foreach ($this->getConstraints($metadata, $property->property, $this->getGroups($metadata, $config)) as $constraint) {
             if (($constraint instanceof NotBlank && !$constraint->allowNull) || $constraint instanceof NotNull) {
                 $required = true;
+                $schema = DialectKeywords::withoutNull($schema);
             }
 
             $schema = $this->apply($constraint, $schema, $config->dialect, $property->type);

@@ -11,6 +11,12 @@
                     "minLength": 3,
                     "maxLength": 20
                 },
+                "code": {
+                    "type": "string"
+                },
+                "initial": {
+                    "type": "string"
+                },
                 "email": {
                     "type": [
                         "string",

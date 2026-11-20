@@ -1599,7 +1599,7 @@ class Process implements \IteratorAggregate
     private function prepareWindowsCommandLine(string|array $cmd, array &$env): string
     {
         $cmd = $this->buildShellCommandline($cmd);
-        $uid = bin2hex(random_bytes(4));
+        $uid = '_'.bin2hex(random_bytes(4));
         $cmd = preg_replace_callback(
             '/"(?:(
                 [^"%!^]*+

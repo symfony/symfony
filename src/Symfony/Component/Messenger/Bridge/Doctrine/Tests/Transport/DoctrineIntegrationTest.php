@@ -17,8 +17,17 @@ use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
+use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Messenger\Worker;
 
 #[RequiresPhpExtension('pdo_sqlite')]
 class DoctrineIntegrationTest extends TestCase
@@ -72,6 +81,72 @@ class DoctrineIntegrationTest extends TestCase
         $this->driverConnection->commit();
 
         $this->assertNotSame('2000-01-01 00:00:00', $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$encoded[0]['id']]));
+    }
+
+    public function testReleaseMakesTheFetchedMessagesThatWereNotHandledAvailableAgain()
+    {
+        $this->connection->send('{"message": "acked"}', ['type' => DummyMessage::class]);
+        $this->connection->send('{"message": "rejected"}', ['type' => DummyMessage::class]);
+        $this->connection->send('{"message": "not reached"}', ['type' => DummyMessage::class]);
+        $fetched = $this->connection->get(3);
+        $this->connection->ack($fetched[0]['id']);
+        $this->connection->reject($fetched[1]['id']);
+
+        $this->assertNull($this->connection->get());
+
+        $this->connection->release();
+
+        $next = $this->connection->get();
+        $this->assertSame('{"message": "not reached"}', $next[0]['body']);
+        $this->assertSame(1, (int) $this->driverConnection->fetchOne('SELECT COUNT(*) FROM messenger_messages'));
+    }
+
+    public function testReleaseKeepsAMessageDeliveredAgainSinceItWasFetched()
+    {
+        $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $fetched = $this->connection->get();
+
+        // the redeliver timeout passed and another worker received the message
+        $this->driverConnection->executeStatement('UPDATE messenger_messages SET delivered_at = ? WHERE id = ?', ['2099-01-01 00:00:00', $fetched[0]['id']]);
+
+        $this->connection->release();
+
+        $this->assertSame('2099-01-01 00:00:00', $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$fetched[0]['id']]));
+    }
+
+    public function testReleaseMakesAMessageKeptAliveAvailableAgain()
+    {
+        $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $fetched = $this->connection->get();
+
+        // the keepalive must write another delivery time than the fetch
+        time_sleep_until(floor(microtime(true)) + 1.01);
+        $this->connection->keepalive($fetched[0]['id']);
+
+        $this->connection->release();
+
+        $this->assertSame('{"message": "Hi"}', $this->connection->get()[0]['body']);
+    }
+
+    public function testAWorkerStoppedByItsMessageLimitReleasesTheRestOfTheFetchedMessages()
+    {
+        $transport = new DoctrineTransport($this->connection, new PhpSerializer());
+        $transport->send(new Envelope(new DummyMessage('first')));
+        $transport->send(new Envelope(new DummyMessage('second')));
+
+        $handled = [];
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [static function (DummyMessage $message) use (&$handled) { $handled[] = $message->getMessage(); }],
+        ]))]);
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run(['sleep' => 0, 'fetch_size' => 2]);
+
+        $this->assertSame(['first'], $handled);
+        $next = $this->connection->get();
+        $this->assertNotNull($next, 'The message the worker did not reach waits for the redeliver timeout.');
+        $this->assertStringContainsString('second', $next[0]['body']);
     }
 
     public function testSendWithDelay()

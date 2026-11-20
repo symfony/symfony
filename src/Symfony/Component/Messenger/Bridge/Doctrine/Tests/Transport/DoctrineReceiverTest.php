@@ -365,6 +365,16 @@ class DoctrineReceiverTest extends TestCase
         $receiver->keepalive($envelope);
     }
 
+    public function testCloseReleasesTheFetchedMessages()
+    {
+        $connection = $this->createMock(Connection::class);
+        $receiver = new DoctrineReceiver($connection, $this->createSerializer());
+
+        $connection->expects($this->once())->method('release');
+
+        $receiver->close();
+    }
+
     public function testAckRetriesADeadlockReportedByTheConnection()
     {
         $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);

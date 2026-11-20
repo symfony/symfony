@@ -62,6 +62,13 @@ class Connection implements ResetInterface
     private bool $autoSetup;
 
     /**
+     * The delivery time of the messages get() returned that were neither acknowledged nor rejected yet, by id.
+     *
+     * @var array<string, \DateTimeImmutable>
+     */
+    private array $deliveredAt = [];
+
+    /**
      * Constructor.
      *
      * Available options:
@@ -247,6 +254,10 @@ class Connection implements ResetInterface
 
             $this->driverConnection->commit();
 
+            foreach ($doctrineEnvelopes as $doctrineEnvelope) {
+                $this->deliveredAt[$doctrineEnvelope['id']] = $now;
+            }
+
             return $doctrineEnvelopes;
         } catch (\Throwable $e) {
             if ($this->driverConnection->isTransactionActive()) {
@@ -264,6 +275,8 @@ class Connection implements ResetInterface
 
     public function ack(string $id): bool
     {
+        unset($this->deliveredAt[$id]);
+
         try {
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
         } catch (DBALException $exception) {
@@ -273,6 +286,8 @@ class Connection implements ResetInterface
 
     public function reject(string $id): bool
     {
+        unset($this->deliveredAt[$id]);
+
         try {
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
         } catch (DBALException $exception) {
@@ -296,13 +311,46 @@ class Connection implements ResetInterface
                 ->set('delivered_at', '?')
                 ->where('id = ?');
             $this->executeStatement($queryBuilder->getSQL(), [
-                new \DateTimeImmutable('UTC'),
+                $now = new \DateTimeImmutable('UTC'),
                 $id,
             ], [
                 Types::DATETIME_IMMUTABLE,
             ]);
         } catch (\Throwable $e) {
             throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        if (isset($this->deliveredAt[$id])) {
+            $this->deliveredAt[$id] = $now;
+        }
+    }
+
+    /**
+     * Makes the messages get() returned that were neither acknowledged nor rejected available again,
+     * unless they were delivered again since, e.g. to another worker after the redeliver timeout.
+     */
+    public function release(): void
+    {
+        $deliveredAt = $this->deliveredAt;
+        $this->deliveredAt = [];
+
+        try {
+            $queryBuilder = $this->driverConnection->createQueryBuilder()
+                ->update($this->configuration['table_name'])
+                ->set('delivered_at', 'NULL')
+                ->where('delivered_at = ?')
+                ->andWhere('id = ?');
+
+            foreach ($deliveredAt as $id => $at) {
+                $this->executeStatement($queryBuilder->getSQL(), [
+                    $at,
+                    $id,
+                ], [
+                    Types::DATETIME_IMMUTABLE,
+                ]);
+            }
+        } catch (DBALException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
         }
     }
 

@@ -50,6 +50,10 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected NodeBuilder $nodeBuilder;
     protected bool $normalizeKeys = true;
 
+    private bool $normalizeKeysConfigured = false;
+    private ?bool $recursiveNormalizeKeys = null;
+    private ?bool $inheritedNormalizeKeys = null;
+
     /**
      * @var list<ExprBuilder::TYPE_*>|null
      */
@@ -476,8 +480,23 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     public function normalizeKeys(bool $bool): static
     {
         $this->normalizeKeys = $bool;
+        $this->normalizeKeysConfigured = true;
 
         return $this;
+    }
+
+    /**
+     * Sets key normalization for this node and the default for its descendant array nodes.
+     *
+     * Descendants can override this default with normalizeKeys() or normalizeKeysRecursively().
+     *
+     * @return $this
+     */
+    public function normalizeKeysRecursively(bool $bool): static
+    {
+        $this->recursiveNormalizeKeys = $bool;
+
+        return $this->normalizeKeys($bool);
     }
 
     public function append(NodeDefinition $node): static
@@ -501,6 +520,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     protected function createNode(): NodeInterface
     {
+        $recursiveNormalizeKeys = $this->recursiveNormalizeKeys ?? $this->inheritedNormalizeKeys;
+
         if (!isset($this->prototype)) {
             $node = new ArrayNode($this->name, $this->parent, $this->pathSeparator);
 
@@ -509,8 +530,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             $node->setAddIfNotSet($this->addDefaults);
 
             foreach ($this->children as $child) {
-                $child->parent = $node;
-                $node->addChild($child->getNode());
+                $node->addChild($this->createChildNode($child, $node, $recursiveNormalizeKeys));
             }
         } else {
             $node = new PrototypedArrayNode($this->name, $this->parent, $this->pathSeparator);
@@ -542,8 +562,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                 }
             }
 
-            $this->prototype->parent = $node;
-            $node->setPrototype($this->prototype->getNode());
+            $node->setPrototype($this->createChildNode($this->prototype, $node, $recursiveNormalizeKeys));
         }
 
         $node->setAllowNewKeys($this->allowNewKeys);
@@ -553,7 +572,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $node->setPerformDeepMerging($this->performDeepMerging);
         $node->setRequired($this->required);
         $node->setIgnoreExtraKeys($this->ignoreExtraKeys, $this->removeExtraKeys);
-        $node->setNormalizeKeys($this->normalizeKeys);
+        $node->setNormalizeKeys($this->normalizeKeysConfigured ? $this->normalizeKeys : ($recursiveNormalizeKeys ?? $this->normalizeKeys));
 
         if ($this->deprecation) {
             $node->setDeprecated($this->deprecation['package'], $this->deprecation['version'], $this->deprecation['message']);
@@ -705,6 +724,22 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         }
 
         return $node->find(substr($nodePath, $pathSeparatorPos + \strlen($this->pathSeparator)));
+    }
+
+    private function createChildNode(NodeDefinition $definition, ArrayNode $parent, ?bool $normalizeKeys): NodeInterface
+    {
+        $definition->parent = $parent;
+        if (!$definition instanceof self) {
+            return $definition->getNode();
+        }
+
+        $inheritedNormalizeKeys = $definition->inheritedNormalizeKeys;
+        $definition->inheritedNormalizeKeys = $normalizeKeys;
+        try {
+            return $definition->getNode();
+        } finally {
+            $definition->inheritedNormalizeKeys = $inheritedNormalizeKeys;
+        }
     }
 
     /**

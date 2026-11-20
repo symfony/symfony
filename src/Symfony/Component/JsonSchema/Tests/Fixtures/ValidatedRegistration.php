@@ -19,6 +19,12 @@ class ValidatedRegistration
     #[Assert\Length(min: 3, max: 20)]
     public string $username = '';
 
+    #[Assert\Length(exactly: 2, countUnit: Assert\Length::COUNT_BYTES)]
+    public string $code;
+
+    #[Assert\Length(exactly: 1, countUnit: Assert\Length::COUNT_GRAPHEMES)]
+    public string $initial;
+
     #[Assert\Email]
     public ?string $email = null;
 

@@ -126,6 +126,18 @@ class JsonSchemaDumperTest extends TestCase
             'additionalProperties' => ['$ref' => '#/$defs/types/string'],
         ]];
 
+        $nonEmptyMap = (new ArrayNodeDefinition('proto'))
+            ->useAttributeAsKey('name')
+            ->requiresAtLeastOneElement()
+            ->stringPrototype()->end()
+            ->getNode();
+        yield 'key-attribute map requiring at least one element' => [$nonEmptyMap, [
+            '$ref' => '#/$defs/types/object_null',
+            'additionalProperties' => ['$ref' => '#/$defs/types/string_null'],
+            'minProperties' => 1,
+            'minItems' => 1,
+        ]];
+
         $mapWithNormalization = (new ArrayNodeDefinition('proto'))
             ->useAttributeAsKey('name')
             ->stringPrototype()->end()
@@ -400,6 +412,7 @@ class JsonSchemaDumperTest extends TestCase
                     '$ref' => '#/$defs/types/object_null',
                     'additionalProperties' => $item,
                     'minProperties' => 1,
+                    'minItems' => 1,
                 ],
             ],
         ]];

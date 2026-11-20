@@ -15,6 +15,7 @@ CHANGELOG
  * Add `BaseNode::hasNormalizationClosures()` to check if closures are used to normalize the value
  * Add `NodeBuilder::appendFromCallback()` to reuse child node definitions
  * Skip writing the meta files of `ResourceCheckerConfigCache` when it has no resource checkers
+ * Allow `ArrayNodeDefinition::defaultValue()` on array nodes that have no prototype, to set their value when they are not configured, and add `ArrayNode::setDefaultValue()` and `ArrayNode::setNullAsDefault()`
 
 8.0
 ---

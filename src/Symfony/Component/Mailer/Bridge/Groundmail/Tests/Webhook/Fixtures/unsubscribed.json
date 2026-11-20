@@ -1,0 +1,20 @@
+{
+    "type": "contact.unsubscribed",
+    "created_at": "2026-10-17T15:02:11.000Z",
+    "data": {
+        "email": "user@example.com",
+        "source": "unsubscribe",
+        "scope": "category",
+        "category": "product",
+        "category_label": "product emails",
+        "suppression_id": null,
+        "category_opt_out_id": "opt_8f2a",
+        "email_id": "msg_01JC8Q7K2Z",
+        "tags": [
+            {
+                "name": "user_id",
+                "value": "u_42"
+            }
+        ]
+    }
+}

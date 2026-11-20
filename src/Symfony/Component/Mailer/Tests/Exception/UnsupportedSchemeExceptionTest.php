@@ -21,6 +21,7 @@ use Symfony\Component\Mailer\Bridge\Azure\Transport\AzureTransportFactory;
 use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
 use Symfony\Component\Mailer\Bridge\Cloudflare\Transport\CloudflareTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
+use Symfony\Component\Mailer\Bridge\Groundmail\Transport\GroundmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
 use Symfony\Component\Mailer\Bridge\MailerSend\Transport\MailerSendTransportFactory;
@@ -54,6 +55,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             BrevoTransportFactory::class => false,
             CloudflareTransportFactory::class => false,
             GmailTransportFactory::class => false,
+            GroundmailTransportFactory::class => false,
             InfobipTransportFactory::class => false,
             MailPaceTransportFactory::class => false,
             MailerSendTransportFactory::class => false,
@@ -94,6 +96,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['brevo', 'symfony/brevo-mailer'];
         yield ['cloudflare', 'symfony/cloudflare-mailer'];
         yield ['gmail', 'symfony/google-mailer'];
+        yield ['groundmail', 'symfony/groundmail-mailer'];
         yield ['infobip', 'symfony/infobip-mailer'];
         yield ['mailersend', 'symfony/mailersend-mailer'];
         yield ['mailgun', 'symfony/mailgun-mailer'];

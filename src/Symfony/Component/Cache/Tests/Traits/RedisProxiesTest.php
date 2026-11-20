@@ -13,12 +13,76 @@ namespace Symfony\Component\Cache\Tests\Traits;
 
 use PHPUnit\Framework\TestCase;
 use Relay\Relay;
+use Symfony\Component\Cache\Traits\Redis6Proxy;
+use Symfony\Component\Cache\Traits\RedisCluster6Proxy;
 use Symfony\Component\Cache\Traits\RelayProxy;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
 
 class RedisProxiesTest extends TestCase
 {
+    /**
+     * @requires extension redis
+     */
+    public function testRedisLazyProxyForNewCommands()
+    {
+        if (!method_exists(\Redis::class, '_digest')) {
+            $this->markTestSkipped('The Redis extension does not support digest commands.');
+        }
+
+        $calls = 0;
+        $proxy = Redis6Proxy::createLazyProxy(static function () use (&$calls) {
+            ++$calls;
+
+            return new class extends \Redis {
+                public function __construct()
+                {
+                }
+
+                public function _digest($value): string
+                {
+                    return 'digest:'.$value;
+                }
+            };
+        });
+
+        $this->assertSame(0, $calls);
+        $this->assertSame('digest:first', $proxy->_digest('first'));
+        $this->assertSame('digest:second', $proxy->_digest('second'));
+        $this->assertSame(1, $calls);
+    }
+
+    /**
+     * @requires extension redis
+     */
+    public function testRedisClusterLazyProxyForNewCommands()
+    {
+        if (!method_exists(\RedisCluster::class, '_digest')) {
+            $this->markTestSkipped('The Redis extension does not support digest commands.');
+        }
+
+        $calls = 0;
+        $proxy = RedisCluster6Proxy::createLazyProxy(static function () use (&$calls) {
+            ++$calls;
+
+            return new class extends \RedisCluster {
+                public function __construct()
+                {
+                }
+
+                public function _digest($value): string
+                {
+                    return 'digest:'.$value;
+                }
+            };
+        });
+
+        $this->assertSame(0, $calls);
+        $this->assertSame('digest:first', $proxy->_digest('first'));
+        $this->assertSame('digest:second', $proxy->_digest('second'));
+        $this->assertSame(1, $calls);
+    }
+
     /**
      * @requires extension redis
      *

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Cache\Traits;
 
-if (version_compare(phpversion('redis'), '6.3.0', '>=')) {
+if (version_compare(phpversion('redis'), '6.3.0', '>=') || method_exists(\Redis::class, 'hgetWithMeta')) {
     /**
      * @internal
      */

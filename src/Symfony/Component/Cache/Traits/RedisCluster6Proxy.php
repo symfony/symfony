@@ -25,12 +25,15 @@ class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
  */
 class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyObjectInterface
 {
-    use RedisCluster61ProxyTrait;
-    use RedisCluster62ProxyTrait;
-    use RedisCluster63ProxyTrait;
     use LazyProxyTrait {
         resetLazyObject as reset;
     }
+    use RedisCluster61ProxyTrait;
+    use RedisCluster62ProxyTrait;
+    use RedisCluster63ProxyTrait;
+    use RedisCluster64ProxyTrait;
+    use RedisCluster6ProxyTrait;
+    use RedisCluster6ZRevRangeByLexProxyTrait;
 
     private const LAZY_OBJECT_PROPERTY_SCOPES = [];
 
@@ -132,16 +135,6 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
     public function brpoplpush($srckey, $deskey, $timeout): mixed
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->brpoplpush(...\func_get_args());
-    }
-
-    public function lmove($src, $dst, $wherefrom, $whereto): \Redis|false|string
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->lmove(...\func_get_args());
-    }
-
-    public function blmove($src, $dst, $wherefrom, $whereto, $timeout): \Redis|false|string
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->blmove(...\func_get_args());
     }
 
     public function bzpopmax($key, $timeout_or_key, ...$extra_args): array
@@ -547,11 +540,6 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
     public function lpop($key, $count = 0): \RedisCluster|array|bool|string
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->lpop(...\func_get_args());
-    }
-
-    public function lpos($key, $value, $options = null): \Redis|array|bool|int|null
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->lpos(...\func_get_args());
     }
 
     public function lpush($key, $value, ...$other_values): \RedisCluster|bool|int
@@ -1084,11 +1072,6 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zrevrange(...\func_get_args());
     }
 
-    public function zrevrangebylex($key, $min, $max, $options = null): \RedisCluster|array|bool
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zrevrangebylex(...\func_get_args());
-    }
-
     public function zrevrangebyscore($key, $min, $max, $options = null): \RedisCluster|array|bool
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zrevrangebyscore(...\func_get_args());
@@ -1107,11 +1090,6 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
     public function zscore($key, $member): \RedisCluster|false|float
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zscore(...\func_get_args());
-    }
-
-    public function zmscore($key, $member, ...$other_members): \Redis|array|false
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zmscore(...\func_get_args());
     }
 
     public function zunionstore($dst, $keys, $weights = null, $aggregate = null): \RedisCluster|false|int

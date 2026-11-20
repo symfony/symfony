@@ -36,6 +36,7 @@ use Symfony\Component\Mailer\Bridge\PufferPost\Transport\PufferPostTransportFact
 use Symfony\Component\Mailer\Bridge\Resend\Transport\ResendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Scaleway\Transport\ScalewayTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
+use Symfony\Component\Mailer\Bridge\Sendly\Transport\SendlyTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sweego\Transport\SweegoTransportFactory;
 use Symfony\Component\Mailer\Bridge\TurboSmtp\Transport\TurboSmtpTransportFactory;
 use Symfony\Component\Mailer\Bridge\ZohoCpaas\Transport\ZohoCpaasTransportFactory;
@@ -69,6 +70,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             ResendTransportFactory::class => false,
             ScalewayTransportFactory::class => false,
             SendgridTransportFactory::class => false,
+            SendlyTransportFactory::class => false,
             SesTransportFactory::class => false,
             SweegoTransportFactory::class => false,
             TurboSmtpTransportFactory::class => false,
@@ -109,6 +111,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['resend', 'symfony/resend-mailer'];
         yield ['scaleway', 'symfony/scaleway-mailer'];
         yield ['sendgrid', 'symfony/sendgrid-mailer'];
+        yield ['sendly', 'symfony/sendly-mailer'];
         yield ['ses', 'symfony/amazon-mailer'];
         yield ['sweego', 'symfony/sweego-mailer'];
         yield ['turbosmtp', 'symfony/turbo-smtp-mailer'];

@@ -71,6 +71,30 @@ class FactoryRegistryTest extends TestCase
         );
     }
 
+    public function testGeneratorFactoriesCanBeUsedAcrossLookups()
+    {
+        $dsn = new Dsn('memory');
+        $kms = new InMemoryKms();
+        $factory = $this->createStub(KmsFactoryInterface::class);
+        $factory->method('supports')->willReturnCallback(static fn (Dsn $dsn) => 'memory' === $dsn->scheme);
+        $factory->method('create')->willReturn($kms);
+
+        $lastFactoryLoaded = false;
+        $registry = new FactoryRegistry((static function () use ($factory, &$lastFactoryLoaded) {
+            yield self::nonSupporting();
+            yield $factory;
+            $lastFactoryLoaded = true;
+            yield self::nonSupporting();
+        })());
+
+        $this->assertTrue($registry->supports($dsn));
+        $this->assertSame($kms, $registry->create($dsn));
+        $this->assertFalse($lastFactoryLoaded);
+        $this->assertFalse($registry->supports(new Dsn('unknown')));
+        $this->assertTrue($lastFactoryLoaded);
+        $this->assertSame($kms, $registry->create($dsn));
+    }
+
     public function testSupportsReportsTrueWhenAnyFactoryMatches()
     {
         $supporting = new class implements KmsFactoryInterface {

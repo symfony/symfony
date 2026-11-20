@@ -29,6 +29,9 @@ use Symfony\Component\KeyManagement\Exception\UnsupportedSchemeException;
  */
 final class FactoryRegistry implements KmsFactoryInterface
 {
+    /** @var list<KmsFactoryInterface> */
+    private array $loadedFactories = [];
+
     /**
      * @param iterable<KmsFactoryInterface> $factories
      */
@@ -44,7 +47,7 @@ final class FactoryRegistry implements KmsFactoryInterface
 
     public function supports(#[\SensitiveParameter] Dsn $dsn): bool
     {
-        foreach ($this->factories as $factory) {
+        foreach ($this->getFactories() as $factory) {
             if ($factory->supports($dsn)) {
                 return true;
             }
@@ -55,7 +58,7 @@ final class FactoryRegistry implements KmsFactoryInterface
 
     public function create(#[\SensitiveParameter] Dsn $dsn): EncrypterInterface&DecrypterInterface
     {
-        foreach ($this->factories as $factory) {
+        foreach ($this->getFactories() as $factory) {
             if ($factory->supports($dsn)) {
                 return $factory->create($dsn);
             }
@@ -66,5 +69,31 @@ final class FactoryRegistry implements KmsFactoryInterface
         }
 
         throw new UnsupportedSchemeException($dsn);
+    }
+
+    /**
+     * @return iterable<KmsFactoryInterface>
+     */
+    private function getFactories(): iterable
+    {
+        if (!$this->factories instanceof \Generator) {
+            yield from $this->factories;
+
+            return;
+        }
+
+        for ($i = 0;; ++$i) {
+            if (!isset($this->loadedFactories[$i])) {
+                if ($i > 0) {
+                    $this->factories->next();
+                }
+                if (!$this->factories->valid()) {
+                    return;
+                }
+                $this->loadedFactories[] = $this->factories->current();
+            }
+
+            yield $this->loadedFactories[$i];
+        }
     }
 }

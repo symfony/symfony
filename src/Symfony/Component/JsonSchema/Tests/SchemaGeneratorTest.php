@@ -60,6 +60,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\MarkingPropertySchemaEnricher;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NativeObjectProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NestedAttributesBook;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NonSerializableProperties;
+use Symfony\Component\JsonSchema\Tests\Fixtures\NullableConstraints;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NullableUnionChoice;
 use Symfony\Component\JsonSchema\Tests\Fixtures\PrivatelyConstructedSnapshot;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ProductPair;
@@ -156,6 +157,7 @@ class SchemaGeneratorTest extends TestCase
             NativeObjectProperties::class,
             NestedAttributesBook::class,
             NonSerializableProperties::class,
+            NullableConstraints::class,
             NullableUnionChoice::class,
             PrivatelyConstructedSnapshot::class,
             ProductPair::class,
@@ -1048,7 +1050,7 @@ class SchemaGeneratorTest extends TestCase
         $schema = SchemaGenerator::create()->generate(Type::object(ValidatedRegistration::class), new Configuration(validationGroups: ['registration:create']));
         $definition = $schema->getDefinitions()['ValidatedRegistration-validation.registration.create'];
 
-        $this->assertSameSchema(['type' => ['string', 'null'], 'minLength' => 1, 'maxLength' => 10], $definition['properties']['invitationCode']);
+        $this->assertSameSchema(['type' => 'string', 'minLength' => 1, 'maxLength' => 10], $definition['properties']['invitationCode']);
         $this->assertSameSchema(['type' => 'string', 'default' => ''], $definition['properties']['username']);
         $this->assertSame(['invitationCode'], $definition['required']);
     }

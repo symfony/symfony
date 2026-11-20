@@ -139,6 +139,10 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
      */
     private function apply(Constraint $constraint, array $schema, Dialect $dialect, ?Type $type): array
     {
+        if (($constraint instanceof NotBlank && !$constraint->allowNull) || $constraint instanceof NotNull) {
+            $schema = DialectKeywords::withoutNull($schema);
+        }
+
         [$values, $minCount, $maxCount] = \in_array('object', (array) ($schema['type'] ?? []), true) ? ['additionalProperties', 'minProperties', 'maxProperties'] : ['items', 'minItems', 'maxItems'];
 
         return match (true) {

@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Routing\Loader;
 
+use Symfony\Component\Routing\Attribute\RouteDeprecation;
 use Symfony\Component\Routing\Controller\RedirectController;
+use Symfony\Component\Routing\Exception\InvalidArgumentException;
 use Symfony\Component\Routing\Loader\Configurator\Traits\HostTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\LocalizedRouteTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\PrefixTrait;
@@ -30,7 +32,7 @@ trait ContentLoaderTrait
      * Config keys accepted at the route or import level by {@see validate()}.
      */
     private const AVAILABLE_KEYS = [
-        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'add_condition', 'controller', 'template', 'redirect_to_route', 'redirect_to', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless', 'firewall',
+        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'add_condition', 'controller', 'template', 'redirect_to_route', 'redirect_to', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless', 'firewall', 'deprecation',
     ];
 
     /**
@@ -123,6 +125,9 @@ trait ContentLoaderTrait
         if (isset($config['firewall'])) {
             $defaults['_firewall'] = $config['firewall'];
         }
+        if (isset($config['deprecation'])) {
+            $defaults['_deprecation'] = RouteDeprecation::fromArray($config['deprecation'])->toArray();
+        }
 
         $routes = $this->createLocalizedRoute(new RouteCollection(), $name, $config['path']);
         $routes->addDefaults($defaults);
@@ -176,6 +181,9 @@ trait ContentLoaderTrait
         }
         if (isset($config['firewall'])) {
             $defaults['_firewall'] = $config['firewall'];
+        }
+        if (isset($config['deprecation'])) {
+            $defaults['_deprecation'] = RouteDeprecation::fromArray($config['deprecation'])->toArray();
         }
 
         $this->setCurrentDir(\dirname($path));
@@ -277,6 +285,19 @@ trait ContentLoaderTrait
         }
         if (isset($config['firewall']) && isset($config['defaults']['_firewall'])) {
             throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "firewall" key and the defaults key "_firewall" for "%s".', $path, $name));
+        }
+        if (isset($config['deprecation'])) {
+            if (isset($config['defaults']['_deprecation'])) {
+                throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "deprecation" key and the defaults key "_deprecation" for "%s".', $path, $name));
+            }
+            if (!\is_array($config['deprecation'])) {
+                throw new \InvalidArgumentException(\sprintf('The "deprecation" key for "%s" in "%s" must be an array, "%s" given.', $name, $path, get_debug_type($config['deprecation'])));
+            }
+            try {
+                RouteDeprecation::fromArray($config['deprecation']);
+            } catch (InvalidArgumentException $e) {
+                throw new \InvalidArgumentException(\sprintf('The "deprecation" key for "%s" in "%s" is invalid: "%s"', $name, $path, $e->getMessage()), 0, $e);
+            }
         }
     }
 

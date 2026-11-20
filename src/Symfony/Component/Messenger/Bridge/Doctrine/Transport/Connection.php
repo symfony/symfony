@@ -62,6 +62,13 @@ class Connection implements ResetInterface
     private bool $autoSetup;
 
     /**
+     * The delivery time of the messages get() returned that were neither acknowledged nor rejected yet, by id.
+     *
+     * @var array<string, \DateTimeImmutable>
+     */
+    private array $deliveredAt = [];
+
+    /**
      * Constructor.
      *
      * Available options:
@@ -247,6 +254,10 @@ class Connection implements ResetInterface
 
             $this->driverConnection->commit();
 
+            foreach ($doctrineEnvelopes as $doctrineEnvelope) {
+                $this->deliveredAt[$doctrineEnvelope['id']] = $now;
+            }
+
             return $doctrineEnvelopes;
         } catch (\Throwable $e) {
             if ($this->driverConnection->isTransactionActive()) {
@@ -264,6 +275,8 @@ class Connection implements ResetInterface
 
     public function ack(string $id): bool
     {
+        unset($this->deliveredAt[$id]);
+
         try {
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
         } catch (DBALException $exception) {
@@ -273,6 +286,8 @@ class Connection implements ResetInterface
 
     public function reject(string $id): bool
     {
+        unset($this->deliveredAt[$id]);
+
         try {
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
         } catch (DBALException $exception) {
@@ -290,19 +305,59 @@ class Connection implements ResetInterface
         // No transaction here: the keepalive runs from a SIGALRM handler that can interrupt the
         // connection between the driver call and the nesting-level update, where beginTransaction()
         // would issue a SAVEPOINT against an idle session and corrupt the nesting state.
+        $deliveredAt = $this->deliveredAt[$id] ?? null;
+
         try {
             $queryBuilder = $this->driverConnection->createQueryBuilder()
                 ->update($this->configuration['table_name'])
                 ->set('delivered_at', '?')
                 ->where('id = ?');
-            $this->executeStatement($queryBuilder->getSQL(), [
-                new \DateTimeImmutable('UTC'),
-                $id,
-            ], [
-                Types::DATETIME_IMMUTABLE,
-            ]);
+            $parameters = [$now = new \DateTimeImmutable('UTC'), $id];
+            $types = [Types::DATETIME_IMMUTABLE];
+
+            // Leave the message alone when another worker received it since, after the redeliver timeout
+            if (null !== $deliveredAt) {
+                $queryBuilder->andWhere('delivered_at = ?');
+                $parameters[] = $deliveredAt;
+                $types[2] = Types::DATETIME_IMMUTABLE;
+            }
+
+            $updated = $this->executeStatement($queryBuilder->getSQL(), $parameters, $types);
         } catch (\Throwable $e) {
             throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        if (null !== $deliveredAt && $updated > 0) {
+            $this->deliveredAt[$id] = $now;
+        }
+    }
+
+    /**
+     * Makes the messages get() returned that were neither acknowledged nor rejected available again,
+     * unless they were delivered again since, e.g. to another worker after the redeliver timeout.
+     */
+    public function release(): void
+    {
+        $deliveredAt = $this->deliveredAt;
+        $this->deliveredAt = [];
+
+        try {
+            $queryBuilder = $this->driverConnection->createQueryBuilder()
+                ->update($this->configuration['table_name'])
+                ->set('delivered_at', 'NULL')
+                ->where('delivered_at = ?')
+                ->andWhere('id = ?');
+
+            foreach ($deliveredAt as $id => $at) {
+                $this->executeStatement($queryBuilder->getSQL(), [
+                    $at,
+                    $id,
+                ], [
+                    Types::DATETIME_IMMUTABLE,
+                ]);
+            }
+        } catch (DBALException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
         }
     }
 

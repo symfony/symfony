@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\CloseableTransportInterface;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
@@ -27,7 +28,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  */
-class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareInterface, KeepaliveReceiverInterface
+class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareInterface, KeepaliveReceiverInterface, CloseableTransportInterface
 {
     private const MAX_RETRIES = 3;
     private int $retryingSafetyCounter = 0;
@@ -99,6 +100,15 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
         $this->withRetryableExceptionRetry(function () use ($envelope) {
             $this->connection->reject($this->findDoctrineReceivedStampId($envelope));
         });
+    }
+
+    /**
+     * Makes the fetched messages that were neither acknowledged nor rejected available again,
+     * e.g. the rest of a batch fetched with --fetch-size when the worker stops.
+     */
+    public function close(): void
+    {
+        $this->connection->release();
     }
 
     public function getMessageCount(): int

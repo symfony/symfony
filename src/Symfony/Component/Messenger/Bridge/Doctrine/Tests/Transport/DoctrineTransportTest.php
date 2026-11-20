@@ -117,6 +117,18 @@ class DoctrineTransportTest extends TestCase
         $transport->keepalive($envelope);
     }
 
+    public function testCloseReleasesTheFetchedMessages()
+    {
+        $transport = $this->getTransport(
+            null,
+            $connection = $this->createMock(Connection::class)
+        );
+
+        $connection->expects($this->once())->method('release');
+
+        $transport->close();
+    }
+
     private function getTransport(?SerializerInterface $serializer = null, ?Connection $connection = null): DoctrineTransport
     {
         $serializer ??= $this->createStub(SerializerInterface::class);

@@ -305,22 +305,29 @@ class Connection implements ResetInterface
         // No transaction here: the keepalive runs from a SIGALRM handler that can interrupt the
         // connection between the driver call and the nesting-level update, where beginTransaction()
         // would issue a SAVEPOINT against an idle session and corrupt the nesting state.
+        $deliveredAt = $this->deliveredAt[$id] ?? null;
+
         try {
             $queryBuilder = $this->driverConnection->createQueryBuilder()
                 ->update($this->configuration['table_name'])
                 ->set('delivered_at', '?')
                 ->where('id = ?');
-            $this->executeStatement($queryBuilder->getSQL(), [
-                $now = new \DateTimeImmutable('UTC'),
-                $id,
-            ], [
-                Types::DATETIME_IMMUTABLE,
-            ]);
+            $parameters = [$now = new \DateTimeImmutable('UTC'), $id];
+            $types = [Types::DATETIME_IMMUTABLE];
+
+            // Leave the message alone when another worker received it since, after the redeliver timeout
+            if (null !== $deliveredAt) {
+                $queryBuilder->andWhere('delivered_at = ?');
+                $parameters[] = $deliveredAt;
+                $types[2] = Types::DATETIME_IMMUTABLE;
+            }
+
+            $updated = $this->executeStatement($queryBuilder->getSQL(), $parameters, $types);
         } catch (\Throwable $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
-        if (isset($this->deliveredAt[$id])) {
+        if (null !== $deliveredAt && $updated > 0) {
             $this->deliveredAt[$id] = $now;
         }
     }

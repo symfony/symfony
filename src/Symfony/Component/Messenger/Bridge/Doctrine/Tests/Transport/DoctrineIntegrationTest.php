@@ -63,24 +63,30 @@ class DoctrineIntegrationTest extends TestCase
     {
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
         $encoded = $this->connection->get();
-        $this->driverConnection->executeStatement('UPDATE messenger_messages SET delivered_at = ? WHERE id = ?', ['2000-01-01 00:00:00', $encoded[0]['id']]);
+        $fetchedAt = $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$encoded[0]['id']]);
+
+        // the keepalive must write another delivery time than the fetch
+        time_sleep_until(floor(microtime(true)) + 1.01);
 
         $this->connection->keepalive($encoded[0]['id']);
 
-        $this->assertNotSame('2000-01-01 00:00:00', $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$encoded[0]['id']]));
+        $this->assertNotSame($fetchedAt, $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$encoded[0]['id']]));
     }
 
     public function testKeepaliveWhileTheConnectionIsInATransaction()
     {
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
         $encoded = $this->connection->get();
-        $this->driverConnection->executeStatement('UPDATE messenger_messages SET delivered_at = ? WHERE id = ?', ['2000-01-01 00:00:00', $encoded[0]['id']]);
+        $fetchedAt = $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$encoded[0]['id']]);
+
+        // the keepalive must write another delivery time than the fetch
+        time_sleep_until(floor(microtime(true)) + 1.01);
 
         $this->driverConnection->beginTransaction();
         $this->connection->keepalive($encoded[0]['id']);
         $this->driverConnection->commit();
 
-        $this->assertNotSame('2000-01-01 00:00:00', $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$encoded[0]['id']]));
+        $this->assertNotSame($fetchedAt, $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$encoded[0]['id']]));
     }
 
     public function testReleaseMakesTheFetchedMessagesThatWereNotHandledAvailableAgain()
@@ -126,6 +132,24 @@ class DoctrineIntegrationTest extends TestCase
         $this->connection->release();
 
         $this->assertSame('{"message": "Hi"}', $this->connection->get()[0]['body']);
+    }
+
+    public function testAKeepaliveAfterAnotherWorkerTookTheMessageOverLeavesItWithThatWorker()
+    {
+        $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $id = $this->connection->get()[0]['id'];
+
+        // the redeliver timeout (0 seconds here) passed and another worker received the message
+        time_sleep_until(floor(microtime(true)) + 1.01);
+        $this->assertSame($id, (new Connection(['redeliver_timeout' => 0], $this->driverConnection))->get()[0]['id']);
+        $takenOverAt = $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$id]);
+
+        // the first worker sends a late keepalive, then stops
+        $this->connection->keepalive($id);
+        $this->connection->release();
+
+        $this->assertSame($takenOverAt, $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$id]));
+        $this->assertNull((new Connection([], $this->driverConnection))->get(), 'A third worker received the message the second worker holds.');
     }
 
     public function testAWorkerStoppedByItsMessageLimitReleasesTheRestOfTheFetchedMessages()

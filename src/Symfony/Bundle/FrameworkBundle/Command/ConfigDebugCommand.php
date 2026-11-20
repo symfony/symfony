@@ -151,6 +151,9 @@ class ConfigDebugCommand extends AbstractConfigCommand
         $kernel = clone $this->getApplication()->getKernel();
         $kernel->boot();
 
+        // booting may have built the container with the extensions of the bundles already; an extension is loaded once only
+        (new \ReflectionMethod($kernel, 'initializeBundles'))->invoke($kernel);
+
         $method = new \ReflectionMethod($kernel, 'buildContainer');
         $container = $method->invoke($kernel);
         if ($this->envVarProcessors) {

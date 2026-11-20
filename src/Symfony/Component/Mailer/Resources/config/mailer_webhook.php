@@ -37,6 +37,8 @@ use Symfony\Component\Mailer\Bridge\Scaleway\RemoteEvent\ScalewayPayloadConverte
 use Symfony\Component\Mailer\Bridge\Scaleway\Webhook\ScalewayRequestParser;
 use Symfony\Component\Mailer\Bridge\Sendgrid\RemoteEvent\SendgridPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Webhook\SendgridRequestParser;
+use Symfony\Component\Mailer\Bridge\Sendora\RemoteEvent\SendoraPayloadConverter;
+use Symfony\Component\Mailer\Bridge\Sendora\Webhook\SendoraRequestParser;
 use Symfony\Component\Mailer\Bridge\Sweego\RemoteEvent\SweegoPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Sweego\Webhook\SweegoRequestParser;
 use Symfony\Component\Mailer\Bridge\TurboSmtp\RemoteEvent\TurboSmtpPayloadConverter;
@@ -110,6 +112,10 @@ return static function (ContainerConfigurator $container) {
         ->set('mailer.webhook.request_parser.sendgrid', SendgridRequestParser::class)
             ->args([service('mailer.payload_converter.sendgrid'), service('clock')->nullOnInvalid()])
         ->alias(SendgridRequestParser::class, 'mailer.webhook.request_parser.sendgrid')
+
+        ->set('mailer.payload_converter.sendora', SendoraPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.sendora', SendoraRequestParser::class)
+            ->args([service('mailer.payload_converter.sendora'), service('clock')->nullOnInvalid()])
 
         ->set('mailer.payload_converter.sweego', SweegoPayloadConverter::class)
         ->set('mailer.webhook.request_parser.sweego', SweegoRequestParser::class)

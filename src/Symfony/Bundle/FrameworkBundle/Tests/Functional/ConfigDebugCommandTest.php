@@ -85,6 +85,24 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('secret: test', $tester->getDisplay());
     }
 
+    public function testDumpWhenTheCachedContainerIsStale()
+    {
+        // a resource dated in the future keeps the cached container stale, so the command's copy of the kernel builds the container again when it boots
+        $configFile = __DIR__.'/app/ConfigDump/config.yml';
+        $mtime = filemtime($configFile);
+        touch($configFile, time() + 10);
+
+        try {
+            $tester = $this->createCommandTester(true);
+            $ret = $tester->execute(['name' => 'framework', 'path' => 'secret']);
+        } finally {
+            touch($configFile, $mtime);
+        }
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('test', $tester->getDisplay());
+    }
+
     /**
      * @testWith [true]
      *           [false]

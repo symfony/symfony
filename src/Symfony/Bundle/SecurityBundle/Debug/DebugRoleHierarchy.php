@@ -54,13 +54,7 @@ final class DebugRoleHierarchy extends RoleHierarchy
      */
     public function getHierarchy(array $roles = []): array
     {
-        $hierarchy = [];
-
-        foreach ($roles ?: array_keys($this->debugHierarchy) as $role) {
-            $hierarchy += $this->buildHierarchy([$role]);
-        }
-
-        return $hierarchy;
+        return $this->buildHierarchy($roles ?: array_keys($this->debugHierarchy));
     }
 
     /**
@@ -81,23 +75,16 @@ final class DebugRoleHierarchy extends RoleHierarchy
         return \in_array($role, array_keys($this->rolePlaceholdersPatterns));
     }
 
-    private function buildHierarchy(array $roles, array &$visited = []): array
+    private function buildHierarchy(array $roles, array $ancestors = []): array
     {
         $tree = [];
         foreach ($roles as $role) {
-            $visited[] = $role;
+            if (isset($ancestors[$role]) || isset($tree[$role])) {
+                continue;
+            }
 
-            $tree[$role] = [];
-
-            // Get placeholders matches
-            $placeholders = array_diff($this->getMatchingPlaceholders([$role]), $visited) ?? [];
-            array_push($visited, ...$placeholders);
-            $tree[$role] += $this->buildHierarchy($placeholders, $visited);
-
-            // Get regular inherited roles
-            $inherited = array_diff($this->debugHierarchy[$role] ?? [], $visited);
-            array_push($visited, ...$inherited);
-            $tree[$role] += $this->buildHierarchy($inherited, $visited);
+            $inherited = array_merge($this->getMatchingPlaceholders([$role]), $this->debugHierarchy[$role] ?? []);
+            $tree[$role] = $this->buildHierarchy($inherited, $ancestors + [$role => true]);
         }
 
         return $tree;

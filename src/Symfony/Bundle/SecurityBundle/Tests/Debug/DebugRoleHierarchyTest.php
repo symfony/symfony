@@ -36,6 +36,23 @@ class DebugRoleHierarchyTest extends TestCase
         ], $debugRoleHierarchy->getHierarchy());
     }
 
+    public function testSharedInheritedRoleAppearsInBothBranches()
+    {
+        $hierarchy = new DebugRoleHierarchy([
+            'ROLE_ADMIN' => ['ROLE_EDITOR', 'ROLE_REVIEWER'],
+            'ROLE_EDITOR' => ['ROLE_USER'],
+            'ROLE_REVIEWER' => ['ROLE_USER'],
+            'ROLE_USER' => ['ROLE_ADMIN'],
+        ]);
+
+        $this->assertSame([
+            'ROLE_ADMIN' => [
+                'ROLE_EDITOR' => ['ROLE_USER' => []],
+                'ROLE_REVIEWER' => ['ROLE_USER' => []],
+            ],
+        ], $hierarchy->getHierarchy(['ROLE_ADMIN']));
+    }
+
     public function testBuildHierarchyWithPlaceholders()
     {
         $debugRoleHierarchy = new DebugRoleHierarchy([

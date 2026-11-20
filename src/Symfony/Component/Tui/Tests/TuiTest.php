@@ -74,6 +74,25 @@ class TuiTest extends TestCase
         $this->assertSame(2, $tui->getWidgetRect($third)?->row, 'A widget starts where the one above it ends.');
     }
 
+    public function testAllReturnsTheWidgetsAddedToTheRoot()
+    {
+        $tui = new Tui(terminal: new VirtualTerminal());
+
+        $this->assertSame([], $tui->all());
+
+        $tui->add($first = new TextWidget('First'));
+        $tui->add($container = new ContainerWidget());
+        $container->add(new TextWidget('Nested'));
+
+        $this->assertSame([$first, $container], $tui->all(), 'Only the direct children of the root are listed.');
+
+        $tui->remove($first);
+        $this->assertSame([$container], $tui->all());
+
+        $tui->clear();
+        $this->assertSame([], $tui->all());
+    }
+
     public function testGetWidgetRectReturnsNullForAWidgetThatWasNotDrawn()
     {
         $terminal = new VirtualTerminal(40, 10);

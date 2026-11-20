@@ -80,6 +80,7 @@ class DumpExtensionTest extends TestCase
             $dump = preg_replace('/^.*?<pre/', '<pre', $dump);
             $dump = preg_replace('/sf-dump-\d+/', 'sf-dump', $dump);
             $dump = preg_replace('/<samp [^>]++>/', '<samp>', $dump);
+            $dump = preg_replace('/(<span class=sf-dump-key) data-key="[^"]*"/', '$1', $dump);
         }
         $this->assertEquals($expectedOutput, $dump);
     }

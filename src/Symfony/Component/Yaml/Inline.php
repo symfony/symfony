@@ -1014,6 +1014,10 @@ class Inline
                     case Parser::preg_match('/^(-|\+)?[0-9][0-9_]*(\.[0-9_]+)?$/', $scalar):
                         return (float) str_replace('_', '', $scalar);
                     case Parser::preg_match(self::getTimestampRegex(), $scalar):
+                        if (Yaml::PARSE_DATETIME_AS_STRING & $flags) {
+                            return $scalar;
+                        }
+
                         try {
                             // When no timezone is provided in the parsed date, YAML spec says we must assume UTC.
                             $time = new \DateTimeImmutable($scalar, new \DateTimeZone('UTC'));

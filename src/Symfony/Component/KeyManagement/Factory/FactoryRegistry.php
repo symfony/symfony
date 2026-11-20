@@ -83,17 +83,17 @@ final class FactoryRegistry implements KmsFactoryInterface
         }
 
         for ($i = 0;; ++$i) {
-            if (!isset($this->loadedFactories[$i])) {
+            if (null === $factory = $this->loadedFactories[$i] ?? null) {
                 if ($i > 0) {
                     $this->factories->next();
                 }
-                if (!$this->factories->valid()) {
+                if (null === $factory = $this->factories->current()) {
                     return;
                 }
-                $this->loadedFactories[] = $this->factories->current();
+                $this->loadedFactories[] = $factory;
             }
 
-            yield $this->loadedFactories[$i];
+            yield $factory;
         }
     }
 }

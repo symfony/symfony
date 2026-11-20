@@ -780,6 +780,89 @@ class ProcessTest extends TestCase
         $process->setIdleTimeout(1);
     }
 
+    public function testDisableInputGivesTheNullDeviceAsStandardInput()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('There is no /dev/null on Windows.');
+        }
+
+        $code = 'echo fstat(STDIN)["rdev"] === stat("/dev/null")["rdev"] ? "null device" : "not the null device";';
+
+        $process = $this->getProcessForCode($code);
+        $this->assertFalse($process->isInputDisabled());
+        $process->run();
+        $this->assertSame('not the null device', $process->getOutput());
+
+        $this->assertSame($process, $process->disableInput());
+        $this->assertTrue($process->isInputDisabled());
+        $process->run();
+        $this->assertSame('null device', $process->getOutput());
+
+        $this->assertSame($process, $process->enableInput());
+        $this->assertFalse($process->isInputDisabled());
+        $process->run();
+        $this->assertSame('not the null device', $process->getOutput());
+    }
+
+    public function testDisableInputGivesNoInput()
+    {
+        $process = $this->getProcessForCode('echo json_encode(stream_get_contents(STDIN));');
+        $process->disableInput();
+        $process->run();
+
+        $this->assertSame(0, $process->getExitCode());
+        $this->assertSame('""', $process->getOutput());
+    }
+
+    public function testDisableInputWhileStdioIsInherited()
+    {
+        $process = $this->getProcess([self::$phpBin, __DIR__.'/InheritStdioProcess.php', '-e', self::$phpBin, '-c', 'echo "out: ".stream_get_contents(STDIN);', '-d'], null, null, 'stdin of the parent');
+        $process->run();
+
+        $this->assertSame('out: '.\PHP_EOL.'exit code: 0'.\PHP_EOL.'captured output: ""', $process->getOutput());
+    }
+
+    public function testDisableInputWhileRunning()
+    {
+        $process = $this->getProcessForCode('sleep(30);');
+        $process->start();
+
+        try {
+            $process->disableInput();
+            $this->fail('A RuntimeException should have been thrown.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('Disabling input while the process is running is not possible.', $e->getMessage());
+        }
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Enabling input while the process is running is not possible.');
+
+        $process->enableInput();
+    }
+
+    #[DataProvider('provideDisabledInputConflicts')]
+    public function testDisabledInputConflicts(callable $configure, string $message)
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage($message);
+
+        $configure($this->getProcess('foo'));
+    }
+
+    public static function provideDisabledInputConflicts(): iterable
+    {
+        yield 'input set' => [static fn (Process $p) => $p->setInput('input')->disableInput(), 'Input cannot be disabled while an input is set.'];
+        yield 'input disabled, then set' => [static fn (Process $p) => $p->disableInput()->setInput(null)->setInput('input'), 'Input cannot be set while the input is disabled.'];
+        if (Process::isTtySupported()) {
+            yield 'TTY enabled' => [static fn (Process $p) => $p->setTty(true)->disableInput(), 'Input cannot be disabled while the TTY mode is enabled.'];
+        }
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            yield 'input disabled, then TTY' => [static fn (Process $p) => $p->disableInput()->setTty(true), 'TTY mode cannot be enabled while the input is disabled.'];
+        }
+        yield 'PTY enabled' => [static fn (Process $p) => $p->setPty(true)->disableInput(), 'Input cannot be disabled while the PTY mode is enabled.'];
+        yield 'input disabled, then PTY' => [static fn (Process $p) => $p->disableInput()->setPty(true), 'PTY mode cannot be enabled while the input is disabled.'];
+    }
+
     public function testExitCodeTextIsNullWhenExitCodeIsNull()
     {
         $process = $this->getProcess('');

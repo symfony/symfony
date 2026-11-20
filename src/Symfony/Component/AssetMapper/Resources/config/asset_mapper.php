@@ -198,7 +198,10 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('asset_mapper.importmap.resolver', JsDelivrEsmResolver::class)
-            ->args([service('asset_mapper.http_client')])
+            ->args([
+                service('asset_mapper.http_client'),
+                abstract_arg('download license files'),
+            ])
 
         ->set('asset_mapper.importmap.renderer', ImportMapRenderer::class)
             ->args([

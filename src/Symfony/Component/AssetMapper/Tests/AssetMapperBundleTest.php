@@ -20,7 +20,9 @@ use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 use Symfony\Component\AssetMapper\AssetMapperBundle;
 use Symfony\Component\AssetMapper\AssetMapperDevServerSubscriber;
 use Symfony\Component\AssetMapper\Compressor\CompressorInterface;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\Definition\Configuration;
@@ -36,6 +38,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class AssetMapperBundleTest extends TestCase
@@ -249,6 +252,29 @@ class AssetMapperBundleTest extends TestCase
         $this->assertSame($this->varDir.'/public/static', $container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')->getArgument(0));
     }
 
+    #[TestWith([null])]
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testLicenseDownloadsAreOptIn(?bool $enabled)
+    {
+        $config = null === $enabled ? [] : ['importmap_download_licenses' => $enabled];
+        $kernel = new TestAssetMapperKernel('test', true, $this->varDir, true, $config);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        $httpClient = $container->get('test.http_client');
+        $httpClient->setResponseFactory([
+            new MockResponse('package contents'),
+            new MockResponse('{"files":[{"type":"file","name":"LICENSE"}]}'),
+            new MockResponse('package license'),
+        ]);
+        $entry = ImportMapEntry::createRemote('package', ImportMapType::JS, 'unused', '1.0.0', 'package', false);
+
+        $result = $container->get('test.importmap_resolver')->downloadPackages(['package' => $entry]);
+
+        $this->assertSame($enabled ? ['/LICENSE' => 'package license'] : [], $result['package']['extraFiles']);
+        $this->assertSame($enabled ? 3 : 1, $httpClient->getRequestsCount());
+    }
+
     public function testDefaultConfig()
     {
         $config = new Processor()->processConfiguration($this->getConfiguration(), [[]]);
@@ -268,6 +294,7 @@ class AssetMapperBundleTest extends TestCase
             'importmap_entries' => 'all',
             'importmap_script_attributes' => [],
             'importmap_integrity_algorithms' => [],
+            'importmap_download_licenses' => false,
             'vendor_dir' => '%kernel.project_dir%/assets/vendor',
             'minimum_release_age' => 0,
             'precompress' => [
@@ -343,6 +370,7 @@ class TestAssetMapperKernel extends AbstractKernel
         bool $debug,
         private string $dir,
         private bool $withHttpClient = true,
+        private array $assetMapperConfig = [],
     ) {
         parent::__construct($env, $debug);
     }
@@ -360,6 +388,7 @@ class TestAssetMapperKernel extends AbstractKernel
     private function configureContainer(ContainerConfigurator $container): void
     {
         $container->parameters()->set('kernel.charset', 'UTF-8');
+        $container->extension('asset_mapper', $this->assetMapperConfig);
 
         $services = $container->services();
         $services
@@ -373,6 +402,7 @@ class TestAssetMapperKernel extends AbstractKernel
             ->alias('test.asset_mapper', 'asset_mapper')->public()
             ->alias('test.cache', 'cache.asset_mapper')->public()
             ->alias('test.importmap_manager', 'asset_mapper.importmap.manager')->public()
+            ->alias('test.importmap_resolver', 'asset_mapper.importmap.resolver')->public()
         ;
 
         if ($this->debug) {
@@ -381,6 +411,7 @@ class TestAssetMapperKernel extends AbstractKernel
 
         if ($this->withHttpClient) {
             $services->set('http_client', MockHttpClient::class);
+            $services->alias('test.http_client', 'http_client')->public();
         }
     }
 }

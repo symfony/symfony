@@ -1,0 +1,4 @@
+⟨44mstart⟨0m                       ⟨44mmiddle⟨0m                       ⟨44mend⟨0m
+         ⟨44ma⟨0m                    ⟨44mb⟨0m                   ⟨44mc⟨0m
+                   ⟨44mx⟨0m                    ⟨44my⟨0m
+⟨44malone at the start⟨0m

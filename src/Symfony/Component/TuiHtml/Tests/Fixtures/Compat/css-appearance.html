@@ -1,0 +1,21 @@
+<!-- covers: css.properties.appearance css.properties.-webkit-appearance -->
+<!-- variant: toggled focus=#flag keys=space -->
+<style>
+  .plain { appearance: none; background: #2563eb; color: #ffffff; padding: 0 1ch }
+  .switch { appearance: none }
+  .switch::before { content: "○ off" }
+  .switch:checked::before { content: "● on " }
+  .bare { -webkit-appearance: none }
+  .base { appearance: base-select; background: #1e293b; padding: 0 1ch }
+  .base::picker-icon { color: cyan }
+  .check { appearance: none; box-sizing: border-box; width: 1em; height: 1em; border: 1px solid #94a3b8; background: #fff }
+  .check:checked { background-color: #0d6efd; border-color: #0d6efd }
+</style>
+<p><button>Native</button> <button class="plain">Styled</button></p>
+<p><button style="border: 1px solid; padding: 0 1ch">Bordered: no brackets</button> <button style="border: 1px solid transparent; background: blue; padding: 0 1ch">On its background</button></p>
+<p><button style="-webkit-appearance: button; border: 1px solid; padding: 0 1ch">appearance: button, bordered: no brackets either</button></p>
+<p><label><input type="checkbox" class="check"> drawn by CSS too small for its border</label> <label><input type="checkbox" class="check" checked> checked</label> <label><input type="radio" class="check" checked> a radio</label></p>
+<label><input type="checkbox"> a native box</label>
+<label><input type="checkbox" class="switch" id="flag"> a switch drawn by CSS</label>
+<select class="bare"><option>No marker</option><option>Two</option></select>
+<select class="base"><option>Base select</option><option>Two</option></select>

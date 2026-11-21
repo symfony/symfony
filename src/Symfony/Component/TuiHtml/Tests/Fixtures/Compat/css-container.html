@@ -1,0 +1,34 @@
+<!-- covers: css.at-rules.container css.properties.container-type css.properties.container-name css.properties.container -->
+<!-- variant: narrow columns=40 -->
+<style>
+  .layout { display: flex; gap: 1ch }
+  .side { flex: 0 0 14ch; container: side / inline-size; border: 1px solid }
+  .main { flex: 1; container-type: inline-size; border: 1px solid }
+  .card { display: flex; flex-direction: column }
+  @container (min-width: 30ch) { .card { flex-direction: row; gap: 2ch } .card > p { flex: none } }
+  @container side (max-width: 20ch) { .card > .extra { display: none } }
+  @container nothing (min-width: 1ch) { .card { color: red } }
+  .callout { --tone: warning; border: 1px solid; padding: 0 1ch; margin-top: 1 }
+  .outer { container-type: size; height: 8 }
+  .inner { container-type: inline-size; width: 20ch }
+  @container (min-height: 8) { .tall { color: green } }
+  @container (inline-size >= 20ch) { .wide { color: cyan } }
+  @container (block-size < 3) { .short { color: red } }
+  .callout.wide-tone { container-type: inline-size }
+  @container (min-width: 30ch) and style(--tone: warning) { .mixed { text-decoration: underline } }
+  @container (max-width: 5ch) and style(--tone: warning) { .mixed { color: red } }
+  @container style(--tone: warning) { .callout-text { color: #f59e0b; font-weight: bold } }
+</style>
+<main class="layout">
+  <aside class="side"><div class="card"><p>Side</p><p class="extra">hidden: narrow</p></div></aside>
+  <section class="main"><div class="card"><p>Title</p><p>row when wide</p><p class="extra">extra</p></div></section>
+</main>
+<div class="outer"><div class="inner"><p class="tall">green: the size container outside answers min-height</p><p class="wide">cyan: inline-size of the inner one</p><p class="short">not red: block-size of the outer one</p></div></div>
+<div class="callout wide-tone"><p class="mixed">underlined: wide and of the warning tone</p></div>
+<div class="callout"><p class="callout-text">Styled by @container style(--tone: warning)</p></div>
+<style>
+  .narrowed { container-type: inline-size; width: 24ch; border: 1px solid }
+  @container (min-width: 30ch) { .narrowed > .wide { color: red } }
+  @container (max-width: 25ch) { .narrowed > .wide { color: green } }
+</style>
+<div class="narrowed"><p class="wide">A container narrower than its row is measured at its width: green</p></div>

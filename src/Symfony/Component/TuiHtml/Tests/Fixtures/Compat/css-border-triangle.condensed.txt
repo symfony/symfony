@@ -1,0 +1,8 @@
+A caret drawn by the borders of an empty ::after: ⟨4mDropdown⟨0m ▾
+[ Menu ▾
+Pointing up, in the color of its border: Sort⟨31m▴⟨0m
+An empty element drawn by its borders: ⟨4m▸ Table of contents⟨0m
+Borders of one color draw no triangle: x
+A color without alpha is no transparent one: Red⟨38;2;255;0;0m▾⟨0m
+After the items of a row, not boxed ▾
+Rounded, like a spinner, no triangle:   .

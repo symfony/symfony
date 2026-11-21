@@ -1,0 +1,9 @@
+<!-- covers: css.properties.margin-bottom -->
+<style>
+  body { background: #fff; color: #222 }
+  .tabs { display: flex; list-style: none; padding: 0; margin: 0; border-bottom: 1px solid #aaa }
+  .tabs a { display: block; padding: 0 1ch; border: 1px solid transparent; margin-bottom: -1px; border-radius: 4px 4px 0 0 }
+  .tabs a.active { border-color: #aaa #aaa #fff; background: #fff }
+</style>
+<ul class="tabs"><li><a class="active">Active</a></li><li><a>Link</a></li><li><a>Other</a></li></ul>
+<p>The active tab opens into the line under the tabs: its bottom border, in the color of the page, covers it.</p>

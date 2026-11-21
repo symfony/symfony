@@ -67,6 +67,17 @@ trait TerminalEscapeTrait
         $this->write("\x1b]0;{$safe}\x07");
     }
 
+    public function pushTitle(): void
+    {
+        // XTWINOPS: the icon and window titles
+        $this->write("\x1b[22;0t");
+    }
+
+    public function popTitle(): void
+    {
+        $this->write("\x1b[23;0t");
+    }
+
     public function setProgramStatus(ProgramStatus $status): void
     {
         $this->write($status->toEscapeSequence());

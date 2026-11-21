@@ -1,0 +1,34 @@
+
+ansi name
+
+palette index
+
+tailwind shade
+
+hex
+
+rgb()
+
+hsl()
+
+light-dark()
+
+color-mix()
+
+contrast-color()
+
+var()
+
+var() fallback
+
+background-color
+
+background
+
+important
+
+⟨2mopacity⟨0m
+
+⟨7mfilter invert⟨0m
+
+inline style

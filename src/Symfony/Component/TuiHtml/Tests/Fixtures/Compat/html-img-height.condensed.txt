@@ -1,0 +1,10 @@
+⟨38;2;255;0;0;48;2;255;0;0m▀▀⟨0m⟨38;2;0;0;255;48;2;0;0;255m▀▀⟨0m A title right after a logo of a row, its height alone
+     set
+A framed image, its border around it, not across the page:
+┌────────┐
+│⟨38;2;255;0;0;48;2;255;0;0m▀▀▀▀⟨0m⟨38;2;0;0;255;48;2;0;0;255m▀▀▀▀⟨0m│
+│⟨38;2;255;0;0;48;2;255;0;0m▀▀▀▀⟨0m⟨38;2;0;0;255;48;2;0;0;255m▀▀▀▀⟨0m│
+└────────┘
+  A comment
+      A reply, indented by a spacer image of 40px not drawn,
+      like on Hacker News

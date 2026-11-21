@@ -1,0 +1,13 @@
+┌────────────────────────────┐
+│Visible line               ┃│
+└────────────────────────────┘
+                                                  Edge
+                                                  ⟨36mfits⟨0m
+
+
+
+
+
+⟨36malways:⟨0m ⟨36mdrawn⟨0m ⟨36mat⟨0m ⟨36mits⟨0m ⟨36minsets⟨0m
+
+⟨36mdrawn:⟨0m ⟨36mno⟨0m ⟨36manchor,⟨0m ⟨36manchors-valid⟨0m ⟨36mnot⟨0m ⟨36masked⟨0m

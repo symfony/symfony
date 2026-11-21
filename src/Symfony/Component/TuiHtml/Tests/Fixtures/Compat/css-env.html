@@ -1,0 +1,11 @@
+<!-- covers: css.types.env -->
+<style>
+  .safe { padding-left: calc(env(safe-area-inset-left) + 2ch); border: 1px solid; max-width: 30ch }
+  .titlebar { --left: env(titlebar-area-x, 4ch); margin-left: var(--left); color: cyan }
+  .unknown { color: green; color: env(not-a-variable) }
+  .fallback { color: env(not-a-variable, yellow) }
+</style>
+<p class="safe">Padded by 2 columns: no notch</p>
+<p class="titlebar">No title bar: its fallback, 4 columns</p>
+<p class="unknown">An unknown variable without fallback: invalid at computed-value time, the color inherited, not the green before it</p>
+<p class="fallback">Its fallback (yellow)</p>

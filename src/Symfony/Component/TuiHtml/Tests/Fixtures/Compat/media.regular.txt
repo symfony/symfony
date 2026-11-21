@@ -1,0 +1,18 @@
+
+width at least 50
+
+height at least 20
+
+width in 41..60
+
+portrait
+
+grid device
+
+color
+
+no hover, no pointer
+
+dark scheme
+
+not print

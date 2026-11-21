@@ -1,0 +1,17 @@
+ Name > Ada
+ Email > ada@example.com
+ Bio
+ ⟨90m──────────────────────────────────────────────────────────⟨0m
+ Analytical engines
+
+ ⟨90m──────────────────────────────────────────────────────────⟨0m
+ ⟨1m→ PHP⟨0m                          ⟨1m→ [x] a⟨0m
+   Rust                           [ ] b
+ [━━━━━━━━━━━━━━━━━━━━━━━━━━━━]  75%
+ ▼ ⟨1mMore⟨0m                                ⟨90mHelp for the details⟨0m
+
+ Details content
+
+ Help for the details
+
+ Saved

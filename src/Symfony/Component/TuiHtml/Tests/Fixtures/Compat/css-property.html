@@ -1,0 +1,14 @@
+<!-- covers: css.at-rules.property -->
+<!-- variant: hovered hover=#tag -->
+<style>
+  @property --accent { syntax: '<color>'; inherits: true; initial-value: #22d3ee }
+  @property --frame { syntax: '<color>'; inherits: false; initial-value: #4b5563 }
+  .card { --frame: #f59e0b; border: 1px solid var(--frame); padding: 0 1ch }
+  .card p { color: var(--accent); border-left: 1px solid var(--frame) }
+  #tag { --accent: #9ca3af; transition: --accent 1s }
+  #tag:hover { --accent: #f472b6 }
+</style>
+<div class="card">
+  <p>The accent is the initial value of --accent: nothing sets it.</p>
+  <p id="tag">--frame does not inherit: this line has its initial gray.</p>
+</div>

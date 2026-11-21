@@ -1,0 +1,20 @@
+<!-- covers: css.properties.order css.properties.min-width css.properties.flex-direction -->
+<!-- variant: narrow columns=30 -->
+<style>
+  .row { display: flex; gap: 1ch }
+  .row > p { flex: none }
+  .last { order: 1; font-weight: bold }
+  .first { order: -1; font-style: italic }
+  .keep { min-width: 24ch; background: blue }
+  .block { max-width: 5ch; min-width: 12ch; border: 1px solid }
+  .stack > .up { order: -1 }
+  .reversed { display: flex; flex-direction: row-reverse; gap: 1ch }
+  .reversed > p { flex: none }
+</style>
+<main>
+  <div class="row"><p class="last">third (bold)</p><p>second</p><p class="first">first (italic)</p></div>
+  <div class="row"><p class="keep">at least 24 columns wide</p><p>this one gives way when the row is narrow</p></div>
+  <p class="block">twelve wide</p>
+  <div class="stack"><p>second line</p><p class="up">first line</p></div>
+  <div class="reversed"><p>c</p><p>b</p><p>a</p></div>
+</main>

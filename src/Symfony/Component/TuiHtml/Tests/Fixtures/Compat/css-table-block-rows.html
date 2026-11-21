@@ -1,0 +1,17 @@
+<!-- covers: css.properties.border-collapse -->
+<style>
+  table { border-collapse: collapse; width: 100% }
+  tbody, tr, td { display: block }
+  thead { display: none }
+  tr { border: 1px solid; margin-bottom: 1 }
+  td { position: relative; padding-left: 12ch }
+  td:before { content: attr(data-label); position: absolute; top: 0; left: 0; color: gray }
+</style>
+<table>
+  <thead><tr><th>Title</th><th>Author</th></tr></thead>
+  <tbody>
+    <tr><td data-label="Title">Analytical Engine</td><td data-label="Author">Ada</td></tr>
+    <tr><td data-label="Title">Calculus</td><td data-label="Author">Ada</td></tr>
+  </tbody>
+</table>
+<p>The rows of a collapsed table displayed as blocks are cards, like those of EasyAdmin on a narrow screen.</p>

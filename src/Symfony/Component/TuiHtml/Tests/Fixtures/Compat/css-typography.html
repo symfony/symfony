@@ -1,0 +1,33 @@
+<!-- covers: css.properties.font-variant css.properties.font-variant-caps css.properties.text-transform css.properties.transform css.properties.translate css.properties.text-decoration-line css.properties.font-weight css.types.transform-function -->
+<!-- variant: narrow columns=30 -->
+<style>
+  .caps { font-variant: small-caps }
+  .all { font-variant-caps: all-small-caps }
+  .wide { text-transform: full-width }
+  .kana { text-transform: full-size-kana }
+  .both-ways { text-transform: uppercase full-width }
+  .over { text-decoration: overline }
+  .both { text-decoration-line: underline overline }
+  .light { font-weight: 300 }
+  .light b { font-weight: bolder }
+  .heavy { font-weight: 600 }
+  .heavy span { font-weight: lighter }
+  .nudge { transform: translate(3ch, 1); color: yellow }
+  .shift { translate: 2 0; color: cyan }
+  .stage { position: relative; height: 5; border: 1px dashed }
+  .stage .badge { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: #7c3aed; padding: 0 1ch }
+</style>
+<h2 class="caps">Chapter One: The Beginning</h2>
+<p class="all">ALL SMALL CAPS, Mixed Case</p>
+<p class="wide">Full width 42!</p>
+<p class="kana">ァィゥ ちょっと → アイウ ちよつと</p>
+<p class="both-ways">up+wide</p>
+<p class="over">An overlined line</p>
+<p class="both">Lines over and under</p>
+<p class="light">Light is dim, <b>bolder is 400 here</b></p>
+<p class="heavy">Heavy is bold, <span>lighter is 400 here</span></p>
+<p>Before the moved line</p>
+<p class="nudge">translated by 3 columns and a row</p>
+<p>The line it is drawn over</p>
+<p class="shift">translate: 2 0</p>
+<div class="stage"><span class="badge">centered by translate</span></div>

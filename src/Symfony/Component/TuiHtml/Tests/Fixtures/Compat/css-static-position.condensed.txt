@@ -1,0 +1,9 @@
+[ Options ]
+⟨40m┌──────┐⟨0m goes on under the menu, which is drawn over it
+⟨40m│ Open │⟨0m would be in the flow.
+⟨40m│ Save │⟨0m
+⟨40m└──────┘⟨0m───────────────────────────────────────────────────┐
+│ First                                                    │
+│ ⟨36mover⟨0mn⟨36mthe⟨0mi⟨36msecond⟨0mthe card                                  │
+└──────────────────────────────────────────────────────────┘
+⟨33m*⟨0m line with a badge out of the flow that does not split it.

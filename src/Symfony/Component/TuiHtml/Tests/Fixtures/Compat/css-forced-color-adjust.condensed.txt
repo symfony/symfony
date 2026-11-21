@@ -1,0 +1,3 @@
+⟨31mRed, without color when colors are forced⟨0m
+⟨33;44mA swatch keeps its colors ⟨0m⟨38;2;0;255;0;44mand so does what is inside⟨0m⟨44m        ⟨0m
+⟨31mpreserve-parent-color: like auto⟨0m

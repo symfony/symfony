@@ -1,0 +1,31 @@
+<!-- covers: html.elements.template html.elements.slot html.global_attributes.slot html.global_attributes.part css.selectors.host css.selectors.hostfunction css.selectors.slotted css.selectors.part html.global_attributes.exportparts -->
+<!-- variant: narrow columns=40 -->
+<style>
+  user-card::part(name) { color: #f97316 }
+  .note { color: #22c55e }
+  user-badge::part(dot) { color: #e11d48 }
+  user-badge::part(text) { font-weight: bold }
+</style>
+<user-card class="featured">
+  <template shadowrootmode="open">
+    <style>
+      :host { display: block; border: 1px solid; padding: 0 1ch; margin-bottom: 1 }
+      :host(.featured) { border-color: #facc15 }
+      :host-context(body) h3 { margin: 0 }
+      h3 { font-weight: bold }
+      ::slotted(.note) { font-style: italic }
+      .note { text-decoration: underline }
+    </style>
+    <h3 part="name"><slot name="name">Anonymous</slot></h3>
+    <slot>No bio.</slot>
+    <p class="note">The note of the card, its own style only</p>
+  </template>
+  <span slot="name">Ada Lovelace</span>
+  <p class="note">A note of the page, in its green and the italic of ::slotted()</p>
+</user-card>
+<user-card><template shadowrootmode="open">
+    <style>:host { display: block; border: 1px dashed; padding: 0 1ch }</style>
+    <strong part="name"><slot name="name">Anonymous</slot></strong>
+    <slot>No bio: the fallback of the slot, nothing being slotted, not even whitespace.</slot>
+  </template></user-card>
+<user-badge><template shadowrootmode="open"><p>Status: <status-dot exportparts="dot"><template shadowrootmode="open"><span part="dot">●</span> <span part="text">online, its text not exported</span></template></status-dot></p></template></user-badge>

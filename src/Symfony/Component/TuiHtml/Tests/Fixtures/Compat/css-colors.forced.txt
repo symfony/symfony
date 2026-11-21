@@ -1,0 +1,16 @@
+
+rebeccapurple (true color)
+
+lightgoldenrodyellow on darkslategray
+
+blue keeps the terminal ANSI blue
+
+┌──────────────────────────────────────────────────────────┐
+│border in currentcolor (orange)                           │
+└──────────────────────────────────────────────────────────┘
+
+teal background from currentcolor
+
+┌──────────────────────────────────────────────────────────┐
+│currentcolor without a color: default border color        │
+└──────────────────────────────────────────────────────────┘

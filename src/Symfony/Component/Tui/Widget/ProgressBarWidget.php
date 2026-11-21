@@ -173,6 +173,7 @@ class ProgressBarWidget extends AbstractWidget
         if (null === $this->max) {
             $this->max = $this->step;
             $this->stepWidth = \strlen((string) $this->max);
+            $this->setState('indeterminate', false);
         }
 
         $this->setProgress($this->max);
@@ -377,6 +378,7 @@ class ProgressBarWidget extends AbstractWidget
             $this->max = $max;
             $this->stepWidth = \strlen((string) $max);
         }
+        $this->setState('indeterminate', null === $this->max);
 
         $this->percent = $this->max ? min(1.0, (float) $this->step / $this->max) : 0.0;
         $this->invalidate();
@@ -454,7 +456,8 @@ class ProgressBarWidget extends AbstractWidget
             return false;
         }
 
-        if (null === $this->max) {
+        // An indeterminate bar stays still for users sensitive to motion
+        if (null === $this->max && !$this->getContext()?->prefersReducedMotion()) {
             ++$this->step;
         }
 

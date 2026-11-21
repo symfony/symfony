@@ -1,0 +1,5 @@
+[ 1 ] ┌───┐┌───────────────────────┐
+      │ @ ││> ⟨2ma field⟨0m              │
+      └───┘└───────────────────────┘
+The field of width: 1% is as wide as its content in a group
+sized by its content, like CSS.

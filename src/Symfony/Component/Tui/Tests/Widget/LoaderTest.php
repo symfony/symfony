@@ -166,6 +166,23 @@ class LoaderTest extends TestCase
         $this->assertSame('/', $loader->getSpinnerFrame());
     }
 
+    public function testTheSpinnerStaysStillWithReducedMotion()
+    {
+        $tui = (new Tui(terminal: new VirtualTerminal(80, 24)))->setReducedMotion();
+        $loader = new LoaderWidget(message: 'Test');
+        $loader->setSpinner('line');
+        $loader->setIntervalMs(80);
+        $tui->add($loader);
+        $loader->start();
+
+        $this->assertFalse($loader->tick(0.24));
+        $this->assertSame('-', $loader->getSpinnerFrame());
+
+        $tui->setReducedMotion(false);
+        $this->assertTrue($loader->tick(0.24));
+        $this->assertSame('/', $loader->getSpinnerFrame());
+    }
+
     public function testSetIntervalMustBePositive()
     {
         $loader = new LoaderWidget();

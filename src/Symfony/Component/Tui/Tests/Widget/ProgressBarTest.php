@@ -320,6 +320,41 @@ class ProgressBarTest extends TestCase
         $this->assertSame(0, $bar->getMaxSteps());
     }
 
+    public function testAnIndeterminateBarHasTheIndeterminateState()
+    {
+        $bar = new ProgressBarWidget();
+        $this->assertTrue($bar->hasState('indeterminate'));
+
+        $bar->setMaxSteps(10);
+        $this->assertFalse($bar->hasState('indeterminate'));
+    }
+
+    public function testAFinishedIndeterminateBarIsNoLongerIndeterminate()
+    {
+        $bar = new ProgressBarWidget();
+        $bar->start();
+        $bar->advance(5);
+        $bar->finish();
+
+        $this->assertSame(5, $bar->getMaxSteps());
+        $this->assertFalse($bar->hasState('indeterminate'));
+    }
+
+    public function testAnIndeterminateBarStaysStillWithReducedMotion()
+    {
+        $tui = (new Tui(terminal: new VirtualTerminal(80, 24)))->setReducedMotion();
+        $tui->add($bar = new ProgressBarWidget());
+        $bar->start();
+        $before = $bar->render(new RenderContext(40, 1));
+
+        $bar->tick();
+        $this->assertSame($before, $bar->render(new RenderContext(40, 1)));
+
+        $tui->setReducedMotion(false);
+        $bar->tick();
+        $this->assertNotSame($before, $bar->render(new RenderContext(40, 1)));
+    }
+
     public function testNegativeMaxStepsMakesIndeterminate()
     {
         $bar = new ProgressBarWidget(-1);

@@ -1,0 +1,13 @@
+<!-- covers: css.properties.text-emphasis css.properties.text-emphasis-style css.properties.text-emphasis-color css.properties.text-emphasis-position -->
+<!-- variant: narrow columns=20 -->
+<style>
+  p { margin: 0 0 1; max-width: 30ch }
+  .key { text-emphasis: filled dot red }
+  .ja { text-emphasis-style: sesame; text-emphasis-color: #2563eb }
+  .under { text-emphasis: open circle; text-emphasis-position: under right }
+  .star { text-emphasis-style: "*" }
+</style>
+<p>Read the <em class="key">whole notice</em>, then sign.</p>
+<p lang="ja">これは<span class="ja">大切</span>な点です。</p>
+<p class="under">Marks below, wrapping over two lines here.</p>
+<p>A <b class="star">string</b> mark.</p>

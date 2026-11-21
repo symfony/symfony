@@ -1,0 +1,19 @@
+
+Labels: ⟨37;48;2;37;99;235m bug ⟨0m ⟨37;48;2;37;99;235m ui ⟨0m ⟨37;48;2;180;83;9m needs review ⟨0m
+
+Press ⟨90m│⟨0m Ctrl ⟨90m│⟨0m+⟨90m│⟨0m C ⟨90m│⟨0m to copy, ⟨90m│⟨0m Esc ⟨90m│⟨0m to leave.
+
+Build ⟨32m│ passed⟨0m in 4.2 seconds, with the boxes of inline
+elements wrapping like words.
+
+Cloned: ⟨36m│⟨0m a quotation long enough to wrap over two lines ⟨36m│⟨0m
+⟨36m│⟨0m or more ⟨36m│⟨0m, each line framed.
+
+Sliced: ⟨36m│⟨0m a quotation long enough to wrap over two lines or
+more ⟨36m│⟨0m, framed at its ends.
+
+Loading: ⟨100m                             ⟨0m ⟨100m              ⟨0m
+
+Pads are no breaks:
+⟨7m code ⟨0m, then a comma
+kept with it.

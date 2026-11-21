@@ -1,0 +1,17 @@
+<!-- covers: css.properties.display -->
+<!-- variant: narrow columns=30 -->
+<style>
+  .menu { margin: 0; padding: 0; list-style: none }
+  .menu li { display: inline-block; padding: 0 1ch; background: #1d4ed8; color: #fff }
+  @media (max-width: 40ch) { .menu li { display: block } }
+  .sized li { width: 12ch }
+  .donate { display: block; border: 1px solid; padding: 0 1ch } @media (min-width: 41ch) { .donate { display: inline } }
+  @media (max-width: 40ch) { .links a { display: block } .links a.back { display: initial } }
+</style>
+<p>Items inline-block on a wide screen, side by side; blocks on a narrow one, a line each:</p>
+<ul class="menu"><li>Download</li><li>Docs</li><li>Community</li><li>Tools</li></ul>
+<p>Of a width, kept where they are blocks:</p>
+<ul class="menu sized"><li>Download</li><li>Docs</li></ul>
+<p><a class="donate" href="#give">Donate</a> a link, a block on a narrow screen only</p>
+<nav class="links"><a href="#a" class="back">About</a> <a href="#b">Philosophy</a> <a href="#c">Licenses</a></nav>
+<p>after the menu</p>

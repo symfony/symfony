@@ -1,0 +1,11 @@
+<!-- covers: css.selectors.visited -->
+<!-- variant: history visited=/guide,https://symfony.com -->
+<style>
+  a:link { color: cyan }
+  a:visited { color: magenta }
+  a:visited::after { content: " ✓" }
+  .tile { display: block; border: 1px solid; padding: 0 1ch; margin-top: 1 }
+  .tile:visited { border-color: magenta }
+</style>
+<p>Read the <a href="/guide">guide</a>, the <a href="/reference">reference</a> and <a href="https://symfony.com">symfony.com</a>.</p>
+<a class="tile" href="/guide">The guide, as a block link</a>

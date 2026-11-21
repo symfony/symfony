@@ -1,0 +1,23 @@
+
+A ⟨3mglyph⟨0m is drawn; ⟨3mn⟨0m
+cells; the shell said
+⟨7mok⟨0m; forty-two; user
+ﻥﺎﻳﺇ.
+
+tōkyō             kan
+東京  without rp: 漢
+
+Backwards: ⟨3mLMTH⟨0m iuT,
+forwards: as is
+
+https://example.com/a/
+very/long/path/that/
+wraps
+
+┌──────────────────────┐
+│⟨1;48;2;55;65;81mPrice⟨0m⟨48;2;55;65;81m ⟨0m ⟨1;48;2;55;65;81mItem⟨0m⟨48;2;55;65;81m  ⟨0m ⟨1;48;2;55;65;81mNote⟨0m⟨48;2;55;65;81m    ⟨0m│
+│⟨48;2;30;58;138m3     ⟨0m Tea    hot     │
+│⟨48;2;127;29;29m              row over⟨0m│
+│⟨48;2;127;29;29m5      Coffee the     ⟨0m│
+│⟨48;2;127;29;29m              column  ⟨0m│
+└──────────────────────┘

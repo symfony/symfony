@@ -1,0 +1,8 @@
+     ⟨36m┌──────────────────────┐⟨0m
+City ⟨36m│⟨0m> l⟨2myon⟨0m                ⟨36m│⟨0m Size > 10
+     ⟨36m└──────────────────────┘⟨0m
+     ┌─────────────┐
+The s│⟨1m→ Lyon⟨0m       │listed over this text
+     │  Lille      │
+while│  Marseille  │the focus.
+     └─────────────┘

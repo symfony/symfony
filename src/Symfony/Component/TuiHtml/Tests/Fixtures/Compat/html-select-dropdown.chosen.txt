@@ -1,0 +1,16 @@
+Fruit ⟨7m[ Cherry ⟨0m⟨7;36m⌄⟨0m⟨7m ]                                          ⟨0m
+
+The list opens over this text,
+
+and these lines,
+
+without moving them.
+
+⟨1mSize makes⟨0m ⟨35m┌────────────┐⟨0m
+a list     ⟨35m│⟨0mJapan ⟨2m(JP)⟨0m ⟨36m⌄⟨0m⟨35m│⟨0m [ ⟨1mUS⟨0m Boston ⟨31mdown⟨0m ⟨36m⌄⟨0m ]
+           ⟨35m└────────────┘⟨0m
+┌───────────────────────────────────────┐
+│ [ Its list opens below its border ⟨36m⌄⟨0m ] │
+└───────────────────────────────────────┘
+
+under the select

@@ -1,0 +1,10 @@
+
+Hidden or transparent, a positioned element draws nothing
+over the text under it, like the chevrons of the breadcrumbs
+of GitHub Docs:
+
+  Home / Get started / Journey
+
+Shown, it does:
+
+⟨30;47m < ⟨0mome / Get started / Journey

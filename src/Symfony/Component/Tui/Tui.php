@@ -17,16 +17,20 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Tui\Event\AbstractEvent;
 use Symfony\Component\Tui\Event\InputEvent;
+use Symfony\Component\Tui\Event\RendererChangeEvent;
 use Symfony\Component\Tui\Event\TickEvent;
 use Symfony\Component\Tui\Exception\InvalidArgumentException;
+use Symfony\Component\Tui\Exception\LogicException;
 use Symfony\Component\Tui\Focus\FocusManager;
+use Symfony\Component\Tui\Focus\FocusPolicyInterface;
 use Symfony\Component\Tui\Input\Keybindings;
 use Symfony\Component\Tui\Loop\AdaptativeTicker;
 use Symfony\Component\Tui\Loop\TickRuntimeInterface;
 use Symfony\Component\Tui\Loop\TickScheduler;
+use Symfony\Component\Tui\Render\FrameWriterInterface;
 use Symfony\Component\Tui\Render\Renderer;
+use Symfony\Component\Tui\Render\RendererInterface;
 use Symfony\Component\Tui\Render\RenderRequestorInterface;
-use Symfony\Component\Tui\Render\ScreenWriter;
 use Symfony\Component\Tui\Render\WidgetRect;
 use Symfony\Component\Tui\Style\StyleSheet;
 use Symfony\Component\Tui\Terminal\Terminal;
@@ -35,6 +39,7 @@ use Symfony\Component\Tui\Widget\AbstractWidget;
 use Symfony\Component\Tui\Widget\ContainerWidget;
 use Symfony\Component\Tui\Widget\Figlet\FontRegistry;
 use Symfony\Component\Tui\Widget\FocusableInterface;
+use Symfony\Component\Tui\Widget\ParentInterface;
 use Symfony\Component\Tui\Widget\WidgetTree;
 
 /**
@@ -62,8 +67,10 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
 {
     private ContainerWidget $root;
     private Keybindings $keybindings;
-    private Renderer $renderer;
-    private ScreenWriter $screenWriter;
+    private RendererInterface $renderer;
+    /** @var list<StyleSheet> */
+    private array $styleSheets = [];
+    private FrameWriterInterface $screenWriter;
     private WidgetTree $widgetTree;
     private FocusManager $focusManager;
     private TickScheduler $tickScheduler;
@@ -75,7 +82,9 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     private ?\Closure $onTick = null;
 
     private bool $renderRequested = false;
+    private bool $reducedMotion = false;
     private bool $running = false;
+    private bool $started = false;
     private bool $stopped = false;
     private bool $restoresOnShutdown = false;
     private bool $ticking = false;
@@ -88,7 +97,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     private ?Suspension $runSuspension = null;
 
     /**
-     * @param Renderer|null                 $renderer        @internal Override the default renderer; framework-internal use only
+     * @param RendererInterface|null        $renderer        The rendering backend, see setRenderer()
      * @param EventDispatcherInterface|null $eventDispatcher Reference dispatcher; the terminal must use the same instance
      */
     public function __construct(
@@ -96,7 +105,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         ?TerminalInterface $terminal = null,
         ?Keybindings $keybindings = null,
         ?FontRegistry $fontRegistry = null,
-        ?Renderer $renderer = null,
+        ?RendererInterface $renderer = null,
         ?EventDispatcherInterface $eventDispatcher = null,
     ) {
         $this->eventDispatcher = $eventDispatcher ?? $terminal?->getEventDispatcher() ?? new EventDispatcher();
@@ -109,7 +118,12 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         $this->root = new ContainerWidget();
         $this->root->expandVertically(true);
         $this->renderer = $renderer ?? new Renderer($styleSheet, $fontRegistry);
-        $this->screenWriter = new ScreenWriter($this->terminal);
+        if (null !== $styleSheet) {
+            $this->styleSheets[] = clone $styleSheet;
+            // Like a stylesheet added later, see addStyleSheet()
+            $renderer?->addStyleSheet($styleSheet);
+        }
+        $this->screenWriter = $this->renderer->createFrameWriter($this->terminal);
 
         // Share the KeyParser so Kitty protocol state is consistent
         $this->focusManager = new FocusManager(
@@ -118,10 +132,92 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
             eventDispatcher: $this->eventDispatcher,
         );
 
+        $this->focusManager->setPolicy($this->renderer instanceof FocusPolicyInterface ? $this->renderer : null);
+
         $this->widgetTree = new WidgetTree($this, $this->keybindings, $this->focusManager, $this->renderer, $this->terminal, $this->eventDispatcher);
         $this->widgetTree->setRoot($this->root);
         $this->tickScheduler = new TickScheduler();
         $this->adaptativeTicker = new AdaptativeTicker($this);
+    }
+
+    /**
+     * Selects the rendering backend before the first start.
+     *
+     * Copies of the stylesheets added so far are added to it, and the widgets
+     * attached so far are drawn by it. A RendererChangeEvent tells the
+     * listeners, so that what they gave the previous renderer can be given to
+     * this one. A renderer that fails to start leaves the previous one in place.
+     *
+     * @return $this
+     *
+     * @throws LogicException When the TUI was already started
+     */
+    public function setRenderer(RendererInterface $renderer): static
+    {
+        if ($this->started) {
+            throw new LogicException('The renderer must be selected before starting the TUI.');
+        }
+        $previous = $this->renderer;
+        if ($previous === $renderer) {
+            return $this;
+        }
+        // What can fail comes first, so that a renderer that throws leaves the previous one in place
+        $screenWriter = $renderer->createFrameWriter($this->terminal);
+        try {
+            foreach ($this->styleSheets as $styleSheet) {
+                $renderer->addStyleSheet(clone $styleSheet);
+            }
+        } catch (\Throwable $e) {
+            $screenWriter->close();
+
+            throw $e;
+        }
+        $previousWriter = $this->screenWriter;
+        $this->renderer = $renderer;
+        $this->screenWriter = $screenWriter;
+        $this->widgetTree->setRenderer($renderer);
+        $this->focusManager->setPolicy($renderer instanceof FocusPolicyInterface ? $renderer : null);
+        $this->clearRenderCaches($this->root);
+        try {
+            $this->eventDispatcher->dispatch(new RendererChangeEvent($this->root, $previous, $renderer));
+            $this->root->invalidate();
+            // The new renderer may refuse the focused widget, see FocusPolicyInterface
+            $this->focusManager->revalidateFocus();
+        } finally {
+            // Last, the new renderer in place whatever happens: the previous output may be gone already
+            $previousWriter->close();
+        }
+        // Not forced: the new writer has drawn nothing yet, and a reset would clear the screen and its scrollback
+        $this->requestRender();
+
+        return $this;
+    }
+
+    public function getRenderer(): RendererInterface
+    {
+        return $this->renderer;
+    }
+
+    /**
+     * Asks the widgets to stay still, like a spinner or an indeterminate
+     * progress bar, for users sensitive to motion; a renderer that knows
+     * the preference, like one reading it from its media, sets it too.
+     *
+     * @return $this
+     */
+    public function setReducedMotion(bool $reducedMotion = true): static
+    {
+        if ($this->reducedMotion !== $reducedMotion) {
+            $this->reducedMotion = $reducedMotion;
+            $this->requestRender();
+        }
+
+        return $this;
+    }
+
+    public function prefersReducedMotion(): bool
+    {
+        return $this->reducedMotion;
     }
 
     /**
@@ -178,14 +274,31 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
      * Add a stylesheet on top of the existing ones.
      *
      * User stylesheets are merged on top of defaults (last wins for same selectors).
+     * The current renderer gets this stylesheet, a renderer selected later a
+     * copy of it as it is now, see setRenderer().
      *
      * @return $this
      */
     public function addStyleSheet(StyleSheet $styleSheet): static
     {
+        $this->styleSheets[] = clone $styleSheet;
         $this->renderer->addStyleSheet($styleSheet);
+        // The widgets drawn before keep their revisions, but not their styles
+        $this->clearRenderCaches($this->root);
+        $this->root->invalidate();
+        $this->requestRender();
 
         return $this;
+    }
+
+    private function clearRenderCaches(AbstractWidget $widget): void
+    {
+        $widget->clearRenderCache();
+        if ($widget instanceof ParentInterface) {
+            foreach ($widget->all() as $child) {
+                $this->clearRenderCaches($child);
+            }
+        }
     }
 
     /**
@@ -217,6 +330,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
      */
     public function start(): void
     {
+        $this->started = true;
         $this->running = true;
         $this->stopped = false;
         $this->lastTickAt = null;
@@ -302,25 +416,33 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         }
         $this->stopped = true;
 
-        // Move cursor to end of content
-        $state = $this->screenWriter->getState();
-        if ($state['line_count'] > 0) {
-            // cursor_row is a zero-based index, line_count a count
-            $lineDiff = $state['line_count'] - 1 - $state['cursor_row'];
+        // The terminal is given back even when the frame writer fails
+        try {
+            // Move cursor to end of content
+            $state = $this->screenWriter->getState();
+            if ($state['line_count'] > 0) {
+                // cursor_row is a zero-based index, line_count a count
+                $lineDiff = $state['line_count'] - 1 - $state['cursor_row'];
 
-            if ($lineDiff > 0) {
-                $this->terminal->write("\x1b[{$lineDiff}B");
-            } elseif ($lineDiff < 0) {
-                $this->terminal->write("\x1b[".(-$lineDiff).'A');
+                if ($lineDiff > 0) {
+                    $this->terminal->write("\x1b[{$lineDiff}B");
+                } elseif ($lineDiff < 0) {
+                    $this->terminal->write("\x1b[".(-$lineDiff).'A');
+                }
+
+                $this->terminal->write("\r\n");
             }
 
-            $this->terminal->write("\r\n");
+            $this->screenWriter->close();
+        } finally {
+            try {
+                // Restore default cursor shape (DECSCUSR 0) and show cursor
+                $this->terminal->write("\x1b[0 q");
+                $this->terminal->showCursor();
+            } finally {
+                $this->terminal->stop();
+            }
         }
-
-        // Restore default cursor shape (DECSCUSR 0) and show cursor
-        $this->terminal->write("\x1b[0 q");
-        $this->terminal->showCursor();
-        $this->terminal->stop();
     }
 
     /**
@@ -345,6 +467,18 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         $this->lastTickAt = null;
         $this->lastTickBusyHint = null;
         $this->refreshLoopDriver();
+
+        return $this;
+    }
+
+    /**
+     * Removes a listener registered with addListener().
+     *
+     * @return $this
+     */
+    public function removeListener(callable $listener): static
+    {
+        $this->eventDispatcher->removeListener($this->resolveEventClass($listener), $listener);
 
         return $this;
     }
@@ -514,6 +648,9 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
             $columns = $this->terminal->getColumns();
             $rows = $this->terminal->getRows();
             $this->screenWriter->writeFrame($this->renderer->renderFrame($this->root, $columns, $rows));
+            // A widget the renderer no longer allows, like one hidden since, loses the focus: once a frame, its styles
+            // resolved, not on each key
+            $this->focusManager->revalidateFocus();
         }
     }
 
@@ -531,9 +668,9 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
             return;
         }
 
-        // Pass input to focused component
+        // Pass input to focused component, unless it was disabled
         $focused = $this->focusManager->getFocus();
-        if ($focused instanceof FocusableInterface) {
+        if ($focused instanceof FocusableInterface && !$focused->hasState(AbstractWidget::STATE_DISABLED)) {
             $revisionBeforeInput = $this->root->getRenderRevision();
             $focused->handleInput($data);
             if ($this->root->getRenderRevision() !== $revisionBeforeInput) {
@@ -592,7 +729,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         // Termux changes the height whenever its software keyboard shows or hides, and a full repaint each time would replay all the content.
         // Multiplexers inherit TERMUX_VERSION but move rows their own way on shrink (tmux deletes the rows below the cursor), so they are excluded.
         if ($heightOnly && false !== getenv('TERMUX_VERSION') && false === getenv('TMUX') && false === getenv('STY') && false === getenv('ZELLIJ')) {
-            $this->screenWriter->followTermuxHeightChange($previousRows, $rows);
+            $this->screenWriter->onTerminalHeightChange($previousRows, $rows);
             $this->requestRender();
 
             return;

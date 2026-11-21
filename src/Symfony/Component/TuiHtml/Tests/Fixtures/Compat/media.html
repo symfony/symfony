@@ -1,0 +1,50 @@
+<!-- covers: css.at-rules.media css.at-rules.media.width css.at-rules.media.height css.at-rules.media.range-syntax css.at-rules.media.aspect-ratio css.at-rules.media.orientation css.at-rules.media.grid css.at-rules.media.color css.at-rules.media.monochrome css.at-rules.media.resolution css.at-rules.media.hover css.at-rules.media.pointer css.at-rules.media.prefers-color-scheme css.at-rules.media.prefers-contrast css.at-rules.media.prefers-reduced-motion css.at-rules.media.forced-colors css.at-rules.media.tui-density css.at-rules.custom-media css.types.ratio css.types.resolution -->
+<!-- variant: narrow-light columns=40 rows=12 scheme=light -->
+<!-- variant: accessible contrast forced-colors reduced-motion -->
+<!-- variant: hidpi dppx=2 -->
+<style>
+  p { display: none }
+  @media (min-width: 50) { .wide { display: block } }
+  @media (max-width: 49) { .narrow { display: block } }
+  @media (min-height: 20) { .tall { display: block } }
+  @media (40 < width <= 60) { .range { display: block } }
+  @media (min-aspect-ratio: 1/1) { .landscape-ratio { display: block } }
+  @media (orientation: portrait) { .portrait { display: block } }
+  @media (grid) { .grid { display: block } }
+  @media (color) { .color { display: block } }
+  @media (monochrome) { .mono { display: block } }
+  @media (min-resolution: 2dppx) { .hidpi { display: block } }
+  @media (hover: none) and (pointer: none) { .nohover { display: block } }
+  @media (prefers-color-scheme: light) { .light { display: block } }
+  @media (prefers-color-scheme: dark) { .dark { display: block } }
+  @media (prefers-contrast: more) { .contrast { display: block } }
+  @media (prefers-reduced-motion: reduce) { .motion { display: block } }
+  @media (forced-colors: active) { .forced { display: block } }
+  @media (tui-density: condensed) { .condensed { display: block } }
+  @media print { .print { display: block } }
+  @media not print { .notprint { display: block } }
+  @media (--compact) { .custom { display: block } }
+  @custom-media --compact (max-width: 49), (tui-density: condensed);
+</style>
+<main>
+  <p class="wide">width at least 50</p>
+  <p class="narrow">width below 50</p>
+  <p class="tall">height at least 20</p>
+  <p class="range">width in 41..60</p>
+  <p class="landscape-ratio">landscape ratio</p>
+  <p class="portrait">portrait</p>
+  <p class="grid">grid device</p>
+  <p class="color">color</p>
+  <p class="mono">monochrome</p>
+  <p class="hidpi">2dppx</p>
+  <p class="nohover">no hover, no pointer</p>
+  <p class="light">light scheme</p>
+  <p class="dark">dark scheme</p>
+  <p class="contrast">more contrast</p>
+  <p class="motion">reduced motion</p>
+  <p class="forced">forced colors</p>
+  <p class="condensed">condensed</p>
+  <p class="print">print</p>
+  <p class="notprint">not print</p>
+  <p class="custom">custom media: narrow or condensed</p>
+</main>

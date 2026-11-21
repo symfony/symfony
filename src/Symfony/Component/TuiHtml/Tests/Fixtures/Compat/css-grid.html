@@ -1,0 +1,50 @@
+<!-- covers: css.properties.grid-template-columns css.properties.grid-column css.properties.grid-column-start css.properties.grid-column-end -->
+<!-- variant: narrow columns=30 -->
+<style>
+  .fixed { display: grid; grid-template-columns: 10ch 1fr 2fr; gap: 1 1ch }
+  .fixed > * { background: blue }
+  .wide { grid-column: span 2 }
+  .full { grid-column: 1 / -1 }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(18ch, 1fr)); gap: 0 1ch }
+  .cards > section { border: 1px solid }
+  .fit { display: grid; grid-template-columns: repeat(auto-fit, minmax(0%, 1fr)); gap: 0 1ch } .fit p { border: 1px solid; margin: 0 }
+  .segments { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: 1px solid } .segments span { padding: 0 1ch }
+  .fluid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(16ch, 100%), 1fr)); gap: 0 1ch }
+  .fluid > p { background: blue }
+  .auto { display: grid; grid-template-columns: auto 1fr; column-gap: 2ch }
+  .end { grid-column-end: span 2 }
+  .stack { display: grid; grid-template-columns: 1fr }
+  .stack > * { grid-column-start: 1; grid-row-start: 1 }
+  .stack .frame { border: 1px solid }
+  .stack .boxes { display: flex; gap: 2ch; padding: 0 2ch }
+  .layers { display: grid; grid-template-columns: 20ch }
+  .layers > * { grid-area: 1 / 1 }
+  .layers .end { justify-self: end; width: 6ch; background: #b91c1c; color: #fff }
+  .layers .wide { width: 16ch; background: #1d4ed8; color: #fff }
+  .layers .raised { position: relative; z-index: 1 }
+  .layers .static { z-index: 1 }
+</style>
+<main>
+  <div class="fixed">
+    <p>10ch</p><p>1fr</p><p>2fr</p>
+    <p class="wide">span 2</p><p>one</p>
+    <p class="full">the whole row</p>
+  </div>
+  <div class="cards">
+    <section><p>Card one</p></section>
+    <section><p>Card two</p><p>taller</p></section>
+    <section><p>Card three</p></section>
+    <section><p>Card four</p></section>
+  </div>
+  <div class="fluid"><p>min(16ch, 100%)</p><p>fluid</p><p>cards</p></div>
+  <dl class="auto">
+    <dt>Name</dt><dd>Ada Lovelace</dd>
+    <dt>Occupation</dt><dd>Mathematician</dd>
+  </dl>
+  <div class="fit"><p>auto-fit</p><p>shares</p><p>the row</p></div>
+  <p>Segments of equal width: <span class="segments"><span>Formatted</span><span>Raw</span></span></p>
+  <div class="stack"><div class="frame"></div><div class="boxes"><b>01</b><b>02</b><b>03</b></div></div>
+  <div class="layers"><span class="end">first</span><span class="wide">later, over it</span></div>
+  <div class="layers"><span class="end raised">raised</span><span class="wide">later, under it</span></div>
+  <div class="layers"><span class="end static">static</span><span class="wide">later, under it</span></div>
+</main>

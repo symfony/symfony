@@ -1,0 +1,24 @@
+<!-- covers: css.properties.animation-timeline css.properties.animation-range css.properties.animation-range-start css.properties.animation-range-end css.properties.scroll-timeline css.properties.scroll-timeline-name css.properties.scroll-timeline-axis css.properties.view-timeline css.properties.view-timeline-name css.properties.view-timeline-axis css.properties.view-timeline-inset css.properties.timeline-scope -->
+<!-- variant: middle scroll=#page:3 -->
+<!-- variant: end scroll=#page:100 -->
+<style>
+  @keyframes grow { from { width: 1% } to { width: 100% } }
+  @keyframes fade { from { color: #000000 } to { color: #ffffff } }
+  .page { height: 8; overflow-y: auto; border: 1px solid; max-width: 30ch; scroll-timeline-name: --page; scroll-timeline-axis: block }
+  .bar { position: sticky; top: 0; background: cyan; height: 1; animation: grow linear both; animation-timeline: scroll() }
+  .item { animation: fade linear both; animation-timeline: view(); animation-range: entry 0% exit 100% }
+  .named { view-timeline-name: --item; view-timeline-axis: block; view-timeline-inset: 0 1; animation: fade linear both; animation-timeline: --item; animation-range-start: cover 0%; animation-range-end: cover 100% }
+  .short { view-timeline: --short block }
+  .outside { background: yellow; animation: grow linear both; animation-timeline: --page }
+  .wrap { timeline-scope: --page }
+  .horizontal { scroll-timeline: --h inline }
+</style>
+<div class="wrap">
+  <div class="page" id="page">
+    <div class="bar"></div>
+    <p>one</p><p>two</p><p class="item">a view timeline</p><p class="named">a named one</p>
+    <p class="short">five</p><p>six</p><p>seven</p><p>eight</p><p>nine</p><p>ten</p>
+  </div>
+  <div class="outside">beside it, by its name</div>
+  <div class="horizontal">no scrolling sideways</div>
+</div>

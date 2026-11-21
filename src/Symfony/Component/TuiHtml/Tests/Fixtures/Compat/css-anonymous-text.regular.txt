@@ -1,0 +1,17 @@
+Text before it is not an element:
+
+⟨32mthe first child, green⟨0m
+
+> 70                   ⟨32mkg, the next sibling of the input:   ⟨0m
+                       ⟨32mgreen⟨0m
+Text
+
+one
+
+more text
+
+⟨32mtwo: the second child, green⟨0m
+
+┌──────────────────────────────────────────────────────────┐
+│An element in the text is a child: ⟨1mbordered⟨0m               │
+└──────────────────────────────────────────────────────────┘

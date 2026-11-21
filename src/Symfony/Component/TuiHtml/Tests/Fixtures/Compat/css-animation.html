@@ -1,0 +1,24 @@
+<!-- covers: css.at-rules.keyframes css.properties.animation css.properties.animation-name css.properties.animation-duration css.properties.animation-delay css.properties.animation-iteration-count css.properties.animation-direction css.properties.animation-fill-mode css.properties.animation-timing-function css.properties.animation-play-state css.types.easing-function.cubic-bezier css.types.easing-function.linear-function css.types.easing-function.steps css.types.easing-function -->
+<!-- variant: light scheme=light -->
+<style>
+  @keyframes pulse { from { color: #22c55e } 50% { color: #166534 } to { color: #22c55e } }
+  @keyframes blink { 50% { opacity: 0 } }
+  @-webkit-keyframes slide { from { margin-left: 0 } to { margin-left: 10 } }
+  .live { animation: pulse 2s ease-in-out infinite }
+  .rec { animation-name: blink; animation-duration: 1s; animation-timing-function: step-end; animation-iteration-count: infinite; color: red }
+  .slide { animation: slide 1s linear 0.5s 2 alternate both }
+  .paused { animation: pulse 1s infinite; animation-play-state: paused; animation-direction: reverse; animation-fill-mode: none; animation-delay: 0s }
+  .bounce { animation: slide 1s cubic-bezier(.5, -1, .5, 2) infinite }
+  .eased { animation: pulse 1s linear(0, 0.25 75%, 1) infinite }
+  .both { animation: pulse 2s infinite, blink 1s step-end infinite }
+  @keyframes across { from { translate: 0 0; background: linear-gradient(to right, #22c55e, white) } to { translate: 8ch 0; background: linear-gradient(to right, #1d4ed8, white) } }
+  .across { animation: across 2s linear -1s paused; width: 20ch }
+</style>
+<p class="live">● Live, pulsing green</p>
+<p class="rec">● REC, blinking</p>
+<p class="slide">Sliding, at its first keyframe during the delay</p>
+<p class="paused">Paused: its first frame</p>
+<p class="bounce">Bouncing, with cubic-bezier()</p>
+<p class="eased">Easing in, with linear() stops</p>
+<p class="both">Pulsing and blinking, two animations</p>
+<p class="across">Halfway across</p>

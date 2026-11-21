@@ -1,0 +1,17 @@
+
+Default: “outer ‘inner’ outer”
+
+French: « dehors ‹ dedans › dehors »
+
+None: no quotes
+
+⟨1;31m“D⟨0mrop cap: the first letter is red, with the quote before it
+
+⟨4;32mFirst line: green and underlined, ⟨0m⟨1;4;34mbold in blue⟨0m⟨4;32m on it, the⟨0m⟨90m   ⟨0m
+⟨90mrest of the paragraph wraps onto lines that stay gray⟨0m
+
+⟨3m:defined matches (italic)⟨0m
+
+⟨90m┌──────────────────────────────────────────────────────────┐⟨0m
+⟨90m│⟨0m> the focus ring is cyan                                  ⟨90m│⟨0m
+⟨90m└──────────────────────────────────────────────────────────┘⟨0m

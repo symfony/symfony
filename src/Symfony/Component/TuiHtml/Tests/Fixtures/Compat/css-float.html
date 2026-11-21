@@ -1,0 +1,44 @@
+<!-- covers: css.properties.float css.properties.clear -->
+<!-- variant: narrow columns=36 -->
+<style>
+  .note { float: right; width: 16ch; border: 1px solid yellow; margin: 0 }
+  .avatar { float: left; border: 1px solid; padding: 0 1ch }
+  .tag { float: inline-start; color: cyan }
+  .after { clear: left }
+  footer { clear: both; border-top: 1px solid }
+  .card { border-left: 1px solid; padding-left: 1ch }
+  .photo { float: left; width: 8ch; height: 4; background: #374151 }
+</style>
+<article>
+  <aside class="note"><p>A note floated to the right of the article.</p></aside>
+  <div class="avatar">AL</div>
+  <p>Ada Lovelace wrote the first program, for an engine that was never built; the text beside the floats takes the room between them.</p>
+  <p class="after">Cleared below the left float, still beside the note.</p>
+  <footer>Footer, below every float</footer>
+</article>
+<section>
+  <div class="photo"></div>
+  <div class="card"><p>The text of a paragraph in a block flows around the float as well, under it once it ends.</p><div><p>Nested further: around it too, as long as it lasts, then the whole width of the card once the float ends, its border showing again.</p></div></div>
+</section>
+<ul style="list-style: none; padding: 0; width: 30ch"><li>Inbox <span style="float: right">14</span></li><li>After text that wraps, on its last line <span style="float: right">99</span></li></ul>
+<p>An inline element floated, <span style="float: right">[right]</span>like the float-end of Bootstrap, at the side of its line, the text around it flowing on. <a href="#" style="float: left">[left]</a></p>
+<div><section style="float: left; width: 70%; border-right: 1px solid">Two floats side by side, of 70% and 25% of the block they are in, like the columns of PHP.net</section><aside style="float: left; width: 25%">The aside, a quarter of the block</aside></div>
+<div><p style="margin: 1 0">Before a float</p><aside style="float: right">[x]</aside><p style="margin: 1 0">after it, their margins collapsing, the float beside this line</p></div>
+<style>.fmenu { margin: 0; padding: 0; list-style: none; width: 30ch } .fmenu li { float: left; padding: 0 1ch }</style>
+<ul class="fmenu"><li>Download</li><li>API Documentation</li><li>Blog</li><li>Browser Support</li><li>Version Support</li></ul>
+<p style="clear: both">Floats too wide for the room beside the others go below them, like a menu of jQuery, not squeezed</p>
+<ul class="fmenu"><li style="width: 10ch">A</li><li style="width: 25ch">B, too wide, below</li><li style="width: 5ch">C</li></ul>
+<p style="clear: both">The float after one moved below goes beside it, not above it</p>
+<div style="width: 30ch"><div style="float: left; width: 27ch; height: 3; border: 1px solid">a wide float</div><p style="margin: 0">Words too long for the room beside the float go below it</p></div>
+<div style="border: 1px solid"><div><ul style="float: left; width: 60%; margin: 0; padding: 0; list-style: none"><li>A menu floated in a block of its own</li></ul></div><div><form style="float: right; width: 30%">search, beside it</form></div><div style="clear: both"></div></div>
+<section><div><span style="float: left; width: 12ch">a float</span><div></div></div><div>beside it, an empty block no content of the one before</div></section>
+<div style="display: flex; gap: 1ch"><div><span style="float: left">A flex item keeps its float</span></div><div>B</div></div>
+<ul style="list-style: none; margin: 0; padding: 0"><li style="float: left; width: 16.6666667%; border: 1px solid">Python</li><li style="float: left; width: 16.6666667%; border: 1px solid">PSF</li><li style="float: left; width: 16.6666667%; border: 1px solid">Docs</li><li style="float: left; width: 16.6666667%; border: 1px solid">PyPI</li><li style="float: left; width: 16.6666667%; border: 1px solid">Jobs</li><li style="float: left; width: 16.6666667%; border: 1px solid">Community</li></ul>
+<p style="clear: both">Six tabs of a sixth of the row each, against each other, the row of them as wide as the block, like python.org</p>
+<style>.cleared::before { content: ""; display: block; clear: both }</style>
+<div><span style="float: left">[logo]</span><span style="float: right; margin-top: 1">A tagline at the right</span></div>
+<div class="cleared">A menu whose ::before clears, like that of SQLite: below the floats</div>
+<div><span style="float: left">[logo]</span><div class="cleared" style="display: flow-root">A formatting context of its own whose ::before clears: beside the float still</div></div>
+<style>.floated::before { content: ""; display: block; float: left; clear: both } .own { clear: left } .own::before { content: ""; display: block; clear: both }</style>
+<div><span style="float: right">[R]</span><div class="floated">A floated ::before that clears: only it moves, this beside the float</div></div>
+<div><span style="float: right">[R]</span><div class="own">A clear of its own and a ::before that clears both: below</div></div>

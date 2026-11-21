@@ -1,0 +1,9 @@
+
+Inline code in reverse video, apart from the text: ⟨7mrender()⟨0m,
+⟨7mCtrl⟨0m
+
+In the colors the page gives it, like browsers: ⟨38;2;31;41;55;48;2;229;231;235mrender()⟨0m,
+⟨38;2;31;41;55;48;2;229;231;235mCtrl⟨0m
+
+A filter the page writes on code of a color of its own,
+kept: ⟨7;38;2;255;0;0minverted⟨0m

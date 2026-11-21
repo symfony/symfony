@@ -1,0 +1,27 @@
+┌────────────────────────────┐
+│⟨46m ⟨0m                          ┃│
+│one                        ┃│
+│two                        ┃│
+│⟨38;2;112;112;112ma view timeline⟨0m            ⟨2m│⟨0m│
+│⟨38;2;87;87;87ma named one⟨0m                ⟨2m│⟨0m│
+│five                       ⟨2m│⟨0m│
+└────────────────────────────┘
+⟨43mb⟨0m
+⟨43me⟨0m
+⟨43ms⟨0m
+⟨43mi⟨0m
+⟨43md⟨0m
+⟨43me⟨0m
+⟨43mi⟨0m
+⟨43mt⟨0m
+⟨43m,⟨0m
+⟨43mb⟨0m
+⟨43my⟨0m
+⟨43mi⟨0m
+⟨43mt⟨0m
+⟨43ms⟨0m
+⟨43mn⟨0m
+⟨43ma⟨0m
+⟨43mm⟨0m
+⟨43me⟨0m
+no scrolling sideways

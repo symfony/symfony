@@ -1,0 +1,13 @@
+<!-- covers: css.properties.field-sizing -->
+<!-- variant: typed focus=#name keys=!,! -->
+<style>
+  input { border: 1px solid; margin-bottom: 1 }
+  .content { field-sizing: content }
+  .capped { field-sizing: content; width: 12ch }
+  .row { display: flex; gap: 1ch }
+</style>
+<input id="name" class="content" aria-label="Name" value="Ada">
+<input class="content" aria-label="Search" placeholder="Search the docs">
+<input class="capped" aria-label="Long" value="a value longer than its width">
+<input aria-label="Fixed" value="fixed: 20 characters, like browsers">
+<div class="row"><input class="content" aria-label="A" value="one"><input class="content" aria-label="B" value="two"><p>after them</p></div>

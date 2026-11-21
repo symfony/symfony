@@ -1,0 +1,35 @@
+<!-- covers: css.properties.border-radius css.selectors.before -->
+<!-- variant: narrow columns=30 -->
+<style>
+  ul { list-style: none; padding-left: 1.25rem }
+  li { position: relative }
+  .doc li::before { content: ""; position: absolute; top: .75rem; left: -1.25rem; width: 5px; height: 5px; border-radius: 50%; background-color: #3c3c3c }
+  .inline li::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 8px; border-radius: 3px; background: green }
+  .square li::before { content: ""; position: absolute; top: 0; left: -1.25rem; width: 5px; height: 5px; background: red }
+  .big li::before { content: ""; position: absolute; top: 0; left: -1.25rem; width: 2rem; height: 2rem; border-radius: 50%; background: red }
+  .caret li::before { content: ""; position: absolute; top: .4rem; left: -1.25rem; border-left: .3rem solid; border-top: .3rem solid transparent; border-bottom: .3rem solid transparent }
+  .tab { position: relative; display: block; padding: .5em .75em .4em; text-align: center; width: 20ch }
+  .tab::before { content: ""; position: absolute; top: 0; left: 50%; border-top: 8px solid; border-left: 8px solid transparent; border-right: 8px solid transparent }
+  .tip::after { content: ""; position: absolute; border-top: 5px solid; border-left: 5px solid transparent; border-right: 5px solid transparent }
+  .links a + a::before { content: ""; display: inline-block; width: 1px; height: 10px; margin-right: 8px; background-color: gray }
+  .icon li::before { content: ""; display: inline-block; width: 8px; height: 8px; background-color: currentColor; mask-image: url(arrow.svg) }
+</style>
+<p>An absolute ::before of 5px, round, on the first line of its item, like the bullets of VitePress:</p>
+<ul class="doc"><li>one item, long enough to wrap onto a second line in a narrow terminal of thirty columns</li><li>two</li></ul>
+<p>In the line, a dot of its background color:</p>
+<ul class="inline"><li>done</li></ul>
+<p>Square, a small square; larger than a cell, its box:</p>
+<ul class="square"><li>square</li></ul>
+<ul class="big"><li>big</li></ul>
+<p>An absolute triangle drawn by its borders:</p>
+<ul class="caret"><li>open</li></ul>
+<p>A triangle in the top padding of a tab, padding less than a row, like python.org: left out, not over its text</p>
+<a class="tab" href="#python">Python</a>
+<p>In a padding of 13px, which rounds to a row: on that row, above its text</p>
+<a class="tab" href="#python" style="padding-top: 13px">Python</a>
+<p>A box holding a paragraph, its triangle drawn once, over it, not in its line too</p>
+<div class="tab" style="padding-top: 13px"><p style="margin: 0">Docs</p></div>
+<p>That of an inline element, in its line: <span class="tip">tip</span> after it</p>
+<p>A thin box, a bar between links, like the footer of GitHub: <span class="links"><a href="#a">Terms</a> <a href="#b">Privacy</a> <a href="#c">Status</a></span></p>
+<p>An icon, its image masking it, no glyph:</p>
+<ul class="icon"><li>icon</li></ul>

@@ -1,0 +1,17 @@
+<!-- covers: css.properties.scroll-marker-group css.selectors.scroll-marker css.selectors.scroll-marker-group css.selectors.target-current -->
+<!-- variant: scrolled scroll=#toc:3 -->
+<!-- variant: marker click=8:7 -->
+<!-- variant: last click=5:7 -->
+<style>
+  .carousel { height: 7; overflow-y: auto; border: 1px solid; max-width: 30ch; scroll-marker-group: after; scroll-snap-type: y mandatory }
+  .carousel::scroll-marker-group { color: gray }
+  .carousel > p { scroll-snap-align: start; margin: 0 0 1 }
+  .carousel > p::scroll-marker { content: "○" }
+  .carousel > p::scroll-marker:target-current { content: "●"; color: cyan }
+  .toc { height: 6; overflow-y: auto; border: 1px solid; max-width: 30ch; scroll-marker-group: before }
+  .toc > h3::scroll-marker { content: attr(data-label) }
+  .toc > h3::scroll-marker:target-current { font-weight: bold; text-decoration: underline }
+  h3 { margin: 0 }
+</style>
+<div class="carousel" id="carousel"><p>Slide one</p><p>Slide two</p><p>Slide three</p><p>Slide four</p></div>
+<div class="toc" id="toc"><h3 data-label="Intro">Intro</h3><p>a</p><p>b</p><h3 data-label="Usage">Usage</h3><p>c</p><p>d</p><h3 data-label="End">End</h3><p>e</p></div>

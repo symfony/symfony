@@ -1,0 +1,14 @@
+<!-- covers: css.properties.position css.properties.top -->
+<!-- variant: narrow columns=30 -->
+<style>
+  .inbox { overflow: auto; max-height: 6; border: 1px solid }
+  .columns { position: sticky; top: 0; font-weight: bold; background: blue }
+  h2 { position: sticky; top: 1; margin: 0; color: yellow }
+  .flow { position: relative; top: 5 }
+</style>
+<div class="inbox">
+  <p class="columns">From / Subject</p>
+  <section><h2>Today</h2><p>Ada: Engines</p><p>Grace: Compilers</p></section>
+  <section><h2>Yesterday</h2><p>Alan: Machines</p><p>Edsger: Semaphores</p><p>Barbara: Abstraction</p><p>Donald: Algorithms</p><p>John: Lisp</p><p>Niklaus: Pascal</p><button>Load more</button></section>
+</div>
+<p class="flow">relative stays in the flow</p>

@@ -209,6 +209,10 @@ class LoaderWidget extends AbstractWidget
         if (0 === $steps = $this->frameStepper->advance($deltaTime)) {
             return false;
         }
+        // The spinner stays still for users sensitive to motion
+        if ($this->getContext()?->prefersReducedMotion()) {
+            return false;
+        }
 
         $this->frame = ($this->frame + $steps) % \count($this->frames);
         $this->invalidate();

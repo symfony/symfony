@@ -1,0 +1,4 @@
+Scripts do not run: the content of ⟨1mnoscript⟨0m is drawn, and
+its style sheets hide what needs them, like in a browser
+without scripts.
+After it.

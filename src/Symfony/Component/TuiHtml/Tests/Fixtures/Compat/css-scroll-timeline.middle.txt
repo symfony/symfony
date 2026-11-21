@@ -1,0 +1,11 @@
+┌────────────────────────────┐
+│⟨46m     ⟨0m                      ⟨2m│⟨0m│
+│two                        ┃│
+│                           ┃│
+│⟨38;2;112;112;112ma view timeline⟨0m            ⟨2m│⟨0m│
+│                           ⟨2m│⟨0m│
+│⟨38;2;64;64;64ma named one⟨0m                ⟨2m│⟨0m│
+└────────────────────────────┘
+⟨43mbeside it,  ⟨0m
+⟨43mby its name ⟨0m
+no scrolling sideways

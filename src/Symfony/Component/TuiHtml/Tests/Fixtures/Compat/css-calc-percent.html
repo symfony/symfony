@@ -1,0 +1,12 @@
+<!-- covers: css.types.calc -->
+<!-- variant: narrow columns=30 -->
+<style>
+  .row { display: flex; gap: 1ch }
+  .side { width: 12ch; border: 1px solid }
+  .main { width: calc(100% - 13ch); border: 1px solid }
+  .third { width: calc((100% - 2ch) / 3); border: 1px solid }
+  .inset { max-width: calc(100% - 4ch); margin: 0 auto; border: 1px solid }
+</style>
+<div class="row"><div class="side">Side</div><div class="main">Main takes the rest: calc(100% - 13ch)</div></div>
+<div class="row"><div class="third">One</div><div class="third">Two</div><div class="third">Three</div></div>
+<div class="inset">Two columns narrower on each side</div>

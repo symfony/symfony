@@ -1,0 +1,17 @@
+<!-- covers: css.properties.anchor-scope -->
+<style>
+  ul { list-style: none; padding: 0; margin: 0 }
+  li { anchor-name: --card; max-width: 20ch; margin-bottom: 1 }
+  .scoped li { anchor-scope: --card }
+  .badge { position: absolute; position-anchor: --card; top: anchor(top); left: anchor(right); color: yellow }
+  .all { anchor-scope: all }
+  #lone { anchor-name: --lone; max-width: 20ch }
+  .outside { position: absolute; position-anchor: --lone; position-area: right; top: 8; left: 0; color: red }
+</style>
+<ul class="scoped">
+  <li>First card <span class="badge">← its own</span></li>
+  <li>Second card <span class="badge">← its own</span></li>
+  <li>Third card <span class="badge">← its own</span></li>
+</ul>
+<div class="all"><p id="lone">Kept inside</p></div>
+<p class="outside">at its insets, not next to it: the name is kept inside</p>

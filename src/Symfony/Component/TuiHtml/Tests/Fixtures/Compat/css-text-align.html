@@ -1,0 +1,26 @@
+<!-- requires: GdImage IntlChar -->
+<!-- covers: css.properties.text-align css.properties.text-justify -->
+<!-- variant: narrow columns=30 -->
+<style>
+  p { margin: 0 0 1 }
+  .center { text-align: center }
+  .right { text-align: right }
+  .justify { text-align: justify; line-height: 2 }
+  .row { display: flex; gap: 1ch }
+  .start { text-align: end }
+  .start p { direction: rtl; text-align: match-parent }
+  .letters { text-align: justify; text-justify: inter-character }
+  .none { text-align: justify; text-justify: none }
+</style>
+<p class="center">Each line of a wrapped paragraph is centered on its own, like in a browser, not the block as a whole.</p>
+<p class="right">Right aligned text keeps every line against the <em>right</em> edge of its box.</p>
+<p class="justify">Justified text stretches the spaces between its words so that every line but the last fills the width.<br>A forced break ends a paragraph line too.</p>
+<div class="row"><p class="center">short<br>and centered</p><p>beside it</p></div>
+<div class="start" dir="ltr"><p>match-parent: on the right, the end of the parent, though this paragraph runs right to left</p></div>
+<p class="letters">inter-character spreads the room between the letters of each line instead of between its words.</p>
+<p class="none">text-justify: none leaves these lines at the start, though they are justified.</p>
+<p class="justify" lang="ja" style="max-width: 25ch; line-height: 1">日本語の文章は、単語の間に空白がないので、文字の間を広げて行を揃えます。</p>
+<p style="text-align: center; width: 30ch">Each line of text and buttons centered in its own room <button>One</button><button>Two</button><button>Three</button></p>
+<p style="text-align: right; width: 30ch">Each line at the right <button>One</button><button>Two</button><button>Three</button></p>
+<p dir="rtl" style="text-align: center; width: 30ch">טקסט <button>שלח</button></p>
+<p style="text-align: center; width: 30ch">An auto margin of an inline button is none <button style="margin-left: auto">Go</button></p>

@@ -1,0 +1,18 @@
+<!-- covers: css.properties.padding css.properties.margin css.properties.border css.properties.box-decoration-break css.properties.-webkit-box-decoration-break -->
+<!-- variant: narrow columns=26 -->
+<style>
+  .tag { background: #2563eb; color: white; padding: 0 1ch; margin: 0 1ch 0 0 }
+  .warn { background: #b45309; color: white; padding-inline: 1ch }
+  kbd { border: 1px solid gray; padding: 0 1ch; filter: none }
+  .quote { border: 1px solid cyan; padding: 0 1ch; box-decoration-break: clone }
+  .sliced { border: 1px solid cyan; padding: 0 1ch; -webkit-box-decoration-break: slice }
+  .status { border-left: 1px solid green; padding-left: 1ch; color: green }
+  .placeholder { display: inline-block; min-height: 1em; background-color: gray }
+</style>
+<p>Labels: <span class="tag">bug</span><span class="tag">ui</span><span class="warn">needs review</span></p>
+<p>Press <kbd>Ctrl</kbd>+<kbd>C</kbd> to copy, <kbd>Esc</kbd> to leave.</p>
+<p>Build <span class="status">passed</span> in 4.2 seconds, with the boxes of inline elements wrapping like words.</p>
+<p>Cloned: <span class="quote">a quotation long enough to wrap over two lines or more</span>, each line framed.</p>
+<p>Sliced: <span class="sliced">a quotation long enough to wrap over two lines or more</span>, framed at its ends.</p>
+<p>Loading: <span class="placeholder" style="width: 50%"></span> <span class="placeholder" style="width: 25%"></span></p>
+<p style="width: 20ch">Pads are no breaks: <code style="padding: 0 1ch">code</code>, then a comma kept with it.</p>

@@ -1,0 +1,11 @@
+<!-- covers: css.properties.position -->
+<!-- variant: cells scroll=.cells:4 -->
+<!-- variant: head scroll=.groups:4 -->
+<style>
+  .cells, .groups { height: 6; overflow-y: auto; border: 1px solid; margin-bottom: 1 }
+  .cells thead th { position: sticky; top: 0; background: blue }
+  .groups thead { position: sticky; top: 0; background: green }
+  table { width: 100% }
+</style>
+<div class="cells"><table><thead><tr><th>Sticky cells</th><th>Size</th></tr></thead><tbody><tr><td>a</td><td>1</td></tr><tr><td>b</td><td>2</td></tr><tr><td>c</td><td>3</td></tr><tr><td>d</td><td>4</td></tr><tr><td>e</td><td>5</td></tr><tr><td>f</td><td>6</td></tr><tr><td>g</td><td>7</td></tr></tbody></table></div>
+<div class="groups"><table><thead><tr><th>Sticky head</th><th>Size</th></tr></thead><tbody><tr><td>a</td><td>1</td></tr><tr><td>b</td><td>2</td></tr><tr><td>c</td><td>3</td></tr><tr><td>d</td><td>4</td></tr><tr><td>e</td><td>5</td></tr><tr><td>f</td><td>6</td></tr><tr><td>g</td><td>7</td></tr></tbody></table></div>

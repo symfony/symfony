@@ -1,0 +1,40 @@
+<!-- covers: css.properties.flex-direction css.properties.gap css.properties.row-gap css.properties.column-gap css.properties.flex css.properties.flex-grow css.properties.justify-content css.properties.align-items css.properties.flex-shrink -->
+<!-- variant: narrow columns=50 -->
+<style>
+  .row { display: flex; gap: 2ch }
+  .col { display: flex; flex-direction: column; row-gap: 1 }
+  .cols { display: flex; column-gap: 4ch }
+  .grow > .one { flex: 1 } .grow > .two { flex-grow: 2 }
+  .grow { display: flex }
+  .center { display: flex; flex-direction: column; align-items: center }
+  .end { display: flex; justify-content: flex-end }
+  .end > p { flex: none }
+  .shrink { display: flex }
+  .shrink > p { flex: 0 }
+  .shrink > .keep { flex-shrink: 0 }
+  .fraction, .partial { display: flex }
+  .fraction p, .partial p { border: 1px solid }
+  .fraction .a { flex: 0.5 } .fraction .b { flex: 1.5 }
+  .partial .a { flex: 0.25 } .partial .b { flex: 0.5 }
+  .hero { text-align: center }
+  .actions { display: flex; justify-content: center; gap: 2ch }
+  .actions a { border: 1px solid }
+  .meter { display: flex; height: 1; width: 20ch; background: gray } .meter div { width: 40%; background: green }
+</style>
+<main>
+  <div class="row"><p>row a</p><p>row b</p></div>
+  <div class="col"><p>column a</p><p>column b</p></div>
+  <div class="cols"><p>gap a</p><p>gap b</p></div>
+  <div class="grow"><p class="one">one</p><p class="two">two</p></div>
+  <div class="center"><p>centered</p></div>
+  <div class="end"><p>at the end</p></div>
+  <div class="shrink"><p class="keep">this cell never gives way, whatever the width</p><p>this one shrinks when the row is too narrow</p></div>
+  <div class="fraction"><p class="a">0.5</p><p class="b">1.5: three times as wide</p></div>
+  <div class="partial"><p class="a">0.25</p><p class="b">0.5: the last quarter left free</p></div>
+  <div class="hero"><p>A centered hero, its actions centered by justify-content alone</p><div class="actions"><a href="#">Get started</a><a href="#">Learn more</a></div></div>
+  <div class="meter"><div><span hidden>40% covered</span></div></div>
+</main>
+<div style="text-align: center"><button>Alone</button> <button>in a centered block</button></div>
+<div style="text-align: right"><a href="#" style="display: inline-block; border: 1px solid">a boxed link on the right</a></div>
+<div style="display: flex"><div style="width: 0%; flex-grow: 1; border: 1px solid">width: 0%, growing</div><div style="min-width: max-content; border: 1px solid">min-width: max-content</div></div>
+<div style="flex-direction: row"><p>flex-direction on a block: no row,</p><p>its blocks stacked</p></div>

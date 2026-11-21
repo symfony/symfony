@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Event\InputEvent;
+use Symfony\Component\Tui\Event\RendererChangeEvent;
 use Symfony\Component\Tui\Event\TickEvent;
 use Symfony\Component\Tui\Exception\InvalidArgumentException;
 use Symfony\Component\Tui\Input\Key;
@@ -34,6 +35,67 @@ use Symfony\Component\Tui\Widget\TextWidget;
 
 class TuiTest extends TestCase
 {
+    public function testRendererGivenToTheConstructorGetsTheStylesheetGivenWithIt()
+    {
+        $styleSheet = new StyleSheet()->addRule('.marked', new Style()->withColor('blue'));
+        $renderer = new Renderer();
+        new Tui($styleSheet, new VirtualTerminal(20, 5), renderer: $renderer);
+
+        $widget = new TextWidget('x');
+        $widget->addStyleClass('marked');
+        $this->assertNotNull($renderer->resolveStyle($widget)->getColor());
+    }
+
+    public function testSelectedRendererGetsTheStylesheetsAddedBefore()
+    {
+        $tui = new Tui(new StyleSheet()->addRule('.first', new Style()->withColor('blue')), new VirtualTerminal(20, 5));
+        $tui->addStyleSheet(new StyleSheet()->addRule('.second', new Style()->withColor('red')));
+        $renderer = new Renderer();
+        $tui->setRenderer($renderer);
+
+        $this->assertSame($renderer, $tui->getRenderer());
+        $first = new TextWidget('x');
+        $first->addStyleClass('first');
+        $second = new TextWidget('x');
+        $second->addStyleClass('second');
+        $this->assertNotNull($renderer->resolveStyle($first)->getColor());
+        $this->assertNotNull($renderer->resolveStyle($second)->getColor());
+    }
+
+    public function testSelectingAnotherRendererDispatchesAnEvent()
+    {
+        $tui = new Tui(terminal: new VirtualTerminal(20, 3));
+        $previous = $tui->getRenderer();
+        $events = [];
+        $tui->addListener(static function (RendererChangeEvent $event) use (&$events): void {
+            $events[] = $event;
+        });
+
+        $tui->setRenderer($renderer = new Renderer());
+        $tui->setRenderer($renderer);
+
+        $this->assertCount(1, $events, 'Not for the renderer already selected.');
+        $this->assertSame($previous, $events[0]->getPreviousRenderer());
+        $this->assertSame($renderer, $events[0]->getRenderer());
+    }
+
+    public function testAStylesheetAddedAfterAFrameIsDrawnInTheNext()
+    {
+        $terminal = new VirtualTerminal(20, 3);
+        $tui = new Tui(terminal: $terminal);
+        $tui->add($text = new TextWidget('x'));
+        $text->addStyleClass('on');
+        $tui->start();
+        $tui->processRender();
+        $this->assertStringNotContainsString("\x1b[1m", $terminal->consumeOutput());
+
+        $tui->addStyleSheet(new StyleSheet(['.on' => new Style(bold: true)]));
+        $tui->processRender();
+
+        $this->assertStringContainsString("\x1b[1m", $terminal->consumeOutput());
+        $tui->stop();
+    }
+
     public function testRejectsTerminalUsingDifferentEventDispatcher()
     {
         $this->expectException(InvalidArgumentException::class);

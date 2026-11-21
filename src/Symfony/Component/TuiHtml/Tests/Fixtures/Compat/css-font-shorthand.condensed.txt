@@ -1,0 +1,18 @@
+┌──────────────────────┐
+│⟨1;3mIᴛᴀʟɪᴄ ꜱᴍᴀʟʟ ᴄᴀᴘꜱ ɪɴ  ⟨0m│
+│⟨1;3m                      ⟨0m│
+│⟨1;3mʙᴏʟᴅ, ᴀ ʟɪɴᴇ ʙᴇᴛᴡᴇᴇɴ  ⟨0m│
+│⟨1;3m                      ⟨0m│
+│⟨1;3mᴛʜᴇ ʀᴏᴡꜱ⟨0m              │
+└──────────────────────┘
+┌──────────────────────┐
+│Longhands after it    │
+│win: as is, no line   │
+│between               │
+└──────────────────────┘
+┌──────────────────────┐
+│The shorthand resets  │
+│the longhands before  │
+│it                    │
+└──────────────────────┘
+A font after a font-weight: bold resets it, its text too

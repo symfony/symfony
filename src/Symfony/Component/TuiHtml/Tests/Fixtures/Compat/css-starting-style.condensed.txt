@@ -1,0 +1,3 @@
+⟨38;2;75;85;99mShown: its transitions start from its starting style, the   ⟨0m
+⟨38;2;75;85;99mfirst frame here.⟨0m
+⟨7m[ Tip ]⟨0m

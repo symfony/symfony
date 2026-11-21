@@ -1,0 +1,36 @@
+<!-- covers: css.selectors.placeholder-shown css.selectors.required css.selectors.optional css.selectors.read-write css.selectors.read-only css.selectors.open css.selectors.indeterminate css.selectors.default css.selectors.placeholder -->
+<!-- variant: focus-search focus=#search -->
+<!-- variant: plan-open focus=#plan keys=enter -->
+<!-- variant: plan-changed focus=#plan keys=enter,up,enter -->
+<style>
+  label { display: none }
+  input::placeholder { color: gray; font-style: italic }
+  input:placeholder-shown { border: 1px solid yellow }
+  :required { border: 1px solid red }
+  input:optional:not(:placeholder-shown) { border: 1px dashed }
+  input:read-only, select:read-only, p:read-only { font-weight: bold }
+  :read-write:read-only { color: red }
+  input:read-write:focus { color: green }
+  details:open::summary { color: magenta }
+  details:not(:open)::summary { color: cyan }
+  progress:indeterminate { color: blue }
+  input[type=radio] { border: none }
+  input[type=radio]:indeterminate { color: yellow }
+  :default { text-decoration: underline }
+  input:disabled { font-style: italic }
+</style>
+<main>
+  <input id="search" aria-label="Search" placeholder="Search…">
+  <input id="email" aria-label="Email" required value="ada@example.com">
+  <input id="locked" aria-label="Id" readonly value="42 (read-only, bold)">
+  <select aria-label="Size" size="1"><option>read-only (bold)</option></select>
+  <details open><summary>Open (magenta)</summary><p>Inside</p></details>
+  <details><summary>Closed (cyan)</summary><p>Hidden</p></details>
+  <progress aria-label="Loading"></progress>
+  <p>A paragraph is read-only too (bold)</p>
+  <form><input type="radio" name="size" aria-label="none checked (yellow)"><input type="radio" name="size" aria-label="none checked (yellow)"></form>
+  <form><input type="radio" name="size" aria-label="another form"><input type="radio" name="size" checked aria-label="one checked (underlined)"></form>
+  <form><input aria-label="Name" value="field"><button>Send (underlined)</button> <button type="submit">Also send</button> <input type="checkbox" checked aria-label="checked (underlined)"></form>
+  <select id="plan" aria-label="Plan"><option><b>Free</b> plan</option><option selected><b>Pro</b> plan (underlined, selected in the markup)</option></select>
+  <fieldset disabled><legend>Off</legend><input aria-label="Off" value="disabled by its fieldset (italic)"></fieldset>
+</main>

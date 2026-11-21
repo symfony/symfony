@@ -1,0 +1,11 @@
+<!-- covers: css.properties.border-spacing css.properties.border-collapse css.properties.width -->
+<style>
+  table { border-collapse: separate; border: 1px solid; width: 46ch; margin-bottom: 1 }
+  td { border-top: 1px solid; padding-left: 2ch }
+  .touching { border-spacing: 0 }
+  .apart { border-spacing: 2ch 0 }
+</style>
+<p>Cells without spacing, their borders one line across a table as wide as it says, like the files of GitHub:</p>
+<table class="touching"><tr><td>src</td><td>Add the parser</td><td>2 days ago</td></tr><tr><td>README.md</td><td>Fix a typo</td><td>last week</td></tr></table>
+<p>Cells two columns apart:</p>
+<table class="apart"><tr><td>src</td><td>Add the parser</td><td>2 days ago</td></tr></table>

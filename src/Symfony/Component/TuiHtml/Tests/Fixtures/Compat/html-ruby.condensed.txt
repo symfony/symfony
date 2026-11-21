@@ -1,0 +1,13 @@
+          とうきょう
+Furigana:  東   京   is the capital.
+                   kanji                 ⟨38;2;156;163;175mlandmark⟨0m
+A wide annotation: 漢 字, a narrow one: Tokyo Tower.
+Under the line:  明日  and today .
+                あした     きょう
+                             こんにち
+                   Centered:  今  日  は
+           ⟨4mしんぶん⟨0m
+In a link:  ⟨4m新⟨0m  ⟨4m聞⟨0m , and a long text that wraps around
+かんじ
+ 漢字  to the next line.
+Displayed inline: 猫(ねこ)

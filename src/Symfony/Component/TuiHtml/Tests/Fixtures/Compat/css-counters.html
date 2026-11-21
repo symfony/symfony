@@ -1,0 +1,34 @@
+<!-- covers: css.properties.counter-reset css.properties.counter-increment css.properties.counter-set css.properties.content css.types.string css.types.counter css.types.counters -->
+<style>
+  main { counter-reset: section }
+  h2 { counter-reset: sub }
+  h2::before { counter-increment: section; content: counter(section) ". " }
+  h3::before { counter-increment: sub; content: counter(section) "." counter(sub, lower-alpha) " " }
+  .skip { display: none }
+  .jump { counter-set: section 9 }
+  ol.toc { list-style: none; counter-reset: item }
+  ol.toc li { counter-increment: item }
+  ol.toc li::before { content: counters(item, ".") " " }
+  aside { border-left: 1px solid; padding-left: 1ch; counter-increment: note }
+  aside::before { content: "Note " counter(note) ":"; font-weight: bold }
+  aside::after { content: "(end of note " counter(note) ")"; color: gray }
+  .roman::after { content: " (" counter(section, upper-roman) ")" }
+</style>
+<main>
+  <h2>Intro</h2>
+  <h3>Why</h3>
+  <h3>How</h3>
+  <h2 class="skip">Hidden, does not count</h2>
+  <h2>Usage</h2>
+  <h3>Install</h3>
+  <p class="jump roman">Jump to nine</p>
+  <h2>After the jump</h2>
+  <ol class="toc">
+    <li>One</li>
+    <li>Two
+      <ol class="toc"><li>Two one</li><li>Two two</li></ol>
+    </li>
+    <li>Three</li>
+  </ol>
+  <aside><p>A block holding blocks draws its ::before and ::after on lines of their own.</p><p>Like a browser.</p></aside>
+</main>

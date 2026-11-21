@@ -95,13 +95,128 @@ class ParallelExecutionStrategyTest extends TestCase
         $this->assertSame([], $phase);
     }
 
-    public function testShouldPauseConsumptionWhileAProbeIsPending()
+    public function testAProbeDoesNotPauseConsumptionOfOtherKeys()
     {
-        $strategy = new ParallelExecutionStrategy(__DIR__.'/../Fixtures/App/bin/console');
+        $probeChannel = $this->createFakeChannel();
+        $channel = $this->createFakeChannel();
+        $strategy = $this->createStrategy([$probeChannel, $channel], 2);
+        $calls = [];
 
-        $this->setPrivateProperty($strategy, 'pendingProbeRequestId', 1);
+        // after a worker restart, the learning is lost and the first message of a key probes
+        // again: messages of other keys must keep being consumed meanwhile
+        $strategy->execute(new Envelope(new DummyMessage('slow')), 'async', $this->createOnHandled($calls));
 
+        $this->assertFalse($strategy->shouldPauseConsumption());
+
+        $strategy->execute(new Envelope(new SecondMessage()), 'async', $this->createOnHandled($calls));
+
+        $this->assertSame([], $calls);
+        $this->assertCount(1, $probeChannel->sent);
+        $this->assertCount(1, $channel->sent);
+    }
+
+    public function testMessagesOfAProbedKeyAreHeldUntilItsProbeDefers()
+    {
+        $probeChannel = $this->createFakeChannel();
+        $channel = $this->createFakeChannel();
+        $strategy = $this->createStrategy([$probeChannel, $channel], 2);
+        $calls = [];
+
+        $strategy->execute(new Envelope(new DummyMessage('probe')), 'async', $this->createOnHandled($calls));
+        $strategy->execute(new Envelope(new DummyMessage('sibling')), 'async', $this->createOnHandled($calls));
+
+        // the sibling of a probed key is held back: spreading it across workers first would
+        // strand a batch on a worker that can never complete it
+        $this->assertSame([], $calls);
+        $this->assertCount(1, $probeChannel->sent);
+        $this->assertSame([], $channel->sent);
+
+        // the probe defers: the key batches, and the held sibling joins the probed worker
+        $probeChannel->push(new DeferredEnvelopeMessage(1));
+        $this->assertTrue($strategy->wait($this->createOnHandled($calls)));
+
+        $this->assertSame([], $calls);
+        $this->assertCount(2, $probeChannel->sent);
+        $this->assertSame([], $channel->sent);
+        $this->assertFalse($strategy->shouldPauseConsumption());
+    }
+
+    public function testHeldMessagesRunOnceAProbeCompletesWithoutBatching()
+    {
+        $probeChannel = $this->createFakeChannel();
+        $channel = $this->createFakeChannel();
+        $strategy = $this->createStrategy([$probeChannel, $channel], 2);
+        $calls = [];
+
+        $strategy->execute($probe = new Envelope(new DummyMessage('probe')), 'async', $this->createOnHandled($calls));
+        $strategy->execute($sibling = new Envelope(new DummyMessage('sibling')), 'async', $this->createOnHandled($calls));
+        $this->assertSame([], $calls);
+
+        // the probe completes without deferring: the key does not batch, and the held
+        // sibling is dispatched to the freed worker
+        $probeChannel->push(new HandledEnvelopeMessage(1, $probe, null));
+        $this->assertTrue($strategy->wait($this->createOnHandled($calls)));
+
+        $this->assertCount(1, $calls);
+        $this->assertSame('probe', $calls[0][0]->getMessage()->getMessage());
+        $this->assertCount(2, $probeChannel->sent);
+
+        $probeChannel->push(new HandledEnvelopeMessage(2, $sibling, null));
+        $this->assertTrue($strategy->wait($this->createOnHandled($calls)));
+
+        $this->assertCount(2, $calls);
+        $this->assertSame('sibling', $calls[1][0]->getMessage()->getMessage());
+    }
+
+    public function testHeldMessagesCountTowardsTheConcurrencyLimit()
+    {
+        $probeChannel = $this->createFakeChannel();
+        $channel = $this->createFakeChannel();
+        $strategy = $this->createStrategy([$probeChannel, $channel], 2);
+        $calls = [];
+        $onHandled = $this->createOnHandled($calls);
+
+        $strategy->execute($probe = new Envelope(new DummyMessage('A')), 'async', $onHandled);
+        $strategy->execute($envelopeB = new Envelope(new DummyMessage('B')), 'async', $onHandled);
+        $strategy->execute($envelopeC = new Envelope(new DummyMessage('C')), 'async', $onHandled);
+
+        // held messages occupy the slot of the worker they wait for, like busy ones do
         $this->assertTrue($strategy->shouldPauseConsumption());
+
+        $probeChannel->push(new HandledEnvelopeMessage(1, $probe, null));
+        $this->assertTrue($strategy->wait($onHandled));
+
+        // the held messages are dispatched once the probe completed: their workers are busy now
+        $this->assertTrue($strategy->shouldPauseConsumption());
+
+        $this->pushHandled($probeChannel, $channel, 2, $envelopeB);
+        $this->assertTrue($strategy->wait($onHandled));
+        $this->assertFalse($strategy->shouldPauseConsumption());
+
+        $this->pushHandled($probeChannel, $channel, 3, $envelopeC);
+        $this->assertTrue($strategy->wait($onHandled));
+        $this->assertFalse($strategy->shouldPauseConsumption());
+        $this->assertCount(3, $calls);
+    }
+
+    public function testFlushForceDoesNotStrandHeldMessages()
+    {
+        $probe = new Envelope(new DummyMessage('probe'));
+        $sibling = new Envelope(new DummyMessage('sibling'));
+        $probeChannel = $this->createFakeChannel([], [new HandledEnvelopeMessage(1, $probe, null)]);
+        $channel = $this->createFakeChannel([], [new HandledEnvelopeMessage(2, $sibling, null)]);
+        $strategy = $this->createStrategy([$probeChannel, $channel], 2);
+        $calls = [];
+
+        $strategy->execute($probe, 'async', $this->createOnHandled($calls));
+        $strategy->execute($sibling, 'async', $this->createOnHandled($calls));
+        $this->assertSame([], $calls);
+
+        // a worker that stops while a probe is pending must not strand the held messages
+        $this->assertTrue($strategy->flush($this->createOnHandled($calls), true));
+
+        $this->assertCount(2, $calls);
+        $this->assertFalse($strategy->shouldPauseConsumption());
     }
 
     public function testShouldPauseConsumptionWhenAllWorkersAreBusy()
@@ -309,16 +424,24 @@ class ParallelExecutionStrategyTest extends TestCase
         $calls = [];
 
         $strategy->execute($envelopeA = new Envelope(new DummyMessage('A')), 'async', $this->createOnHandled($calls));
-        $strategy->execute(new Envelope(new DummyMessage('C')), 'async', $this->createOnHandled($calls));
+        $strategy->execute($envelopeC = new Envelope(new DummyMessage('C')), 'async', $this->createOnHandled($calls));
         $stoppedChannel->push(null);
         $crashedChannel->push(new ChannelException('Channel source closed unexpectedly'));
         $this->setPrivateProperty($strategy, 'taskFailures', [spl_object_id($stoppedChannel) => new \RuntimeException('Reset failed.'), spl_object_id($crashedChannel) => new \RuntimeException('Crashed.')]);
 
         $strategy->execute($envelopeB = new Envelope(new DummyMessage('B')), 'async', $this->createOnHandled($calls));
 
-        $this->assertSame(['C'], array_map(static fn (array $call) => $call[0]->getMessage()->getMessage(), $calls));
-        $this->assertSame('Crashed.', $calls[0][2]->getPrevious()->getMessage());
-        $this->assertSame([$envelopeA, $envelopeB], array_map(static fn (DispatchEnvelopeMessage $message) => $message->envelope, $channel->sent));
+        // the message that the stopped worker did not read probes again on another worker, and
+        // the messages of its key wait for it: the crashed worker had nothing left to settle
+        $this->assertSame([], $calls);
+        $this->assertSame([$envelopeA], array_map(static fn (DispatchEnvelopeMessage $message) => $message->envelope, $channel->sent));
+
+        // once the probe of the key completes, the held messages run on the remaining worker
+        $channel->push(new HandledEnvelopeMessage(2, $envelopeA, null));
+        $this->assertTrue($strategy->wait($this->createOnHandled($calls)));
+
+        $this->assertSame(['A'], array_map(static fn (array $call) => $call[0]->getMessage()->getMessage(), $calls));
+        $this->assertSame([$envelopeA, $envelopeC, $envelopeB], array_map(static fn (DispatchEnvelopeMessage $message) => $message->envelope, $channel->sent));
     }
 
     public function testAFailureToSettleAnotherMessageIsNotChargedToTheDispatchedOne()
@@ -467,6 +590,21 @@ class ParallelExecutionStrategyTest extends TestCase
 
         $this->assertCount(2, $channelA->sent);
         $this->assertSame([], $channelB->sent);
+    }
+
+    private function pushHandled(object $firstChannel, object $secondChannel, int $requestId, Envelope $envelope): void
+    {
+        foreach ([$firstChannel, $secondChannel] as $channel) {
+            foreach ($channel->sent as $message) {
+                if ($message instanceof DispatchEnvelopeMessage && $message->requestId === $requestId) {
+                    $channel->push(new HandledEnvelopeMessage($requestId, $envelope, null));
+
+                    return;
+                }
+            }
+        }
+
+        $this->fail(\sprintf('No channel was sent the request "%d".', $requestId));
     }
 
     private function createStrategy(object|array $channels, int $concurrencyLimit = 1): ParallelExecutionStrategy

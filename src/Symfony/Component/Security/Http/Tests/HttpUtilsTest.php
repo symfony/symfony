@@ -93,6 +93,26 @@ class HttpUtilsTest extends TestCase
                 'http://localhost/blog',
                 'http://localhost/blog',
             ],
+            'http://localhost?foo with #^https?://%s$#i' => [
+                '#^https?://%s$#i',
+                'http://localhost?foo',
+                'http://localhost?foo',
+            ],
+            'subdomain' => [
+                '{^https?://(?:%s|(?:.+\.)?example\.com)$}i',
+                'https://www.example.com/foo?bar=.pirate.net#baz',
+                'https://www.example.com/foo?bar=.pirate.net#baz',
+            ],
+            'subdomain followed by a query string' => [
+                '{^https?://(?:%s|(?:.+\.)?example\.com)$}i',
+                'https://www.example.com?foo=.pirate.net',
+                'https://www.example.com?foo=.pirate.net',
+            ],
+            'subdomain followed by a fragment' => [
+                '{^https?://(?:%s|(?:.+\.)?example\.com)$}i',
+                'https://www.example.com#.pirate.net',
+                'https://www.example.com#.pirate.net',
+            ],
             'custom scheme' => [
                 null,
                 'android-app://com.google.android.gm/',
@@ -126,6 +146,47 @@ class HttpUtilsTest extends TestCase
             ['http:\\/pirate.net/foo'],
             ['http://////pirate.net/foo'],
             ['http:///foo'],
+        ];
+    }
+
+    /**
+     * @dataProvider badRequestSubDomainUrls
+     */
+    public function testCreateRedirectResponseWithBadRequestsSubDomain(string $url)
+    {
+        $utils = new HttpUtils($this->getUrlGenerator(), null, '{^https?://(?:%s|(?:.+\.)?example\.com)$}i');
+        $response = $utils->createRedirectResponse($this->getRequest(), $url);
+
+        $this->assertTrue($response->isRedirect('http://localhost/'));
+    }
+
+    /**
+     * @dataProvider badRequestSubDomainUrls
+     */
+    public function testCreateRedirectResponseWithBadSecureRequestsSubDomain(string $url)
+    {
+        $urlMatcher = $this->createStub(UrlMatcherInterface::class);
+        $urlMatcher->method('getContext')->willReturn(new RequestContext('', 'GET', 'localhost', 'https'));
+
+        $utils = new HttpUtils($this->getUrlGenerator(), $urlMatcher, null, '{^https://(?:%s|(?:.+\.)?example\.com)$}i');
+        $response = $utils->createRedirectResponse($this->getRequest(), $url);
+
+        $this->assertTrue($response->isRedirect('http://localhost/'));
+    }
+
+    public static function badRequestSubDomainUrls()
+    {
+        return [
+            ['https://pirate.net/foo'],
+            ['https://pirate.net/.example.com'],
+            ['https://pirate.net?.example.com'],
+            ['https://pirate.net#.example.com'],
+            ['https://pirate.net\\.example.com'],
+            ['https://pirate.net?foo=.example.com'],
+            ['https://pirate.net\\@www.example.com'],
+            ['https://www.example.com@pirate.net'],
+            ['https://www.example.com\\@pirate.net'],
+            ['https://?@pirate.net'],
         ];
     }
 

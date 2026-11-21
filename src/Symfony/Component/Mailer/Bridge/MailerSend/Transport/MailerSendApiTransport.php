@@ -80,7 +80,7 @@ final class MailerSendApiTransport extends AbstractApiTransport implements Remot
         }
 
         if (isset($headers['x-message-id'][0])) {
-            $sentMessage->setMessageId($headers['x-message-id'][0]);
+            $sentMessage->setTransportMessageId($headers['x-message-id'][0]);
         }
 
         return $response;

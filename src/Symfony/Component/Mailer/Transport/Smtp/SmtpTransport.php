@@ -168,10 +168,31 @@ class SmtpTransport extends AbstractTransport
         return $message;
     }
 
+    /**
+     * @deprecated since Symfony 8.3, use parseTransportMessageId() instead
+     */
     protected function parseMessageId(string $mtaResult): string
+    {
+        trigger_deprecation('symfony/mailer', '8.3', 'Method "%s()" is deprecated, use "parseTransportMessageId()" instead.', __METHOD__);
+
+        return $this->parseTransportMessageId($mtaResult);
+    }
+
+    protected function parseTransportMessageId(string $mtaResult): string
     {
         // an id without a prefix must contain a digit, so that a word like "queued" is not taken as the id
         return preg_match('/^250 (?:\S+ )?Ok:?+ (?:queued as |ids?=|(?=[A-Z._-]*+\d))(?P<id>[A-Z0-9._-]++)/im', $mtaResult, $matches) ? $matches['id'] : '';
+    }
+
+    private function getTransportMessageIdFromResult(string $mtaResult): string
+    {
+        if (self::class === (new \ReflectionMethod($this, 'parseMessageId'))->class) {
+            return $this->parseTransportMessageId($mtaResult);
+        }
+
+        trigger_deprecation('symfony/mailer', '8.3', 'Overriding "%s::parseMessageId()" is deprecated, override "parseTransportMessageId()" instead.', static::class);
+
+        return $this->parseMessageId($mtaResult); // @phpstan-ignore method.deprecated
     }
 
     public function __toString(): string
@@ -240,8 +261,8 @@ class SmtpTransport extends AbstractTransport
             $message->appendDebug($this->stream->getDebug());
             $this->lastMessageTime = microtime(true);
 
-            if ($mtaResult && $messageId = $this->parseMessageId($mtaResult)) {
-                $message->setMessageId($messageId);
+            if ($mtaResult && $messageId = $this->getTransportMessageIdFromResult($mtaResult)) {
+                $message->setTransportMessageId($messageId);
             }
         } catch (TransportExceptionInterface $e) {
             $e->appendDebug($this->stream->getDebug());

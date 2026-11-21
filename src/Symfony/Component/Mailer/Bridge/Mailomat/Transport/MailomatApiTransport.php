@@ -68,7 +68,7 @@ final class MailomatApiTransport extends AbstractApiTransport
         }
 
         if (isset($result['messageUuid'])) {
-            $sentMessage->setMessageId($result['messageUuid']);
+            $sentMessage->setTransportMessageId($result['messageUuid']);
         }
 
         return $response;

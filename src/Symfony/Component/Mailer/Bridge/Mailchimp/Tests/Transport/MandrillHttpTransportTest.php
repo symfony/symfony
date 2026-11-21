@@ -82,7 +82,7 @@ class MandrillHttpTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        $this->assertSame('foobar', $message->getTransportMessageId());
     }
 
     public function testSendThrowsForErrorResponse()

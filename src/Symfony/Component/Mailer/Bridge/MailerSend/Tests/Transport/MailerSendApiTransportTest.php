@@ -89,7 +89,7 @@ class MailerSendApiTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('test_message_id', $message->getMessageId());
+        $this->assertSame('test_message_id', $message->getTransportMessageId());
     }
 
     public function testSendEmailWithAttachment()
@@ -128,7 +128,7 @@ class MailerSendApiTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('test_message_id', $message->getMessageId());
+        $this->assertSame('test_message_id', $message->getTransportMessageId());
     }
 
     public function testRemoteTemplate()

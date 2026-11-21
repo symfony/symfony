@@ -99,7 +99,7 @@ class PostmarkApiTransport extends AbstractApiTransport implements RemoteTemplat
             throw new HttpTransportException('Unable to send an email: '.$errorMessage.\sprintf(' (code %d).', $errorCode), $response);
         }
 
-        $sentMessage->setMessageId($result['MessageID']);
+        $sentMessage->setTransportMessageId($result['MessageID']);
 
         return $response;
     }

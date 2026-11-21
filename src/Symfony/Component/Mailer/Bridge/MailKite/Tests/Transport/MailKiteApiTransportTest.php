@@ -85,7 +85,7 @@ class MailKiteApiTransportTest extends TestCase
         $transport = new MailKiteApiTransport('KEY', $client);
         $sentMessage = $transport->send($email);
 
-        $this->assertSame('msg_1234', $sentMessage->getMessageId());
+        $this->assertSame('msg_1234', $sentMessage->getTransportMessageId());
     }
 
     public function testSendWithAttachment()

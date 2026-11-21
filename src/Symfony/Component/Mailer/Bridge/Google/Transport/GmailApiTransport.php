@@ -61,7 +61,7 @@ final class GmailApiTransport extends AbstractApiTransport
         // has none, so it would differ from the one SentMessage already settled on
         if (!$email->getHeaders()->has('Message-ID')) {
             $headers->remove('Message-ID');
-            $headers->addIdHeader('Message-ID', $sentMessage->getMessageId());
+            $headers->addIdHeader('Message-ID', $sentMessage->getMessageIdHeader());
         }
 
         $encodedMessage = $this->base64UrlEncode($headers->toString().$email->getBody()->toString());
@@ -87,7 +87,7 @@ final class GmailApiTransport extends AbstractApiTransport
 
         // Set the message ID from Gmail's response
         if (isset($result['id'])) {
-            $sentMessage->setMessageId($result['id']);
+            $sentMessage->setTransportMessageId($result['id']);
         }
 
         return $response;

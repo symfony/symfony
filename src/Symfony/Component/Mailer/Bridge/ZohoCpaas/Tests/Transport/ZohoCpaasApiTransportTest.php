@@ -90,7 +90,7 @@ class ZohoCpaasApiTransportTest extends TestCase
 
         $sentMessage = (new ZohoCpaasApiTransport('KEY', $client))->setHost('cpaas.zoho.eu')->send($email);
 
-        $this->assertSame('req-1234', $sentMessage->getMessageId());
+        $this->assertSame('req-1234', $sentMessage->getTransportMessageId());
     }
 
     public function testSendAcceptsCreated()
@@ -104,7 +104,7 @@ class ZohoCpaasApiTransportTest extends TestCase
             ->subject('An email')
             ->text('Test email body'));
 
-        $this->assertSame('req-5678', $sentMessage->getMessageId());
+        $this->assertSame('req-5678', $sentMessage->getTransportMessageId());
     }
 
     public function testSendWithAttachmentAndInlineImage()
@@ -464,7 +464,7 @@ class ZohoCpaasApiTransportTest extends TestCase
             ->subject('An email')
             ->text('Test email body'));
 
-        $this->assertNotSame('', $sentMessage->getMessageId());
+        $this->assertNotSame('', $sentMessage->getTransportMessageId());
     }
 
     public function testSendThrowsWhenTheServerCannotBeReached()

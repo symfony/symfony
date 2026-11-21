@@ -84,7 +84,7 @@ final class AzureApiTransport extends AbstractApiTransport
             }
         }
 
-        $sentMessage->setMessageId(json_decode($response->getContent(false), true)['id']);
+        $sentMessage->setTransportMessageId(json_decode($response->getContent(false), true)['id']);
 
         return $response;
     }

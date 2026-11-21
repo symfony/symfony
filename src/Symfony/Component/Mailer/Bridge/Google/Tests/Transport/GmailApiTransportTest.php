@@ -73,7 +73,7 @@ class GmailApiTransportTest extends TestCase
             ->text('Hello There!');
 
         $sentMessage = $transport->send($mail);
-        $this->assertSame('message-id-123', $sentMessage->getMessageId());
+        $this->assertSame('message-id-123', $sentMessage->getTransportMessageId());
     }
 
     public function testSendWithCc()

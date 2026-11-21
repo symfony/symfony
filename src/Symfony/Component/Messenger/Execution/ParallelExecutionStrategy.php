@@ -75,9 +75,17 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
     private array $taskFailures = [];
 
     // whether a key batches is only known once a handler defers, so the first message of an
-    // unknown key runs alone: spreading its siblings across channels first would strand a
-    // batch on a worker that can never complete it
-    private ?int $pendingProbeRequestId = null;
+    // unknown key runs alone while the next messages of its key are held back: spreading its
+    // siblings across channels first would strand a batch on a worker that can never complete
+    // it. A probe holds only the messages of its own key, so messages of other keys keep being
+    // consumed meanwhile, even after a restart of the worker wiped the learning.
+    /** @var array<string, int> Affinity keys with a probe in flight, keyed by affinity key */
+    private array $pendingProbeRequests = [];
+
+    /** @var array<string, list<array{Envelope, string, callable}>> Messages held until the probe of their key completes */
+    private array $heldRequests = [];
+
+    private bool $releasingHeldRequests = false;
     private ?\WeakMap $completionCallbacks = null;
 
     public function __construct(
@@ -98,7 +106,16 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         try {
             $affinityKey = $this->getAffinityKey($envelope);
             $keyMode = $this->keyModes[$affinityKey] ?? null;
-            $isProbe = null === $keyMode;
+
+            if (!$this->releasingHeldRequests && null === $keyMode && isset($this->pendingProbeRequests[$affinityKey])) {
+                // a probe is learning whether this key batches: the message joins its siblings
+                // and is dispatched when the probe completes
+                $this->heldRequests[$affinityKey][] = [$envelope, $transportName, $onHandled];
+
+                return;
+            }
+
+            $isProbe = null === $keyMode && !isset($this->pendingProbeRequests[$affinityKey]);
             $channel = $this->getChannel($affinityKey, $keyMode);
             $channelId = spl_object_id($channel);
             $requestId = ++$this->nextRequestId;
@@ -126,7 +143,7 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
             $this->busyChannels[$channelId] = true;
 
             if ($isProbe) {
-                $this->pendingProbeRequestId = $requestId;
+                $this->pendingProbeRequests[$affinityKey] = $requestId;
             }
 
             $this->armChannel($channelId);
@@ -150,7 +167,8 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
 
     public function shouldPauseConsumption(): bool
     {
-        return null !== $this->pendingProbeRequestId || \count($this->busyChannels) >= $this->concurrencyLimit;
+        // held messages occupy the slot of the worker they wait for, like busy ones do
+        return \count($this->busyChannels) + $this->countHeldRequests() >= $this->concurrencyLimit;
     }
 
     /**
@@ -195,6 +213,11 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
     public function flush(callable $onHandled, bool|float $force = false): bool
     {
         $handled = $this->drainReadyResponses($onHandled);
+
+        if (true === $force) {
+            // a worker that stops must not strand the messages held by a pending probe
+            $handled = $this->releaseAllHeldRequests($onHandled) || $handled;
+        }
 
         if (!$this->pendingRequests) {
             return $handled;
@@ -391,11 +414,12 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
             $this->keyModes[$pendingRequest->affinityKey] = self::KEY_MODE_BATCHING;
             $this->batchingKeyAffinities[$pendingRequest->affinityKey] = $channelId;
 
-            if ($pendingRequest->isProbe && $requestId === $this->pendingProbeRequestId) {
-                $this->pendingProbeRequestId = null;
-            }
-
             $this->recomputeBusyChannel($channelId);
+
+            if ($pendingRequest->isProbe && ($this->pendingProbeRequests[$pendingRequest->affinityKey] ?? null) === $requestId) {
+                unset($this->pendingProbeRequests[$pendingRequest->affinityKey]);
+                $this->releaseHeldRequests($pendingRequest->affinityKey, $onHandled);
+            }
 
             return true;
         }
@@ -408,8 +432,11 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
             $this->recomputeBusyChannel($channelId);
         }
 
-        if ($pendingRequest->isProbe && $requestId === $this->pendingProbeRequestId) {
-            $this->pendingProbeRequestId = null;
+        $probeCompleted = false;
+
+        if ($pendingRequest->isProbe && ($this->pendingProbeRequests[$pendingRequest->affinityKey] ?? null) === $requestId) {
+            unset($this->pendingProbeRequests[$pendingRequest->affinityKey]);
+            $probeCompleted = true;
         }
 
         $this->keyModes[$pendingRequest->affinityKey] ??= self::KEY_MODE_NON_BATCHING;
@@ -431,6 +458,10 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         }
 
         $this->completeRequest($pendingRequest, $onHandled, $handledEnvelope, $error);
+
+        if ($probeCompleted) {
+            $this->releaseHeldRequests($pendingRequest->affinityKey, $onHandled);
+        }
 
         return true;
     }
@@ -457,6 +488,7 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
     {
         $handled = false;
         $previous = $this->taskFailures[$channelId] ?? $previous;
+        $releasedProbeKeys = [];
 
         unset($this->workers[$channelId], $this->channels[$channelId], $this->busyChannels[$channelId], $this->receiveFutures[$channelId], $this->taskFailures[$channelId]);
         $channelPendingRequests = $this->pendingRequests[$channelId] ?? [];
@@ -469,12 +501,18 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         }
 
         foreach ($channelPendingRequests as $requestId => $pendingRequest) {
-            if ($pendingRequest->isProbe && $requestId === $this->pendingProbeRequestId) {
-                $this->pendingProbeRequestId = null;
+            if ($pendingRequest->isProbe && ($this->pendingProbeRequests[$pendingRequest->affinityKey] ?? null) === $requestId) {
+                unset($this->pendingProbeRequests[$pendingRequest->affinityKey]);
+                $releasedProbeKeys[] = $pendingRequest->affinityKey;
             }
 
             $this->completeRequest($pendingRequest, $onHandled, $pendingRequest->envelope, new \RuntimeException('The parallel worker stopped before returning a result.', 0, $previous));
             $handled = true;
+        }
+
+        // the messages held by a settled probe get another chance: the next message of their key probes again
+        foreach ($releasedProbeKeys as $affinityKey) {
+            $this->releaseHeldRequests($affinityKey, $onHandled);
         }
 
         return $handled;
@@ -490,12 +528,66 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         $this->removeChannel($channelId, $onHandled);
 
         foreach ($channelPendingRequests as $requestId => $pendingRequest) {
-            if ($requestId === $this->pendingProbeRequestId) {
-                $this->pendingProbeRequestId = null;
+            if ($pendingRequest->isProbe && ($this->pendingProbeRequests[$pendingRequest->affinityKey] ?? null) === $requestId) {
+                // the re-executed probe of this key will register itself again
+                unset($this->pendingProbeRequests[$pendingRequest->affinityKey]);
             }
 
             $this->execute($pendingRequest->envelope, $pendingRequest->transportName, $this->completionCallbacks[$pendingRequest] ?? $onHandled);
         }
+    }
+
+    private function countHeldRequests(): int
+    {
+        $count = 0;
+
+        foreach ($this->heldRequests as $requests) {
+            $count += \count($requests);
+        }
+
+        return $count;
+    }
+
+    private function releaseHeldRequests(string $affinityKey, callable $onHandled): void
+    {
+        if (!isset($this->heldRequests[$affinityKey])) {
+            return;
+        }
+
+        $heldRequests = $this->heldRequests[$affinityKey];
+        unset($this->heldRequests[$affinityKey]);
+
+        foreach ($heldRequests as [$envelope, $transportName, $callback]) {
+            $this->execute($envelope, $transportName, $callback);
+        }
+    }
+
+    /**
+     * @phpstan-impure
+     */
+    private function releaseAllHeldRequests(callable $onHandled): bool
+    {
+        if (!$this->heldRequests) {
+            return false;
+        }
+
+        $handled = false;
+        $heldRequests = $this->heldRequests;
+        $this->heldRequests = [];
+        $this->releasingHeldRequests = true;
+
+        try {
+            foreach ($heldRequests as $requests) {
+                foreach ($requests as [$envelope, $transportName, $callback]) {
+                    $this->execute($envelope, $transportName, $callback);
+                    $handled = true;
+                }
+            }
+        } finally {
+            $this->releasingHeldRequests = false;
+        }
+
+        return $handled;
     }
 
     /**

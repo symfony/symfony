@@ -55,7 +55,15 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
 
     public function accept(): bool
     {
-        $path = $this->normalizePath($this->current()->getPathname());
+        return $this->acceptFile($this->current());
+    }
+
+    /**
+     * @internal
+     */
+    public function acceptFile(\SplFileInfo $file): bool
+    {
+        $path = $this->normalizePath($file->getPathname());
 
         // git matches a symlink by its own path, so only the search directory is resolved
         if (str_starts_with($path, $this->searchDir)) {

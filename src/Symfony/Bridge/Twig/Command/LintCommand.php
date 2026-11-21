@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\CI\GithubActionReporter;
+use Symfony\Component\Console\CI\JunitReporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -236,43 +237,25 @@ class LintCommand extends Command
     private function displayJunit(OutputInterface $output, array $filesInfo): int
     {
         $failures = 0;
-        $testCases = '';
+        $reporter = new JunitReporter($output, 'lint:twig');
 
         foreach ($filesInfo as $info) {
-            $file = $this->escapeXml((string) $info['file']);
-            $testCases .= \sprintf('    <testcase name="%s" classname="lint:twig" file="%s"', $file, $file);
+            $file = (string) $info['file'];
 
             if (!$info['valid']) {
-                $type = 'error';
-                $message = $info['exception']->getRawMessage();
-                $details = $info['exception']->getMessage();
+                ++$failures;
+                $reporter->fail($file, $info['exception']->getRawMessage(), $info['exception']->getMessage());
             } elseif ($info['deprecations']) {
-                $type = 'deprecation';
-                $message = \sprintf('%d deprecation(s) found', \count($info['deprecations']));
-                $details = implode("\n", array_map(static fn (array $deprecation) => \sprintf('Line %d: %s', $deprecation['line'], $deprecation['message']), $info['deprecations']));
+                ++$failures;
+                $reporter->fail($file, \sprintf('%d deprecation(s) found', \count($info['deprecations'])), implode("\n", array_map(static fn (array $deprecation) => \sprintf('Line %d: %s', $deprecation['line'], $deprecation['message']), $info['deprecations'])), 'deprecation');
             } else {
-                $testCases .= "/>\n";
-
-                continue;
+                $reporter->pass($file);
             }
-
-            ++$failures;
-            $testCases .= \sprintf(">\n      <failure type=\"%s\" message=\"%s\">%s</failure>\n    </testcase>\n", $type, $this->escapeXml($message), $this->escapeXml($details));
         }
 
-        $output->writeln('<?xml version="1.0" encoding="UTF-8"?>', OutputInterface::OUTPUT_RAW);
-        $output->writeln('<testsuites>', OutputInterface::OUTPUT_RAW);
-        $output->writeln(\sprintf('  <testsuite name="lint:twig" tests="%d" failures="%d" errors="0">', \count($filesInfo), $failures), OutputInterface::OUTPUT_RAW);
-        $output->write($testCases, false, OutputInterface::OUTPUT_RAW);
-        $output->writeln('  </testsuite>', OutputInterface::OUTPUT_RAW);
-        $output->writeln('</testsuites>', OutputInterface::OUTPUT_RAW);
+        $reporter->write();
 
         return min($failures, 1);
-    }
-
-    private function escapeXml(string $value): string
-    {
-        return htmlspecialchars($value, \ENT_XML1 | \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');
     }
 
     private function renderDeprecation(SymfonyStyle $output, int $line, string $message, string $file, ?GithubActionReporter $githubReporter): void

@@ -260,19 +260,21 @@
 
 {%- block choice_widget_expanded -%}
     <div {{ block('widget_container_attributes') }}>
-        {%- for child in form %}
-            {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
-            {{- form_widget(child, {
-                label_required: false,
-                parent_label_class: label_attr.class|default(''),
-                translation_domain: choice_translation_domain,
-                valid: valid,
-                attr: child_attr,
-            }) -}}
-            {{- form_help(child) -}}
-        {% endfor -%}
+        {{- block('choice_widget_expanded_children') -}}
     </div>
 {%- endblock choice_widget_expanded %}
+
+{%- block choice_widget_expanded_child -%}
+    {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
+    {{- form_widget(child, {
+        label_required: false,
+        parent_label_class: label_attr.class|default(''),
+        translation_domain: choice_translation_domain,
+        valid: valid,
+        attr: child_attr,
+    }) -}}
+    {{- form_help(child) -}}
+{%- endblock choice_widget_expanded_child %}
 
 {# Labels #}
 

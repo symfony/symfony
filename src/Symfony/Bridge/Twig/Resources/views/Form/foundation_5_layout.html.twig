@@ -179,29 +179,32 @@
 {% block choice_widget_expanded -%}
     {% if '-inline' in label_attr.class|default('') %}
         <ul class="inline-list">
-            {% for child in form %}
-                {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
-                <li>{{ form_widget(child, {
-                        label_required: false,
-                        parent_label_class: label_attr.class|default(''),
-                        attr: child_attr,
-                    }) }}{{ form_help(child) }}</li>
-            {% endfor %}
+            {{- block('choice_widget_expanded_children') -}}
         </ul>
     {% else %}
         <div {{ block('widget_container_attributes') }}>
-            {% for child in form %}
-                {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
-                {{ form_widget(child, {
-                    label_required: false,
-                    parent_label_class: label_attr.class|default(''),
-                    attr: child_attr,
-                }) }}
-                {{ form_help(child) }}
-            {% endfor %}
+            {{- block('choice_widget_expanded_children') -}}
         </div>
     {% endif %}
 {%- endblock choice_widget_expanded %}
+
+{% block choice_widget_expanded_child -%}
+    {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
+    {% if '-inline' in label_attr.class|default('') %}
+        <li>{{ form_widget(child, {
+                label_required: false,
+                parent_label_class: label_attr.class|default(''),
+                attr: child_attr,
+            }) }}{{ form_help(child) }}</li>
+    {% else %}
+        {{ form_widget(child, {
+            label_required: false,
+            parent_label_class: label_attr.class|default(''),
+            attr: child_attr,
+        }) }}
+        {{ form_help(child) }}
+    {% endif %}
+{%- endblock choice_widget_expanded_child %}
 
 {% block checkbox_widget -%}
     {% set parent_label_class = parent_label_class|default('') %}

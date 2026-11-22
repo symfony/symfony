@@ -1,0 +1,12 @@
+project@optional:
+    foo: bar
+
+missing@optional:
+    foo: bar
+
+when@some-env:
+    project@optional:
+        foo: baz
+
+    missing@optional:
+        foo: baz

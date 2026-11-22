@@ -123,7 +123,7 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($content as $namespace => $data) {
-            if (\in_array($namespace, ['imports', 'parameters', 'services'], true) || str_starts_with($namespace, 'when@')) {
+            if (\in_array($namespace, ['imports', 'parameters', 'services'], true) || str_starts_with($namespace, 'when@') || str_ends_with($namespace, '@optional')) {
                 continue;
             }
 

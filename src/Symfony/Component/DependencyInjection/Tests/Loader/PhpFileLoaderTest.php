@@ -439,6 +439,29 @@ class PhpFileLoaderTest extends TestCase
         $this->assertIsString($container->getExtensionConfig('acme')[0]['color']);
     }
 
+    public function testOptionalExtensionConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures/config'), 'some-env');
+        $loader->load('optional_extension.php');
+
+        $this->assertSame([['color' => 'blue'], ['color' => 'red']], $container->getExtensionConfig('acme'));
+        $this->assertSame([], $container->getExtensionConfig('missing'));
+        $this->assertSame([], $container->getExtensionConfig('missing@optional'));
+    }
+
+    public function testOptionalExtensionConfigIsSkippedWhenTheExtensionIsNotRegistered()
+    {
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures/config'), 'some-env');
+        $loader->load('optional_extension.php');
+
+        $this->assertSame([], $container->getExtensionConfig('acme'));
+        $this->assertSame([], $container->getExtensionConfig('missing'));
+        $this->assertSame([], $container->getExtensionConfig('missing@optional'));
+    }
+
     public function testNamedClosure()
     {
         $container = new ContainerBuilder();

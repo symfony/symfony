@@ -201,6 +201,7 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
         foreach ($extensions as $extension) {
             $type = $this->camelCase($extension->getAlias()).'Config';
             $shape .= \sprintf("\n *     %s%s?: %s,", $indent, $extension->getAlias(), $type);
+            $shape .= \sprintf("\n *     %s\"%s@optional\"?: %s,", $indent, $extension->getAlias(), $type);
         }
 
         return $shape;

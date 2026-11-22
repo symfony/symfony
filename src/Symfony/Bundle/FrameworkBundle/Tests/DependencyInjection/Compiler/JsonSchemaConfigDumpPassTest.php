@@ -244,6 +244,41 @@ class JsonSchemaConfigDumpPassTest extends TestCase
 
     #[RequiresMethod(Validator::class, 'validate')]
     #[RequiresMethod(SchemaValidator::class, 'validate')]
+    public function testGeneratedSchemaValidatesOptionalExtensionsLikeRegisteredOnes()
+    {
+        $schemaFile = $this->tempDir.'/optional_schema.json';
+        $container = new ContainerBuilder();
+
+        (new JsonSchemaConfigDumpPass($schemaFile, new ExtensionConfigTrees([JsonSchemaTestBundle::class => ['all' => true], JsonSchemaDevBundle::class => ['dev' => true]])))->process($container);
+
+        $config = Yaml::parse(<<<YAML
+            json_schema_test@optional:
+                enabled: true
+            not_installed@optional:
+                anything: goes
+            when@dev:
+                json_schema_test@optional:
+                    enabled: true
+                json_schema_dev@optional:
+                    toolbar: true
+                not_installed@optional:
+                    anything: goes
+            when@custom:
+                json_schema_test@optional:
+                    enabled: true
+                not_installed@optional:
+                    anything: goes
+            YAML);
+
+        $this->assertSame([], (new SchemaValidator())->validate($config, $schemaFile));
+
+        foreach (['json_schema_test@optional: { unknown_key: true }', 'when@dev: { json_schema_dev@optional: { unknown_key: true } }', 'when@custom: { json_schema_test@optional: { unknown_key: true } }'] as $yaml) {
+            $this->assertNotSame([], (new SchemaValidator())->validate(Yaml::parse($yaml), $schemaFile), $yaml);
+        }
+    }
+
+    #[RequiresMethod(Validator::class, 'validate')]
+    #[RequiresMethod(SchemaValidator::class, 'validate')]
     public function testGeneratedSchemaAcceptsImportsParametersAndServicesInTheBlockOfAnEnvironment()
     {
         $schemaFile = $this->tempDir.'/when_schema.json';
@@ -326,7 +361,7 @@ class JsonSchemaConfigDumpPassTest extends TestCase
                     blog_publishing:
                         places:
                             draft:
-                                metdata: { description: Draft }
+                                unknown_key: { description: Draft }
             YAML);
 
         $this->assertNotSame([], (new SchemaValidator())->validate($config, $schemaFile));

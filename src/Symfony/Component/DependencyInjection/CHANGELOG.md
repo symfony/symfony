@@ -35,6 +35,7 @@ CHANGELOG
  * Reset the container in `AbstractKernel::shutdown()`, so that its services are released even when something still references the container
  * Release the listeners of the `event_dispatcher` service when the kernel shuts down
  * Generate JSON schema for YAML configuration of bundles
+ * Add the `<alias>@optional` convention to the YAML and array-based PHP config formats, to load the configuration of an extension only when it is registered
 
 8.1
 ---

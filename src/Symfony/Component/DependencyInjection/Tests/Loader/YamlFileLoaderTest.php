@@ -1428,6 +1428,41 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedBar, $container->get('bar'));
     }
 
+    public function testOptionalExtensionConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \ProjectExtension());
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'), 'some-env');
+        $loader->load('optional_extension.yml');
+
+        $this->assertSame([['foo' => 'bar'], ['foo' => 'baz']], $container->getExtensionConfig('project'));
+        $this->assertSame([], $container->getExtensionConfig('missing'));
+        $this->assertSame([], $container->getExtensionConfig('missing@optional'));
+    }
+
+    public function testOptionalExtensionConfigIsSkippedWhenTheExtensionIsNotRegistered()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'), 'some-env');
+        $loader->load('optional_extension.yml');
+
+        $this->assertSame([], $container->getExtensionConfig('project'));
+        $this->assertSame([], $container->getExtensionConfig('missing'));
+        $this->assertSame([], $container->getExtensionConfig('missing@optional'));
+    }
+
+    public function testPrependOptionalExtensionConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \ProjectExtension());
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'), 'some-env', prepend: true);
+        $loader->load('optional_extension.yml');
+
+        $this->assertSame([['foo' => 'bar'], ['foo' => 'baz']], $container->getExtensionConfig('project'));
+        $this->assertSame([], $container->getExtensionConfig('missing'));
+        $this->assertSame([], $container->getExtensionConfig('missing@optional'));
+    }
+
     public function testWhenEnv()
     {
         $container = new ContainerBuilder();

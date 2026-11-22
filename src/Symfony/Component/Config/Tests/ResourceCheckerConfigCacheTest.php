@@ -206,11 +206,14 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertSame($timestamp, filemtime($this->cacheFile.'.meta'));
     }
 
+    #[Group('time-sensitive')]
     public function testAnUnchangedGeneratedFileNeedsOnlyOneCorrectiveBuild()
     {
         $resourceFile = tempnam(sys_get_temp_dir(), 'config_generated_');
+        // Start the build in the past, so that the mocked clock matches the filesystem one when the resource is generated
+        ClockMock::withClockMock(time() - 10);
         $cache = new ResourceCheckerConfigCache($this->cacheFile, [new SelfCheckingResourceChecker()]);
-        sleep(1);
+        sleep(10);
         file_put_contents($resourceFile, 'generated');
         clearstatcache();
 

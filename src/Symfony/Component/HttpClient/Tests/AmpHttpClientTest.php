@@ -59,6 +59,12 @@ class AmpHttpClientTest extends HttpClientTestCase
     }
 
     #[Group('transient-on-windows')]
+    public function testPauseDuringBodyLongerThanTimeout()
+    {
+        parent::testPauseDuringBodyLongerThanTimeout();
+    }
+
+    #[Group('transient-on-windows')]
     public function testMaxConnectDuration()
     {
         parent::testMaxConnectDuration();

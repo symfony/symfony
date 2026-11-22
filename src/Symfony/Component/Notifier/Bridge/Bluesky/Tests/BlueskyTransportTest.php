@@ -182,6 +182,36 @@ final class BlueskyTransportTest extends TransportTestCase
         $this->assertEquals($expected, $output);
     }
 
+    public function testParseFacetsMentionAtTheStartOfTheText()
+    {
+        $input = '@atproto.com thanks for the review';
+        $expected = [
+            [
+                'index' => ['byteStart' => 0, 'byteEnd' => 12],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#mention', 'did' => 'did0'],
+                ],
+            ],
+        ];
+        $output = $this->parseFacets($input, new MockHttpClient([new JsonMockResponse(['did' => 'did0'])]));
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testParseFacetsUrlAtTheStartOfTheText()
+    {
+        $input = 'https://symfony.com/blog is live';
+        $expected = [
+            [
+                'index' => ['byteStart' => 0, 'byteEnd' => 24],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#link', 'uri' => 'https://symfony.com/blog'],
+                ],
+            ],
+        ];
+        $output = $this->parseFacets($input);
+        $this->assertEquals($expected, $output);
+    }
+
     /**
      * Example from https://github.com/bluesky-social/atproto-website/blob/main/examples/create_bsky_post.py.
      */

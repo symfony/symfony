@@ -16,6 +16,7 @@ use Fabpot\Amp\Sqlite\SqliteConfig;
 use Fabpot\Amp\Sqlite\SqliteConnectionPool;
 use Fabpot\Amp\Sqlite\SqliteConnector;
 use Fabpot\Amp\Sqlite\SqliteTransactionMode;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmpSql\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\AmpSql\Transport\AmpSqlTransport;
@@ -222,6 +223,7 @@ final class AmpSqlTransportTest extends TestCase
         }
     }
 
+    #[Group('transient-on-windows')]
     public function testSetupIsIdempotent()
     {
         $first = $this->createTransport(['auto_setup' => false]);

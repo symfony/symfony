@@ -714,8 +714,10 @@ trait HttpClientTrait
             return $proxy;
         }
 
-        // Ignore HTTP_PROXY except on the CLI to work around httpoxy set of vulnerabilities
-        $proxy = $_SERVER['http_proxy'] ?? (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? $_SERVER['HTTP_PROXY'] ?? null : null) ?? $_SERVER['all_proxy'] ?? $_SERVER['ALL_PROXY'] ?? null;
+        // Ignore HTTP_PROXY except on the CLI to work around httpoxy set of vulnerabilities, and read it from
+        // the environment there, since HTTP workers that run on the CLI put request headers in $_SERVER
+        $httpProxy = \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? $_ENV['HTTP_PROXY'] ?? getenv('HTTP_PROXY', true) : false;
+        $proxy = $_SERVER['http_proxy'] ?? (false !== $httpProxy ? $httpProxy : null) ?? $_SERVER['all_proxy'] ?? $_SERVER['ALL_PROXY'] ?? null;
 
         if ('https:' === $url['scheme']) {
             $proxy = $_SERVER['https_proxy'] ?? $_SERVER['HTTPS_PROXY'] ?? $proxy;

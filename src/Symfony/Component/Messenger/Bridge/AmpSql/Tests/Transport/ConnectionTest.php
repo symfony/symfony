@@ -28,6 +28,9 @@ use Symfony\Component\Messenger\Bridge\AmpSql\Transport\Backend\SqliteBackend;
 use Symfony\Component\Messenger\Bridge\AmpSql\Transport\Connection;
 use Symfony\Component\Messenger\Exception\TransportException;
 
+use function Amp\async;
+use function Amp\delay;
+
 final class ConnectionTest extends TestCase
 {
     public function testUnsupportedServerVersionKeepsActionableError()
@@ -349,6 +352,45 @@ final class ConnectionTest extends TestCase
             ->willReturn($this->createStub(SqlResult::class));
 
         self::assertSame([], $backend->insertBatch($transaction, 'messages', [['body a', '{"type":"A"}', 0], ['body b', '[]', 500]], 'queue'));
+    }
+
+    public function testReconnectingWaitsUntilTheClosedConnectionIsClosed()
+    {
+        $result = $this->createStub(SqlResult::class);
+        $result->method('fetchRow')->willReturn(['version' => '3.45.1', 'message_count' => 1]);
+        $onClose = [];
+        $events = [];
+        $first = $this->createMock(SqlConnection::class);
+        $first->method('query')->willReturn($result);
+        $first->method('execute')->willReturn($result);
+        $first->method('onClose')->willReturnCallback(static function (\Closure $callback) use (&$onClose) {
+            $onClose[] = $callback;
+        });
+        $first->expects(self::once())->method('close');
+        $second = $this->createStub(SqlConnection::class);
+        $second->method('execute')->willReturn($result);
+        $connections = [$first, $second];
+        $connection = new Connection(static function () use (&$connections, &$events) {
+            $events[] = 'connect';
+
+            return array_shift($connections);
+        }, new SqliteBackend(), ['auto_setup' => false]);
+
+        $connection->getMessageCount();
+        // like a pool that closes its connections in the background, the first connection is closed later
+        $connection->close();
+        $count = async($connection->getMessageCount(...));
+        delay(0);
+
+        self::assertSame(['connect'], $events);
+
+        $events[] = 'closed';
+        foreach ($onClose as $callback) {
+            $callback();
+        }
+
+        self::assertSame(1, $count->await());
+        self::assertSame(['connect', 'closed', 'connect'], $events);
     }
 
     private function getClaimStatements(BackendInterface $backend, string $version): array

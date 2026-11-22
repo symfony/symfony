@@ -40,6 +40,11 @@ class RecurringMessageTest extends TestCase
         RecurringMessage::cron('#midnight', new \stdClass());
     }
 
+    public function testNthWeekdayCronDoesNotRequireAStringableMessage()
+    {
+        $this->assertSame('0 9 * * 1#2', (string) RecurringMessage::cron('0 9 * * 1#2', new \stdClass())->getTrigger());
+    }
+
     public function testHashedCronExpressionIsBuiltFromTheMessageInsideTheEnvelope()
     {
         $message = new DummyStringableMessage();

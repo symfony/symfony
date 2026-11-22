@@ -13,6 +13,7 @@ namespace Symfony\Component\Scheduler\Tests\Trigger;
 
 use PHPUnit\Framework\TestCase;
 use Random\Randomizer;
+use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Trigger\CronExpressionTrigger;
 
 class CronExpressionTriggerTest extends TestCase
@@ -95,6 +96,21 @@ class CronExpressionTriggerTest extends TestCase
     {
         $this->assertSame('56 20 1 9 0', (string) CronExpressionTrigger::fromSpec('56 20 1 9 0', 'some context'));
         $this->assertSame('0 0 * * *', (string) CronExpressionTrigger::fromSpec('@daily'));
+    }
+
+    public function testNthWeekdayIsNotAHashedExpression()
+    {
+        $trigger = CronExpressionTrigger::fromSpec('0 9 * * 1#2');
+
+        $this->assertSame('0 9 * * 1#2', (string) $trigger);
+        $this->assertEquals(new \DateTimeImmutable('2024-01-08 09:00:00'), $trigger->getNextRunDate(new \DateTimeImmutable('2024-01-01 10:00:00')));
+    }
+
+    public function testHashedExpressionWithNthWeekdayRequiresAContext()
+    {
+        $this->expectException(LogicException::class);
+
+        CronExpressionTrigger::fromSpec('#(0-2) 9 * * 1#2');
     }
 
     public function testDefaultTimezone()

@@ -782,7 +782,11 @@ class ProcessTest extends TestCase
 
     public function testDisableInputGivesTheNullDeviceAsStandardInput()
     {
-        $code = '$s = fstat(STDIN); echo 0020000 === ($s["mode"] & 0170000) && ("\\\\" === \DIRECTORY_SEPARATOR || $s["rdev"] === stat("/dev/null")["rdev"]) ? "null device" : "not the null device";';
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('fstat() cannot stat the NUL device on Windows.');
+        }
+
+        $code = '$s = fstat(STDIN); echo 0020000 === ($s["mode"] & 0170000) && $s["rdev"] === stat("/dev/null")["rdev"] ? "null device" : "not the null device";';
 
         $process = $this->getProcessForCode($code);
         $this->assertFalse($process->isInputDisabled());

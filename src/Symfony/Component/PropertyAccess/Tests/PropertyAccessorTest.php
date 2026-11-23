@@ -47,6 +47,7 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedObjectProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty;
+use Symfony\Component\PropertyInfo\PropertyReadInfo;
 use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
 
 class PropertyAccessorTest extends TestCase
@@ -1387,6 +1388,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertFalse($this->propertyAccessor->isWritable($object, 'publicPrivate'));
         $this->assertFalse($this->propertyAccessor->isWritable($object, 'privatePrivate'));
         $this->assertFalse($this->propertyAccessor->isWritable($object, 'virtualNoSetHook'));
+        $this->assertTrue($this->propertyAccessor->isWritable($object, 'virtualNoGetHook'));
     }
 
     public function testIsReadableWithAsymmetricVisibility()
@@ -1398,6 +1400,56 @@ class PropertyAccessorTest extends TestCase
         $this->assertTrue($this->propertyAccessor->isReadable($object, 'publicPrivate'));
         $this->assertFalse($this->propertyAccessor->isReadable($object, 'privatePrivate'));
         $this->assertTrue($this->propertyAccessor->isReadable($object, 'virtualNoSetHook'));
+        $this->assertFalse($this->propertyAccessor->isReadable($object, 'virtualNoGetHook'));
+    }
+
+    public function testGetValueOnWriteOnlyVirtualPropertyThrows()
+    {
+        $object = new AsymmetricVisibility();
+
+        $this->expectException(NoSuchPropertyException::class);
+
+        $this->propertyAccessor->getValue($object, 'virtualNoGetHook');
+    }
+
+    public function testGetValueOnWriteOnlyVirtualPropertyIgnoresInvalidProperty()
+    {
+        $object = new AsymmetricVisibility();
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::DO_NOT_THROW);
+
+        $this->assertNull($propertyAccessor->getValue($object, 'virtualNoGetHook'));
+    }
+
+    public function testGetValueOnWriteOnlyVirtualPropertyWithCustomExtractor()
+    {
+        $object = new AsymmetricVisibility();
+        $readInfoExtractor = $this->createStub(PropertyReadInfoExtractorInterface::class);
+        $readInfoExtractor->method('getReadInfo')->willReturn(new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, 'virtualNoGetHook', PropertyReadInfo::VISIBILITY_PUBLIC, false, true));
+
+        $ignoringAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::DO_NOT_THROW, null, $readInfoExtractor);
+        $this->assertNull($ignoringAccessor->getValue($object, 'virtualNoGetHook'));
+
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH, null, $readInfoExtractor);
+        $this->assertFalse($propertyAccessor->isReadable($object, 'virtualNoGetHook'));
+
+        $this->expectException(NoSuchPropertyException::class);
+
+        $propertyAccessor->getValue($object, 'virtualNoGetHook');
+    }
+
+    public function testGetValueOnPropertyThatIsNotPubliclyReadableThrows()
+    {
+        $object = new TestClass('Bernhard');
+        $readInfoExtractor = $this->createStub(PropertyReadInfoExtractorInterface::class);
+        $readInfoExtractor->method('getReadInfo')->willReturn(new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, 'privateProperty', PropertyReadInfo::VISIBILITY_PRIVATE, false, false));
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH, null, $readInfoExtractor);
+
+        $this->assertFalse($propertyAccessor->isReadable($object, 'privateProperty'));
+
+        $this->expectException(NoSuchPropertyException::class);
+        $this->expectExceptionMessage(\sprintf('The property "privateProperty" in class "%s" is not publicly readable.', TestClass::class));
+
+        $propertyAccessor->getValue($object, 'privateProperty');
     }
 
     #[DataProvider('setValueWithAsymmetricVisibilityDataProvider')]
@@ -1424,6 +1476,7 @@ class PropertyAccessorTest extends TestCase
         yield ['publicPrivate', NoSuchPropertyException::class];
         yield ['privatePrivate', NoSuchPropertyException::class];
         yield ['virtualNoSetHook', NoSuchPropertyException::class];
+        yield ['virtualNoGetHook', null];
     }
 
     public function testSetValueWithAsymmetricVisibilityIgnoresInvalidProperty()

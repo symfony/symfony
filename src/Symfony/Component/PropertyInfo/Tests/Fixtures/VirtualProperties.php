@@ -15,6 +15,7 @@ class VirtualProperties
 {
     public bool $virtualNoSetHook { get => true; }
     public bool $virtualSetHookOnly { set => $value; }
+    public bool $virtualSetOnly { set (bool $value) { } }
     public bool $virtualHook { get => true; set => $value; }
     public string $expandedSetterType {
         set (string|null $value) => $value ?? 'default';

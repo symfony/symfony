@@ -273,7 +273,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return true;
         }
 
-        return null !== $this->getReadInfo($class, $property, $context);
+        return null !== ($readInfo = $this->getReadInfo($class, $property, $context))
+            && (PropertyReadInfo::TYPE_PROPERTY !== $readInfo->getType() || PropertyReadInfo::VISIBILITY_PUBLIC === $readInfo->getVisibility());
     }
 
     public function isWritable(string $class, string $property, array $context = []): ?bool
@@ -364,12 +365,14 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             }
         }
 
-        if ($allowMagicGet && $reflClass->hasMethod('__get') && (($r = $reflClass->getMethod('__get'))->getModifiers() & $this->methodReflectionFlags)) {
-            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, PropertyReadInfo::VISIBILITY_PUBLIC, false, $r->returnsReference());
+        $magicGet = $allowMagicGet && $reflClass->hasMethod('__get') && ($reflClass->getMethod('__get')->getModifiers() & $this->methodReflectionFlags) ? $reflClass->getMethod('__get') : null;
+
+        if ($hasProperty && (($r = $reflClass->getProperty($property))->getModifiers() & $this->propertyReflectionFlags) && (null === $magicGet || $r->isPublic() && $r->isVirtual() && !$r->hasHook(\PropertyHookType::Get))) {
+            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, $this->getReadVisibilityForProperty($r), $r->isStatic(), true);
         }
 
-        if ($hasProperty && (($r = $reflClass->getProperty($property))->getModifiers() & $this->propertyReflectionFlags)) {
-            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, $this->getReadVisibilityForProperty($r), $r->isStatic(), true);
+        if (null !== $magicGet) {
+            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, PropertyReadInfo::VISIBILITY_PUBLIC, false, $magicGet->returnsReference());
         }
 
         if ($allowMagicCall && $reflClass->hasMethod('__call') && ($reflClass->getMethod('__call')->getModifiers() & $this->methodReflectionFlags)) {
@@ -639,6 +642,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 if ($reflectionProperty->isVirtual() && !$reflectionProperty->hasHook(\PropertyHookType::Set)) {
                     return false;
                 }
+            } elseif ($reflectionProperty->isVirtual() && !$reflectionProperty->hasHook(\PropertyHookType::Get)) {
+                return false;
             }
 
             return (bool) ($reflectionProperty->getModifiers() & $this->propertyReflectionFlags);
@@ -864,6 +869,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
     private function getReadVisibilityForProperty(\ReflectionProperty $reflectionProperty): string
     {
+        if ($reflectionProperty->isVirtual() && !$reflectionProperty->hasHook(\PropertyHookType::Get)) {
+            return PropertyReadInfo::VISIBILITY_PRIVATE;
+        }
+
         if ($reflectionProperty->isPrivate()) {
             return PropertyReadInfo::VISIBILITY_PRIVATE;
         }

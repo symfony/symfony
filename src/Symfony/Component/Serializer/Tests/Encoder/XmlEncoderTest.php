@@ -764,7 +764,57 @@ class XmlEncoderTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $this->encoder->decode($source, 'xml', [XmlEncoder::FORCE_COLLECTION => ['order_rows']]));
+        $this->assertEquals($expected, $this->encoder->decode($source, 'xml', [XmlEncoder::FORCE_COLLECTION => ['order_row']]));
+        $this->assertSame(['order_row' => [['id' => ['1'], 'price' => ['1200']]]], $this->encoder->decode($source, 'xml', [XmlEncoder::FORCE_COLLECTION => ['order_row'], XmlEncoder::AS_COLLECTION => true]));
+    }
+
+    public function testDecodeForceCollectionWithMultipleChildrenSiblingsCommentsAndAttributes()
+    {
+        $source = <<<'XML'
+            <order count="2">
+                <!-- rows -->
+                <id>42</id>
+                <order_row>
+                    <id>1</id>
+                    <price>1200</price>
+                    <tag>sale</tag>
+                </order_row>
+                <order_row>
+                    <id>2</id>
+                    <price>1500</price>
+                </order_row>
+                <total>2700</total>
+            </order>
+            XML;
+        $expected = [
+            '@count' => 2,
+            'id' => '42',
+            'order_row' => [
+                ['id' => '1', 'price' => '1200', 'tag' => ['sale']],
+                ['id' => '2', 'price' => '1500'],
+            ],
+            'total' => '2700',
+        ];
+
+        $this->assertSame($expected, $this->encoder->decode($source, 'xml', [XmlEncoder::FORCE_COLLECTION => ['order_row', 'tag']]));
+
+        $singleWithCommentAndSibling = <<<'XML'
+            <order>
+                <!-- single row -->
+                <order_row>
+                    <id>1</id>
+                    <tag>sale</tag>
+                </order_row>
+                <total>5</total>
+            </order>
+            XML;
+
+        $this->assertSame([
+            'order_row' => [
+                ['id' => '1', 'tag' => ['sale']],
+            ],
+            'total' => '5',
+        ], $this->encoder->decode($singleWithCommentAndSibling, 'xml', [XmlEncoder::FORCE_COLLECTION => ['order_row', 'tag']]));
     }
 
     public function testDecodeWithoutItemHash()

@@ -34,7 +34,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     public const AS_COLLECTION = 'as_collection';
 
     /**
-     * An array of XML tags who should always be treated as a collection, even when it has only one child.
+     * An array of XML tags that should always be treated as a collection, even when there is only one occurrence.
      */
     public const FORCE_COLLECTION = 'force_collection';
 
@@ -251,14 +251,6 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
         $value = $this->parseXmlValue($node, $context);
 
-        if (\is_array($value)
-            && ($childNodeName = $node->firstChild?->nodeName)
-            && 1 === \count($value)
-            && \in_array($node->nodeName, $context[self::FORCE_COLLECTION] ?? $this->defaultContext[self::FORCE_COLLECTION], true)
-        ) {
-            return [$childNodeName => [$value[$childNodeName]]];
-        }
-
         if (!$data) {
             return $value;
         }
@@ -343,8 +335,9 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         }
 
         $asCollection = $context[self::AS_COLLECTION] ?? $this->defaultContext[self::AS_COLLECTION];
+        $forceCollection = $context[self::FORCE_COLLECTION] ?? $this->defaultContext[self::FORCE_COLLECTION];
         foreach ($value as $key => $val) {
-            if (!$asCollection && \is_array($val) && 1 === \count($val)) {
+            if (!$asCollection && \is_array($val) && 1 === \count($val) && !\in_array($key, $forceCollection, true)) {
                 $value[$key] = current($val);
             }
         }

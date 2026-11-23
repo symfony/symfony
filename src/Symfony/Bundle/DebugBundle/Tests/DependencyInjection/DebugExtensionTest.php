@@ -110,6 +110,36 @@ class DebugExtensionTest extends TestCase
         $this->assertSame($expectedOutput, $container->findDefinition('cli_dumper_public')->getArgument(0));
     }
 
+    public function testDumpDestinationUsesDefaultVarDumperServer()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', true);
+        $container->setParameter('kernel.bundles', ['DebugBundle' => DebugBundle::class]);
+        $container->registerExtension(new DebugExtension());
+        $container->loadFromExtension('debug', ['dump_destination' => 'tcp://%env(VAR_DUMPER_SERVER)%']);
+        $container->setAlias('dump_server_public', 'var_dumper.dump_server')->setPublic(true);
+        $container->register('request_stack', RequestStack::class);
+        $this->compileContainer($container);
+
+        $this->assertSame('tcp://127.0.0.1:9912', $container->findDefinition('dump_server_public')->getArgument(0));
+    }
+
+    public function testDumpDestinationUsesUserDefinedVarDumperServer()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', true);
+        $container->setParameter('kernel.bundles', ['DebugBundle' => DebugBundle::class]);
+        $container->setParameter('env(VAR_DUMPER_SERVER)', '192.168.0.1:1234');
+        $container->registerExtension(new DebugExtension());
+        $container->loadFromExtension('debug', ['dump_destination' => 'tcp://%env(VAR_DUMPER_SERVER)%']);
+        $container->setAlias('dump_server_public', 'var_dumper.dump_server')->setPublic(true);
+        $container->register('request_stack', RequestStack::class);
+        $this->compileContainer($container);
+
+        $this->assertSame('tcp://192.168.0.1:1234', $container->findDefinition('dump_server_public')->getArgument(0));
+        $this->assertSame('192.168.0.1:1234', $container->getParameter('env(VAR_DUMPER_SERVER)'));
+    }
+
     public function testRuntimeModeIsNotSetIfParameterDoesNotExist()
     {
         $kernel = new class('dev', true) extends Kernel {

@@ -28,6 +28,10 @@ class DebugExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container): void
     {
+        if (!$container->hasParameter('env(VAR_DUMPER_SERVER)')) {
+            $container->setParameter('env(VAR_DUMPER_SERVER)', '127.0.0.1:9912');
+        }
+
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 

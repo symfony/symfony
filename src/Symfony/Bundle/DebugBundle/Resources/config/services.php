@@ -31,10 +31,6 @@ use Symfony\Component\VarDumper\Server\Connection;
 use Symfony\Component\VarDumper\Server\DumpServer;
 
 return static function (ContainerConfigurator $container) {
-    $container->parameters()
-        ->set('env(VAR_DUMPER_SERVER)', '127.0.0.1:9912')
-    ;
-
     $container->services()
 
         ->set('twig.extension.dump', DumpExtension::class)

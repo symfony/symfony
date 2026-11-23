@@ -164,6 +164,17 @@ class DispatchTaskTest extends TestCase
         $this->assertSame("Serialization of 'Closure' is not allowed", $full[2]->getMessage());
     }
 
+    public function testItAnswersEachFlush()
+    {
+        BatchHandlingMiddleware::$log = [];
+
+        $sent = $this->runTaskWith(new FlushBatchHandlersMessage(false), new DispatchEnvelopeMessage(1, new Envelope(new DummyMessage('Hey'))), new FlushBatchHandlersMessage(30.0), new FlushBatchHandlersMessage(true));
+
+        $this->assertSame([FlushBatchHandlersMessage::class, DeferredEnvelopeMessage::class, FlushBatchHandlersMessage::class, HandledEnvelopeMessage::class, FlushBatchHandlersMessage::class], array_map(get_debug_type(...), $sent));
+        $this->assertSame([false, 30.0, true], [$sent[0]->force, $sent[2]->force, $sent[4]->force]);
+        $this->assertSame(['begin Hey', 'end Hey', 'begin flush', 'process Hey', 'end flush'], BatchHandlingMiddleware::$log);
+    }
+
     public function testAnOutcomeThatCannotBeSentDoesNotLoseTheOtherOutcomesOfItsBatch()
     {
         $sent = $this->runTaskWith(new DispatchEnvelopeMessage(1, new Envelope(new DummyMessage('Hey'), [new DummyStampHoldingAnObject(static fn () => null)])), new DispatchEnvelopeMessage(2, new Envelope(new DummyMessage('Bob'))));
@@ -177,6 +188,9 @@ class DispatchTaskTest extends TestCase
     private function runTask(Envelope $envelope): Envelope
     {
         $sent = $this->runTaskWith(new DispatchEnvelopeMessage(1, $envelope), new FlushBatchHandlersMessage(true));
+
+        self::assertInstanceOf(FlushBatchHandlersMessage::class, array_pop($sent));
+
         $result = end($sent);
 
         self::assertInstanceOf(HandledEnvelopeMessage::class, $result);

@@ -65,6 +65,9 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
     /** @var array<int, true> */
     private array $busyChannels = [];
 
+    /** @var array<int, int> The number of flushes that each worker did not answer yet */
+    private array $unansweredFlushes = [];
+
     /** @var array<int, Worker> */
     private array $workers = [];
 
@@ -224,8 +227,15 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
                 continue;
             }
 
+            // a worker inside a handler, or inside the previous flush, does not read its channel: a flush sent to it waits in the socket buffer, and once that buffer is full the send blocks this process until the worker reads again
+            // the worker gets the next flush once it is free, which is the earliest it could act on one anyway
+            if (true !== $force && (isset($this->busyChannels[$channelId]) || isset($this->unansweredFlushes[$channelId]))) {
+                continue;
+            }
+
             try {
                 $channel->send(new FlushBatchHandlersMessage($force));
+                $this->unansweredFlushes[$channelId] = 1 + ($this->unansweredFlushes[$channelId] ?? 0);
             } catch (\Throwable $e) {
                 $handled = $this->removeChannel($channelId, $onHandled, $e) || $handled;
             }
@@ -267,6 +277,7 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         $this->channels = [];
         $this->receiveFutures = [];
         $this->taskFailures = [];
+        $this->unansweredFlushes = [];
     }
 
     private function getChannel(string $affinityKey, ?int $keyMode): Channel
@@ -388,6 +399,14 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
             return false;
         }
 
+        if ($response instanceof FlushBatchHandlersMessage) {
+            if (isset($this->unansweredFlushes[$channelId]) && 0 >= --$this->unansweredFlushes[$channelId]) {
+                unset($this->unansweredFlushes[$channelId]);
+            }
+
+            return false;
+        }
+
         if (!$response instanceof DeferredEnvelopeMessage && !$response instanceof HandledEnvelopeMessage) {
             return false;
         }
@@ -486,7 +505,7 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         $previous = $this->taskFailures[$channelId] ?? $previous;
         $releasedProbeKeys = [];
 
-        unset($this->workers[$channelId], $this->channels[$channelId], $this->busyChannels[$channelId], $this->receiveFutures[$channelId], $this->taskFailures[$channelId]);
+        unset($this->workers[$channelId], $this->channels[$channelId], $this->busyChannels[$channelId], $this->unansweredFlushes[$channelId], $this->receiveFutures[$channelId], $this->taskFailures[$channelId]);
         $channelPendingRequests = $this->pendingRequests[$channelId] ?? [];
         unset($this->pendingRequests[$channelId]);
 

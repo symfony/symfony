@@ -160,7 +160,7 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
                 (bool) $type?->isIdentifiedBy(TypeIdentifier::ARRAY, TypeIdentifier::ITERABLE) => [...$schema, $minCount => max(1, $schema[$minCount] ?? 1)],
                 default => $schema,
             },
-            $constraint instanceof Length => [...$schema, ...array_filter(['minLength' => $constraint->min, 'maxLength' => $constraint->max], self::isSet(...))],
+            $constraint instanceof Length && Length::COUNT_CODEPOINTS === $constraint->countUnit && 0 === strcasecmp('UTF-8', $constraint->charset) => [...$schema, ...array_filter(['minLength' => $constraint->min, 'maxLength' => $constraint->max], self::isSet(...))],
             $constraint instanceof Count => [...$schema, ...array_filter([$minCount => $constraint->min, $maxCount => $constraint->max], self::isSet(...))],
             $constraint instanceof Range => [...$schema, ...array_filter(['minimum' => $constraint->min, 'maximum' => $constraint->max], self::isNumber(...))],
             $constraint instanceof GreaterThan => self::isNumber($constraint->value) && null === $constraint->propertyPath ? [...$schema, ...$dialect->exclusiveMinimum($constraint->value)] : $schema,

@@ -229,14 +229,13 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
                     return self::createNotModifiedResponse($method, $url, $options, $cachedData['headers']);
                 }
 
-                return $this->createResponseFromCache($cachedData, $method, $url, $options, $metadataKey);
-            }
+                if ($cachedResponse = $this->createResponseFromCache($cachedData, $method, $url, $options, $metadataKey)) {
+                    return $cachedResponse;
+                }
 
-            if (isset($requestCacheControl['only-if-cached'])) {
-                return self::createGatewayTimeoutResponse($method, $url, $options);
-            }
-
-            if (!$hasClientConditionalValidator) {
+                $cachedData = [];
+                $freshness = null;
+            } elseif (!$hasClientConditionalValidator) {
                 if (isset($cachedData['headers']['etag'])) {
                     $options['headers']['If-None-Match'] = implode(', ', $cachedData['headers']['etag']);
                     $sentCacheValidator = true;
@@ -266,7 +265,7 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
             $varyFields,
             &$metadataKey,
             $cachedData,
-            $freshness,
+            &$freshness,
             $url,
             $method,
             $options,
@@ -282,11 +281,11 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
             if (null !== $chunk->getError() || $chunk->isTimeout()) {
                 null !== $attemptTag && $this->cache->invalidateTags([$attemptTag]);
 
-                if ($allowStaleFallback && Freshness::StaleButUsable === $freshness) {
+                if ($allowStaleFallback && Freshness::StaleButUsable === $freshness && $staleResponse = $this->createResponseFromCache($cachedData, $method, $url, $options, $metadataKey)) {
                     // avoid throwing exception in ErrorChunk#__destruct()
                     $chunk instanceof ErrorChunk && $chunk->didThrow(true);
                     $context->passthru();
-                    $context->replaceResponse($this->createResponseFromCache($cachedData, $method, $url, $options, $metadataKey));
+                    $context->replaceResponse($staleResponse);
 
                     return;
                 }
@@ -342,35 +341,38 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
 
                     if (!$updatedMetadataIsCacheable) {
                         $this->cache->delete($metadataKey);
+                    } else {
+                        $updatedCachedData = $this->cache->get($metadataKey, static function (ItemInterface $item) use ($updatedCachedData, $expiresAt, $fullUrlTag, $metadataKey): array {
+                            $item->expiresAt($expiresAt)->tag([$fullUrlTag, $metadataKey]);
 
-                        $context->passthru();
-
-                        if (!$hasClientConditionalValidator) {
-                            $context->replaceResponse($this->createResponseFromCache($updatedCachedData, $method, $url, $options, $metadataKey, $expiresAt));
-                        }
-
-                        return;
+                            return $updatedCachedData;
+                        }, \INF);
                     }
 
-                    $updatedCachedData = $this->cache->get($metadataKey, static function (ItemInterface $item) use ($updatedCachedData, $expiresAt, $fullUrlTag, $metadataKey): array {
-                        $item->expiresAt($expiresAt)->tag([$fullUrlTag, $metadataKey]);
+                    if ($hasClientConditionalValidator) {
+                        $context->passthru();
+                    } elseif ($cachedResponse = $this->createResponseFromCache($updatedCachedData, $method, $url, $options, $metadataKey, $expiresAt)) {
+                        $context->passthru();
+                        $context->replaceResponse($cachedResponse);
+                    } else {
+                        $freshness = null;
+                        unset($options['headers']['If-None-Match'], $options['headers']['If-Modified-Since']);
+                        $this->isInnerRequest = true;
 
-                        return $updatedCachedData;
-                    }, \INF);
-
-                    $context->passthru();
-
-                    if (!$hasClientConditionalValidator) {
-                        $context->replaceResponse($this->createResponseFromCache($updatedCachedData, $method, $url, $options, $metadataKey, $expiresAt));
+                        try {
+                            $context->replaceRequest($method, $url, $options);
+                        } finally {
+                            $this->isInnerRequest = false;
+                        }
                     }
 
                     return;
                 }
 
                 if ($statusCode >= 500 && $statusCode < 600) {
-                    if ($allowStaleFallback && Freshness::StaleButUsable === $freshness) {
+                    if ($allowStaleFallback && Freshness::StaleButUsable === $freshness && $staleResponse = $this->createResponseFromCache($cachedData, $method, $url, $options, $metadataKey)) {
                         $context->passthru();
-                        $context->replaceResponse($this->createResponseFromCache($cachedData, $method, $url, $options, $metadataKey));
+                        $context->replaceResponse($staleResponse);
 
                         return;
                     }
@@ -1202,11 +1204,11 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
      * This function constructs a MockResponse from the cached data, including
      * the original request method, URL, and options, as well as the cached
      * response headers and content. The constructed MockResponse is then
-     * returned.
+     * returned, or null when a chunk of the body is missing from the cache.
      *
      * @param array{next_chunk: string, status_code: int, initial_age: int, headers: array<string, string|string[]>, stored_at: int} $cachedData
      */
-    private function createResponseFromCache(array $cachedData, string $method, string $url, array $options, string $metadataKey, \DateTimeImmutable|false|null $newExpiresAt = false): MockResponse
+    private function createResponseFromCache(array $cachedData, string $method, string $url, array $options, string $metadataKey, \DateTimeImmutable|false|null $newExpiresAt = false): ?MockResponse
     {
         $cache = $this->cache;
 
@@ -1230,17 +1232,22 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
             };
         }
 
-        $body = static function () use ($cache, $cachedData, $callback, $beta): \Generator {
-            while (null !== $cachedData['next_chunk']) {
-                $cachedData = $cache->get($cachedData['next_chunk'], $callback, $beta);
+        $body = [];
+        $chunk = $cachedData;
 
-                if ('' !== $cachedData['content']) {
-                    yield $cachedData['content'];
+        try {
+            while (null !== $chunk['next_chunk']) {
+                $chunk = $cache->get($chunk['next_chunk'], $callback, $beta);
+
+                if ('' !== $chunk['content']) {
+                    $body[] = $chunk['content'];
                 }
             }
-        };
+        } catch (ChunkCacheItemNotFoundException) {
+            return null;
+        }
 
-        return MockResponse::fromRequest($method, $url, $options, new MockResponse($body(), [
+        return MockResponse::fromRequest($method, $url, $options, new MockResponse($body, [
             'http_code' => $cachedData['status_code'],
             'response_headers' => [
                 'age' => $this->getCachedResponseAge($cachedData),

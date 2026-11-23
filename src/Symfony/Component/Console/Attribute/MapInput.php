@@ -176,10 +176,10 @@ final class MapInput
                 if ($spec->isRequired() && \in_array($value, [null, []], true)) {
                     continue;
                 }
-                $this->class->getProperty($name)->setValue($instance, $this->resolveValue($spec->typeName, $value, $spec->default));
+                $this->class->getProperty($name)->setValue($instance, $this->resolveValue($name, $spec->typeName, $value, $spec->default));
             } elseif ($spec instanceof Option) {
                 $value = $input->getOption($spec->name);
-                $this->class->getProperty($name)->setValue($instance, $this->resolveValue($spec->typeName, $value, $spec->default));
+                $this->class->getProperty($name)->setValue($instance, $this->resolveValue($name, $spec->typeName, $value, $spec->default));
             } elseif ($spec instanceof self) {
                 $this->class->getProperty($name)->setValue($instance, $spec->createInstance($input));
             }
@@ -188,7 +188,7 @@ final class MapInput
         return $instance;
     }
 
-    private function resolveValue(string $typeName, mixed $value, mixed $default): mixed
+    private function resolveValue(string $name, string $typeName, mixed $value, mixed $default): mixed
     {
         if (null === $value) {
             return $default;
@@ -208,7 +208,15 @@ final class MapInput
             }
             $class = \DateTimeInterface::class === $typeName ? \DateTimeImmutable::class : $typeName;
 
-            return new $class($value);
+            if (false !== filter_var($value, \FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]])) {
+                $value = '@'.$value;
+            }
+
+            try {
+                return new $class($value);
+            } catch (\Exception) {
+                throw new \RuntimeException(\sprintf('Invalid date given for parameter "$%s". Use #[MapDateTime(format: \'your-format\')] to specify a custom format.', $name));
+            }
         }
 
         return $value;

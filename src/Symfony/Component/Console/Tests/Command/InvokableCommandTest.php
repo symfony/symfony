@@ -20,6 +20,7 @@ use Symfony\Component\Console\ArgumentResolver\ValueResolver\ServiceValueResolve
 use Symfony\Component\Console\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\Ask;
+use Symfony\Component\Console\Attribute\Interact;
 use Symfony\Component\Console\Attribute\MapDateTime;
 use Symfony\Component\Console\Attribute\MapInput;
 use Symfony\Component\Console\Attribute\Option;
@@ -455,6 +456,32 @@ class InvokableCommandTest extends TestCase
         self::assertSame(IntEnum::Two, $invokable->received);
         $display = preg_replace('/\s+/', ' ', $tester->getDisplay());
         self::assertStringContainsString('The value "abc" is not valid for the "enum" argument. Supported values are "1", "2".', $display);
+    }
+
+    public function testInvalidDateOnMapInputWithInteractMethod()
+    {
+        $command = new Command('foo');
+        $command->setCode(static fn (#[MapInput] DateInteractInputDto $input): int => Command::SUCCESS);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid date given for parameter "$since".');
+
+        (new CommandTester($command))->execute(['--since' => 'garbage'], ['interactive' => true]);
+    }
+
+    public function testTimestampOnMapInputWithInteractMethod()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (#[MapInput] DateInteractInputDto $input): int {
+            Assert::assertSame('2001-05-11 00:42:00', $input->since->format('Y-m-d H:i:s'));
+
+            return Command::SUCCESS;
+        });
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--since' => '989541720'], ['interactive' => true]);
+
+        $tester->assertCommandIsSuccessful();
     }
 
     public function testNumericUnionOptionIsConvertedOrRejected()
@@ -1154,4 +1181,15 @@ final class IntEnumAskInputDto
     #[Argument]
     #[Ask('Pick a value')]
     public IntEnum $enum;
+}
+
+final class DateInteractInputDto
+{
+    #[Option]
+    public ?\DateTimeImmutable $since = null;
+
+    #[Interact]
+    public function interact(): void
+    {
+    }
 }

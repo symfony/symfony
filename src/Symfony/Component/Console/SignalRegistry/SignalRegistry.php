@@ -28,6 +28,13 @@ final class SignalRegistry
      */
     private array $originalHandlers = [];
 
+    /**
+     * @var array<string, true>
+     */
+    private static array $autoloadsInProgress = [];
+
+    private static bool $autoloaderRegistered = false;
+
     public function __construct()
     {
         if (\function_exists('pcntl_async_signals')) {
@@ -37,6 +44,8 @@ final class SignalRegistry
 
     public function register(int $signal, callable $signalHandler): void
     {
+        self::registerAutoloader();
+
         $previous = pcntl_signal_get_handler($signal);
 
         if (!isset($this->originalHandlers[$signal])) {
@@ -131,5 +140,36 @@ final class SignalRegistry
     public function scheduleAlarm(int $seconds): void
     {
         pcntl_alarm($seconds);
+    }
+
+    /**
+     * Queues the signals that arrive while an autoload is running, and handles them when it is over.
+     *
+     * The engine cannot autoload a class that is already being autoloaded: a handler that needs such a class would fail with a "Class not found" error if it ran in the middle of the autoload.
+     */
+    private static function registerAutoloader(): void
+    {
+        if (self::$autoloaderRegistered) {
+            return;
+        }
+        self::$autoloaderRegistered = true;
+
+        spl_autoload_register(static function (string $class): void {
+            if (isset(self::$autoloadsInProgress[$class])) {
+                // spl_autoload_call() below invokes this autoloader again for the class being loaded
+                return;
+            }
+            self::$autoloadsInProgress[$class] = true;
+            $async = pcntl_async_signals(false);
+            try {
+                spl_autoload_call($class);
+            } finally {
+                unset(self::$autoloadsInProgress[$class]);
+                pcntl_async_signals($async);
+                if ($async) {
+                    pcntl_signal_dispatch();
+                }
+            }
+        }, true, true);
     }
 }

@@ -157,6 +157,9 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedConstructedTarget\Outer;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMapping\NestedBankDataDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMapping\NestedBankDataResource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMapping\NestedBankDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedLazyGhost\ArrayObjectTarget as NestedLazyGhostArrayObjectTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedLazyGhost\ParentSource as NestedLazyGhostParentSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedLazyGhost\StdClassTarget as NestedLazyGhostStdClassTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransformer\ChildWithClassTransformTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransformer\ChildWithoutClassTransformerTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransformer\ParentSource;
@@ -260,6 +263,8 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\Unreadable\Order;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Unreadable\OrderView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\UnwritableTargetProperty\AsymmetricVisibilityTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\UnwritableTargetProperty\ReadonlyPropertyTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\WriteOnlyVirtualProperty\ConstructorTarget as WriteOnlyVirtualPropertyConstructorTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\WriteOnlyVirtualProperty\Source as WriteOnlyVirtualPropertySource;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -2126,5 +2131,23 @@ final class ObjectMapperTest extends TestCase
         $this->assertSame('source', $target->uninitialized);
         $this->assertSame('target', $target->initialized);
         $this->assertSame('target', $target->virtual);
+    }
+
+    public function testWriteOnlyVirtualSourcePropertyIsSkippedWithoutPropertyAccessor()
+    {
+        $mapper = new ObjectMapper();
+
+        $this->assertSame('none', $mapper->map(new WriteOnlyVirtualPropertySource())->nickname);
+        $this->assertSame('none', $mapper->map(new WriteOnlyVirtualPropertySource(), WriteOnlyVirtualPropertyConstructorTarget::class)->nickname);
+    }
+
+    public function testNestedTargetExtendingAnInternalClassIsMappedEagerly()
+    {
+        $target = (new ObjectMapper())->map(new NestedLazyGhostParentSource());
+
+        $this->assertInstanceOf(NestedLazyGhostArrayObjectTarget::class, $target->arrayObject);
+        $this->assertSame('array object', $target->arrayObject->name);
+        $this->assertTrue((new \ReflectionClass(NestedLazyGhostStdClassTarget::class))->isUninitializedLazyObject($target->stdClass));
+        $this->assertSame('std class', $target->stdClass->name);
     }
 }

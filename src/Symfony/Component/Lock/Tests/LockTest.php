@@ -361,6 +361,32 @@ class LockTest extends TestCase
         $lock->release();
     }
 
+    public function testReleaseThrowsExceptionWhenExistsFail()
+    {
+        $key = new Key(__METHOD__);
+        $store = $this->createMock(PersistingStoreInterface::class);
+        $lock = new Lock($key, $store, 10);
+
+        $store
+            ->expects($this->once())
+            ->method('delete')
+            ->with($key);
+
+        $previous = new \RuntimeException('Connection lost');
+        $store
+            ->expects($this->once())
+            ->method('exists')
+            ->with($key)
+            ->willThrowException($previous);
+
+        try {
+            $lock->release();
+            $this->fail('A LockReleasingException should have been thrown.');
+        } catch (LockReleasingException $e) {
+            $this->assertSame($previous, $e->getPrevious());
+        }
+    }
+
     public function testReleaseThrowsExceptionIfNotWellDeleted()
     {
         $this->expectException(LockReleasingException::class);

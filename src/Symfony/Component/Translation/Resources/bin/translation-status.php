@@ -82,6 +82,7 @@ foreach ($config['original_files'] as $originalFilePath) {
 
 $totalMissingTranslations = 0;
 $totalTranslationMismatches = 0;
+$totalMixedAlphabetWords = 0;
 
 foreach ($config['original_files'] as $originalFilePath) {
     $translationFilePaths = findTranslationFiles($originalFilePath, $config['locale_to_analyze']);
@@ -89,11 +90,12 @@ foreach ($config['original_files'] as $originalFilePath) {
 
     $totalMissingTranslations += array_sum(array_map(static fn ($translation) => count($translation['missingKeys']), array_values($translationStatus)));
     $totalTranslationMismatches += array_sum(array_map(static fn ($translation) => count($translation['mismatches']), array_values($translationStatus)));
+    $totalMixedAlphabetWords += array_sum(array_map(static fn ($translation) => count($translation['mixedAlphabetWords']), array_values($translationStatus)));
 
     printTranslationStatus($originalFilePath, $translationStatus, $config['verbose_output'], $config['include_completed_languages']);
 }
 
-exit($totalTranslationMismatches > 0 ? 1 : 0);
+exit($totalTranslationMismatches > 0 || $totalMixedAlphabetWords > 0 ? 1 : 0);
 
 function findTranslationFiles($originalFilePath, $localeToAnalyze): array
 {
@@ -133,6 +135,7 @@ function calculateTranslationStatus($originalFilePath, $translationFilePaths): a
             'translated' => count($translatedKeys),
             'missingKeys' => $missingKeys,
             'mismatches' => $mismatches,
+            'mixedAlphabetWords' => findMixedAlphabetWords($translationPath),
         ];
         $translationStatus[$locale]['is_completed'] = isTranslationCompleted($translationStatus[$locale]);
     }
@@ -142,7 +145,7 @@ function calculateTranslationStatus($originalFilePath, $translationFilePaths): a
 
 function isTranslationCompleted(array $translationStatus): bool
 {
-    return $translationStatus['total'] === $translationStatus['translated'] && !$translationStatus['mismatches'];
+    return $translationStatus['total'] === $translationStatus['translated'] && !$translationStatus['mismatches'] && !$translationStatus['mixedAlphabetWords'];
 }
 
 function printTranslationStatus($originalFilePath, $translationStatus, $verboseOutput, $includeCompletedLanguages): void
@@ -196,6 +199,28 @@ function findTransUnitMismatches(array $baseTranslationKeys, array $translatedKe
     return $mismatches;
 }
 
+/**
+ * Find the words of the targets that mix letters from the Latin, Cyrillic and Greek alphabets.
+ */
+function findMixedAlphabetWords($filePath): array
+{
+    $words = [];
+    $contents = new SimpleXMLElement(file_get_contents($filePath));
+
+    foreach ($contents->file->body->{'trans-unit'} as $translationKey) {
+        foreach (preg_split('/[^\p{L}]++/u', (string) $translationKey->target, -1, \PREG_SPLIT_NO_EMPTY) as $word) {
+            // a letter shared by several scripts (like U+02BC) belongs to none of them
+            $alphabets = preg_match('/(?![\p{Cyrillic}\p{Greek}])\p{Latin}/u', $word) + preg_match('/(?![\p{Latin}\p{Greek}])\p{Cyrillic}/u', $word) + preg_match('/(?![\p{Latin}\p{Cyrillic}])\p{Greek}/u', $word);
+
+            if (1 < $alphabets) {
+                $words[] = [(string) $translationKey['id'], $word];
+            }
+        }
+    }
+
+    return $words;
+}
+
 function printTitle($title): void
 {
     echo $title.\PHP_EOL;
@@ -218,18 +243,19 @@ function printTable($translations, $verboseOutput, bool $includeCompletedLanguag
 
         if ($translation['translated'] > $translation['total']) {
             textColorRed();
-        } elseif ($translation['mismatches']) {
+        } elseif ($translation['mismatches'] || $translation['mixedAlphabetWords']) {
             textColorRed();
         } elseif ($translation['is_completed']) {
             textColorGreen();
         }
 
         echo sprintf(
-            '|  Locale: %-'.$longestLocaleNameLength.'s  |  Translated: %2d/%2d  |  Mismatches: %d  |',
+            '|  Locale: %-'.$longestLocaleNameLength.'s  |  Translated: %2d/%2d  |  Mismatches: %d  |  Mixed alphabets: %d  |',
             $locale,
             $translation['translated'],
             $translation['total'],
-            count($translation['mismatches'])
+            count($translation['mismatches']),
+            count($translation['mixedAlphabetWords'])
         ).\PHP_EOL;
 
         textColorNormal();
@@ -249,6 +275,14 @@ function printTable($translations, $verboseOutput, bool $includeCompletedLanguag
             foreach ($translation['mismatches'] as $id => $content) {
                 echo sprintf('|      (id=%s) Expected: %s', $id, $content['expected']).\PHP_EOL;
                 echo sprintf('|              Found:    %s', $content['found']).\PHP_EOL;
+            }
+            $shouldBeClosed = true;
+        }
+        if ($verboseOutput && $translation['mixedAlphabetWords']) {
+            echo '|    Words mixing letters from the Latin, Cyrillic and Greek alphabets:'.\PHP_EOL;
+
+            foreach ($translation['mixedAlphabetWords'] as [$id, $word]) {
+                echo sprintf('|      (id=%s) %s', $id, $word).\PHP_EOL;
             }
             $shouldBeClosed = true;
         }

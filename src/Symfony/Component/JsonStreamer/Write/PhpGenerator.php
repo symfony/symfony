@@ -169,7 +169,7 @@ final class PhpGenerator
         $accessor = $dataModelNode->getAccessor();
 
         if ($this->canBeEncodedWithJsonEncode($dataModelNode)) {
-            return $this->yield($this->encode($accessor, $context), $context);
+            return $this->yield($this->encode($accessor, $context, $this->shouldForceObject($dataModelNode)), $context);
         }
 
         if ($context['depth'] >= self::MAX_DEPTH) {
@@ -207,52 +207,27 @@ final class PhpGenerator
         }
 
         if ($dataModelNode instanceof CollectionNode) {
-            ++$context['depth'];
-
-            $collectionKeyType = $dataModelNode->getType()->getCollectionKeyType();
-
-            if ($collectionKeyType instanceof BuiltinType && TypeIdentifier::INT === $collectionKeyType->getTypeIdentifier()) {
-                $php = $this->yieldInterpolatedString('[', $context)
-                    .$this->flushYieldBuffer($context)
-                    .$this->line('$prefix'.$context['depth'].' = \'\';', $context)
-                    .$this->line("foreach ($accessor as ".$dataModelNode->getItemNode()->getAccessor().') {', $context);
+            if ($dataModelNode->getType()->isIdentifiedBy(TypeIdentifier::ITERABLE) && $this->canItemsBeEncodedWithJsonEncode($dataModelNode)) {
+                $php = $this->flushYieldBuffer($context)
+                    .$this->line("if (\is_array($accessor)) {", $context);
 
                 ++$context['indentation_level'];
-                $php .= $this->yieldInterpolatedString('{$prefix'.$context['depth'].'}', $context, false)
-                    .$this->generateYields($dataModelNode->getItemNode(), $options, $context)
-                    .$this->flushYieldBuffer($context)
-                    .$this->line('$prefix'.$context['depth'].' = \',\';', $context);
+                $php .= $this->yield($this->encode($accessor, $context, $this->shouldForceObject($dataModelNode)), $context)
+                    .$this->flushYieldBuffer($context);
+                --$context['indentation_level'];
 
+                $php .= $this->line('} else {', $context);
+
+                ++$context['indentation_level'];
+                $php .= $this->generateCollectionLoop($dataModelNode, $options, $context)
+                    .$this->flushYieldBuffer($context);
                 --$context['indentation_level'];
 
                 return $php
-                    .$this->line('}', $context)
-                    .$this->yieldInterpolatedString(']', $context);
+                    .$this->line('}', $context);
             }
 
-            $keyAccessor = $dataModelNode->getKeyNode()->getAccessor();
-
-            $escapedKey = $dataModelNode->getType()->getCollectionKeyType()->isIdentifiedBy(TypeIdentifier::INT)
-                ? "$keyAccessor = is_int($keyAccessor) ? $keyAccessor : \substr(\json_encode($keyAccessor, ".self::THROWING_JSON_ENCODE_FLAGS_EXPRESSION.'), 1, -1);'
-                : "$keyAccessor = \substr(\json_encode($keyAccessor, ".self::THROWING_JSON_ENCODE_FLAGS_EXPRESSION.'), 1, -1);';
-
-            $php = $this->yieldInterpolatedString('{', $context)
-                .$this->flushYieldBuffer($context)
-                .$this->line('$prefix'.$context['depth'].' = \'\';', $context)
-                .$this->line("foreach ($accessor as $keyAccessor => ".$dataModelNode->getItemNode()->getAccessor().') {', $context);
-
-            ++$context['indentation_level'];
-            $php .= $this->line($escapedKey, $context)
-                .$this->yieldInterpolatedString('{$prefix'.$context['depth'].'}"{'.$keyAccessor.'}":', $context, false)
-                .$this->generateYields($dataModelNode->getItemNode(), $options, $context)
-                .$this->flushYieldBuffer($context)
-                .$this->line('$prefix'.$context['depth'].' = \',\';', $context);
-
-            --$context['indentation_level'];
-
-            return $php
-                .$this->line('}', $context)
-                .$this->yieldInterpolatedString('}', $context);
+            return $this->generateCollectionLoop($dataModelNode, $options, $context);
         }
 
         if ($dataModelNode instanceof ObjectNode) {
@@ -354,9 +329,9 @@ final class PhpGenerator
     /**
      * @param array<string, mixed> $context
      */
-    private function encode(string $value, array $context): string
+    private function encode(string $value, array $context, bool $forceObject = false): string
     {
-        return "\json_encode($value, ".self::THROWING_JSON_ENCODE_FLAGS_EXPRESSION.', '.(self::MAX_DEPTH - $context['depth']).')';
+        return "\json_encode($value, ".self::THROWING_JSON_ENCODE_FLAGS_EXPRESSION.($forceObject ? ' | \\JSON_FORCE_OBJECT' : '').', '.(self::MAX_DEPTH - $context['depth']).')';
     }
 
     /**
@@ -430,13 +405,66 @@ final class PhpGenerator
     }
 
     /**
+     * @param array<string, mixed> $options
+     * @param array<string, mixed> $context
+     */
+    private function generateCollectionLoop(CollectionNode $dataModelNode, array $options, array $context): string
+    {
+        $accessor = $dataModelNode->getAccessor();
+        ++$context['depth'];
+
+        $collectionKeyType = $dataModelNode->getType()->getCollectionKeyType();
+
+        if ($collectionKeyType instanceof BuiltinType && TypeIdentifier::INT === $collectionKeyType->getTypeIdentifier()) {
+            $php = $this->yieldInterpolatedString('[', $context)
+                .$this->flushYieldBuffer($context)
+                .$this->line('$prefix'.$context['depth'].' = \'\';', $context)
+                .$this->line("foreach ($accessor as ".$dataModelNode->getItemNode()->getAccessor().') {', $context);
+
+            ++$context['indentation_level'];
+            $php .= $this->yieldInterpolatedString('{$prefix'.$context['depth'].'}', $context, false)
+                .$this->generateYields($dataModelNode->getItemNode(), $options, $context)
+                .$this->flushYieldBuffer($context)
+                .$this->line('$prefix'.$context['depth'].' = \',\';', $context);
+
+            --$context['indentation_level'];
+
+            return $php
+                .$this->line('}', $context)
+                .$this->yieldInterpolatedString(']', $context);
+        }
+
+        $keyAccessor = $dataModelNode->getKeyNode()->getAccessor();
+
+        $escapedKey = "$keyAccessor = is_int($keyAccessor) ? $keyAccessor : \substr(\json_encode($keyAccessor, ".self::THROWING_JSON_ENCODE_FLAGS_EXPRESSION.'), 1, -1);';
+
+        $php = $this->yieldInterpolatedString('{', $context)
+            .$this->flushYieldBuffer($context)
+            .$this->line('$prefix'.$context['depth'].' = \'\';', $context)
+            .$this->line("foreach ($accessor as $keyAccessor => ".$dataModelNode->getItemNode()->getAccessor().') {', $context);
+
+        ++$context['indentation_level'];
+        $php .= $this->line($escapedKey, $context)
+            .$this->yieldInterpolatedString('{$prefix'.$context['depth'].'}"{'.$keyAccessor.'}":', $context, false)
+            .$this->generateYields($dataModelNode->getItemNode(), $options, $context)
+            .$this->flushYieldBuffer($context)
+            .$this->line('$prefix'.$context['depth'].' = \',\';', $context);
+
+        --$context['indentation_level'];
+
+        return $php
+            .$this->line('}', $context)
+            .$this->yieldInterpolatedString('}', $context);
+    }
+
+    /**
      * Determines if the $node can be encoded using a simple "json_encode".
      */
-    private function canBeEncodedWithJsonEncode(DataModelNodeInterface $node, int $depth = 0): bool
+    private function canBeEncodedWithJsonEncode(DataModelNodeInterface $node, int $depth = 0, bool $splitDictLists = true): bool
     {
         if ($node instanceof CompositeNode) {
             foreach ($node->getNodes() as $n) {
-                if (!$this->canBeEncodedWithJsonEncode($n, $depth)) {
+                if (!$this->canBeEncodedWithJsonEncode($n, $depth, $splitDictLists)) {
                     return false;
                 }
             }
@@ -445,7 +473,7 @@ final class PhpGenerator
         }
 
         if ($node instanceof CollectionNode) {
-            return $this->canBeEncodedWithJsonEncode($node->getItemNode(), $depth + 1);
+            return $node->getType()->isIdentifiedBy(TypeIdentifier::ARRAY) && $this->canItemsBeEncodedWithJsonEncode($node, $depth, $splitDictLists);
         }
 
         if (!$node instanceof ScalarNode) {
@@ -462,5 +490,71 @@ final class PhpGenerator
         }
 
         return true;
+    }
+
+    private function canItemsBeEncodedWithJsonEncode(CollectionNode $node, int $depth = 0, bool $splitDictLists = true): bool
+    {
+        $keyType = $node->getType()->getCollectionKeyType();
+
+        if ($keyType instanceof BuiltinType && TypeIdentifier::INT === $keyType->getTypeIdentifier()) {
+            // dicts in a list are encoded one by one, so that "\JSON_FORCE_OBJECT" can be used for each of them
+            if ($splitDictLists && $this->shouldForceObject($node->getItemNode())) {
+                return false;
+            }
+        } elseif (!$this->isDict($node)) {
+            // keep json_encode() for "int|string" keys, since it writes lists as JSON arrays while the generated loop writes a JSON object
+            $splitDictLists = false;
+        }
+
+        return $this->canBeEncodedWithJsonEncode($node->getItemNode(), $depth + 1, $splitDictLists);
+    }
+
+    /**
+     * Determines if the node contains dicts and if "\JSON_FORCE_OBJECT" can be used to encode it.
+     */
+    private function shouldForceObject(DataModelNodeInterface $node): bool
+    {
+        return $this->containsDict($node) && $this->canBeEncodedAsObject($node);
+    }
+
+    private function containsDict(DataModelNodeInterface $node): bool
+    {
+        if ($node instanceof CompositeNode) {
+            foreach ($node->getNodes() as $n) {
+                if ($this->containsDict($n)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return $node instanceof CollectionNode && $this->isDict($node);
+    }
+
+    private function canBeEncodedAsObject(DataModelNodeInterface $node): bool
+    {
+        if ($node instanceof CompositeNode) {
+            foreach ($node->getNodes() as $n) {
+                if (!$this->canBeEncodedAsObject($n)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        if ($node instanceof CollectionNode) {
+            return $this->isDict($node) && $this->canBeEncodedAsObject($node->getItemNode());
+        }
+
+        return $node instanceof ScalarNode && $node->getType()->isIdentifiedBy(TypeIdentifier::INT, TypeIdentifier::FLOAT, TypeIdentifier::STRING, TypeIdentifier::BOOL, TypeIdentifier::TRUE, TypeIdentifier::FALSE, TypeIdentifier::NULL);
+    }
+
+    private function isDict(CollectionNode $node): bool
+    {
+        $keyType = $node->getType()->getCollectionKeyType();
+
+        return $keyType instanceof BuiltinType && TypeIdentifier::STRING === $keyType->getTypeIdentifier();
     }
 }

@@ -136,8 +136,20 @@ final class QueryParameterValueResolver implements ValueResolverInterface, Sourc
             $value = \is_array($value) ? array_map($enumFrom, $value) : $enumFrom($value);
         }
 
-        if (null !== $uidType) {
-            $value = \is_array($value) ? array_map([$uidType, 'fromString'], $value) : $uidType::fromString($value);
+        if (null !== $uidType && null !== $value) {
+            $uidFrom = static function ($value) use ($uidType) {
+                if (!\is_string($value)) {
+                    return null;
+                }
+
+                try {
+                    return $uidType::fromString($value);
+                } catch (\InvalidArgumentException) {
+                    return null;
+                }
+            };
+
+            $value = \is_array($value) ? array_map($uidFrom, $value) : $uidFrom($value);
         }
 
         if (null === $value && !($attribute->flags & \FILTER_NULL_ON_FAILURE)) {

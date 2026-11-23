@@ -386,6 +386,11 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
             return $this->docBlocks[$propertyHash];
         }
 
+        if (1000 < \count($this->docBlocks)) {
+            // stop memory leak if there are many keys
+            $this->docBlocks = \array_slice($this->docBlocks, 500, null, true);
+        }
+
         $ucFirstProperty = ucfirst($property);
 
         if ([$docBlock, $constructorDocBlock, $source, $declaringClass, $selfClass] = $this->getDocBlockFromProperty($class, $property)) {

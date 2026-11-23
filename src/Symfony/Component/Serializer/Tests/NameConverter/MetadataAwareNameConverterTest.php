@@ -165,6 +165,14 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertEquals($expected, $nameConverter->denormalize($propertyName, OtherSerializedNameDummy::class, null, $context));
     }
 
+    public function testDenormalizeWithAndWithoutDefaultGroups()
+    {
+        $nameConverter = new MetadataAwareNameConverter(new ClassMetadataFactory(new AttributeLoader()));
+
+        $this->assertSame('renamedNoGroup', $nameConverter->denormalize('renamedNoGroup', OtherSerializedNameDummy::class, null, ['groups' => ['Default']]));
+        $this->assertSame('noGroup', $nameConverter->denormalize('renamedNoGroup', OtherSerializedNameDummy::class, null, ['groups' => ['Default'], 'enable_default_groups' => true]));
+    }
+
     #[DataProvider('denormalizeFallbackAttributeAndContextProvider')]
     public function testDenormalizeWithGroupsAndFallback(string $expected, string $propertyName, array $context = [])
     {

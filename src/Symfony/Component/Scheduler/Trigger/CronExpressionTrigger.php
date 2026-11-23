@@ -64,7 +64,8 @@ final class CronExpressionTrigger implements TriggerInterface
             throw new LogicException(\sprintf('You cannot use "%s" as the "cron expression" package is not installed. Try running "composer require dragonmantank/cron-expression".', __CLASS__));
         }
 
-        if (!str_contains($expression, '#')) {
+        // a hashed part starts a field ("#", "#(0-2)", "#daily"...); "1#2" is the standard "nth weekday" syntax
+        if (!preg_match('/(?:^|\s)#/', $expression)) {
             return new self(new CronExpression($expression), $timezone);
         }
 

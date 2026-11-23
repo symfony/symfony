@@ -110,6 +110,8 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
             ['Y-m-d H:i:s', '2010-01-01 24:00:00', DateTime::INVALID_TIME_ERROR],
             ['Y-m-d H:i:s', '2010-01-01 00:60:00', DateTime::INVALID_TIME_ERROR],
             ['Y-m-d H:i:s', '2010-01-01 00:00:60', DateTime::INVALID_TIME_ERROR],
+            ['Y-m-d H:i:s', "2010-01-01 00:00:00\0", DateTime::INVALID_FORMAT_ERROR],
+            ['Y-m-d', "\0", DateTime::INVALID_FORMAT_ERROR],
         ];
     }
 

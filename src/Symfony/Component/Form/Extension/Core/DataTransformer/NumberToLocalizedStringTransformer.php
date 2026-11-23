@@ -110,7 +110,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException($formatter->getErrorMessage(), $formatter->getErrorCode());
         }
 
-        if ($result >= \PHP_INT_MAX || $result <= -\PHP_INT_MAX) {
+        // Without ext-intl, an integer overflow is returned as false or as a clamped integer, not as an error
+        if ((\is_float($result) || !\extension_loaded('intl')) && ($result >= \PHP_INT_MAX || $result <= -\PHP_INT_MAX)) {
             throw new TransformationFailedException('I don\'t have a clear idea what infinity looks like.');
         }
 
@@ -187,7 +188,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      */
     protected function castParsedValue(int|float $value): int|float
     {
-        if (\is_int($value) && (($float = (float) $value) < \PHP_INT_MAX) && $value === (int) $float) {
+        if (\is_int($value) && (($float = (float) $value) < \PHP_INT_MAX) && $float > \PHP_INT_MIN && $value === (int) $float) {
             return $float;
         }
 
@@ -206,8 +207,14 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         if (null !== $this->scale) {
             // shift number to maintain the correct scale during rounding
             $roundingCoef = 10 ** $this->scale;
-            // string representation to avoid rounding errors, similar to bcmul()
-            $number = (string) ($number * $roundingCoef);
+
+            // a float has 15 significant digits, so a shifted number of 1e15 or more has no decimals left to round
+            if (abs($number * $roundingCoef) >= 1e15) {
+                return 1 === $roundingCoef ? (int) $number : $number;
+            }
+
+            // keep 15 significant digits to avoid rounding errors, similar to bcmul()
+            $number = (float) \sprintf('%.15H', $number * $roundingCoef);
 
             $number = match ($this->roundingMode) {
                 \NumberFormatter::ROUND_CEILING => ceil($number),

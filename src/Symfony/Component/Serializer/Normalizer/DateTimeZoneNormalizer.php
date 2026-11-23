@@ -56,7 +56,7 @@ final class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerI
 
         try {
             return new \DateTimeZone($data);
-        } catch (\Exception $e) {
+        } catch (\Exception|\ValueError $e) {
             throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $data, ['string'], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
         }
     }

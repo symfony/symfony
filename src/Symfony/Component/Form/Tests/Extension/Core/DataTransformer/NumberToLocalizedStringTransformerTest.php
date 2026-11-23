@@ -677,6 +677,25 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(\PHP_INT_MAX - 1, (int) $transformer->reverseTransform((string) (\PHP_INT_MAX - 1)));
     }
 
+    #[RequiresPhpExtension('intl')]
+    public function testReverseTransformIntegerLimits()
+    {
+        foreach ([null, 0, 2] as $scale) {
+            $transformer = new NumberToLocalizedStringTransformer($scale);
+
+            $this->assertSame(\PHP_INT_MAX, $transformer->reverseTransform((string) \PHP_INT_MAX));
+            $this->assertSame(\PHP_INT_MIN, $transformer->reverseTransform((string) \PHP_INT_MIN));
+        }
+    }
+
+    public function testReverseTransformDisallowsIntegerOverflow()
+    {
+        $this->expectException(TransformationFailedException::class);
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('99999999999999999999');
+    }
+
     public function testReverseTransformSmallInt()
     {
         $transformer = new NumberToLocalizedStringTransformer(null, true);
@@ -771,5 +790,23 @@ class NumberToLocalizedStringTransformerTest extends TestCase
 
         $this->assertSame($largeInt, $result);
         $this->assertIsInt($result);
+    }
+
+    public function testReverseTransformBigNumbersWithScale()
+    {
+        if (4 === \PHP_INT_SIZE) {
+            $this->markTestSkipped('This test requires a 64bit PHP.');
+        }
+
+        $this->assertSame(1234567890123.45, (new NumberToLocalizedStringTransformer(2))->reverseTransform('1234567890123.45'));
+        $this->assertSame(1234567890123.45, (new NumberToLocalizedStringTransformer(2, null, \NumberFormatter::ROUND_DOWN))->reverseTransform('1234567890123.45'));
+        $this->assertSame(60000000000000.0, (new NumberToLocalizedStringTransformer(2))->reverseTransform('60000000000000.00'));
+
+        $transformer = new NumberToLocalizedStringTransformer(0);
+
+        $this->assertSame(6000000000000000, $transformer->reverseTransform('6000000000000000'));
+        $this->assertSame(123456789012345680, $transformer->reverseTransform('123456789012345680'));
+        $this->assertSame(9223372036854774784, $transformer->reverseTransform('9223372036854774784'));
+        $this->assertSame(-9223372036854774784, $transformer->reverseTransform('-9223372036854774784'));
     }
 }

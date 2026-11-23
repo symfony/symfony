@@ -312,6 +312,27 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         yield 'option --format, debug' => [true, ['--format', ''], ['yaml', 'json']];
     }
 
+    public function testDumpWhenTheCachedContainerIsStale()
+    {
+        // a resource dated in the future keeps the cached container stale, so the command's copy of the kernel builds the container again when it boots
+        $configFile = __DIR__.'/app/ConfigDump/config.yml';
+        $mtime = filemtime($configFile);
+        touch($configFile, time() + 10);
+
+        try {
+            // the kernel does not check a container again once it found it fresh in this process, so this test needs its own environment
+            $application = new Application(static::bootKernel(['debug' => true, 'test_case' => 'ConfigDump', 'root_config' => 'config.yml', 'environment' => 'stale_container']));
+            $application->doRun(new ArrayInput([]), new NullOutput());
+            $tester = new CommandTester($application->find('debug:config'));
+            $ret = $tester->execute(['name' => 'framework', 'path' => 'secret']);
+        } finally {
+            touch($configFile, $mtime);
+        }
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('test', $tester->getDisplay());
+    }
+
     public function testDumpPathDeepIntoScalar()
     {
         $tester = $this->createCommandTester(true);

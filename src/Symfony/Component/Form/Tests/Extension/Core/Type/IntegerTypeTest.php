@@ -113,13 +113,23 @@ class IntegerTypeTest extends BaseTypeTestCase
         if (4 === \PHP_INT_SIZE) {
             $min = '-2147483649';
         } else {
-            $min = '-9223372036854775808';
+            $min = '-9223372036854775809';
         }
 
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->submit($min);
 
         $this->assertFalse($form->isSynchronized());
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testMinimumIntegerIsValid()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE);
+        $form->submit((string) \PHP_INT_MIN);
+
+        $this->assertTrue($form->isSynchronized());
+        $this->assertSame(\PHP_INT_MIN, $form->getData());
     }
 
     public function testTooGreatIntegersAreNotValid()

@@ -1004,6 +1004,25 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame($cachedValues, $cache->getValues());
     }
 
+    public function testDenormalizeLooksUpCaseVariantsByTheirDeclaredName()
+    {
+        $cache = new ArrayAdapter();
+        $propertyInfo = new PropertyInfoCacheExtractor(new PropertyInfoExtractor([], [new ReflectionExtractor()], [], [new ReflectionExtractor()]), $cache);
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, $propertyInfo, null, null, [], $propertyInfo)]);
+
+        $serializer->denormalize(['inner' => ['foo' => 'foo']], ObjectOuter::class);
+        $cachedValues = $cache->getValues();
+
+        foreach (['INNER', 'Inner', 'iNnEr'] as $attribute) {
+            $obj = $serializer->denormalize([$attribute => ['foo' => 'foo']], ObjectOuter::class);
+
+            $this->assertInstanceOf(ObjectInner::class, $obj->getInner());
+            $this->assertSame('foo', $obj->getInner()->foo);
+        }
+
+        $this->assertSame($cachedValues, $cache->getValues());
+    }
+
     public function testNoTraversableSupport()
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \ArrayObject()));

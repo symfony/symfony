@@ -129,11 +129,23 @@ class Ask implements InteractiveAttributeInterface
             $question->setTrimmable($self->trimmable);
             $question->setTimeout($self->timeout);
 
-            if (!$self->validator && $reflection->isProperty() && 'array' !== $typeName) {
-                $self->validator = fn (mixed $value): mixed => $this->{$reflection->getName()} = $value;
+            $validator = $self->validator;
+
+            if (!$validator && $reflection->isProperty() && 'array' !== $typeName) {
+                $validator = function (mixed $value) use ($reflection, $name, $typeName): mixed {
+                    try {
+                        return $this->{$reflection->getName()} = $value;
+                    } catch (\TypeError $e) {
+                        throw match (true) {
+                            null === $value => new InvalidArgumentException(\sprintf('The "%s" argument requires a value.', $name)),
+                            \is_string($value) => InvalidArgumentException::fromInvalidType($name, $value, $typeName),
+                            default => $e,
+                        };
+                    }
+                };
             }
 
-            $question->setValidator($self->validator);
+            $question->setValidator($validator);
             $question->setMaxAttempts($self->maxAttempts);
             $question->setConstraints($self->constraints);
 
@@ -142,7 +154,19 @@ class Ask implements InteractiveAttributeInterface
             } elseif (is_subclass_of($typeName, \BackedEnum::class)) {
                 /** @var class-string<\BackedEnum> $backedType */
                 $backedType = $reflection->getType()->getName();
-                $question->setNormalizer(static fn (string|int $value) => $backedType::tryFrom($value) ?? throw InvalidArgumentException::fromEnumValue($reflection->getName(), $value, array_column($backedType::cases(), 'value')));
+                $question->setNormalizer(static function (string|int|null $value) use ($backedType, $reflection): ?\BackedEnum {
+                    if (null === $value) {
+                        return null;
+                    }
+
+                    try {
+                        $enum = $backedType::tryFrom($value);
+                    } catch (\TypeError) {
+                        $enum = null;
+                    }
+
+                    return $enum ?? throw InvalidArgumentException::fromEnumValue($reflection->getName(), $value, array_column($backedType::cases(), 'value'));
+                });
             }
 
             if ('array' === $typeName) {
@@ -165,7 +189,7 @@ class Ask implements InteractiveAttributeInterface
             }
 
             if ($reflection->isProperty()) {
-                $this->{$reflection->getName()} = $value;
+                $this->{$reflection->getName()} ??= $value;
             } else {
                 $input->setArgument($name, $value);
             }

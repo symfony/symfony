@@ -177,7 +177,7 @@ final class BlueskyTransport extends AbstractTransport
         $facets = [];
 
         // regex based on: https://bluesky.com/specs/handle#handle-identifier-syntax
-        $regex = '#[$|\W](@([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)#';
+        $regex = '#(?:^|\W)(@([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)#';
         foreach ($this->getMatchAndPosition($input, $regex) as $match) {
             $endpoint = \sprintf('%s://%s/xrpc/com.atproto.identity.resolveHandle', $this->getHttpScheme(), $this->getEndpoint());
             $response = $this->client->request('GET', $endpoint, [
@@ -216,7 +216,7 @@ final class BlueskyTransport extends AbstractTransport
 
         // partial/naive URL regex based on: https://stackoverflow.com/a/3809435
         // tweaked to disallow some trailing punctuation
-        $regex = ';[$|\W](https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*[-a-zA-Z0-9@%_\+~#//=])?);';
+        $regex = ';(?:^|\W)(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*[-a-zA-Z0-9@%_\+~#//=])?);';
         foreach ($this->getMatchAndPosition($input, $regex) as $match) {
             $facets[] = [
                 'index' => [

@@ -307,6 +307,10 @@ class DateTimeValueResolverTest extends TestCase
                 new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null, false, [new MapDateTime(format: 'Y-m-d')]),
                 self::requestWithAttributes(['dummy' => '2012-21-07']),
             ],
+            'null byte with format' => [
+                new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null, false, [new MapDateTime(format: 'Y-m-d')]),
+                self::requestWithAttributes(['dummy' => "2012-07-21\0"]),
+            ],
         ];
     }
 

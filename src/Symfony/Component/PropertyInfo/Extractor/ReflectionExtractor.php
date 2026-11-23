@@ -439,7 +439,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
             $adderAccessName = $adderMethod?->name;
             $removerAccessName = $removerMethod?->name;
 
-            if (null !== $adderMethod && null !== $removerMethod) {
+            if (null !== $adderMethod && null !== $removerMethod && !$this->isSingularWithExactMutator($reflClass, $camelized)) {
                 $mutator = new PropertyWriteInfo(PropertyWriteInfo::TYPE_ADDER_AND_REMOVER);
                 $mutator->setAdderInfo(new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $adderAccessName, $this->getWriteVisibilityForMethod($adderMethod), $adderMethod->isStatic()));
                 $mutator->setRemoverInfo(new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $removerAccessName, $this->getWriteVisibilityForMethod($removerMethod), $removerMethod->isStatic()));
@@ -513,12 +513,13 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
 
         if ($reflClass->hasProperty($property) && ($reflClass->getProperty($property)->getModifiers() & $this->propertyReflectionFlags)) {
             $reflProperty = $reflClass->getProperty($property);
-            if (!$reflProperty->isReadOnly()) {
+            if ($reflProperty->isReadOnly()) {
+                $errors[] = [\sprintf('The property "%s" in class "%s" is a promoted readonly property.', $property, $reflClass->getName())];
+                $allowMagicSet = $allowMagicCall = false;
+            } elseif ($reflProperty->isPublic() || !$allowMagicSet || null === $this->getAccessibleMethod($reflClass, '__set', 2)[0]) {
+                // PHP calls __set() for non-public properties, but never for public properties, even with private(set) or protected(set)
                 return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, $this->getWriteVisibilityForProperty($reflProperty), $reflProperty->isStatic(), $this->propertyHasHook($reflProperty, 'set'));
             }
-
-            $errors[] = [\sprintf('The property "%s" in class "%s" is a promoted readonly property.', $property, $reflClass->getName())];
-            $allowMagicSet = $allowMagicCall = false;
         }
 
         if ($allowMagicSet) {
@@ -1165,5 +1166,35 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
         }
 
         return null;
+    }
+
+    private function isSingularWithExactMutator(\ReflectionClass $reflClass, string $camelized): bool
+    {
+        foreach ($this->mutatorPrefixes as $mutatorPrefix) {
+            if (\in_array($mutatorPrefix, $this->arrayMutatorPrefixes, true)) {
+                continue;
+            }
+
+            [$method] = $this->getAccessibleMethod($reflClass, $mutatorPrefix.$camelized, 1);
+            if (null === $method) {
+                continue;
+            }
+
+            return $this->hasDistinctPluralProperty($reflClass, $camelized);
+        }
+
+        return false;
+    }
+
+    private function hasDistinctPluralProperty(\ReflectionClass $reflClass, string $camelized): bool
+    {
+        foreach ($reflClass->getProperties() as $reflectionProperty) {
+            $name = $this->camelize($reflectionProperty->name);
+            if ($name !== $camelized && \in_array($camelized, $this->inflector->singularize($name), true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -268,6 +268,18 @@ class QueryParameterValueResolverTest extends TestCase
             new ArgumentMetadata('groupId', Ulid::class, false, true, false, false, [new MapQueryParameter()]),
             [Ulid::fromString('01E439TP9XJZ9RPFH3T1PYBCR8')],
         ];
+
+        yield 'parameter found and invalid ULID that falls back to null on failure' => [
+            Request::create('/', 'GET', ['groupId' => 'not-a-ulid']),
+            new ArgumentMetadata('groupId', Ulid::class, false, false, false, true, [new MapQueryParameter(flags: \FILTER_NULL_ON_FAILURE)]),
+            [null],
+        ];
+
+        yield 'parameter found and ULID variadic and at least one invalid value that falls back to null on failure' => [
+            Request::create('/', 'GET', ['groupIds' => ['01E439TP9XJZ9RPFH3T1PYBCR8', 'not-a-ulid']]),
+            new ArgumentMetadata('groupIds', Ulid::class, true, false, false, false, [new MapQueryParameter(flags: \FILTER_NULL_ON_FAILURE)]),
+            [Ulid::fromString('01E439TP9XJZ9RPFH3T1PYBCR8')],
+        ];
     }
 
     /**
@@ -325,6 +337,30 @@ class QueryParameterValueResolverTest extends TestCase
             Request::create('/', 'GET', ['suits' => ['B', 'D']]),
             new ArgumentMetadata('suits', Suit::class, false, false, false, false, [new MapQueryParameter()]),
             new NotFoundHttpException('Invalid query parameter "suits".'),
+        ];
+
+        yield 'parameter found and invalid ULID' => [
+            Request::create('/', 'GET', ['groupId' => 'not-a-ulid']),
+            new ArgumentMetadata('groupId', Ulid::class, false, false, false, false, [new MapQueryParameter()]),
+            new NotFoundHttpException('Invalid query parameter "groupId".'),
+        ];
+
+        yield 'parameter found and ULID given as an array' => [
+            Request::create('/', 'GET', ['groupId' => ['01E439TP9XJZ9RPFH3T1PYBCR8']]),
+            new ArgumentMetadata('groupId', Ulid::class, false, false, false, false, [new MapQueryParameter()]),
+            new NotFoundHttpException('Invalid query parameter "groupId".'),
+        ];
+
+        yield 'parameter found and ULID variadic and at least one invalid value' => [
+            Request::create('/', 'GET', ['groupIds' => ['01E439TP9XJZ9RPFH3T1PYBCR8', 'not-a-ulid']]),
+            new ArgumentMetadata('groupIds', Ulid::class, true, false, false, false, [new MapQueryParameter()]),
+            new NotFoundHttpException('Invalid query parameter "groupIds".'),
+        ];
+
+        yield 'parameter found and ULID variadic and at least one value given as an array' => [
+            Request::create('/', 'GET', ['groupIds' => ['01E439TP9XJZ9RPFH3T1PYBCR8', ['01E439TP9XJZ9RPFH3T1PYBCR8']]]),
+            new ArgumentMetadata('groupIds', Ulid::class, true, false, false, false, [new MapQueryParameter()]),
+            new NotFoundHttpException('Invalid query parameter "groupIds".'),
         ];
 
         yield 'parameter not found' => [

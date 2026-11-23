@@ -52,13 +52,18 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
     {
         $value = parent::reverseTransform($value);
         if (null !== $value) {
-            $value = (string) ($value * $this->divisor);
+            $value *= $this->divisor;
+
+            if (1 !== $this->divisor && abs($value) < 1e15) {
+                // keep 15 significant digits to avoid rounding errors, similar to bcmul()
+                $value = (float) \sprintf('%.15H', $value);
+            }
 
             if ('integer' !== $this->input) {
                 return (float) $value;
             }
 
-            if ($value > \PHP_INT_MAX || $value < \PHP_INT_MIN) {
+            if (\is_float($value) && ($value >= \PHP_INT_MAX || $value < \PHP_INT_MIN)) {
                 throw new TransformationFailedException(\sprintf('Cannot cast "%s" to an integer. Try setting the input to "float" instead.', $value));
             }
 

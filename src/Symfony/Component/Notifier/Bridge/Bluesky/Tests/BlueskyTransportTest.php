@@ -119,6 +119,42 @@ final class BlueskyTransportTest extends TransportTestCase
         $this->assertEquals($expected, $output);
     }
 
+    public function testParseFacetsHandlesSharingAPrefixDoNotOverlap()
+    {
+        $input = 'hi @bob.test and @bob.test.example.org';
+        $expected = [
+            [
+                'index' => ['byteStart' => 3, 'byteEnd' => 12],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#mention', 'did' => 'did0'],
+                ],
+            ],
+            [
+                'index' => ['byteStart' => 17, 'byteEnd' => 38],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#mention', 'did' => 'did0'],
+                ],
+            ],
+        ];
+        $output = $this->parseFacets($input, new MockHttpClient(static fn () => new JsonMockResponse(['did' => 'did0'])));
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testParseFacetsHandleInsideEmailIsNotAMention()
+    {
+        $input = 'write to me@foo.com or @foo.com';
+        $expected = [
+            [
+                'index' => ['byteStart' => 23, 'byteEnd' => 31],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#mention', 'did' => 'did0'],
+                ],
+            ],
+        ];
+        $output = $this->parseFacets($input, new MockHttpClient(static fn () => new JsonMockResponse(['did' => 'did0'])));
+        $this->assertEquals($expected, $output);
+    }
+
     /**
      * Example from https://github.com/bluesky-social/atproto-website/blob/main/examples/create_bsky_post.py.
      */
@@ -179,6 +215,36 @@ final class BlueskyTransportTest extends TransportTestCase
             ],
         ];
         $output = $this->parseFacets($input, new MockHttpClient([new JsonMockResponse(['did' => 'did0'])]));
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testParseFacetsMentionAtTheStartOfTheText()
+    {
+        $input = '@atproto.com thanks for the review';
+        $expected = [
+            [
+                'index' => ['byteStart' => 0, 'byteEnd' => 12],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#mention', 'did' => 'did0'],
+                ],
+            ],
+        ];
+        $output = $this->parseFacets($input, new MockHttpClient([new JsonMockResponse(['did' => 'did0'])]));
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testParseFacetsUrlAtTheStartOfTheText()
+    {
+        $input = 'https://symfony.com/blog is live';
+        $expected = [
+            [
+                'index' => ['byteStart' => 0, 'byteEnd' => 24],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#link', 'uri' => 'https://symfony.com/blog'],
+                ],
+            ],
+        ];
+        $output = $this->parseFacets($input);
         $this->assertEquals($expected, $output);
     }
 

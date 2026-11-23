@@ -29,8 +29,10 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithAccessorWithoutProper
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithGetterSetter;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithHasser;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithMagicGet;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithMagicSet;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithNonAsciiStaticAccessor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithSelfReturningAccessor;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithSingularAndPlural;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithStaticConstructorAndAccessor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithStaticMutator;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\FalseAccessorDummy;
@@ -51,6 +53,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php82Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php84DummyWithMagicSet;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\SnakeCaseDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\UnderscoreDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\VirtualProperties;
@@ -734,6 +737,8 @@ class ReflectionExtractorTest extends TestCase
             [SnakeCaseDummy::class, 'snake_property', false, true, PropertyWriteInfo::TYPE_METHOD, 'setSnakeProperty', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
             [SnakeCaseDummy::class, 'snake_method', false, true, PropertyWriteInfo::TYPE_METHOD, 'setSnake_method', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
             [SnakeCaseDummy::class, 'snake_readonly', false, false, PropertyWriteInfo::TYPE_NONE, null, null, null, null, null],
+            [DummyWithMagicSet::class, 'protected', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'protected', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [DummyWithMagicSet::class, 'private', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'private', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
         ];
     }
 
@@ -757,6 +762,15 @@ class ReflectionExtractorTest extends TestCase
         $this->assertSame(PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, $writeInfo->getType());
         $this->assertSame('addBaz', $writeInfo->getAdderInfo()->getName());
         $this->assertSame('removeBaz', $writeInfo->getRemoverInfo()->getName());
+    }
+
+    public function testGetWriteInfoKeepsTheNonPublicPropertyWhenMagicSetIsDisabled()
+    {
+        $extractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC | ReflectionExtractor::ALLOW_PROTECTED | ReflectionExtractor::ALLOW_PRIVATE);
+        $writeMutator = $extractor->getWriteInfo(DummyWithMagicSet::class, 'private', ['enable_magic_methods_extraction' => ReflectionExtractor::DISALLOW_MAGIC_METHODS]);
+
+        $this->assertSame(PropertyWriteInfo::TYPE_PROPERTY, $writeMutator->getType());
+        $this->assertSame(PropertyWriteInfo::VISIBILITY_PRIVATE, $writeMutator->getVisibility());
     }
 
     public function testDisabledAdderAndRemoverReturnsError()
@@ -1041,6 +1055,24 @@ class ReflectionExtractorTest extends TestCase
         yield ['virtualHook', PropertyReadInfo::VISIBILITY_PUBLIC, PropertyWriteInfo::VISIBILITY_PUBLIC];
     }
 
+    #[DataProvider('provideAsymmetricVisibilityAndVirtualPropertiesWithMagicSet')]
+    public function testAsymmetricVisibilityAndVirtualPropertiesWithMagicSet(string $property, string $writeVisibility)
+    {
+        $extractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC | ReflectionExtractor::ALLOW_PROTECTED | ReflectionExtractor::ALLOW_PRIVATE);
+        $writeMutator = $extractor->getWriteInfo(Php84DummyWithMagicSet::class, $property);
+
+        $this->assertSame(PropertyWriteInfo::TYPE_PROPERTY, $writeMutator->getType());
+        $this->assertSame($writeVisibility, $writeMutator->getVisibility());
+    }
+
+    public static function provideAsymmetricVisibilityAndVirtualPropertiesWithMagicSet(): iterable
+    {
+        yield ['publicPrivate', PropertyWriteInfo::VISIBILITY_PRIVATE];
+        yield ['publicProtected', PropertyWriteInfo::VISIBILITY_PROTECTED];
+        yield ['protectedPrivate', PropertyWriteInfo::VISIBILITY_PUBLIC];
+        yield ['virtualNoSetHook', PropertyWriteInfo::VISIBILITY_PRIVATE];
+    }
+
     #[DataProvider('typesProvider')]
     public function testExtractors(string $property, ?Type $type)
     {
@@ -1317,5 +1349,49 @@ class ReflectionExtractorTest extends TestCase
     {
         $this->assertEquals(Type::list(Type::object(\DateTime::class)), $this->extractor->getType(MutatorPrefixesDummy::class, 'item'));
         $this->assertSame('addItem', $this->extractor->getWriteInfo(MutatorPrefixesDummy::class, 'item')->getAdderInfo()->getName());
+    }
+
+    public function testGetWriteInfoPrefersTheSetterForASingularPropertyNextToItsPluralProperty()
+    {
+        $writeInfo = $this->extractor->getWriteInfo(DummyWithSingularAndPlural::class, 'network');
+
+        $this->assertSame(PropertyWriteInfo::TYPE_METHOD, $writeInfo->getType());
+        $this->assertSame('setNetwork', $writeInfo->getName());
+    }
+
+    public function testGetWriteInfoKeepsTheAdderAndRemoverForThePluralProperty()
+    {
+        $writeInfo = $this->extractor->getWriteInfo(DummyWithSingularAndPlural::class, 'networks');
+
+        $this->assertSame(PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, $writeInfo->getType());
+        $this->assertSame('addNetwork', $writeInfo->getAdderInfo()->getName());
+        $this->assertSame('removeNetwork', $writeInfo->getRemoverInfo()->getName());
+    }
+
+    public function testGetWriteInfoKeepsTheAdderAndRemoverWhenASingularPropertyHasNoSetter()
+    {
+        $writeInfo = $this->extractor->getWriteInfo(DummyWithSingularAndPlural::class, 'tag');
+
+        $this->assertSame(PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, $writeInfo->getType());
+        $this->assertSame('addTag', $writeInfo->getAdderInfo()->getName());
+        $this->assertSame('removeTag', $writeInfo->getRemoverInfo()->getName());
+    }
+
+    public function testGetWriteInfoKeepsTheAdderAndRemoverWhenTheSingularAndPluralAreTheSame()
+    {
+        $writeInfo = $this->extractor->getWriteInfo(DummyWithSingularAndPlural::class, 'aircraft');
+
+        $this->assertSame(PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, $writeInfo->getType());
+        $this->assertSame('addAircraft', $writeInfo->getAdderInfo()->getName());
+        $this->assertSame('removeAircraft', $writeInfo->getRemoverInfo()->getName());
+    }
+
+    public function testGetWriteInfoKeepsTheAdderAndRemoverWhenNoDistinctPluralPropertyExists()
+    {
+        $writeInfo = $this->extractor->getWriteInfo(DummyWithSingularAndPlural::class, 'staff');
+
+        $this->assertSame(PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, $writeInfo->getType());
+        $this->assertSame('addStaff', $writeInfo->getAdderInfo()->getName());
+        $this->assertSame('removeStaff', $writeInfo->getRemoverInfo()->getName());
     }
 }

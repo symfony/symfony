@@ -109,10 +109,10 @@ class AddressTest extends TestCase
         $this->assertSame('"em@il"@[em@il]', $a->getAddress());
     }
 
-    public function testConstructorWithACommentAfterADomainLiteral()
+    public function testConstructorWithAnAtSignInACommentInTheDomain()
     {
-        $a = new Address('user@[em@il] (comment)');
-        $this->assertSame('user@[em@il] (comment)', $a->getAddress());
+        $a = new Address('user@example(c@mment).test');
+        $this->assertSame('user@example(c@mment).test', $a->getAddress());
     }
 
     #[DataProvider('provideAddressesWithControlCharacters')]

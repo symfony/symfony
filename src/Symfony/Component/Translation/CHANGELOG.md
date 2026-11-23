@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add the `--check-mixed-alphabets` option to the `lint:translations` command
+
 8.2
 ---
 

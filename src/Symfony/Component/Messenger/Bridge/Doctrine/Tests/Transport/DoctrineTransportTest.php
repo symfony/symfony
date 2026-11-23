@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Receiver\ReleasableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -32,6 +33,7 @@ class DoctrineTransportTest extends TestCase
         $transport = $this->getTransport();
 
         $this->assertInstanceOf(TransportInterface::class, $transport);
+        $this->assertInstanceOf(ReleasableReceiverInterface::class, $transport);
     }
 
     public function testReceivesMessages()
@@ -116,6 +118,22 @@ class DoctrineTransportTest extends TestCase
             ->with('1');
 
         $transport->keepalive($envelope);
+    }
+
+    public function testRelease()
+    {
+        $transport = $this->getTransport(
+            null,
+            $connection = $this->createMock(Connection::class)
+        );
+
+        $envelope = new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]);
+
+        $connection->expects($this->once())
+            ->method('release')
+            ->with('1');
+
+        $transport->release($envelope);
     }
 
     public function testSendBatch()

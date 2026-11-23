@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Make `DoctrineReceiver` and `DoctrineTransport` implement `ReleasableReceiverInterface`, so that the messages a worker fetched but did not start handling are available again as soon as it stops, instead of after `redeliver_timeout`
+ * Make `DoctrineReceiver::keepalive()` leave alone a message that another worker received in the meantime, after `redeliver_timeout`
+
 8.2
 ---
 

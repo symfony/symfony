@@ -47,6 +47,7 @@ use Symfony\Component\Messenger\Transport\CloseableTransportInterface;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\ReleasableReceiverInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
 
 /**
@@ -186,14 +187,21 @@ class Worker
 
                             $envelopes = $this->fetch($transportName, $receiver, $queueNames, $fetchSize);
 
-                            if ($receiver instanceof KeepaliveReceiverInterface) {
-                                // the transport delivered the whole batch: keep alive the messages that wait for their turn too
-                                $envelopes = new \ArrayIterator(iterator_to_array($envelopes, false));
+                            if (($keepalive = $receiver instanceof KeepaliveReceiverInterface) || $receiver instanceof ReleasableReceiverInterface) {
+                                // the transport delivered the whole batch: keep alive the messages that wait for their turn too,
+                                // and remember them to release the ones that are still waiting when the worker stops
+                                $batch = [];
 
                                 foreach ($envelopes as $envelope) {
-                                    $waitingReceipts[$transportName][] = $receipt = new \stdClass();
-                                    $this->keepalives[$receipt] = [$transportName, $envelope];
+                                    $batch[] = $envelope;
+                                    $waitingReceipts[$transportName][] = [$receipt = new \stdClass(), $envelope];
+
+                                    if ($keepalive) {
+                                        $this->keepalives[$receipt] = [$transportName, $envelope];
+                                    }
                                 }
+
+                                $envelopes = new \ArrayIterator($batch);
                             }
 
                             $envelopes->rewind();
@@ -202,9 +210,10 @@ class Worker
                         for (; $envelopes->valid(); $envelopes->next()) {
                             $envelope = $envelopes->current();
                             $envelopeHandled = true;
-                            $receipt = isset($waitingReceipts[$transportName][0]) ? array_shift($waitingReceipts[$transportName]) : new \stdClass();
 
                             $this->rateLimit($transportName);
+                            // from here on, the message is not waiting anymore: it is not released when the worker stops or fails
+                            $receipt = isset($waitingReceipts[$transportName][0]) ? array_shift($waitingReceipts[$transportName])[0] : new \stdClass();
                             $this->handleMessage($envelope, $transportName, $receipt, $options['bus_name'] ?? null);
                             $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
 
@@ -281,11 +290,7 @@ class Worker
                 }
             } finally {
                 // the rest of the batches is not handled when the worker stops or fails
-                foreach ($waitingReceipts as $receipts) {
-                    foreach ($receipts as $receipt) {
-                        unset($this->keepalives[$receipt]);
-                    }
-                }
+                $this->releaseWaitingMessages($waitingReceipts);
             }
 
             $this->flush(true);
@@ -615,6 +620,35 @@ class Worker
         }
 
         return new \stdClass();
+    }
+
+    /**
+     * Stops keeping alive the fetched messages the worker did not start handling, and gives them back to the receivers that can make them available again.
+     *
+     * @param array<string, list<array{0: object, 1: Envelope}>> $waitingReceipts
+     */
+    private function releaseWaitingMessages(array $waitingReceipts): void
+    {
+        foreach ($waitingReceipts as $transportName => $receipts) {
+            $receiver = $this->receivers[$transportName];
+            $release = $receiver instanceof ReleasableReceiverInterface;
+
+            foreach ($receipts as [$receipt, $envelope]) {
+                unset($this->keepalives[$receipt]);
+
+                if (!$release) {
+                    continue;
+                }
+
+                try {
+                    $receiver->release($envelope);
+                } catch (\Throwable $e) {
+                    // the messages that are left come back when the transport gives up on their delivery, as they did before
+                    $release = false;
+                    $this->logger?->warning('Releasing the messages of the transport "{transport}" failed: {error}', ['transport' => $transportName, 'error' => $e->getMessage(), 'exception' => $e]);
+                }
+            }
+        }
     }
 
     private function closeReceivers(): void

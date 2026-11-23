@@ -116,7 +116,7 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
             'mergeReadability' => $mappings || $targetHasProperty ? $readability : $this->getReadability($sourceRefl, $iteratedRefl, $property, $declared, $hasMagicGet),
             'mappings' => $mappings,
             'targetHasProperty' => $targetHasProperty,
-            'initializedKey' => $iteratedProperty && $iteratedRefl->isInstance($source) ? $this->getArrayCastKey($iteratedProperty) : null,
+            'initializedKey' => $iteratedProperty && $iteratedRefl->isInstance($source) && !$iteratedProperty->isVirtual() ? $this->getArrayCastKey($iteratedProperty) : null,
             'sameNameMapping' => $targetHasProperty && !$readMetadataFromTarget ? $this->getSameNameTargetMapping($target, $property) : null,
             'targetPropertyClass' => $this->getPropertyClass($targetRefl, $property),
             'targetWritable' => $targetWritable,
@@ -154,6 +154,10 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
 
         if (!$lookupRefl->getProperty($property)->isPublic()) {
             return $hasMagicGet ? PropertyReadability::ALWAYS : PropertyReadability::NEVER;
+        }
+
+        if ($declared->isVirtual()) {
+            return $declared->hasHook(\PropertyHookType::Get) ? PropertyReadability::ALWAYS : PropertyReadability::NEVER;
         }
 
         return PropertyReadability::INITIALIZED;
@@ -266,13 +270,6 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
     {
         if (!$this->readInfoExtractor || !$this->isPlainPublicProperty($refl, $property) || $refl->hasMethod('__get') || $refl->hasMethod('__isset')) {
             return false;
-        }
-
-        // the array cast of some internal classes, like \ArrayObject, does not return their properties
-        for ($class = $refl; $class; $class = $class->getParentClass()) {
-            if ($class->isInternal()) {
-                return false;
-            }
         }
 
         $readInfo = $this->readInfoExtractor->getReadInfo($refl->name, $property, self::getAccessorContext());

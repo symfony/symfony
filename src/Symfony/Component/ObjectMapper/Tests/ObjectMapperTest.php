@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\ObjectMapper\Condition\ClassRule;
 use Symfony\Component\ObjectMapper\Condition\ClassRuleList;
 use Symfony\Component\ObjectMapper\Exception\InvalidArgumentException;
@@ -93,6 +94,7 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultLazy\OrderTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultLazy\UserSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultLazy\UserTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultValueStdClass\TargetDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\DirectAccess\PlainTarget as DirectAccessPlainTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DirectionlessTargetTransform\Product as DirectionlessTransformProduct;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DirectionlessTargetTransform\ProductInput as DirectionlessTransformProductInput;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EmbeddedMapping\Address;
@@ -2475,5 +2477,73 @@ final class ObjectMapperTest extends TestCase
         $activity = (new ObjectMapper())->map((object) ['name' => 'Keyboard'], WriteBySetterPromotedActivity::class);
 
         $this->assertSame('Keyboard', $activity->getName());
+    }
+
+    #[DataProvider('provideAccessor')]
+    public function testVirtualHookedSourcePropertiesAreMapped(?PropertyAccessorInterface $accessor)
+    {
+        $mapper = new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), $accessor);
+
+        $source = new #[Map(target: DirectAccessPlainTarget::class)] class {
+            public string $first = 'Jane';
+            public string $last = 'Doe';
+            public string $name {
+                get => $this->first.' '.$this->last;
+            }
+            public ?string $nickname {
+                get => null;
+            }
+        };
+
+        $mapped = $mapper->map($source);
+        $this->assertInstanceOf(DirectAccessPlainTarget::class, $mapped);
+        $this->assertSame('Jane Doe', $mapped->name);
+        $this->assertNull($mapped->nickname);
+
+        $plainSource = new class {
+            public ?string $nickname {
+                get => null;
+            }
+        };
+
+        $this->assertNull($mapper->map($plainSource, DirectAccessPlainTarget::class)->nickname);
+    }
+
+    public function testWriteOnlyVirtualHookedSourcePropertyIsSkippedWithoutPropertyAccessor()
+    {
+        $source = new #[Map(target: DirectAccessPlainTarget::class)] class {
+            private string $backing = '';
+            public ?string $nickname {
+                set {
+                    $this->backing = $value ?? '';
+                }
+            }
+        };
+
+        $this->assertSame('none', (new ObjectMapper())->map($source)->nickname);
+    }
+
+    #[DataProvider('provideAccessor')]
+    public function testArrayObjectSubclassPropertiesAreMapped(?PropertyAccessorInterface $accessor)
+    {
+        $mapper = new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), $accessor);
+
+        $source = new #[Map(target: DirectAccessPlainTarget::class)] class(['item']) extends \ArrayObject {
+            public string $name = 'alice';
+            public ?string $nickname = null;
+            public int $count;
+        };
+
+        $mapped = $mapper->map($source);
+        $this->assertInstanceOf(DirectAccessPlainTarget::class, $mapped);
+        $this->assertSame('alice', $mapped->name);
+        $this->assertNull($mapped->nickname);
+        $this->assertSame(7, $mapped->count);
+
+        $plainSource = new class(['item']) extends \ArrayObject {
+            public ?string $nickname = null;
+        };
+
+        $this->assertNull($mapper->map($plainSource, DirectAccessPlainTarget::class)->nickname);
     }
 }

@@ -236,7 +236,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     continue;
                 }
 
-                if (null !== $propertyMetadata['initializedKey'] && !\array_key_exists($propertyMetadata['initializedKey'], $sourceVars ??= (array) $source)) {
+                if (null !== $propertyMetadata['initializedKey'] && !\array_key_exists($propertyMetadata['initializedKey'], $sourceVars ??= get_mangled_object_vars($source))) {
                     continue;
                 }
 
@@ -317,7 +317,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
 
     /**
      * @param PropertyReadability::* $readability
-     * @param ?array                 $sourceVars  the array cast of the source, computed on first use and shared by the whole map() call
+     * @param ?array                 $sourceVars  the properties of the source as get_mangled_object_vars() returns them, computed on first use and shared by the whole map() call
      */
     private function isReadable(object $source, string $propertyName, int $readability, ?array &$sourceVars): bool
     {
@@ -325,7 +325,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             PropertyReadability::ACCESSOR => $this->propertyAccessor->isReadable($source, $propertyName),
             PropertyReadability::ALWAYS => true,
             PropertyReadability::NEVER => false,
-            PropertyReadability::INITIALIZED => \array_key_exists($propertyName, $sourceVars ??= (array) $source) || isset($source->{$propertyName}),
+            PropertyReadability::INITIALIZED => \array_key_exists($propertyName, $sourceVars ??= get_mangled_object_vars($source)) || isset($source->{$propertyName}),
             PropertyReadability::DYNAMIC => property_exists($source, $propertyName) || isset($source->{$propertyName}),
         };
     }

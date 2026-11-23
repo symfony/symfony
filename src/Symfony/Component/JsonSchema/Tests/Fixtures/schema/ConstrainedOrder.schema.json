@@ -71,12 +71,36 @@
                         "null"
                     ],
                     "format": "ipv6"
+                },
+                "couponCode": {
+                    "type": "string",
+                    "default": ""
+                },
+                "countryCode": {
+                    "type": "string",
+                    "default": ""
+                },
+                "termsAccepted": {
+                    "type": "boolean",
+                    "not": {
+                        "const": false
+                    }
+                },
+                "giftWrapped": {
+                    "type": [
+                        "boolean",
+                        "null"
+                    ],
+                    "not": {
+                        "const": false
+                    }
                 }
             },
             "required": [
                 "reference",
                 "lines",
-                "notesByLine"
+                "notesByLine",
+                "termsAccepted"
             ]
         }
     }

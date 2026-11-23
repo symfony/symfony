@@ -1,0 +1,141 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/RepeatedConstraints",
+    "$defs": {
+        "RepeatedConstraints": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "default": "",
+                    "maxLength": 10,
+                    "minLength": 2
+                },
+                "code": {
+                    "type": "string",
+                    "default": "",
+                    "pattern": "^(a.*)$",
+                    "allOf": [
+                        {
+                            "pattern": "^(.*b)$"
+                        }
+                    ]
+                },
+                "openingTime": {
+                    "type": "string",
+                    "default": "",
+                    "pattern": "^\\d{2}:\\d{2}:\\d{2}$",
+                    "allOf": [
+                        {
+                            "pattern": "^(0.*)$"
+                        }
+                    ]
+                },
+                "quantity": {
+                    "type": "integer",
+                    "default": 5,
+                    "minimum": 5,
+                    "maximum": 20
+                },
+                "price": {
+                    "type": "number",
+                    "default": 50.0,
+                    "exclusiveMinimum": 10,
+                    "exclusiveMaximum": 100
+                },
+                "stars": {
+                    "type": "integer",
+                    "default": 1,
+                    "exclusiveMinimum": 0,
+                    "minimum": 1,
+                    "maximum": 5,
+                    "exclusiveMaximum": 5
+                },
+                "batchSize": {
+                    "type": "integer",
+                    "default": 6,
+                    "multipleOf": 2,
+                    "allOf": [
+                        {
+                            "multipleOf": 3
+                        }
+                    ]
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "minItems": 2,
+                    "maxItems": 5
+                },
+                "size": {
+                    "type": "string",
+                    "default": "medium",
+                    "enum": [
+                        "medium",
+                        "large"
+                    ]
+                },
+                "impossibleSize": {
+                    "type": "string",
+                    "enum": [
+                        "small"
+                    ],
+                    "allOf": [
+                        {
+                            "enum": [
+                                "huge"
+                            ]
+                        }
+                    ]
+                },
+                "suit": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "enum": [
+                        "spades",
+                        null
+                    ]
+                },
+                "color": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "enum": [
+                        "Green",
+                        null
+                    ]
+                },
+                "requiredSize": {
+                    "type": "string",
+                    "enum": [
+                        "large"
+                    ]
+                },
+                "colors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "green",
+                            "blue"
+                        ]
+                    },
+                    "default": [],
+                    "maxItems": 3,
+                    "minItems": 1
+                }
+            },
+            "required": [
+                "tags",
+                "requiredSize",
+                "colors"
+            ]
+        }
+    }
+}

@@ -135,11 +135,6 @@ class WindowsPipes extends AbstractPipes
         return $this->files;
     }
 
-    protected function getNullDevice(): string
-    {
-        return 'NUL';
-    }
-
     public function readAndWrite(bool $blocking, bool $close = false): array
     {
         $this->unblock();

@@ -92,11 +92,6 @@ class UnixPipes extends AbstractPipes
         return [];
     }
 
-    protected function getNullDevice(): string
-    {
-        return '/dev/null';
-    }
-
     public function readAndWrite(bool $blocking, bool $close = false): array
     {
         $this->unblock();

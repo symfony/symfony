@@ -782,11 +782,7 @@ class ProcessTest extends TestCase
 
     public function testDisableInputGivesTheNullDeviceAsStandardInput()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('There is no /dev/null on Windows.');
-        }
-
-        $code = 'echo fstat(STDIN)["rdev"] === stat("/dev/null")["rdev"] ? "null device" : "not the null device";';
+        $code = '$s = fstat(STDIN); echo 0020000 === ($s["mode"] & 0170000) && ("\\\\" === \DIRECTORY_SEPARATOR || $s["rdev"] === stat("/dev/null")["rdev"]) ? "null device" : "not the null device";';
 
         $process = $this->getProcessForCode($code);
         $this->assertFalse($process->isInputDisabled());

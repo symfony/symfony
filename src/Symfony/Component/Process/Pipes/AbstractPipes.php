@@ -73,13 +73,9 @@ abstract class AbstractPipes implements PipesInterface
      */
     protected function getInputDescriptor(): array
     {
-        return $this->inputDisabled ? ['file', $this->getNullDevice(), 'r'] : ['pipe', 'r'];
+        // proc_open() opens the null device itself (/dev/null, or NUL on Windows), outside of the open_basedir restriction
+        return $this->inputDisabled ? ['null'] : ['pipe', 'r'];
     }
-
-    /**
-     * Returns the path of the null device.
-     */
-    abstract protected function getNullDevice(): string;
 
     /**
      * Returns true if a system call has been interrupted.

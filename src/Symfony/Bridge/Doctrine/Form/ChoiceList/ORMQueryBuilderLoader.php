@@ -13,9 +13,11 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\DBAL\Types\GuidType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Types\AbstractUidType;
+use Symfony\Bridge\Doctrine\Types\PlatformHelper;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
@@ -81,6 +83,12 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
             if ($types->has($type)) {
                 $doctrineType = $types->get($type);
                 $platform = $qb->getEntityManager()->getConnection()->getDatabasePlatform();
+
+                if ($doctrineType instanceof GuidType && PlatformHelper::hasNativeGuidType($platform)) {
+                    // This type doesn't check its values, so filter out the ones that databases with a native GUID type reject
+                    $values = array_values(array_filter($values, static fn ($v) => (bool) preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iD', (string) $v)));
+                }
+
                 foreach ($values as &$value) {
                     try {
                         $value = $doctrineType->convertToDatabaseValue($value, $platform);

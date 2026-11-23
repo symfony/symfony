@@ -27,7 +27,7 @@ abstract class AbstractUidType extends Type
 
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        if ($this->hasNativeGuidType($platform)) {
+        if (PlatformHelper::hasNativeGuidType($platform)) {
             return $platform->getGuidTypeDeclarationSQL($column);
         }
 
@@ -62,7 +62,7 @@ abstract class AbstractUidType extends Type
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
-        $toString = $this->hasNativeGuidType($platform) ? 'toRfc4122' : 'toBinary';
+        $toString = PlatformHelper::hasNativeGuidType($platform) ? 'toRfc4122' : 'toBinary';
 
         if ($value instanceof AbstractUid) {
             return $value->$toString();
@@ -86,11 +86,6 @@ abstract class AbstractUidType extends Type
     public function requiresSQLCommentHint(AbstractPlatform $platform): bool
     {
         return true;
-    }
-
-    private function hasNativeGuidType(AbstractPlatform $platform): bool
-    {
-        return $platform->getGuidTypeDeclarationSQL([]) !== $platform->getStringTypeDeclarationSQL(['fixed' => true, 'length' => 36]);
     }
 
     private function throwInvalidType(mixed $value): never

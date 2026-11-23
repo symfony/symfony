@@ -182,6 +182,35 @@ class ReflectionPropertyMetadataFactoryTest extends TestCase
         );
     }
 
+    public function testVirtualHookedPropertiesMetadata()
+    {
+        $factory = $this->createFactory();
+        $target = new class {
+            public ?string $readable = null;
+            public string $writeOnly = '';
+        };
+
+        $hooked = new class {
+            private string $backing = '';
+            public ?string $readable {
+                get => null;
+            }
+            public string $writeOnly {
+                set {
+                    $this->backing = $value;
+                }
+            }
+        };
+
+        $readableMetadata = $factory->create($hooked, $target, 'readable');
+        $this->assertSame(PropertyReadability::ALWAYS, $readableMetadata['readability']);
+        $this->assertNull($readableMetadata['initializedKey']);
+
+        $writeOnlyMetadata = $factory->create($hooked, $target, 'writeOnly');
+        $this->assertSame(PropertyReadability::NEVER, $writeOnlyMetadata['readability']);
+        $this->assertNull($writeOnlyMetadata['initializedKey']);
+    }
+
     private function createFactory(): ReflectionPropertyMetadataFactory
     {
         $metadataFactory = new ReflectionObjectMapperMetadataFactory();

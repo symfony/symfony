@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Classify deprecations from Composer packages installed outside the vendor directory
+
 8.2
 ---
 

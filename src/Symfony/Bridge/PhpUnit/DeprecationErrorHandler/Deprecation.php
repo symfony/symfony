@@ -46,6 +46,9 @@ class Deprecation
     /** @var string[] Absolute paths to vendor directories */
     private static $vendors;
 
+    /** @var array<string, string> Package names indexed by external install path */
+    private static array $externalPackages = [];
+
     /**
      * @var string[] Absolute paths to source or tests of the project, cache
      *               directories excluded because it is based on autoloading
@@ -310,7 +313,12 @@ class Deprecation
     private function getPackage(string $path): string
     {
         $path = realpath($path) ?: $path;
-        foreach (self::getVendors() as $vendorRoot) {
+        $vendors = self::getVendors();
+        if (null !== $package = self::getExternalPackage($path)) {
+            return $package;
+        }
+
+        foreach ($vendors as $vendorRoot) {
             if (str_starts_with($path, $vendorRoot)) {
                 $relativePath = substr($path, \strlen($vendorRoot) + 1);
                 $vendor = strstr($relativePath, \DIRECTORY_SEPARATOR, true);
@@ -342,6 +350,7 @@ class Deprecation
                     $v = \dirname($r->getFileName(), 2);
                     if (file_exists($v.'/composer/installed.json')) {
                         self::$vendors[] = $v;
+                        self::loadExternalPackages($v);
                         $loader = require $v.'/autoload.php';
                         $paths = self::addSourcePathsFromPrefixes(
                             array_merge($loader->getPrefixes(), $loader->getPrefixesPsr4()),
@@ -364,6 +373,44 @@ class Deprecation
         }
 
         return self::$vendors;
+    }
+
+    private static function loadExternalPackages(string $vendorDir): void
+    {
+        $composerDir = $vendorDir.'/composer';
+        $installed = json_decode(@file_get_contents($composerDir.'/installed.json') ?: '', true);
+        if (!\is_array($packages = $installed['packages'] ?? null)) {
+            return;
+        }
+
+        $vendorDir = realpath($vendorDir) ?: $vendorDir;
+
+        foreach ($packages as $package) {
+            if (!\is_string($package['install-path'] ?? null) || '' === $package['install-path'] || !\is_string($package['name'] ?? null)) {
+                continue;
+            }
+
+            $path = realpath($composerDir.'/'.$package['install-path']);
+            if (false !== $path && $path !== $vendorDir && !str_starts_with($path, $vendorDir.\DIRECTORY_SEPARATOR)) {
+                self::$externalPackages[$path] = $package['name'];
+            }
+        }
+    }
+
+    private static function getExternalPackage(string $path): ?string
+    {
+        if (!self::$externalPackages) {
+            return null;
+        }
+
+        while ($path !== $directory = \dirname($path)) {
+            if (isset(self::$externalPackages[$directory])) {
+                return self::$externalPackages[$directory];
+            }
+            $path = $directory;
+        }
+
+        return null;
     }
 
     private static function addSourcePathsFromPrefixes(array $prefixesByNamespace, array $paths): array
@@ -389,6 +436,10 @@ class Deprecation
             if (str_starts_with($realPath, $vendor) && false !== strpbrk(substr($realPath, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
                 return self::PATH_TYPE_VENDOR;
             }
+        }
+
+        if (false !== $realPath && null !== self::getExternalPackage($realPath)) {
+            return self::PATH_TYPE_VENDOR;
         }
 
         foreach (self::$internalPaths as $internalPath) {

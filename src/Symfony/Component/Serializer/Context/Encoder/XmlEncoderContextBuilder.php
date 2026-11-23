@@ -188,7 +188,7 @@ final class XmlEncoderContextBuilder implements ContextBuilderInterface
     }
 
     /**
-     * Configures which tags must always be decoded as a collection, even with a single child.
+     * Configures which tags must always be decoded as a collection, even when there is only one occurrence.
      *
      * @param list<string>|null $forceCollection
      */

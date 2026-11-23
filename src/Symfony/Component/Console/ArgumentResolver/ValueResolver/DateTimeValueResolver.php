@@ -12,7 +12,9 @@
 namespace Symfony\Component\Console\ArgumentResolver\ValueResolver;
 
 use Psr\Clock\ClockInterface;
+use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\MapDateTime;
+use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
 use Symfony\Component\Console\Input\InputInterface;
 
@@ -40,7 +42,7 @@ final class DateTimeValueResolver implements ValueResolverInterface
 
         $attribute = $member->getAttribute(MapDateTime::class);
 
-        $inputName = $attribute?->argument ?? $attribute?->option ?? $member->getInputName();
+        $inputName = $attribute->argument ?? $attribute->option ?? (Argument::tryFrom($member->getMember()) ?? Option::tryFrom($member->getMember()))->name ?? $member->getInputName();
 
         // Try to get value from argument or option
         $value = null;
@@ -80,7 +82,11 @@ final class DateTimeValueResolver implements ValueResolverInterface
         }
 
         if (null !== $format) {
-            $date = $class::createFromFormat($format, $value, $this->clock?->now()->getTimeZone());
+            try {
+                $date = $class::createFromFormat($format, $value, $this->clock?->now()->getTimeZone());
+            } catch (\ValueError) {
+                $date = false;
+            }
 
             if (($class::getLastErrors() ?: ['warning_count' => 0])['warning_count']) {
                 $date = false;

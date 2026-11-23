@@ -140,6 +140,10 @@ final class StreamWriterGenerator
             $propertiesNodes = [];
 
             foreach ($propertiesMetadata as $streamedName => $propertyMetadata) {
+                if (\PHP_VERSION_ID >= 80400 && ($name = $propertyMetadata->getName()) && $classReflection->hasProperty($name) && ($propertyReflection = $classReflection->getProperty($name))->isVirtual() && !$propertyReflection->hasHook(\PropertyHookType::Get)) {
+                    continue;
+                }
+
                 $propertyAccessor = $propertyMetadata->getName() ? $accessor.'->'.$propertyMetadata->getName() : 'null';
 
                 foreach ($propertyMetadata->getValueTransformers() as $valueTransformer) {

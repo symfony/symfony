@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Terminal;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -18,9 +19,7 @@ use Symfony\Component\Process\Process;
 
 class TerminalInputHelperTest extends TestCase
 {
-    /**
-     * @group tty
-     */
+    #[Group('tty')]
     public function testFinishFallsBackToSttySaneWhenInitialStateIsInvalid()
     {
         if (!Terminal::hasSttyAvailable()) {

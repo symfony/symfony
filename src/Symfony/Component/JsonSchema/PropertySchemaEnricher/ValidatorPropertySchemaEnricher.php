@@ -119,18 +119,30 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
         foreach ($metadata->getPropertyMetadata($property) as $propertyMetadata) {
             foreach ($groups as $group) {
                 foreach ($propertyMetadata->findConstraints($group) as $constraint) {
-                    $nested = $constraint instanceof Sequentially || $constraint instanceof Compound
-                        ? array_filter($constraint->getNestedConstraints(), static fn (Constraint $nested): bool => \in_array($group, $nested->groups, true))
-                        : [$constraint];
-
-                    foreach ($nested as $candidate) {
-                        $constraints[spl_object_id($candidate)] = $candidate;
-                    }
+                    self::collectConstraints($constraint, $group, $constraints);
                 }
             }
         }
 
         return array_values($constraints);
+    }
+
+    /**
+     * @param array<int, Constraint> $constraints
+     */
+    private static function collectConstraints(Constraint $constraint, string $group, array &$constraints): void
+    {
+        if ($constraint instanceof Sequentially || $constraint instanceof Compound) {
+            foreach ($constraint->getNestedConstraints() as $nested) {
+                if (null === $nested->groups || \in_array($group, $nested->groups, true)) {
+                    self::collectConstraints($nested, $group, $constraints);
+                }
+            }
+
+            return;
+        }
+
+        $constraints[spl_object_id($constraint)] = $constraint;
     }
 
     /**

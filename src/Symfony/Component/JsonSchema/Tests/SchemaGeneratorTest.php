@@ -59,6 +59,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\ListOfClassSchemaResolver;
 use Symfony\Component\JsonSchema\Tests\Fixtures\MarkingPropertySchemaEnricher;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NativeObjectProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NestedAttributesBook;
+use Symfony\Component\JsonSchema\Tests\Fixtures\NestedCompoundItem;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NonSerializableProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NullableConstraints;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NullableUnionChoice;
@@ -74,6 +75,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\ScalarProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\SearchTool;
 use Symfony\Component\JsonSchema\Tests\Fixtures\SelfReferencingCategory;
 use Symfony\Component\JsonSchema\Tests\Fixtures\SequencedSignup;
+use Symfony\Component\JsonSchema\Tests\Fixtures\SequentiallyValidatedItem;
 use Symfony\Component\JsonSchema\Tests\Fixtures\SerializerMappedAccount;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ServiceDefaults;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Shape;
@@ -93,6 +95,9 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\Constraints\Sequentially;
+use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 class SchemaGeneratorTest extends TestCase
 {
@@ -1060,6 +1065,36 @@ class SchemaGeneratorTest extends TestCase
         $schema = SchemaGenerator::create()->generate(Type::object(ValidatedRegistration::class), new Configuration(validationGroups: new GroupSequence(['registration:create'])));
 
         $this->assertSame(['invitationCode'], $schema->getDefinitions()['ValidatedRegistration-validation.registration.create']['required']);
+    }
+
+    public function testNestedCompoundConstraintsInsideSequentially()
+    {
+        $defaultDefinition = SchemaGenerator::create()->generate(Type::object(NestedCompoundItem::class))->getDefinitions()['NestedCompoundItem'];
+
+        $this->assertSame(['code'], $defaultDefinition['required']);
+        $this->assertSameSchema(['type' => 'string', 'default' => '', 'minLength' => 3, 'maxLength' => 12], $defaultDefinition['properties']['code']);
+
+        $strictDefinition = SchemaGenerator::create()->generate(Type::object(NestedCompoundItem::class), new Configuration(validationGroups: ['strict']))->getDefinitions()['NestedCompoundItem-validation.strict'];
+
+        $this->assertArrayNotHasKey('required', $strictDefinition);
+        $this->assertSameSchema(['type' => 'string', 'default' => '', 'pattern' => '^([a-z]+)$'], $strictDefinition['properties']['code']);
+    }
+
+    public function testSequentiallyWithValidConstraint()
+    {
+        try {
+            new Sequentially([new Valid()]);
+        } catch (ConstraintDefinitionException) {
+            $this->markTestSkipped('Nesting Valid inside Sequentially requires symfony/validator >= 8.2.');
+        }
+
+        $defaultDefinition = SchemaGenerator::create()->generate(Type::object(SequentiallyValidatedItem::class))->getDefinitions()['SequentiallyValidatedItem'];
+
+        $this->assertSame(['author'], $defaultDefinition['required']);
+
+        $strictDefinition = SchemaGenerator::create()->generate(Type::object(SequentiallyValidatedItem::class), new Configuration(validationGroups: ['strict']))->getDefinitions()['SequentiallyValidatedItem-validation.strict'];
+
+        $this->assertSame(['reviewer'], $strictDefinition['required']);
     }
 
     public function testJsonSchemaConstraintAttributeFollowsTheDialect()

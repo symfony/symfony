@@ -19,6 +19,7 @@ use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\UnionType;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
@@ -61,10 +62,24 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
                 if (method_exists(Type::class, 'getBaseType')) {
                     $typeIdentifiers = array_map(static fn (Type $t): string => $t->getBaseType()->getTypeIdentifier()->value, $keyType instanceof UnionType ? $keyType->getTypes() : [$keyType]);
                 } else {
-                    /** @var list<BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>> */
+                    while ($keyType instanceof WrappingTypeInterface) {
+                        $keyType = $keyType->getWrappedType();
+                    }
+
                     $keyTypes = $keyType instanceof UnionType ? $keyType->getTypes() : [$keyType];
 
-                    $typeIdentifiers = array_map(static fn (BuiltinType $t): string => $t->getTypeIdentifier()->value, $keyTypes);
+                    foreach ($keyTypes as $t) {
+                        while ($t instanceof WrappingTypeInterface) {
+                            $t = $t->getWrappedType();
+                        }
+
+                        if (!$t instanceof BuiltinType || TypeIdentifier::MIXED === $t->getTypeIdentifier()) {
+                            $typeIdentifiers = [];
+                            break;
+                        }
+
+                        $typeIdentifiers[] = $t->getTypeIdentifier()->value;
+                    }
                 }
             } else {
                 $typeIdentifiers = array_map(static fn (LegacyType $t): string => $t->getBuiltinType(), \is_array($keyType) ? $keyType : [$keyType]);

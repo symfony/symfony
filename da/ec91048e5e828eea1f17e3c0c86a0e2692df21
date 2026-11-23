@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-23T08:44:27Z
+
+Thanks @prateekbhujel. I moved this to 7.4, since 6.4 now gets only fixes for common use cases and this one is about malformed input.
+
+On SQL Server, `uniqueidentifier` only converts the `8-4-4-4-12` form, so `71c5fd463f164abbbad790ac1e654a2d` passes the check and still makes the query fail. DoctrineChoiceLoader matches entities by their exact id string anyway. What about accepting only the `8-4-4-4-12` form?
+
+---------------------------------------------------------------------------
+
+by prateekbhujel at 2026-11-23T10:35:20Z
+
+Tightened the regex to only accept the `8-4-4-4-12` form and updated the tests to reject the unhyphenated and braced formats.

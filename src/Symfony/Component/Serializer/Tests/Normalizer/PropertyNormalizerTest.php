@@ -41,6 +41,8 @@ use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertyCircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertySiblingHolder;
 use Symfony\Component\Serializer\Tests\Fixtures\SpecialBookDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\VirtualDiscriminatorDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\VirtualPropertiesDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CacheableObjectAttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CircularReferenceTestTrait;
@@ -209,6 +211,66 @@ class PropertyNormalizerTest extends TestCase
         $this->assertSame('life', $object->title);
         $this->assertSame('Santiago San Martin', $object->author);
         $this->assertSame(2000, $object->getPubYear());
+
+        $updated = $this->normalizer->denormalize(['title' => 'updated', 'author' => 'Other Author', 'pubYear' => 2025], SpecialBookDummy::class, 'any', [AbstractNormalizer::OBJECT_TO_POPULATE => $object]);
+
+        $this->assertSame($object, $updated);
+        $this->assertSame('updated', $updated->title);
+        $this->assertSame('Other Author', $updated->author);
+        $this->assertSame(2025, $updated->getPubYear());
+    }
+
+    #[RequiresPhp('>=8.4.0')]
+    public function testNormalizeAndDenormalizeWithVirtualProperties()
+    {
+        $this->assertSame(
+            [
+                'name' => 'Alice',
+                'readOnly' => 'ALICE',
+                'untypedNull' => null,
+                'privateUntyped' => 'secret',
+            ],
+            $this->normalizer->normalize(new VirtualPropertiesDummy(), 'any')
+        );
+
+        $object = $this->normalizer->denormalize(['readOnly' => 'IGNORED', 'writeOnly' => 'Bob'], VirtualPropertiesDummy::class, 'any');
+
+        $this->assertSame('Bob', $object->name);
+    }
+
+    #[RequiresPhp('>=8.4.0')]
+    public function testDenormalizeWriteOnlyVirtualPropertyWithDeepObjectToPopulate()
+    {
+        $normalizer = new PropertyNormalizer(null, null, new ReflectionExtractor());
+        $object = new VirtualPropertiesDummy();
+
+        $normalizer->denormalize(['writeOnly' => 'Bob'], VirtualPropertiesDummy::class, 'any', [AbstractNormalizer::OBJECT_TO_POPULATE => $object, AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true]);
+
+        $this->assertSame('Bob', $object->name);
+    }
+
+    #[RequiresPhp('>=8.4.0')]
+    public function testDenormalizeWithVirtualDiscriminatorProperty()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new PropertyNormalizer($classMetadataFactory, null, null, new ClassDiscriminatorFromClassMetadata($classMetadataFactory));
+
+        $object = $normalizer->denormalize(['type' => 'virtual', 'name' => 'Rex'], VirtualDiscriminatorDummy::class);
+
+        $this->assertSame('Rex', $object->name);
+    }
+
+    public function testNormalizeArrayObjectSubclassWithUntypedNullProperty()
+    {
+        $object = new class extends \ArrayObject {
+            public $untypedNull;
+            public $untypedValue = 'hello';
+        };
+
+        $this->assertSame(
+            ['untypedNull' => null, 'untypedValue' => 'hello'],
+            $this->normalizer->normalize($object, 'any')
+        );
     }
 
     public function testNormalizeWithParentClass()

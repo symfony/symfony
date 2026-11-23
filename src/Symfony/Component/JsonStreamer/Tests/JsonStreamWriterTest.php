@@ -179,6 +179,57 @@ class JsonStreamWriterTest extends TestCase
         );
     }
 
+    public function testWriteScalarIterable()
+    {
+        $this->assertWritten('["foo","bar"]', ['foo', 'bar'], Type::iterable(Type::string()));
+        $this->assertWritten('[]', [], Type::iterable(Type::string()));
+        $this->assertWritten('{"a":"foo","b":"bar"}', ['a' => 'foo', 'b' => 'bar'], Type::iterable(Type::string()));
+
+        $this->assertWritten(
+            '{"0":"foo","1":"bar"}',
+            (static function () {
+                yield 'foo';
+                yield 'bar';
+            })(),
+            Type::iterable(Type::string()),
+        );
+
+        $this->assertWritten(
+            '["foo","bar"]',
+            (static function () {
+                yield 'foo';
+                yield 'bar';
+            })(),
+            Type::iterable(Type::string(), Type::int()),
+        );
+
+        $this->assertWritten(
+            '{"a":1,"b":2}',
+            new \ArrayIterator(['a' => 1, 'b' => 2]),
+            Type::iterable(Type::int(), Type::string()),
+        );
+
+        $this->assertWritten(
+            '["foo","bar"]',
+            new \ArrayObject(['foo', 'bar']),
+            Type::collection(Type::object(\ArrayObject::class), Type::string(), Type::int()),
+        );
+
+        $this->assertWritten(
+            '[["foo","bar"],["baz"]]',
+            [
+                (static function () {
+                    yield 'foo';
+                    yield 'bar';
+                })(),
+                (static function () {
+                    yield 'baz';
+                })(),
+            ],
+            Type::list(Type::iterable(Type::string(), Type::int())),
+        );
+    }
+
     public function testWriteObjectWithQuotedStreamedNameAndValueTransformerId()
     {
         $this->assertWritten('{"it\'s \\\\\' quoted":1,"transformed":"20"}', new DummyWithQuotes(), Type::object(DummyWithQuotes::class), ['scale' => 1], ["double'it" => new DoubleIntAndCastToStringValueTransformer()]);

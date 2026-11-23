@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by prateekbhujel at 2026-11-23T14:09:06Z
+
+Makes sense — keeping `json_encode()` for arrays avoids changing the output on 7.4 and preserves the fast path.
+
+Updated `PhpGenerator` to emit an `if (\is_array(...))` check around `json_encode()` with the loop in `else` for `iterable` nodes whose items can be `json_encode()`d (while `Traversable` / `ArrayObject` types still go straight to the loop), added the array assertions to `JsonStreamWriterTest`, and rebased onto 7.4.

@@ -235,26 +235,12 @@ final class BlueskyTransport extends AbstractTransport
     private function getMatchAndPosition(AbstractString $text, string $regex): array
     {
         $output = [];
-        $handled = [];
-        $matches = $text->match($regex, \PREG_PATTERN_ORDER);
-        if ([] === $matches) {
-            return $output;
-        }
-
-        $length = $text->length();
-        foreach ($matches[1] as $match) {
-            if (isset($handled[$match])) {
-                continue;
-            }
-            $handled[$match] = true;
-            $end = -1;
-            while (null !== $start = $text->indexOf($match, min($length, $end + 1))) {
-                $output[] = [
-                    'start' => $start,
-                    'end' => $end = $start + (new ByteString($match))->length(),
-                    'match' => $match,
-                ];
-            }
+        foreach ($text->match($regex, \PREG_PATTERN_ORDER | \PREG_OFFSET_CAPTURE)[1] as [$match, $start]) {
+            $output[] = [
+                'start' => $start,
+                'end' => $start + \strlen($match),
+                'match' => $match,
+            ];
         }
 
         return $output;

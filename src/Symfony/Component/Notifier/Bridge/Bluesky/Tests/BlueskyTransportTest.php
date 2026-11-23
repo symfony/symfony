@@ -119,6 +119,42 @@ final class BlueskyTransportTest extends TransportTestCase
         $this->assertEquals($expected, $output);
     }
 
+    public function testParseFacetsHandlesSharingAPrefixDoNotOverlap()
+    {
+        $input = 'hi @bob.test and @bob.test.example.org';
+        $expected = [
+            [
+                'index' => ['byteStart' => 3, 'byteEnd' => 12],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#mention', 'did' => 'did0'],
+                ],
+            ],
+            [
+                'index' => ['byteStart' => 17, 'byteEnd' => 38],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#mention', 'did' => 'did0'],
+                ],
+            ],
+        ];
+        $output = $this->parseFacets($input, new MockHttpClient(static fn () => new JsonMockResponse(['did' => 'did0'])));
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testParseFacetsHandleInsideEmailIsNotAMention()
+    {
+        $input = 'write to me@foo.com or @foo.com';
+        $expected = [
+            [
+                'index' => ['byteStart' => 23, 'byteEnd' => 31],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#mention', 'did' => 'did0'],
+                ],
+            ],
+        ];
+        $output = $this->parseFacets($input, new MockHttpClient(static fn () => new JsonMockResponse(['did' => 'did0'])));
+        $this->assertEquals($expected, $output);
+    }
+
     /**
      * Example from https://github.com/bluesky-social/atproto-website/blob/main/examples/create_bsky_post.py.
      */
@@ -233,6 +269,27 @@ final class BlueskyTransportTest extends TransportTestCase
                 'index' => ['byteStart' => 13, 'byteEnd' => 28],
                 'features' => [
                     ['$type' => 'app.bsky.richtext.facet#link', 'uri' => 'http://bsky.app']],
+            ],
+        ];
+        $output = $this->parseFacets($input);
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testParseFacetsUrlsSharingAPrefixDoNotOverlap()
+    {
+        $input = 'a https://ex.com b https://ex.com/x';
+        $expected = [
+            [
+                'index' => ['byteStart' => 2, 'byteEnd' => 16],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#link', 'uri' => 'https://ex.com'],
+                ],
+            ],
+            [
+                'index' => ['byteStart' => 19, 'byteEnd' => 35],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#link', 'uri' => 'https://ex.com/x'],
+                ],
             ],
         ];
         $output = $this->parseFacets($input);

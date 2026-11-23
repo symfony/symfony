@@ -125,6 +125,8 @@ class StreamWriterGeneratorTest extends TestCase
         yield ['double_nested_array', Type::list(Type::object(DummyWithNestedArray::class))];
 
         yield ['dict', Type::dict()];
+        yield ['scalar_dict', Type::dict(Type::int())];
+        yield ['scalar_dict_list', Type::list(Type::dict(Type::int()))];
         yield ['object_dict', Type::dict(Type::object(DummyWithNameAttributes::class))];
         yield ['nullable_object_dict', Type::nullable(Type::dict(Type::object(DummyWithNameAttributes::class)))];
 

@@ -249,7 +249,10 @@ final class ConstructorMapper
 
             if ($parameter->isPromoted()) {
                 $property = $method->getDeclaringClass()->getProperty($parameter->name);
-                $constructor['promoted'][$parameter->name] = $property;
+
+                if (!$property->isVirtual() || $property->hasHook(\PropertyHookType::Get)) {
+                    $constructor['promoted'][$parameter->name] = $property;
+                }
 
                 if ($property->isReadOnly()) {
                     $constructor['readonly'][$parameter->name] = $property;

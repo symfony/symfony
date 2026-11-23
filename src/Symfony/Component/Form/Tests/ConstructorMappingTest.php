@@ -28,6 +28,7 @@ use Symfony\Component\Form\Tests\Fixtures\ConstructorMapping\ReadonlyAddress;
 use Symfony\Component\Form\Tests\Fixtures\ConstructorMapping\ReadonlyChild;
 use Symfony\Component\Form\Tests\Fixtures\ConstructorMapping\ReadonlyEntity;
 use Symfony\Component\Form\Tests\Fixtures\ConstructorMapping\ReadonlyPerson;
+use Symfony\Component\Form\Tests\Fixtures\ConstructorMapping\ReadonlyWithWriteOnlyVirtual;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 class ConstructorMappingTest extends FormIntegrationTestCase
@@ -355,6 +356,18 @@ class ConstructorMappingTest extends FormIntegrationTestCase
         $form->submit(['name' => 'Bernhard']);
 
         $this->assertEquals(new ReadonlyEntity('Bernhard'), $form->getData());
+    }
+
+    public function testReplacingDataWithWriteOnlyVirtualPromotedPropertyUsesDefaultValue()
+    {
+        $form = $this->factory->createBuilder(FormType::class, new ReadonlyWithWriteOnlyVirtual('Bernhard', 'initial'), ['data_class' => ReadonlyWithWriteOnlyVirtual::class])
+            ->add('name', TextType::class)
+            ->getForm();
+
+        $form->submit(['name' => 'Fabien']);
+
+        $this->assertTrue($form->isSynchronized());
+        $this->assertEquals(new ReadonlyWithWriteOnlyVirtual('Fabien'), $form->getData());
     }
 
     private function createAddressForm(?ReadonlyAddress $data = null): FormInterface

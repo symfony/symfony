@@ -33,7 +33,7 @@ final class FactoryRegistry implements KmsFactoryInterface
      * @param iterable<KmsFactoryInterface> $factories
      */
     public function __construct(
-        private readonly iterable $factories,
+        private iterable $factories,
     ) {
     }
 
@@ -44,7 +44,7 @@ final class FactoryRegistry implements KmsFactoryInterface
 
     public function supports(#[\SensitiveParameter] Dsn $dsn): bool
     {
-        foreach ($this->factories as $factory) {
+        foreach ($this->getFactories() as $factory) {
             if ($factory->supports($dsn)) {
                 return true;
             }
@@ -55,7 +55,7 @@ final class FactoryRegistry implements KmsFactoryInterface
 
     public function create(#[\SensitiveParameter] Dsn $dsn): EncrypterInterface&DecrypterInterface
     {
-        foreach ($this->factories as $factory) {
+        foreach ($this->getFactories() as $factory) {
             if ($factory->supports($dsn)) {
                 return $factory->create($dsn);
             }
@@ -66,5 +66,17 @@ final class FactoryRegistry implements KmsFactoryInterface
         }
 
         throw new UnsupportedSchemeException($dsn);
+    }
+
+    /**
+     * @return iterable<KmsFactoryInterface>
+     */
+    private function getFactories(): iterable
+    {
+        if ($this->factories instanceof \Generator) {
+            $this->factories = iterator_to_array($this->factories, false);
+        }
+
+        return $this->factories;
     }
 }

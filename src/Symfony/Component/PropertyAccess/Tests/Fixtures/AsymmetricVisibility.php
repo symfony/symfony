@@ -18,4 +18,5 @@ class AsymmetricVisibility
     public private(set) mixed $publicPrivate = null;
     private private(set) mixed $privatePrivate = null;
     public bool $virtualNoSetHook { get => true; }
+    public bool $virtualNoGetHook { set (bool $value) {} }
 }

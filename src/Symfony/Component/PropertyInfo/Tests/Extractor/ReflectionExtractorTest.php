@@ -53,6 +53,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php82Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php84DummyWithMagicGet;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php84DummyWithMagicSet;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\SnakeCaseDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\UnderscoreDummy;
@@ -960,7 +961,7 @@ class ReflectionExtractorTest extends TestCase
         $this->assertTrue($this->extractor->isReadable(VirtualProperties::class, 'virtualSetHookOnly'));
         $this->assertFalse($this->extractor->getReadInfo(VirtualProperties::class, 'virtualSetHookOnly')->isVirtual());
         $this->assertFalse($this->extractor->getReadInfo(VirtualProperties::class, 'virtualSetHookOnly')->hasHook());
-        $this->assertTrue($this->extractor->isReadable(VirtualProperties::class, 'virtualSetOnly'));
+        $this->assertFalse($this->extractor->isReadable(VirtualProperties::class, 'virtualSetOnly'));
         $this->assertTrue($this->extractor->getReadInfo(VirtualProperties::class, 'virtualSetOnly')->isVirtual());
         $this->assertFalse($this->extractor->getReadInfo(VirtualProperties::class, 'virtualSetOnly')->hasHook());
         $this->assertTrue($this->extractor->isReadable(VirtualProperties::class, 'virtualHook'));
@@ -970,6 +971,10 @@ class ReflectionExtractorTest extends TestCase
         $this->assertTrue($this->extractor->isWritable(VirtualProperties::class, 'virtualSetHookOnly'));
         $this->assertTrue($this->extractor->isWritable(VirtualProperties::class, 'virtualSetOnly'));
         $this->assertTrue($this->extractor->isWritable(VirtualProperties::class, 'virtualHook'));
+
+        $allVisibilitiesExtractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC | ReflectionExtractor::ALLOW_PROTECTED | ReflectionExtractor::ALLOW_PRIVATE);
+        $this->assertFalse($allVisibilitiesExtractor->isReadable(VirtualProperties::class, 'virtualSetOnly'));
+        $this->assertFalse($allVisibilitiesExtractor->isWritable(VirtualProperties::class, 'virtualNoSetHook'));
     }
 
     public function testPropertyHookExpandedSetterType()
@@ -1052,7 +1057,28 @@ class ReflectionExtractorTest extends TestCase
     {
         yield ['virtualNoSetHook', PropertyReadInfo::VISIBILITY_PUBLIC, PropertyWriteInfo::VISIBILITY_PRIVATE];
         yield ['virtualSetHookOnly', PropertyReadInfo::VISIBILITY_PUBLIC, PropertyWriteInfo::VISIBILITY_PUBLIC];
+        yield ['virtualSetOnly', PropertyReadInfo::VISIBILITY_PRIVATE, PropertyWriteInfo::VISIBILITY_PUBLIC];
         yield ['virtualHook', PropertyReadInfo::VISIBILITY_PUBLIC, PropertyWriteInfo::VISIBILITY_PUBLIC];
+    }
+
+    #[DataProvider('provideVirtualPropertiesWithMagicGet')]
+    public function testVirtualPropertiesWithMagicGet(string $property, string $readVisibility, bool $expectedReadable)
+    {
+        $readInfo = $this->extractor->getReadInfo(Php84DummyWithMagicGet::class, $property, [
+            'enable_magic_methods_extraction' => ReflectionExtractor::ALLOW_MAGIC_GET,
+        ]);
+
+        $this->assertSame(PropertyReadInfo::TYPE_PROPERTY, $readInfo->getType());
+        $this->assertSame($readVisibility, $readInfo->getVisibility());
+        $this->assertSame($expectedReadable, $this->extractor->isReadable(Php84DummyWithMagicGet::class, $property, [
+            'enable_magic_methods_extraction' => ReflectionExtractor::ALLOW_MAGIC_GET,
+        ]));
+    }
+
+    public static function provideVirtualPropertiesWithMagicGet(): iterable
+    {
+        yield ['virtualSetOnly', PropertyReadInfo::VISIBILITY_PRIVATE, false];
+        yield ['privateVirtualSetOnly', PropertyReadInfo::VISIBILITY_PUBLIC, true];
     }
 
     #[DataProvider('provideAsymmetricVisibilityAndVirtualPropertiesWithMagicSet')]

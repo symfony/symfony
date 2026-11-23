@@ -474,6 +474,14 @@ class PropertyAccessor implements PropertyAccessorInterface
                         throw $e;
                     }
                 } elseif (PropertyReadInfo::TYPE_PROPERTY === $type) {
+                    if (PropertyReadInfo::VISIBILITY_PUBLIC !== $access->getVisibility()) {
+                        if (!$isNullSafe && !$ignoreInvalidProperty) {
+                            throw new NoSuchPropertyException(\sprintf('The property "%s" in class "%s" is not publicly readable.', $name, get_debug_type($object)));
+                        }
+
+                        return $result;
+                    }
+
                     if (!isset($object->$name) && !\array_key_exists($name, (array) $object)) {
                         try {
                             $r = new \ReflectionProperty($class, $name);
@@ -501,6 +509,14 @@ class PropertyAccessor implements PropertyAccessorInterface
                     $type = ($type = $r->getType()) instanceof \ReflectionNamedType ? $type->getName() : (string) $type;
 
                     throw new UninitializedPropertyException(\sprintf('The property "%s::$%s" is not readable because it is typed "%s". You should initialize it or declare a default value instead.', $matches[1], $r->getName(), $type), 0, $e);
+                }
+
+                if (__FILE__ === $e->getFile() && ($r = new \ReflectionClass($class))->hasProperty($name) && ($r = $r->getProperty($name))->isVirtual() && !$r->hasHook(\PropertyHookType::Get)) {
+                    if (!$isNullSafe && !$ignoreInvalidProperty) {
+                        throw new NoSuchPropertyException(\sprintf('The property "%s" in class "%s" is not publicly readable.', $name, get_debug_type($object)), 0, $e);
+                    }
+
+                    return $result;
                 }
 
                 throw $e;

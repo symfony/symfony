@@ -304,7 +304,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
             return true;
         }
 
-        return null !== $this->getReadInfo($class, $property, $context);
+        return null !== ($readInfo = $this->getReadInfo($class, $property, $context))
+            && (PropertyReadInfo::TYPE_PROPERTY !== $readInfo->getType() || PropertyReadInfo::VISIBILITY_PUBLIC === $readInfo->getVisibility());
     }
 
     public function isWritable(string $class, string $property, array $context = []): ?bool
@@ -663,6 +664,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
                 if ($reflectionProperty->isVirtual() && !$reflectionProperty->hasHook(\PropertyHookType::Set)) {
                     return false;
                 }
+            } elseif ($reflectionProperty->isVirtual() && !$reflectionProperty->hasHook(\PropertyHookType::Get)) {
+                return false;
             }
 
             return (bool) ($reflectionProperty->getModifiers() & $this->propertyReflectionFlags);
@@ -918,6 +921,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
 
     private function getReadVisibilityForProperty(\ReflectionProperty $reflectionProperty): string
     {
+        if ($reflectionProperty->isVirtual() && !$reflectionProperty->hasHook(\PropertyHookType::Get)) {
+            return PropertyReadInfo::VISIBILITY_PRIVATE;
+        }
+
         if ($reflectionProperty->isPrivate()) {
             return PropertyReadInfo::VISIBILITY_PRIVATE;
         }

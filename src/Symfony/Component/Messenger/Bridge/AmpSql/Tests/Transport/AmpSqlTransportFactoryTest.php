@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\AmpSql\Tests\Transport;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmpSql\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\AmpSql\Transport\AmpSqlTransport;
@@ -124,6 +125,7 @@ final class AmpSqlTransportFactoryTest extends TestCase
         yield 'with TLS' => ['amp-mysql://user:pass@localhost/app?tls_ca=/path/to/ca.pem'];
     }
 
+    #[Group('transient-on-windows')]
     public function testTheTransportCanBeUsedAgainAfterBeingClosed()
     {
         $path = sys_get_temp_dir().'/symfony-amp-sql-messenger-'.bin2hex(random_bytes(8)).'.db';

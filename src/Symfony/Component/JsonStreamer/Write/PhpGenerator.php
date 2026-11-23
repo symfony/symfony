@@ -224,9 +224,7 @@ final class PhpGenerator
 
             $keyAccessor = $dataModelNode->getKeyNode()->getAccessor();
 
-            $escapedKey = $dataModelNode->getType()->getCollectionKeyType()->isIdentifiedBy(TypeIdentifier::INT)
-                ? "$keyAccessor = is_int($keyAccessor) ? $keyAccessor : \substr(\json_encode($keyAccessor, ".self::THROWING_JSON_ENCODE_FLAGS_EXPRESSION.'), 1, -1);'
-                : "$keyAccessor = \substr(\json_encode($keyAccessor, ".self::THROWING_JSON_ENCODE_FLAGS_EXPRESSION.'), 1, -1);';
+            $escapedKey = "$keyAccessor = is_int($keyAccessor) ? $keyAccessor : \substr(\json_encode($keyAccessor, ".self::THROWING_JSON_ENCODE_FLAGS_EXPRESSION.'), 1, -1);';
 
             $php = $this->yieldInterpolatedString('{', $context)
                 .$this->flushYieldBuffer($context)

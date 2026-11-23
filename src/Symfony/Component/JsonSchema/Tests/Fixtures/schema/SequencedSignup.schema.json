@@ -11,10 +11,7 @@
                     "maxLength": 50
                 },
                 "email": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": "string",
                     "minLength": 1
                 },
                 "nickname": {

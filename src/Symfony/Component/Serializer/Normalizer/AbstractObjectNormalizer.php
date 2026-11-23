@@ -259,6 +259,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return $this->attributesCache[$key];
         }
 
+        if (1000 < \count($this->attributesCache)) {
+            // stop memory leak if there are many keys
+            $this->attributesCache = \array_slice($this->attributesCache, 500, null, true);
+        }
+
         $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
 
         if (false !== $allowedAttributes) {
@@ -726,7 +731,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         // asking PropertyInfo about attributes that the class doesn't have would fill its cache with each unknown key
-        if ($this->isDeclaredAttribute($currentClass, $attribute) && null !== $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute)) {
+        if (null !== ($name = $this->getDeclaredAttributeName($currentClass, $attribute)) && null !== $types = $this->propertyTypeExtractor->getTypes($currentClass, $name)) {
             return $this->typesCache[$key] = $types;
         }
 
@@ -738,7 +743,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             foreach ($discriminatorMapping->getTypesMapping() as $mappedClass) {
-                if ($this->isDeclaredAttribute($mappedClass, $attribute) && null !== $types = $this->propertyTypeExtractor->getTypes($mappedClass, $attribute)) {
+                if (null !== ($name = $this->getDeclaredAttributeName($mappedClass, $attribute)) && null !== $types = $this->propertyTypeExtractor->getTypes($mappedClass, $name)) {
                     return $this->typesCache[$key] = $types;
                 }
             }
@@ -750,23 +755,32 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
-     * Tells whether the class has a property, a getter, a setter or a constructor argument named after the attribute.
+     * Returns the name of the property, getter, setter or constructor argument that the attribute refers to, as PropertyInfo lists it.
      */
-    private function isDeclaredAttribute(string $class, string $attribute): bool
+    private function getDeclaredAttributeName(string $class, string $attribute): ?string
     {
-        if (property_exists($class, $attribute) || method_exists($class, 'get'.$attribute) || method_exists($class, 'set'.$attribute)) {
-            return true;
+        if (property_exists($class, $attribute)) {
+            return $attribute;
         }
 
         if (method_exists($class, '__construct')) {
             foreach ((new \ReflectionMethod($class, '__construct'))->getParameters() as $parameter) {
                 if ($attribute === $parameter->name) {
-                    return true;
+                    return $attribute;
                 }
             }
         }
 
-        return false;
+        foreach (['get', 'set'] as $prefix) {
+            if (method_exists($class, $prefix.$attribute)) {
+                // method names are case-insensitive, so the name is read from the method, the way ReflectionExtractor::getProperties() does
+                $name = substr((new \ReflectionMethod($class, $prefix.$attribute))->name, 3);
+
+                return property_exists($class, lcfirst($name)) || (!property_exists($class, $name) && !preg_match('/^[A-Z]{2,}/', $name)) ? lcfirst($name) : $name;
+            }
+        }
+
+        return null;
     }
 
     /**

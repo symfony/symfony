@@ -465,6 +465,19 @@ class PhpDocExtractorTest extends TestCase
         $this->assertNull($this->extractor->getTypes(Dummy::class, 'genericInterface'));
     }
 
+    public function testDocBlocksCacheSizeLimit()
+    {
+        for ($i = 0; $i < 2000; ++$i) {
+            $this->assertNull($this->extractor->getTypes(Dummy::class, 'unknown'.$i));
+        }
+
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_STRING)], $this->extractor->getTypes(Dummy::class, 'bar'));
+
+        $docBlocks = \Closure::bind(fn () => $this->docBlocks, $this->extractor, PhpDocExtractor::class)();
+
+        $this->assertLessThanOrEqual(1001, \count($docBlocks));
+    }
+
     public function testIntersectionTypesAreIgnored()
     {
         $this->assertNull($this->extractor->getTypes(DummyIntersectionType::class, 'objects'));

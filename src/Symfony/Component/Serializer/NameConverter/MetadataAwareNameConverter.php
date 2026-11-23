@@ -157,10 +157,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
 
     private function getCacheKey(string $class, array $context): string
     {
-        if ($context['cache_key'] ?? false) {
-            return $class.'-'.$context['cache_key'];
-        }
-
-        return $class.hash('xxh128', serialize($context[AbstractNormalizer::GROUPS] ?? []));
+        // the cache_key of the context isn't used since it changes with each nesting path
+        return isset($context[AbstractNormalizer::GROUPS]) ? $class.serialize($context[AbstractNormalizer::GROUPS]) : $class;
     }
 }

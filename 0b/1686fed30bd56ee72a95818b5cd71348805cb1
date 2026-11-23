@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-23T10:40:27Z
+
+I added the charset to the condition. With `Length(min: 2, charset: 'ISO-8859-1')`, `mb_strlen()` counts bytes, so `minLength: 2` rejected `"é"` while the validator accepts it.

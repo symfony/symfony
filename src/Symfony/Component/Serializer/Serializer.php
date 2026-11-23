@@ -213,7 +213,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             throw new NotNormalizableValueException(\sprintf('Could not denormalize object of type "%s", no supporting normalizer found.', $type));
         }
 
-        if ((isset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS]) || isset($this->defaultContext[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS])) && !isset($context['not_normalizable_value_exceptions'])) {
+        if (($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS] ?? $this->defaultContext[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS] ?? false) && !isset($context['not_normalizable_value_exceptions'])) {
             unset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS]);
             $context['not_normalizable_value_exceptions'] = [];
             $errors = &$context['not_normalizable_value_exceptions'];

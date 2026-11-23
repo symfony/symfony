@@ -1853,6 +1853,27 @@ class SerializerTest extends TestCase
         $serializer->denormalize($data, DummyWithVariadicParameter::class);
     }
 
+    #[DataProvider('provideCollectDenormalizationErrorsDisabled')]
+    public function testCollectDenormalizationErrorsDisabled(array $defaultContext, array $context)
+    {
+        $data = ['variadic' => ['a random string']];
+        $serializer = new Serializer([new UidNormalizer(), new ObjectNormalizer()], [], $defaultContext);
+
+        $this->expectException(NotNormalizableValueException::class);
+
+        $serializer->denormalize($data, DummyWithVariadicParameter::class, null, $context);
+    }
+
+    public static function provideCollectDenormalizationErrorsDisabled(): iterable
+    {
+        yield 'false in context' => [[], [DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => false]];
+        yield 'false in default context' => [[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => false], []];
+        yield 'false in context overrides true in default context' => [
+            [DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true],
+            [DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => false],
+        ];
+    }
+
     public function testDenormalizationFailsWithMultipleErrorsInDefaultContext()
     {
         $serializer = new Serializer(

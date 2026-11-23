@@ -258,6 +258,11 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return $this->docBlocks[$propertyHash];
         }
 
+        if (1000 < \count($this->docBlocks)) {
+            // stop memory leak if there are many keys
+            $this->docBlocks = \array_slice($this->docBlocks, 500, null, true);
+        }
+
         try {
             $reflectionProperty = new \ReflectionProperty($class, $property);
         } catch (\ReflectionException) {
@@ -443,6 +448,11 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         if (isset($this->promotedPropertyDocBlocks[$propertyHash])) {
             return false === $this->promotedPropertyDocBlocks[$propertyHash] ? null : $this->promotedPropertyDocBlocks[$propertyHash];
+        }
+
+        if (1000 < \count($this->promotedPropertyDocBlocks)) {
+            // stop memory leak if there are many keys
+            $this->promotedPropertyDocBlocks = \array_slice($this->promotedPropertyDocBlocks, 500, null, true);
         }
 
         try {

@@ -1203,6 +1203,17 @@ class PhpStanExtractorTest extends TestCase
         $this->assertEquals(Type::object(DummyUsedInTrait::class), $this->extractor->getType(DummyImportingDummy::class, 'dummyFromParent'));
     }
 
+    public function testDocBlocksCacheSizeLimit()
+    {
+        for ($i = 0; $i < 2000; ++$i) {
+            $this->assertNull($this->extractor->getType(Dummy::class, 'unknown'.$i));
+        }
+
+        $this->assertEquals(Type::string(), $this->extractor->getType(Dummy::class, 'bar'));
+
+        $this->assertLessThanOrEqual(1001, \count((new \ReflectionProperty(PhpStanExtractor::class, 'docBlocks'))->getValue($this->extractor)));
+    }
+
     #[DataProvider('intRangeTypeProvider')]
     public function testExtractorIntRangeType(string $property, ?Type $type)
     {

@@ -56,7 +56,8 @@ final class RecurringMessage implements MessageProviderInterface
      */
     public static function cron(string $expression, object $message, \DateTimeZone|string|null $timezone = null): self
     {
-        if (!str_contains($expression, '#')) {
+        // a hashed part starts a field ("#", "#(0-2)", "#daily"...); "1#2" is the standard "nth weekday" syntax
+        if (!preg_match('/(?:^|\s)#/', $expression)) {
             return self::trigger(CronExpressionTrigger::fromSpec($expression, null, $timezone), $message);
         }
 

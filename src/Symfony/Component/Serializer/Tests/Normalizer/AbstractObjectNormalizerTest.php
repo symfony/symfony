@@ -35,6 +35,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
@@ -2087,6 +2088,98 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame('dummy', $denormalizedData->values[0]->type);
     }
 
+    public function testDenormalizeIntersectionTypes()
+    {
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $this->markTestSkipped('The PropertyInfo component before Symfony 7.1 does not support DNF types.');
+        }
+
+        $normalizer = new class(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
+            protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
+            {
+                return true;
+            }
+        };
+        $serializer = new Serializer([$normalizer]);
+        $normalizer->setSerializer($serializer);
+
+        $both = new DummyImplementingBothInterfaces();
+
+        $result = $normalizer->denormalize(['intersection' => $both, 'nullable' => $both, 'value' => $both], DummyWithIntersectionTypes::class);
+        $this->assertSame($both, $result->intersection);
+        $this->assertSame($both, $result->nullable);
+        $this->assertSame($both, $result->value);
+
+        $result = $normalizer->denormalize(['nullable' => null, 'value' => 'hello'], DummyWithIntersectionTypes::class);
+        $this->assertNull($result->nullable);
+        $this->assertSame('hello', $result->value);
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage(\sprintf('The type of the "intersection" attribute for class "%s" must be one of "%s&%s" ("array" given).', DummyWithIntersectionTypes::class, DummyDnfInterfaceA::class, DummyDnfInterfaceB::class));
+
+        $normalizer->denormalize(['intersection' => ['foo' => 'bar']], DummyWithIntersectionTypes::class);
+    }
+
+    public function testDenormalizeIntersectionTypesCollectsErrors()
+    {
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $this->markTestSkipped('The PropertyInfo component before Symfony 7.1 does not support DNF types.');
+        }
+
+        $normalizer = new class(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
+            protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
+            {
+                return true;
+            }
+        };
+        $serializer = new Serializer([$normalizer]);
+        $normalizer->setSerializer($serializer);
+
+        $intersection = DummyDnfInterfaceA::class.'&'.DummyDnfInterfaceB::class;
+
+        try {
+            $serializer->denormalize(['intersection' => [], 'nullable' => [], 'value' => []], DummyWithIntersectionTypes::class, null, [DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true]);
+            $this->fail('A PartialDenormalizationException should have been thrown.');
+        } catch (PartialDenormalizationException $e) {
+            $this->assertSame([
+                ['intersection', [$intersection], \sprintf('The type of the "intersection" attribute for class "%s" must be one of "%s" ("array" given).', DummyWithIntersectionTypes::class, $intersection)],
+                ['nullable', [$intersection, 'null'], \sprintf('The type of the "nullable" attribute for class "%s" must be one of "%s", "null" ("array" given).', DummyWithIntersectionTypes::class, $intersection)],
+                ['value', [$intersection, 'string'], \sprintf('The type of the "value" attribute for class "%s" must be one of "%s", "string" ("array" given).', DummyWithIntersectionTypes::class, $intersection)],
+            ], array_map(static fn (NotNormalizableValueException $e): array => [$e->getPath(), $e->getExpectedTypes(), $e->getMessage()], $e->getErrors()));
+        }
+    }
+
+    public function testDenormalizeUnionBoundTemplateType()
+    {
+        if (!interface_exists(PropertyDocBlockExtractorInterface::class)) {
+            $this->markTestSkipped('The PropertyInfo component before Symfony 7.1 does not support template types.');
+        }
+
+        $normalizer = new class(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new PhpStanExtractor(), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
+            protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
+            {
+                return true;
+            }
+        };
+        $serializer = new Serializer([$normalizer]);
+        $normalizer->setSerializer($serializer);
+
+        $result = $normalizer->denormalize(['value' => 42, 'nullableValue' => null], DummyWithUnionBoundTemplate::class);
+        $this->assertSame(42, $result->value);
+        $this->assertNull($result->nullableValue);
+
+        $result = $normalizer->denormalize(['value' => 'hello', 'nullableValue' => 'world'], DummyWithUnionBoundTemplate::class);
+        $this->assertSame('hello', $result->value);
+        $this->assertSame('world', $result->nullableValue);
+
+        $result = $normalizer->denormalize(['value' => 'abc', 'nullableValue' => '42'], DummyWithUnionBoundTemplate::class, 'xml');
+        $this->assertSame('abc', $result->value);
+        $this->assertSame(42, $result->nullableValue);
+
+        $this->expectException(NotNormalizableValueException::class);
+        $normalizer->denormalize(['value' => ['invalid']], DummyWithUnionBoundTemplate::class);
+    }
+
     private function getDenormalizerForUnionsWithObjectType(): Serializer
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
@@ -2873,4 +2966,35 @@ class DummyWithArrayObjectOfDtos
     {
         $this->items = new \ArrayObject(iterator_to_array($items));
     }
+}
+
+interface DummyDnfInterfaceA
+{
+}
+
+interface DummyDnfInterfaceB
+{
+}
+
+class DummyImplementingBothInterfaces implements DummyDnfInterfaceA, DummyDnfInterfaceB
+{
+}
+
+class DummyWithIntersectionTypes
+{
+    public DummyDnfInterfaceA&DummyDnfInterfaceB $intersection;
+    public (DummyDnfInterfaceA&DummyDnfInterfaceB)|null $nullable = null;
+    public (DummyDnfInterfaceA&DummyDnfInterfaceB)|string $value;
+}
+
+/**
+ * @template T of int|string
+ */
+class DummyWithUnionBoundTemplate
+{
+    /** @var T */
+    public mixed $value;
+
+    /** @var T|null */
+    public mixed $nullableValue = null;
 }

@@ -45,4 +45,16 @@ class ConstrainedOrder
 
     #[Assert\Ip(version: Assert\Ip::V6_ONLY_PUBLIC)]
     public ?string $publicIpv6 = null;
+
+    #[Assert\Length(min: 2, max: 4, normalizer: 'trim')]
+    public string $couponCode = '';
+
+    #[Assert\Regex(pattern: '/^[A-Z]{2}$/', normalizer: 'trim')]
+    public string $countryCode = '';
+
+    #[Assert\NotBlank]
+    public bool $termsAccepted;
+
+    #[Assert\NotBlank(allowNull: true)]
+    public ?bool $giftWrapped = null;
 }

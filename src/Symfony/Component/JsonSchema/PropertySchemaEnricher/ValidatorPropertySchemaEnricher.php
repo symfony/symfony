@@ -64,19 +64,15 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
             return $property;
         }
 
-        $schema = $property->schema;
-        $required = $property->required;
+        $constraints = $this->getConstraints($metadata, $property->property, $this->getGroups($metadata, $config));
+        $rejectsNull = array_any($constraints, static fn (Constraint $constraint): bool => ($constraint instanceof NotBlank && !$constraint->allowNull) || $constraint instanceof NotNull);
+        $schema = $base = $rejectsNull ? DialectKeywords::withoutNull($property->schema) : $property->schema;
 
-        foreach ($this->getConstraints($metadata, $property->property, $this->getGroups($metadata, $config)) as $constraint) {
-            if (($constraint instanceof NotBlank && !$constraint->allowNull) || $constraint instanceof NotNull) {
-                $required = true;
-                $schema = DialectKeywords::withoutNull($schema);
-            }
-
-            $schema = $this->apply($constraint, $schema, $config->dialect, $property->type);
+        foreach ($constraints as $constraint) {
+            $schema = self::intersect($schema, $this->apply($constraint, $base, $config->dialect, $property->type));
         }
 
-        return $property->withSchema($schema)->withRequired($required);
+        return $property->withSchema($schema)->withRequired($property->required || $rejectsNull);
     }
 
     /**
@@ -155,9 +151,11 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
         [$values, $minCount, $maxCount] = \in_array('object', (array) ($schema['type'] ?? []), true) ? ['additionalProperties', 'minProperties', 'maxProperties'] : ['items', 'minItems', 'maxItems'];
 
         return match (true) {
+            ($constraint instanceof Length || $constraint instanceof Regex) && null !== $constraint->normalizer => $schema,
             $constraint instanceof NotBlank => match (true) {
-                (bool) $type?->isIdentifiedBy(TypeIdentifier::STRING) => [...$schema, 'minLength' => max(1, $schema['minLength'] ?? 1)],
-                (bool) $type?->isIdentifiedBy(TypeIdentifier::ARRAY, TypeIdentifier::ITERABLE) => [...$schema, $minCount => max(1, $schema[$minCount] ?? 1)],
+                (bool) $type?->isIdentifiedBy(TypeIdentifier::STRING) => [...$schema, 'minLength' => 1],
+                (bool) $type?->isIdentifiedBy(TypeIdentifier::ARRAY, TypeIdentifier::ITERABLE) => [...$schema, $minCount => 1],
+                (bool) $type?->isIdentifiedBy(TypeIdentifier::BOOL) => [...$schema, 'not' => $dialect->const(false)],
                 default => $schema,
             },
             $constraint instanceof Length => [...$schema, ...array_filter(['minLength' => $constraint->min, 'maxLength' => $constraint->max], self::isSet(...))],
@@ -187,7 +185,7 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
                 'Y-m-d' => [...$schema, 'format' => 'date'],
                 default => $schema,
             },
-            $constraint instanceof Time => $schema + ['pattern' => $constraint->withSeconds ? '^\\d{2}:\\d{2}:\\d{2}$' : '^\\d{2}:\\d{2}$'],
+            $constraint instanceof Time => [...$schema, 'pattern' => $constraint->withSeconds ? '^\\d{2}:\\d{2}:\\d{2}$' : '^\\d{2}:\\d{2}$'],
             default => $schema,
         };
     }
@@ -203,7 +201,11 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
             return $schema;
         }
 
-        $choices = array_values($constraint->choices);
+        $choices = array_map(static fn (mixed $choice): mixed => match (true) {
+            $choice instanceof \BackedEnum => $choice->value,
+            $choice instanceof \UnitEnum => $choice->name,
+            default => $choice,
+        }, array_values($constraint->choices));
 
         if (!$constraint->multiple) {
             return DialectKeywords::enum($schema, $choices);
@@ -218,6 +220,51 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
             },
             ...array_filter([$minCount => $constraint->min, $maxCount => $constraint->max], self::isSet(...)),
         ];
+    }
+
+    /**
+     * Combines two schemas into one that accepts only the values that both of them accept.
+     *
+     * @param array<string, mixed> $schema
+     * @param array<string, mixed> $other
+     *
+     * @return array<string, mixed>
+     */
+    private static function intersect(array $schema, array $other): array
+    {
+        // OpenAPI 3.0 writes exclusive bounds as boolean flags next to minimum and maximum
+        foreach (['minimum' => 'exclusiveMinimum', 'maximum' => 'exclusiveMaximum'] as $bound => $exclusive) {
+            if (!isset($schema[$bound], $other[$bound]) || !\is_bool($schema[$exclusive] ?? $other[$exclusive] ?? null)) {
+                continue;
+            }
+
+            $tighter = 'minimum' === $bound ? $other[$bound] > $schema[$bound] : $other[$bound] < $schema[$bound];
+
+            if ($tighter || ($other[$bound] == $schema[$bound] && ($other[$exclusive] ?? false))) {
+                unset($schema[$exclusive]);
+                $schema = [...$schema, ...array_intersect_key($other, [$bound => true, $exclusive => true])];
+            }
+
+            unset($other[$bound], $other[$exclusive]);
+        }
+
+        foreach ($other as $keyword => $value) {
+            $schema = match (true) {
+                !\array_key_exists($keyword, $schema), $value === $schema[$keyword] => [...$schema, $keyword => $value],
+                \in_array($keyword, ['minLength', 'minItems', 'minProperties', 'minimum', 'exclusiveMinimum'], true) => [...$schema, $keyword => max($schema[$keyword], $value)],
+                \in_array($keyword, ['maxLength', 'maxItems', 'maxProperties', 'maximum', 'exclusiveMaximum'], true) => [...$schema, $keyword => min($schema[$keyword], $value)],
+                'enum' === $keyword && [] !== ($choices = array_values(array_filter($schema['enum'], static fn (mixed $choice): bool => \in_array($choice, $value, true)))) => [...$schema, 'enum' => $choices],
+                'items' === $keyword, 'additionalProperties' === $keyword => [...$schema, $keyword => match (true) {
+                    true === $schema[$keyword], false === $value => $value,
+                    true === $value, false === $schema[$keyword] => $schema[$keyword],
+                    default => self::intersect($schema[$keyword], $value),
+                }],
+                'allOf' === $keyword => [...$schema, 'allOf' => [...$schema['allOf'], ...array_filter($value, static fn (mixed $subschema): bool => !\in_array($subschema, $schema['allOf'], true))]],
+                default => self::intersect($schema, ['allOf' => [[$keyword => $value]]]),
+            };
+        }
+
+        return $schema;
     }
 
     private static function isSet(mixed $value): bool

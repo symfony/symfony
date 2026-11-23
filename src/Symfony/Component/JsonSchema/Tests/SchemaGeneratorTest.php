@@ -71,6 +71,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingDefinitionPolicy;
 use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingDefinitionProcessor;
 use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingNameConverter;
 use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingPropertyListExtractor;
+use Symfony\Component\JsonSchema\Tests\Fixtures\RepeatedConstraints;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ScalarProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\SearchTool;
 use Symfony\Component\JsonSchema\Tests\Fixtures\SelfReferencingCategory;
@@ -167,6 +168,7 @@ class SchemaGeneratorTest extends TestCase
             PrivatelyConstructedSnapshot::class,
             ProductPair::class,
             PublishedArticle::class,
+            RepeatedConstraints::class,
             ScalarProperties::class,
             SelfReferencingCategory::class,
             SequencedSignup::class,
@@ -721,6 +723,32 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSameSchema(['type' => 'string', 'nullable' => true], $scalars['nickname']);
         $this->assertSameSchema(['type' => 'boolean', 'enum' => [true], 'default' => true], $scalars['enabled']);
         $this->assertSameSchema(['allOf' => [['$ref' => '#/components/schemas/Author']], 'nullable' => true], $book['coAuthor']);
+    }
+
+    public function testNotBlankBooleanRejectsFalseWithTheDialectSyntax()
+    {
+        $properties = SchemaGenerator::create()->generate(Type::object(ConstrainedOrder::class), new Configuration(Dialect::openApi30()))->getDefinitions()['ConstrainedOrder']['properties'];
+
+        $this->assertSameSchema(['type' => 'boolean', 'not' => ['enum' => [false]]], $properties['termsAccepted']);
+        $this->assertSameSchema(['type' => 'boolean', 'nullable' => true, 'not' => ['enum' => [false]]], $properties['giftWrapped']);
+    }
+
+    public function testRepeatedBoundsKeepTheTightestWithTheDialectSyntax()
+    {
+        $properties = SchemaGenerator::create()->generate(Type::object(RepeatedConstraints::class), new Configuration(Dialect::openApi30()))->getDefinitions()['RepeatedConstraints']['properties'];
+
+        $this->assertSameSchema(['type' => 'integer', 'default' => 5, 'minimum' => 5, 'maximum' => 20], $properties['quantity']);
+        $this->assertSameSchema(['type' => 'number', 'default' => 50.0, 'minimum' => 10, 'exclusiveMinimum' => true, 'maximum' => 100, 'exclusiveMaximum' => true], $properties['price']);
+        $this->assertSameSchema(['type' => 'integer', 'default' => 1, 'minimum' => 1, 'maximum' => 5, 'exclusiveMaximum' => true], $properties['stars']);
+    }
+
+    public function testRepeatedConstraintsKeepThePatternsOfTheProvidedSchema()
+    {
+        $generator = SchemaGenerator::create(null, [], [new FixedPropertySchemaProvider(RepeatedConstraints::class, 'openingTime', ['type' => 'string', 'pattern' => '^[0-2]', 'allOf' => [['maxLength' => 8]]])]);
+
+        $definition = $generator->generate(Type::object(RepeatedConstraints::class))->getDefinitions()['RepeatedConstraints'];
+
+        $this->assertSameSchema(['type' => 'string', 'pattern' => '^[0-2]', 'allOf' => [['maxLength' => 8], ['pattern' => '^\\d{2}:\\d{2}:\\d{2}$'], ['pattern' => '^(0.*)$']], 'default' => ''], $definition['properties']['openingTime']);
     }
 
     public function testUnsupportedNullSyntaxDropsNullability()

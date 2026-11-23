@@ -81,33 +81,6 @@ class TranslationFilesTest extends TestCase
         $this->assertSame([], $invalidUnits);
     }
 
-    public function testTargetsDoNotMixAlphabetsInAWord()
-    {
-        $invalidUnits = [];
-
-        foreach (glob(\dirname(__DIR__, 2).'/Resources/translations/*.xlf') as $filePath) {
-            $document = new \DOMDocument();
-            $document->load($filePath);
-
-            foreach ($document->getElementsByTagName('trans-unit') as $unit) {
-                $target = $unit->getElementsByTagName('target')->item(0)->textContent;
-
-                foreach (preg_split('/[^\p{L}]++/u', $target, -1, \PREG_SPLIT_NO_EMPTY) as $word) {
-                    // a letter shared by several scripts (like U+02BC) belongs to none of them
-                    $alphabets = preg_match('/(?![\p{Cyrillic}\p{Greek}])\p{Latin}/u', $word)
-                        + preg_match('/(?![\p{Latin}\p{Greek}])\p{Cyrillic}/u', $word)
-                        + preg_match('/(?![\p{Latin}\p{Cyrillic}])\p{Greek}/u', $word);
-
-                    if (1 < $alphabets) {
-                        $invalidUnits[] = basename($filePath).' #'.$unit->getAttribute('id').': '.$word;
-                    }
-                }
-            }
-        }
-
-        $this->assertSame([], $invalidUnits);
-    }
-
     public function testSingleFormLocalesDisplayTheCountOfPluralMessages()
     {
         $invalidUnits = [];

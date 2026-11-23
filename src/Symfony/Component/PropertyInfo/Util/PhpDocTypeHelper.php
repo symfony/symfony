@@ -23,6 +23,7 @@ use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Expression;
 use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\Intersection;
+use phpDocumentor\Reflection\Types\Iterable_;
 use phpDocumentor\Reflection\Types\Null_;
 use phpDocumentor\Reflection\Types\Nullable;
 use phpDocumentor\Reflection\Types\Scalar as LegacyScalar;
@@ -205,6 +206,14 @@ final class PhpDocTypeHelper
             }
 
             return Type::generic($type, ...$variableTypes);
+        }
+
+        if ($docType instanceof Iterable_) {
+            if ('iterable' === $docTypeString) {
+                return Type::iterable();
+            }
+
+            return Type::iterable($this->getType($docType->getValueType()), $this->getType($docType->getKeyType()));
         }
 
         if (!$docTypeString) {

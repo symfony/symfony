@@ -28,6 +28,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyCollection;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyGeneric;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyIntersectionType;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyIterableType;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildOfParentUsingTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildOfParentWithPromotedSelfDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildWithConstructorOverride;
@@ -553,6 +554,25 @@ class PhpDocExtractorTest extends TestCase
         $this->assertNull($this->extractor->getType(DummyIntersectionType::class, 'orNull'));
         $this->assertNull($this->extractor->getType(DummyIntersectionType::class, 'orString'));
         $this->assertEquals(Type::array(), $this->extractor->getType(DummyIntersectionType::class, 'collection'));
+    }
+
+    #[DataProvider('iterableTypesProvider')]
+    public function testIterableTypes(string $property, Type $type)
+    {
+        $this->assertEquals($type, $this->extractor->getType(DummyIterableType::class, $property));
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: Type}>
+     */
+    public static function iterableTypesProvider(): iterable
+    {
+        yield ['keyAndValue', Type::iterable(Type::object(Dummy::class), Type::int())];
+        yield ['value', Type::iterable(Type::object(Dummy::class))];
+        yield ['plain', Type::iterable()];
+        yield ['nullable', Type::nullable(Type::iterable(Type::object(Dummy::class), Type::int()))];
+        yield ['nested', Type::iterable(Type::iterable(Type::object(Dummy::class), Type::int()), Type::string())];
+        yield ['arrayKey', Type::iterable(Type::object(Dummy::class))];
     }
 
     #[DataProvider('constructorTypesProvider')]

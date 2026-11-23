@@ -482,11 +482,11 @@ class PropertyAccessor implements PropertyAccessorInterface
                         return $result;
                     }
 
-                    if (!isset($object->$name) && !\array_key_exists($name, (array) $object)) {
+                    if (!isset($object->$name) && !\array_key_exists($name, get_mangled_object_vars($object))) {
                         try {
                             $r = new \ReflectionProperty($class, $name);
 
-                            if ($r->isPublic() && !$r->hasType()) {
+                            if ($r->isPublic() && !$r->hasType() && !$r->isVirtual()) {
                                 throw new UninitializedPropertyException(\sprintf('The property "%s::$%s" is not initialized.', $class, $name));
                             }
                         } catch (\ReflectionException $e) {

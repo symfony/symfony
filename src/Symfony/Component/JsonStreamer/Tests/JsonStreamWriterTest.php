@@ -52,6 +52,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUids;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueObjects;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithVirtualProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyDict;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyList;
@@ -364,6 +365,11 @@ class JsonStreamWriterTest extends TestCase
     public function testWriteObjectWithStaticProperty()
     {
         $this->assertWritten('{"id":1}', new DummyWithStaticProperty(), Type::object(DummyWithStaticProperty::class));
+    }
+
+    public function testWriteObjectWithVirtualProperties()
+    {
+        $this->assertWritten('{"name":"Alice","upperName":"ALICE"}', new DummyWithVirtualProperties(), Type::object(DummyWithVirtualProperties::class));
     }
 
     public function testWriteObjectWithGenerics()

@@ -533,17 +533,31 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     {
         $expectedTypes = [];
 
+        while ($type instanceof TemplateType) {
+            $type = $type->getWrappedType();
+        }
+
+        $types = [];
+        $queue = [$type];
+        while ($candidate = array_shift($queue)) {
+            if ($candidate instanceof TemplateType) {
+                array_unshift($queue, $candidate->getWrappedType());
+                continue;
+            }
+
+            if ($candidate instanceof UnionType) {
+                array_unshift($queue, ...$candidate->getTypes());
+                continue;
+            }
+
+            $types[] = $candidate;
+        }
+
         $e = null;
         $extraAttributesException = null;
         $missingConstructorArgumentsException = null;
         $filterBoolFailed = false;
         $enforceTypes = !($context[self::DISABLE_TYPE_ENFORCEMENT] ?? $this->defaultContext[self::DISABLE_TYPE_ENFORCEMENT] ?? false);
-
-        $types = match (true) {
-            $type instanceof IntersectionType => throw new LogicException('Unable to handle intersection type.'),
-            $type instanceof UnionType => $type->getTypes(),
-            default => [$type],
-        };
 
         $originalData = $data;
         foreach ($types as $t) {
@@ -565,6 +579,25 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $genericType = self::findGenericType($t);
             while ($t instanceof WrappingTypeInterface) {
                 $t = $t->getWrappedType();
+            }
+
+            if ($t instanceof IntersectionType) {
+                if (\is_object($data)) {
+                    $matchesIntersection = true;
+                    foreach ($t->getTypes() as $intersectedType) {
+                        if (!$intersectedType instanceof ObjectType || !is_a($data, $intersectedType->getClassName())) {
+                            $matchesIntersection = false;
+                            break;
+                        }
+                    }
+
+                    if ($matchesIntersection) {
+                        return $data;
+                    }
+                }
+
+                $expectedTypes[(string) $t] = true;
+                continue;
             }
 
             // the class of a collection of known elements, e.g. "Collection" for "Collection<int, User>", is built from the elements once they are denormalized

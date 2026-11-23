@@ -108,6 +108,21 @@ class JsonStreamWriterTest extends TestCase
         );
     }
 
+    public function testWriteDictionaryWithNumericStringKeys()
+    {
+        $this->assertWritten(
+            '{"0":{"id":1,"name":"dummy"},"42":{"id":1,"name":"dummy"},"1234":{"id":1,"name":"dummy"},"-5":{"id":1,"name":"dummy"},"01":{"id":1,"name":"dummy"}}',
+            [
+                '0' => new ClassicDummy(),
+                '42' => new ClassicDummy(),
+                '1234' => new ClassicDummy(),
+                '-5' => new ClassicDummy(),
+                '01' => new ClassicDummy(),
+            ],
+            Type::dict(Type::object(ClassicDummy::class)),
+        );
+    }
+
     public function testThrowWhenDictionaryKeyCannotBeEncoded()
     {
         $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);

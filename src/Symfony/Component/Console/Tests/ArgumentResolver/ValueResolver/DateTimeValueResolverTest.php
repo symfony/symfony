@@ -16,7 +16,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Console\ArgumentResolver\ValueResolver\DateTimeValueResolver;
+use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\MapDateTime;
+use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -320,6 +322,38 @@ class DateTimeValueResolverTest extends TestCase
         $this->assertEquals('2016-09-08 00:00:00', $results[0]->format('Y-m-d H:i:s'));
     }
 
+    public function testWithRenamedArgument()
+    {
+        $resolver = new DateTimeValueResolver();
+
+        $input = new ArrayInput(['from' => '2016-09-08'], new InputDefinition([
+            new InputArgument('from'),
+        ]));
+
+        $function = static fn (#[Argument(name: 'from')] ?\DateTimeImmutable $since) => null;
+        $member = new ReflectionMember((new \ReflectionFunction($function))->getParameters()[0]);
+
+        $results = $resolver->resolve('since', $input, $member);
+
+        $this->assertSame('2016-09-08', $results[0]?->format('Y-m-d'));
+    }
+
+    public function testWithRenamedOption()
+    {
+        $resolver = new DateTimeValueResolver();
+
+        $input = new ArrayInput(['--from' => '2016-09-08'], new InputDefinition([
+            new InputOption('from', null, InputOption::VALUE_REQUIRED),
+        ]));
+
+        $function = static fn (#[Option(name: 'from')] ?\DateTimeImmutable $since = null) => null;
+        $member = new ReflectionMember((new \ReflectionFunction($function))->getParameters()[0]);
+
+        $results = $resolver->resolve('since', $input, $member);
+
+        $this->assertSame('2016-09-08', $results[0]?->format('Y-m-d'));
+    }
+
     public function testVariadic()
     {
         date_default_timezone_set('UTC');
@@ -367,6 +401,7 @@ class DateTimeValueResolverTest extends TestCase
             'invalid date' => ['Invalid DateTime Format'],
             'invalid format' => ['2012-07-21', 'd.m.Y'],
             'invalid ymd format' => ['2012-21-07', 'Y-m-d'],
+            'null byte with format' => ["2012-07-21\0", 'Y-m-d'],
         ];
     }
 

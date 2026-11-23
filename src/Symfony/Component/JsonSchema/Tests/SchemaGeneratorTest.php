@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\JsonSchema\Attribute\JsonSchemaConstraint;
 use Symfony\Component\JsonSchema\ClassSchemaResolver\NativeClassSchemaResolver;
 use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\DefinitionParent;
@@ -38,6 +39,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\CamelCaseProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Catalog;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ConstantNameDefinitionPolicy;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ConstrainedOrder;
+use Symfony\Component\JsonSchema\Tests\Fixtures\ConstrainedQuerySearchTool;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ConstructorInitializedShipment;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ContactWithFormatConstraints;
 use Symfony\Component\JsonSchema\Tests\Fixtures\CreditedArticle;
@@ -47,6 +49,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\Drawing;
 use Symfony\Component\JsonSchema\Tests\Fixtures\EnumCollectionDefaults;
 use Symfony\Component\JsonSchema\Tests\Fixtures\FailingPropertySchemaProvider;
 use Symfony\Component\JsonSchema\Tests\Fixtures\FallbackClassSchemaResolver;
+use Symfony\Component\JsonSchema\Tests\Fixtures\FixedParameterSchemaEnricher;
 use Symfony\Component\JsonSchema\Tests\Fixtures\FixedPropertySchemaProvider;
 use Symfony\Component\JsonSchema\Tests\Fixtures\FixedSchemaPropertySchemaEnricher;
 use Symfony\Component\JsonSchema\Tests\Fixtures\GroupedPathArticle;
@@ -56,6 +59,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\Inventory;
 use Symfony\Component\JsonSchema\Tests\Fixtures\IriReferenceClassSchemaResolver;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Library;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ListOfClassSchemaResolver;
+use Symfony\Component\JsonSchema\Tests\Fixtures\MarkingParameterSchemaEnricher;
 use Symfony\Component\JsonSchema\Tests\Fixtures\MarkingPropertySchemaEnricher;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NativeObjectProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NestedAttributesBook;
@@ -79,6 +83,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\Shape;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Shelf;
 use Symfony\Component\JsonSchema\Tests\Fixtures\StrictInput;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Ticket;
+use Symfony\Component\JsonSchema\Tests\Fixtures\TypeRecordingParameterSchemaEnricher;
 use Symfony\Component\JsonSchema\Tests\Fixtures\UnboundedDistance;
 use Symfony\Component\JsonSchema\Tests\Fixtures\UnionProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ValidatedRegistration;
@@ -463,6 +468,67 @@ class SchemaGeneratorTest extends TestCase
         $schema = SchemaGenerator::create()->generateForParameters([], new Configuration(allowExtraAttributes: false));
 
         $this->assertSameSchema(['type' => 'object', 'additionalProperties' => false], $schema->getRoot());
+    }
+
+    public function testParameterSchemaEnrichersRefineTheParameters()
+    {
+        $generator = new SchemaGenerator(self::createReflectionPropertyInfo(), new ShortNameDefinitionPolicy(), [], [], [], [], null, null, null, null, [
+            new FixedParameterSchemaEnricher('query', ['type' => 'string', 'minLength' => 3], false),
+            new FixedParameterSchemaEnricher('limit', ['type' => 'integer', 'maximum' => 50], true),
+            new MarkingParameterSchemaEnricher(),
+        ]);
+
+        $schema = $generator->generateForParameters((new \ReflectionMethod(SearchTool::class, '__invoke'))->getParameters());
+
+        $this->assertSameSchema(['type' => 'string', 'minLength' => 3, 'x-enriched' => true], $schema->getRoot()['properties']['query']);
+        $this->assertSameSchema(['type' => 'integer', 'maximum' => 50, 'x-enriched' => true], $schema->getRoot()['properties']['limit']);
+        $this->assertSame(['author', 'limit'], $schema->getRoot()['required']);
+    }
+
+    public function testParameterSchemaEnrichersReceiveTheListTypeOfAVariadicParameter()
+    {
+        $enricher = new TypeRecordingParameterSchemaEnricher();
+        $parameters = (new \ReflectionFunction(static function (string $query, int ...$ids) {}))->getParameters();
+
+        (new SchemaGenerator(self::createReflectionPropertyInfo(), new ShortNameDefinitionPolicy(), [], [], [], [], null, null, null, null, [$enricher]))->generateForParameters($parameters);
+
+        $this->assertEquals(Type::string(), $enricher->types['query']);
+        $this->assertEquals(Type::list(Type::int()), $enricher->types['ids']);
+    }
+
+    public function testParametersAreNotEnrichedByThePropertyOfTheSameName()
+    {
+        $schema = SchemaGenerator::create(null, [], [], [new MarkingPropertySchemaEnricher()])->generateForParameters((new \ReflectionMethod(ConstrainedQuerySearchTool::class, '__invoke'))->getParameters());
+
+        $this->assertSameSchema(['type' => 'object', 'properties' => ['query' => ['type' => 'string']], 'required' => ['query']], $schema->getRoot());
+    }
+
+    public function testParameterConstraintsCanChangeWhetherAParameterIsRequired()
+    {
+        $parameters = (new \ReflectionFunction(static function (#[JsonSchemaConstraint(required: false)] string $query, #[JsonSchemaConstraint(minimum: 1, required: true)] int $page = 1) {}))->getParameters();
+
+        $schema = SchemaGenerator::create()->generateForParameters($parameters);
+
+        $this->assertSameSchema(['type' => 'integer', 'default' => 1, 'minimum' => 1], $schema->getRoot()['properties']['page']);
+        $this->assertSame(['page'], $schema->getRoot()['required']);
+    }
+
+    public function testConstructedGeneratorAppliesParameterConstraintsByDefault()
+    {
+        $parameters = (new \ReflectionFunction(static function (#[JsonSchemaConstraint(minimum: 1)] int $page) {}))->getParameters();
+
+        $schema = (new SchemaGenerator(self::createReflectionPropertyInfo()))->generateForParameters($parameters);
+
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 1], $schema->getRoot()['properties']['page']);
+    }
+
+    public function testCreateRunsTheGivenParameterEnrichersAfterTheBuiltInOnes()
+    {
+        $generator = SchemaGenerator::create(null, [], [], [], [], [new FixedParameterSchemaEnricher('limit', ['type' => 'string'], false)]);
+
+        $schema = $generator->generateForParameters((new \ReflectionMethod(SearchTool::class, '__invoke'))->getParameters());
+
+        $this->assertSameSchema(['type' => 'string'], $schema->getRoot()['properties']['limit']);
     }
 
     public function testSameShapeReachedTwiceSharesOneDefinition()

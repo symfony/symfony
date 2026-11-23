@@ -66,6 +66,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'json_path.function',
         'json_schema.class_schema_resolver',
         'json_schema.definition_processor',
+        'json_schema.parameter_schema_enricher',
         'json_schema.property_schema_enricher',
         'json_schema.property_schema_provider',
         'json_streamer.property_value_transformer',

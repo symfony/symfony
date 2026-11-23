@@ -28,6 +28,7 @@ use Symfony\Component\JsonSchema\SchemaGeneratorInterface;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Author;
 use Symfony\Component\JsonSchema\Tests\Fixtures\BookWithAuthors;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Drawing;
+use Symfony\Component\JsonSchema\Tests\Fixtures\FixedParameterSchemaEnricher;
 use Symfony\Component\JsonSchema\Tests\Fixtures\FixedPropertySchemaProvider;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Generic\Inbox;
 use Symfony\Component\JsonSchema\Tests\Fixtures\IdentifierDefinitionProcessor;
@@ -35,6 +36,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\IriReferenceClassSchemaResolver;
 use Symfony\Component\JsonSchema\Tests\Fixtures\JsonSchemaBundleTestAppBundle;
 use Symfony\Component\JsonSchema\Tests\Fixtures\JsonSchemaBundleTestKernel;
 use Symfony\Component\JsonSchema\Tests\Fixtures\MarkingPropertySchemaEnricher;
+use Symfony\Component\JsonSchema\Tests\Fixtures\SearchTool;
 use Symfony\Component\PropertyInfo\PropertyInfoBundle;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\SerializerBundle;
@@ -71,7 +73,7 @@ class JsonSchemaBundleTest extends TestCase
 
         $definition = $container->getDefinition('json_schema.generator');
 
-        foreach ([2 => 'json_schema.class_schema_resolver', 3 => 'json_schema.property_schema_provider', 4 => 'json_schema.property_schema_enricher', 5 => 'json_schema.definition_processor'] as $index => $tag) {
+        foreach ([2 => 'json_schema.class_schema_resolver', 3 => 'json_schema.property_schema_provider', 4 => 'json_schema.property_schema_enricher', 5 => 'json_schema.definition_processor', 10 => 'json_schema.parameter_schema_enricher'] as $index => $tag) {
             $this->assertInstanceOf(TaggedIteratorArgument::class, $definition->getArgument($index));
             $this->assertSame($tag, $definition->getArgument($index)->getTag());
         }
@@ -108,6 +110,18 @@ class JsonSchemaBundleTest extends TestCase
         $this->assertSame(['type' => 'string', 'format' => 'isbn', 'x-enriched' => true], $properties['title']);
         $this->assertSame(['type' => 'string', 'format' => 'iri-reference', 'x-enriched' => true], $properties['author']);
         $this->assertSame(['type' => 'string'], $properties['@id']);
+    }
+
+    public function testParameterSchemaEnrichersAreAutoconfiguredAndRunBeforeTheBuiltInOne()
+    {
+        $generator = $this->bootKernel('parameter_enrichers', [new JsonSchemaBundleTestAppBundle(static function (ContainerBuilder $container) {
+            $container->register('app.limit_enricher', FixedParameterSchemaEnricher::class)->setArguments(['limit', ['type' => 'integer', 'minimum' => 5, 'x-enriched' => true], true])->setAutoconfigured(true);
+        })])->getContainer()->get('test.json_schema.generator');
+
+        $schema = $generator->generateForParameters((new \ReflectionMethod(SearchTool::class, '__invoke'))->getParameters())->getRoot();
+
+        $this->assertSame(['type' => 'integer', 'minimum' => 1, 'x-enriched' => true, 'maximum' => 100], $schema['properties']['limit']);
+        $this->assertSame(['query', 'author', 'limit'], $schema['required']);
     }
 
     public function testBuiltInExtensionsRunAroundTheOnesOfOtherBundles()

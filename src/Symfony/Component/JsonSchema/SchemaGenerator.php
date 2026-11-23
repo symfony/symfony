@@ -18,7 +18,6 @@ use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
 use PHPStan\PhpDocParser\ParserConfig;
-use Symfony\Component\JsonSchema\Attribute\JsonSchemaConstraint;
 use Symfony\Component\JsonSchema\ClassSchemaResolver\ClassSchemaResolverInterface;
 use Symfony\Component\JsonSchema\ClassSchemaResolver\NativeClassSchemaResolver;
 use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionPolicyInterface;
@@ -26,6 +25,9 @@ use Symfony\Component\JsonSchema\DefinitionPolicy\ShortNameDefinitionPolicy;
 use Symfony\Component\JsonSchema\DefinitionProcessor\DefinitionProcessorInterface;
 use Symfony\Component\JsonSchema\Exception\InvalidArgumentException;
 use Symfony\Component\JsonSchema\Exception\LogicException;
+use Symfony\Component\JsonSchema\ParameterSchemaEnricher\AttributeParameterSchemaEnricher;
+use Symfony\Component\JsonSchema\ParameterSchemaEnricher\ParameterSchema;
+use Symfony\Component\JsonSchema\ParameterSchemaEnricher\ParameterSchemaEnricherInterface;
 use Symfony\Component\JsonSchema\PropertySchemaEnricher\AttributePropertySchemaEnricher;
 use Symfony\Component\JsonSchema\PropertySchemaEnricher\PropertySchema;
 use Symfony\Component\JsonSchema\PropertySchemaEnricher\PropertySchemaEnricherInterface;
@@ -87,10 +89,11 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     private ?TypeContextFactory $typeContextFactory = null;
 
     /**
-     * @param iterable<ClassSchemaResolverInterface>    $classSchemaResolvers
-     * @param iterable<PropertySchemaProviderInterface> $propertySchemaProviders
-     * @param iterable<PropertySchemaEnricherInterface> $propertySchemaEnrichers
-     * @param iterable<DefinitionProcessorInterface>    $definitionProcessors
+     * @param iterable<ClassSchemaResolverInterface>     $classSchemaResolvers
+     * @param iterable<PropertySchemaProviderInterface>  $propertySchemaProviders
+     * @param iterable<PropertySchemaEnricherInterface>  $propertySchemaEnrichers
+     * @param iterable<DefinitionProcessorInterface>     $definitionProcessors
+     * @param iterable<ParameterSchemaEnricherInterface> $parameterSchemaEnrichers
      */
     public function __construct(
         private readonly PropertyInfoExtractorInterface $propertyInfoExtractor,
@@ -103,6 +106,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         private readonly ?ClassMetadataFactoryInterface $classMetadataFactory = null,
         ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null,
         private ?TypeResolverInterface $typeResolver = null,
+        private readonly iterable $parameterSchemaEnrichers = [new AttributeParameterSchemaEnricher()],
     ) {
         $this->classDiscriminatorResolver = $classDiscriminatorResolver ?? ($classMetadataFactory ? new ClassDiscriminatorFromClassMetadata($classMetadataFactory) : null);
     }
@@ -112,12 +116,13 @@ final class SchemaGenerator implements SchemaGeneratorInterface
      *
      * The given resolvers and providers run before the built-in ones, the given enrichers and processors after them.
      *
-     * @param iterable<ClassSchemaResolverInterface>    $classSchemaResolvers
-     * @param iterable<PropertySchemaProviderInterface> $propertySchemaProviders
-     * @param iterable<PropertySchemaEnricherInterface> $propertySchemaEnrichers
-     * @param iterable<DefinitionProcessorInterface>    $definitionProcessors
+     * @param iterable<ClassSchemaResolverInterface>     $classSchemaResolvers
+     * @param iterable<PropertySchemaProviderInterface>  $propertySchemaProviders
+     * @param iterable<PropertySchemaEnricherInterface>  $propertySchemaEnrichers
+     * @param iterable<DefinitionProcessorInterface>     $definitionProcessors
+     * @param iterable<ParameterSchemaEnricherInterface> $parameterSchemaEnrichers
      */
-    public static function create(?DefinitionPolicyInterface $definitionPolicy = null, iterable $classSchemaResolvers = [], iterable $propertySchemaProviders = [], iterable $propertySchemaEnrichers = [], iterable $definitionProcessors = []): self
+    public static function create(?DefinitionPolicyInterface $definitionPolicy = null, iterable $classSchemaResolvers = [], iterable $propertySchemaProviders = [], iterable $propertySchemaEnrichers = [], iterable $definitionProcessors = [], iterable $parameterSchemaEnrichers = []): self
     {
         $reflectionExtractor = new ReflectionExtractor();
         $listExtractors = [$reflectionExtractor];
@@ -145,7 +150,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         }
         $builtInEnrichers[] = new AttributePropertySchemaEnricher();
 
-        return new self($propertyInfoExtractor, $definitionPolicy ?? new ShortNameDefinitionPolicy(), [...self::toList($classSchemaResolvers), new NativeClassSchemaResolver([], $classMetadataFactory)], self::toList($propertySchemaProviders), [...$builtInEnrichers, ...self::toList($propertySchemaEnrichers)], self::toList($definitionProcessors), $nameConverter, $classMetadataFactory);
+        return new self($propertyInfoExtractor, $definitionPolicy ?? new ShortNameDefinitionPolicy(), [...self::toList($classSchemaResolvers), new NativeClassSchemaResolver([], $classMetadataFactory)], self::toList($propertySchemaProviders), [...$builtInEnrichers, ...self::toList($propertySchemaEnrichers)], self::toList($definitionProcessors), $nameConverter, $classMetadataFactory, null, null, [new AttributeParameterSchemaEnricher(), ...self::toList($parameterSchemaEnrichers)]);
     }
 
     public function generate(Type $type, Configuration $config = new Configuration(), ?SchemaDocument $document = null): Schema
@@ -199,8 +204,12 @@ final class SchemaGenerator implements SchemaGeneratorInterface
                 continue;
             }
 
+            if (null !== $type && $parameter->isVariadic()) {
+                $type = Type::list($type);
+            }
+
             $class = $parameter->getDeclaringClass()?->name;
-            $parameterSchema = null === $type ? [] : $this->buildTypeSchema($parameter->isVariadic() ? Type::list($type) : $type, $config, null !== $class ? new DefinitionParent($class, $parameter->name, $config) : null, $document);
+            $parameterSchema = null === $type ? [] : $this->buildTypeSchema($type, $config, null !== $class ? new DefinitionParent($class, $parameter->name, $config) : null, $document);
 
             if ($parameter->isDefaultValueAvailable() && self::canDescribeDefaultValue($parameter->getType()) && null !== $default = self::normalizeDefaultValue($parameter->getDefaultValue(), $parameterSchema)) {
                 $parameterSchema['default'] = $default;
@@ -213,16 +222,14 @@ final class SchemaGenerator implements SchemaGeneratorInterface
                 $parameterSchema['description'] = $descriptions[$key][$parameter->name];
             }
 
-            $required = !$parameter->isOptional();
-            foreach ($parameter->getAttributes(JsonSchemaConstraint::class) as $attribute) {
-                $constraint = $attribute->newInstance();
-                $parameterSchema = AttributePropertySchemaEnricher::applyConstraint($constraint, $parameterSchema, $config->dialect);
-                $required = $constraint->required ?? $required;
+            $enrichedParameter = new ParameterSchema($parameter, $type, $parameterSchema, !$parameter->isOptional());
+            foreach ($this->parameterSchemaEnrichers as $enricher) {
+                $enrichedParameter = $enricher->enrich($enrichedParameter, $config, $document);
             }
 
-            $schema['properties'][$parameter->name] = self::wrapReferenceSiblings($parameterSchema, $config->dialect);
+            $schema['properties'][$parameter->name] = self::wrapReferenceSiblings($enrichedParameter->schema, $config->dialect);
 
-            if ($required) {
+            if ($enrichedParameter->required) {
                 $schema['required'][] = $parameter->name;
             }
         }

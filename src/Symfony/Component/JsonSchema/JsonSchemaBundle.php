@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\JsonSchema\ClassSchemaResolver\ClassSchemaResolverInterface;
 use Symfony\Component\JsonSchema\DefinitionProcessor\DefinitionProcessorInterface;
 use Symfony\Component\JsonSchema\DependencyInjection\SerializerDefaultContextPass;
+use Symfony\Component\JsonSchema\ParameterSchemaEnricher\ParameterSchemaEnricherInterface;
 use Symfony\Component\JsonSchema\PropertySchemaEnricher\PropertySchemaEnricherInterface;
 use Symfony\Component\JsonSchema\PropertySchemaProvider\PropertySchemaProviderInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoBundle;
@@ -58,5 +59,7 @@ class JsonSchemaBundle extends AbstractBundle
             ->addTag('json_schema.property_schema_enricher');
         $container->registerForAutoconfiguration(DefinitionProcessorInterface::class)
             ->addTag('json_schema.definition_processor');
+        $container->registerForAutoconfiguration(ParameterSchemaEnricherInterface::class)
+            ->addTag('json_schema.parameter_schema_enricher');
     }
 }

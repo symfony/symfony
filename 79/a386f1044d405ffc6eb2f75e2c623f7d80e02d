@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-23T19:39:21Z
+
+Thanks @andreybolonin. I pushed a commit that covers the other places reading stored chunks. When a chunk is missing, a 304 revalidation now refetches without the validators, and a stale-if-error fallback now forwards the error from the origin. I also removed the `$checkChunks` flag: `MockResponse` already reads the whole body on the first chunk, so reading all chunks upfront doesn't use more memory.

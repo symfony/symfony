@@ -58,12 +58,17 @@ final class PropertyInfoLoader implements LoaderInterface
 
         $loaded = false;
         $enabledForClass = $this->isAutoMappingEnabledForClass($metadata, $this->classValidatorRegexp);
+        $reflectionClass = $metadata->getReflectionClass();
         foreach ($properties as $property) {
             if (false === $this->accessExtractor->isWritable($className, $property)) {
                 continue;
             }
 
-            if (!property_exists($className, $property)) {
+            if (!$reflectionClass->hasProperty($property)) {
+                continue;
+            }
+
+            if (\PHP_VERSION_ID >= 80400 && ($reflectionProperty = $reflectionClass->getProperty($property))->isVirtual() && !$reflectionProperty->hasHook(\PropertyHookType::Get)) {
                 continue;
             }
 

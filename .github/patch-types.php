@@ -58,6 +58,7 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/Validator/Tests/Constraints/Fixtures/WhenTestWithClosure.php'):
         case false !== strpos($file, '/src/Symfony/Component/Validator/Tests/Fixtures/EntityWithHook.php'):
         case false !== strpos($file, '/src/Symfony/Component/Validator/Tests/Fixtures/NestedAttribute/Entity.php'):
+        case false !== strpos($file, '/src/Symfony/Component/Validator/Tests/Fixtures/WriteOnlyVirtualPropertyEntity.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/NotLoadableClass.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/VirtualProperty.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarExporter/Internal'):

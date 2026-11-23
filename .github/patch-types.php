@@ -46,6 +46,7 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/ErrorHandler/Tests/Fixtures/'):
         case false !== strpos($file, '/src/Symfony/Component/HttpClient/Internal/') && str_contains($file, 'V5'):
         case false !== strpos($file, '/src/Symfony/Component/ObjectMapper/Tests/Fixtures/UnwritableTargetProperty/'):
+        case false !== strpos($file, '/src/Symfony/Component/ObjectMapper/Tests/Fixtures/WriteOnlyVirtualProperty/'):
         case false !== strpos($file, '/src/Symfony/Component/PropertyAccess/Tests/Fixtures/AsymmetricVisibility.php'):
         case false !== strpos($file, '/src/Symfony/Component/PropertyInfo/Tests/Fixtures/'):
         case false !== strpos($file, '/src/Symfony/Component/Runtime/Internal/ComposerPlugin.php'):

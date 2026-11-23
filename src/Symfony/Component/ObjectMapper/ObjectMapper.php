@@ -276,6 +276,10 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             return method_exists($source, '__get');
         }
 
+        if (\PHP_VERSION_ID >= 80400 && $property->isVirtual()) {
+            return $property->hasHook(\PropertyHookType::Get);
+        }
+
         return $property->isInitialized($source) || isset($source->{$propertyName});
     }
 
@@ -346,6 +350,10 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             } else {
                 $refl = new \ReflectionClass($mapTo->target);
                 $mapper = $this->objectMapper ?? $this;
+
+                if (!self::canBeLazy($refl)) {
+                    return $mapper->map($value, $mapTo->target);
+                }
 
                 return $refl->newLazyGhost(function ($target) use ($mapper, $value, $objectMap) {
                     $previousMap = $this->objectMap;
@@ -583,5 +591,19 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         $clone->pendingConstruction = null;
 
         return $clone;
+    }
+
+    /**
+     * PHP cannot make an object lazy when its class or one of its parents is internal, except stdClass.
+     */
+    private static function canBeLazy(\ReflectionClass $class): bool
+    {
+        do {
+            if ($class->isInternal() && \stdClass::class !== $class->name) {
+                return false;
+            }
+        } while ($class = $class->getParentClass());
+
+        return true;
     }
 }

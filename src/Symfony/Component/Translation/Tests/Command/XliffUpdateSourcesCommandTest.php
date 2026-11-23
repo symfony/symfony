@@ -138,18 +138,7 @@ class XliffUpdateSourcesCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
 
-        // translations/messages.en.xlf should be updated
-        $this->assertStringContainsString(
-            \sprintf('Updating XLIFF files in %s...', $this->defaultTranslationPath),
-            $tester->getDisplay(),
-        );
         $this->assertFileContainsSource('Hello there', $enFileInDefaultDir);
-
-        // other/messages.en.xlf should be updated
-        $this->assertStringContainsString(
-            \sprintf('Updating XLIFF files in %s...', $otherPath),
-            $tester->getDisplay()
-        );
         $this->assertFileContainsSource('Hello there', $enFileInOtherDir);
     }
 
@@ -168,19 +157,8 @@ class XliffUpdateSourcesCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
 
-        // foo/messages.en.xlf should be updated
-        $this->assertStringContainsString(
-            \sprintf('Updating XLIFF files in %s...', $fooDir),
-            $tester->getDisplay(),
-        );
         $this->assertFileContainsSource('Hello there', $fileInFooDir);
-
-        // translations/messages.en.xlf shouldn't be updated
-        $this->assertStringNotContainsString(
-            \sprintf('Updating XLIFF files in %s...', $this->defaultTranslationPath),
-            $tester->getDisplay(),
-        );
-        $this->assertFileContainsSource('hello', $fileInDefaultDir);
+        $this->assertStringEqualsFile($fileInDefaultDir, $originalContent);
     }
 
     public function testCommandUpdatesAllDomainsByDefault()

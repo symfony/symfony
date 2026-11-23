@@ -27,6 +27,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyCollection;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyGeneric;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyIntersectionType;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyIterableType;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildOfParentUsingTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildOfParentWithPromotedSelfDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildWithConstructorOverride;
@@ -540,6 +541,29 @@ class PhpDocExtractorTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
+    #[DataProvider('legacyIterableTypesProvider')]
+    public function testIterableTypesLegacy(string $property, array $types)
+    {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
+        $this->assertEquals($types, $this->extractor->getTypes(DummyIterableType::class, $property));
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: list<LegacyType>}>
+     */
+    public static function legacyIterableTypesProvider(): iterable
+    {
+        yield ['keyAndValue', [new LegacyType(LegacyType::BUILTIN_TYPE_ITERABLE, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class))]];
+        yield ['value', [new LegacyType(LegacyType::BUILTIN_TYPE_ITERABLE, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class))]];
+        yield ['plain', [new LegacyType(LegacyType::BUILTIN_TYPE_ITERABLE)]];
+        yield ['nullable', [new LegacyType(LegacyType::BUILTIN_TYPE_ITERABLE, true, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class))]];
+        yield ['nested', [new LegacyType(LegacyType::BUILTIN_TYPE_ITERABLE, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_STRING), new LegacyType(LegacyType::BUILTIN_TYPE_ITERABLE, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class)))]];
+        yield ['arrayKey', [new LegacyType(LegacyType::BUILTIN_TYPE_ITERABLE, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class))]];
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     #[DataProvider('legacyGenericsProvider')]
     public function testGenericsLegacy(string $class, string $property, array $expectedTypes)
     {
@@ -671,7 +695,7 @@ class PhpDocExtractorTest extends TestCase
     #[IgnoreDeprecations]
     #[Group('legacy')]
     #[DataProvider('provideLegacyPseudoTypes')]
-    public function testPseudoTypesLegacy($property, array $type)
+    public function testPseudoTypesLegacy($property, ?array $type)
     {
         $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
 
@@ -690,6 +714,21 @@ class PhpDocExtractorTest extends TestCase
             ['numericString', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null)]],
             ['traitString', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null)]],
             ['positiveInt', [new LegacyType(LegacyType::BUILTIN_TYPE_INT, false, null)]],
+            ['true', [new LegacyType(LegacyType::BUILTIN_TYPE_TRUE, false, null)]],
+            ['false', [new LegacyType(LegacyType::BUILTIN_TYPE_FALSE, false, null)]],
+            ['valueOfStrings', null],
+            ['valueOfIntegers', null],
+            ['valueOfIntEnum', null],
+            ['valueOfStringEnum', null],
+            ['valueOfNullableIntEnum', null],
+            ['valueOfNullableStringEnum', null],
+            ['keyOfStrings', null],
+            ['keyOfIntegers', null],
+            ['arrayKey', null],
+            ['intMask', class_exists(IntMask::class) ? [new LegacyType(LegacyType::BUILTIN_TYPE_INT, false, null)] : null],
+            ['intMaskOf', class_exists(IntMaskOf::class) ? [new LegacyType(LegacyType::BUILTIN_TYPE_INT, false, null)] : null],
+            ['conditional', null],
+            ['offsetAccess', null],
         ];
     }
 
@@ -1183,6 +1222,25 @@ class PhpDocExtractorTest extends TestCase
         $this->assertNull($this->extractor->getType(DummyIntersectionType::class, 'orNull'));
         $this->assertNull($this->extractor->getType(DummyIntersectionType::class, 'orString'));
         $this->assertEquals(Type::array(), $this->extractor->getType(DummyIntersectionType::class, 'collection'));
+    }
+
+    #[DataProvider('iterableTypesProvider')]
+    public function testIterableTypes(string $property, Type $type)
+    {
+        $this->assertEquals($type, $this->extractor->getType(DummyIterableType::class, $property));
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: Type}>
+     */
+    public static function iterableTypesProvider(): iterable
+    {
+        yield ['keyAndValue', Type::iterable(Type::object(Dummy::class), Type::int())];
+        yield ['value', Type::iterable(Type::object(Dummy::class))];
+        yield ['plain', Type::iterable()];
+        yield ['nullable', Type::nullable(Type::iterable(Type::object(Dummy::class), Type::int()))];
+        yield ['nested', Type::iterable(Type::iterable(Type::object(Dummy::class), Type::int()), Type::string())];
+        yield ['arrayKey', Type::iterable(Type::object(Dummy::class))];
     }
 
     #[DataProvider('constructorTypesProvider')]

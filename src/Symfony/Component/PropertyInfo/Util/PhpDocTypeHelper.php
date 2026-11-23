@@ -23,6 +23,7 @@ use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Expression;
 use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\Intersection;
+use phpDocumentor\Reflection\Types\Iterable_;
 use phpDocumentor\Reflection\Types\Mixed_;
 use phpDocumentor\Reflection\Types\Null_;
 use phpDocumentor\Reflection\Types\Nullable;
@@ -267,6 +268,13 @@ final class PhpDocTypeHelper
             return new LegacyType($phpType, $nullable, $class, $collection, $keys, $values);
         }
 
+        if ($type instanceof Iterable_ && 'iterable' !== $docType) {
+            $collectionKeyTypes = $this->hasNoExplicitKeyType($type) ? null : $this->getTypes($type->getKeyType());
+            $collectionValueTypes = $this->getTypes($type->getValueType());
+
+            return new LegacyType(LegacyType::BUILTIN_TYPE_ITERABLE, $nullable, null, true, $collectionKeyTypes, $collectionValueTypes);
+        }
+
         // Cannot guess
         if (!$docType || 'mixed' === $docType) {
             return null;
@@ -287,19 +295,26 @@ final class PhpDocTypeHelper
             return new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, $nullable, null, true, $collectionKeyTypes, $collectionValueTypes);
         }
 
+        $docType = $this->normalizeType($docType);
+        [$phpType, $class] = $this->getPhpTypeAndClass($docType);
+
+        if ('array' === $docType) {
+            return new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, $nullable, null, true, null, null);
+        }
+
+        if (null === $class) {
+            return new LegacyType($phpType, $nullable, $class);
+        }
+
         if ($type instanceof PseudoType) {
             if ($type->underlyingType() instanceof Integer) {
                 return new LegacyType(LegacyType::BUILTIN_TYPE_INT, $nullable, null);
             } elseif ($type->underlyingType() instanceof String_) {
                 return new LegacyType(LegacyType::BUILTIN_TYPE_STRING, $nullable, null);
             }
-        }
 
-        $docType = $this->normalizeType($docType);
-        [$phpType, $class] = $this->getPhpTypeAndClass($docType);
-
-        if ('array' === $docType) {
-            return new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, $nullable, null, true, null, null);
+            // It's safer to fall back to other extractors here, as resolving pseudo types correctly is not easy at the moment
+            return null;
         }
 
         return new LegacyType($phpType, $nullable, $class);
@@ -388,6 +403,14 @@ final class PhpDocTypeHelper
             return Type::generic($type, ...$variableTypes);
         }
 
+        if ($docType instanceof Iterable_) {
+            if ('iterable' === $docTypeString) {
+                return Type::iterable();
+            }
+
+            return Type::iterable($this->getType($docType->getValueType()), $this->getType($docType->getKeyType()));
+        }
+
         if (!$docTypeString) {
             return null;
         }
@@ -468,7 +491,7 @@ final class PhpDocTypeHelper
         };
     }
 
-    private function hasNoExplicitKeyType(Array_|Collection $type): bool
+    private function hasNoExplicitKeyType(Array_|Collection|Iterable_ $type): bool
     {
         if (method_exists($type, 'getOriginalKeyType')) {
             return null === $type->getOriginalKeyType();

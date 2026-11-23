@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\JsonStreamer\Exception\NotEncodableValueException;
+use Symfony\Component\JsonStreamer\JsonStreamReader;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
@@ -121,6 +122,39 @@ class JsonStreamWriterTest extends TestCase
             ],
             Type::dict(Type::object(ClassicDummy::class)),
         );
+    }
+
+    public function testWriteDictionaryOfScalarsAsObject()
+    {
+        $this->assertWritten('{"0":"a","1":"b"}', ['0' => 'a', '1' => 'b'], Type::dict(Type::string()));
+        $this->assertWritten('{}', [], Type::dict(Type::int()));
+        $this->assertWritten('{}', [], Type::nullable(Type::dict(Type::int())));
+        $this->assertWritten('{"a":{},"b":{"0":1}}', ['a' => [], 'b' => ['0' => 1]], Type::dict(Type::dict(Type::int())));
+        $this->assertWritten('[{"a":1},{},{"0":2}]', [['a' => 1], [], ['0' => 2]], Type::list(Type::dict(Type::int())));
+        $this->assertWritten('{}', [], Type::iterable(Type::int(), Type::string()));
+        $this->assertWritten('[{},{"a":1}]', [[], ['a' => 1]], Type::iterable(Type::dict(Type::int()), Type::int()));
+    }
+
+    public function testWriteDictionaryOfCollectionsOrMixedValues()
+    {
+        $this->assertWritten('{"a":[1,2],"b":[]}', ['a' => [1, 2], 'b' => []], Type::dict(Type::list(Type::int())));
+        $this->assertWritten('{"a":[1,2],"b":[]}', ['a' => [1, 2], 'b' => []], Type::dict());
+        $this->assertWritten('[{"a":1},[]]', [['a' => 1], []], Type::list(Type::dict()));
+        $this->assertWritten('[{"a":1}]', [['a' => 1]], Type::array(Type::dict(Type::int())));
+        $this->assertWritten('[[{"a":1}]]', [[['a' => 1]]], Type::array(Type::list(Type::dict(Type::int()))));
+    }
+
+    public function testWrittenEmptyDictionaryCanBeReadFromStream()
+    {
+        $resource = fopen('php://temp', 'w+');
+        foreach (JsonStreamWriter::create([], $this->streamWritersDir)->write([], Type::dict(Type::int())) as $chunk) {
+            fwrite($resource, $chunk);
+        }
+        rewind($resource);
+
+        $reader = JsonStreamReader::create([], \sprintf('%s/symfony_json_streamer_test/stream_reader', sys_get_temp_dir()));
+
+        $this->assertSame([], $reader->read($resource, Type::dict(Type::int())));
     }
 
     public function testThrowWhenDictionaryKeyCannotBeEncoded()

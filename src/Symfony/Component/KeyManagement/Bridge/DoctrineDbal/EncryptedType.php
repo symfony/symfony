@@ -115,7 +115,7 @@ class EncryptedType extends Type
         $this->context = self::CONTEXT_LABEL.pack('n', $length).$key.pack('n', $typeLength).$typeName;
     }
 
-    public function convertToDatabaseValue(#[\SensitiveParameter] mixed $value, AbstractPlatform $platform): mixed
+    public function convertToDatabaseValue(#[\SensitiveParameter] mixed $value, AbstractPlatform $platform): ?string
     {
         $plaintext = $this->parentType->convertToDatabaseValue($value, $platform);
         if (null === $plaintext) {
@@ -132,7 +132,7 @@ class EncryptedType extends Type
             $plaintext = var_export($plaintext, true);
         }
 
-        return $this->envelopes->encrypt($this->key, self::bytes($plaintext), $this->context);
+        return (string) $this->envelopes->encrypt($this->key, self::bytes($plaintext), $this->context);
     }
 
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed

@@ -62,6 +62,7 @@ class EncryptedTypeTest extends TestCase
         $type = $this->makeType(new StringType());
 
         $encrypted = $type->convertToDatabaseValue('hello@example.com', $this->platform);
+        $this->assertIsString($encrypted);
         $this->assertNotSame('hello@example.com', $encrypted);
         $this->assertSame('hello@example.com', $type->convertToPHPValue($encrypted, $this->platform));
     }
@@ -373,7 +374,7 @@ class EncryptedTypeTest extends TestCase
 
         $this->expectException(ValueNotConvertible::class);
         $this->expectExceptionMessage('not a valid KeyManagement envelope');
-        $type->convertToPHPValue(\chr(0x2A).substr((string) $written, 1), $this->platform);
+        $type->convertToPHPValue(\chr(0x2A).substr($written, 1), $this->platform);
     }
 
     public function testAnEmptyPlaintextRoundTripsThroughAnEnvelope()

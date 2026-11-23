@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by prateekbhujel at 2026-11-23T16:58:48Z
+
+Agreed, matching the repeated element name is much cleaner here. Beyond keeping sibling scalars like `<total>` unwrapped, it also works for flat structures like `<order><id>42</id><order_row>...</order_row></order>` where there's no wrapper tag at all, and it already lines up with the 8.2 changelog wording.
+
+I updated the PR with that check in `parseXmlValue()`, adjusted the docblocks on `FORCE_COLLECTION` and `withForceCollection()`, and expanded the tests to cover siblings, nested forced collections, comments, attributes, and `AS_COLLECTION => true`. Happy to adjust if @AlexandreGerault prefers keeping parent matching.

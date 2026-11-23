@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-23T08:34:00Z
+
+Thanks! I moved this to 7.4, because before 8.2 the copy rebuilds the container only on clock skew.
+
+I also changed the fix to build the container like `debug:container` and `lint:container` do, with `initializeBundles()` then `buildContainer()`, without booting the copy. And the test now gets its own environment. With the static `Kernel::$freshCache`, it passed without the fix when the whole class ran.

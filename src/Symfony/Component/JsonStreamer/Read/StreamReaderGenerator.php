@@ -138,7 +138,11 @@ final class StreamReaderGenerator
             }
 
             foreach ($propertiesMetadata as $streamedName => $propertyMetadata) {
-                if (!$propertyMetadata->getName()) {
+                if (!$name = $propertyMetadata->getName()) {
+                    continue;
+                }
+
+                if (\PHP_VERSION_ID >= 80400 && property_exists($className, $name) && ($propertyReflection = new \ReflectionProperty($className, $name))->isVirtual() && !$propertyReflection->hasHook(\PropertyHookType::Set)) {
                     continue;
                 }
 

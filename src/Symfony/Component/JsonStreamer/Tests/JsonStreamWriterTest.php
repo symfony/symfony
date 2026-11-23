@@ -12,6 +12,7 @@
 namespace Symfony\Component\JsonStreamer\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\JsonStreamer\Exception\NotEncodableValueException;
@@ -43,6 +44,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithStaticProperty;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithVirtualProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyDict;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyList;
@@ -347,6 +349,12 @@ class JsonStreamWriterTest extends TestCase
     public function testWriteObjectWithStaticProperty()
     {
         $this->assertWritten('{"id":1}', new DummyWithStaticProperty(), Type::object(DummyWithStaticProperty::class));
+    }
+
+    #[RequiresPhp('>=8.4.0')]
+    public function testWriteObjectWithVirtualProperties()
+    {
+        $this->assertWritten('{"name":"Alice","upperName":"ALICE"}', new DummyWithVirtualProperties(), Type::object(DummyWithVirtualProperties::class));
     }
 
     public function testWriteObjectWithGenerics()

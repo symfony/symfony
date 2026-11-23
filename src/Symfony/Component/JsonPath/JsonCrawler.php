@@ -79,12 +79,6 @@ final class JsonCrawler implements JsonCrawlerInterface
     private array $absoluteQueries = [];
 
     /**
-     * How many more values the arrays kept in $absoluteQueries may hold, so that these copies never add up to more
-     * than one copy of the document. The budget is null until the values of the document are counted.
-     */
-    private ?int $absoluteQueriesBudget = null;
-
-    /**
      * @param resource|string                                                                        $raw
      * @param ContainerInterface|ServiceProviderInterface<callable(mixed ...$arguments): mixed>|null $functionsProvider
      * @param array<string, array{arity?: int|null, return_type?: FunctionReturnType|null}>          $functionsMetadata
@@ -104,10 +98,9 @@ final class JsonCrawler implements JsonCrawlerInterface
         $this->regexBudget = self::REGEX_WORK_BUDGET;
 
         try {
-            return $this->evaluate(\is_string($query) ? new JsonPath($query) : $query);
+            return $this->normalizeStorage($this->evaluate(\is_string($query) ? new JsonPath($query) : $query));
         } finally {
             $this->document = $this->absoluteQueries = [];
-            $this->absoluteQueriesBudget = null;
         }
     }
 
@@ -121,13 +114,13 @@ final class JsonCrawler implements JsonCrawlerInterface
             if ($this->isComplexBracketExpression($query)) {
                 preg_match('/^\$\[([^\[\]]+)]$/', $query, $matches);
 
-                return $this->normalizeStorage($this->evaluateBracket($matches[1], $this->getDocument()));
+                return $this->evaluateBracket($matches[1], $this->getDocument());
             }
 
             $tokens = JsonPathTokenizer::tokenize($query);
 
             if ($wholeDocument || !\is_resource($this->raw)) {
-                return $this->normalizeStorage($this->evaluateTokensOnDecodedData($tokens, $this->getDocument()));
+                return $this->evaluateTokensOnDecodedData($tokens, $this->getDocument());
             }
 
             if (!class_exists(Splitter::class)) {
@@ -144,7 +137,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                     throw new \LogicException(); // fallback to reading the entire stream
                 }
             } catch (\LogicException|UnexpectedValueException) {
-                return $this->normalizeStorage($this->evaluateTokensOnDecodedData(JsonPathTokenizer::tokenize($query), $this->getDocument()));
+                return $this->evaluateTokensOnDecodedData(JsonPathTokenizer::tokenize($query), $this->getDocument());
             }
 
             try {
@@ -153,7 +146,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                 throw new InvalidJsonStringInputException($e->getMessage(), $e);
             }
 
-            return $this->normalizeStorage($this->evaluateTokensOnDecodedData($tokens, $data));
+            return $this->evaluateTokensOnDecodedData($tokens, $data);
         } catch (InvalidArgumentException $e) {
             throw $e;
         } catch (InvalidJsonPathException $e) {
@@ -205,32 +198,7 @@ final class JsonCrawler implements JsonCrawlerInterface
             throw $this->absoluteQueries[$expr] = $e;
         }
 
-        $result = [$nodes[0] ?? null, \count($nodes)];
-
-        if (\is_array($result[0])) {
-            $this->absoluteQueriesBudget ??= $this->countNestedValues($this->getDocument());
-
-            // several spellings of a query can select the same large node: past the budget, such a query is evaluated again when read
-            if (0 > $this->absoluteQueriesBudget -= \count($result[0], \COUNT_RECURSIVE)) {
-                return $result;
-            }
-        }
-
-        return $this->absoluteQueries[$expr] = $result;
-    }
-
-    /**
-     * Counts the values in a decoded container and in its descendants, like count() does with COUNT_RECURSIVE.
-     */
-    private function countNestedValues(array|\stdClass $container): int
-    {
-        $count = 0;
-
-        foreach ($container as $value) {
-            $count += $this->isArrayOrObject($value) ? 1 + $this->countNestedValues($value) : 1;
-        }
-
-        return $count;
+        return $this->absoluteQueries[$expr] = [$nodes[0] ?? null, \count($nodes)];
     }
 
     private function isComplexBracketExpression(JsonPath $query): bool
@@ -834,13 +802,15 @@ final class JsonCrawler implements JsonCrawlerInterface
                 throw new JsonCrawlerException($expr, 'non-singular query is not comparable');
             }
 
-            return $this->evaluateAbsoluteQuery($expr)[0];
+            [$node, $nodelistSize] = $this->evaluateAbsoluteQuery($expr);
+
+            return $nodelistSize ? $node : Nothing::Nothing;
         }
 
         // current node references
         if (str_starts_with($expr, '@')) {
             if (!$this->isArrayOrObject($context)) {
-                return null;
+                return Nothing::Nothing;
             }
 
             $path = substr($expr, 1);
@@ -898,7 +868,7 @@ final class JsonCrawler implements JsonCrawlerInterface
             } elseif (str_starts_with($pathPart = substr($arg, 1), '[')) {
                 // handle bracket expressions like @['a','d']
                 $results = $this->evaluateBracket(substr($pathPart, 1, -1), $context);
-                $argList[] = $results;
+                $argList[] = $results[0] ?? null;
                 $nodelistSizes[] = \count($results);
             } else {
                 // handle dot notation like @.a
@@ -939,7 +909,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                 \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch("/{$this->transformJsonPathRegex($argList[1])}/u", $value, $argList[1]),
                 default => false,
             },
-            'value' => 1 < $nodelistSize ? Nothing::Nothing : (1 === $nodelistSize ? (\is_array($value) ? ($value[0] ?? null) : $value) : $value),
+            'value' => 1 === $nodelistSize ? $value : Nothing::Nothing,
             default => null,
         };
     }
@@ -969,7 +939,10 @@ final class JsonCrawler implements JsonCrawlerInterface
         return match ($operator) {
             '==' => $this->compareEquality($left, $right),
             '!=' => !$this->compareEquality($left, $right),
-            '>', '>=', '<', '<=' => $this->compareOrdering($left, $right, $operator),
+            '<' => $this->compareLessThan($left, $right),
+            '>' => $this->compareLessThan($right, $left),
+            '<=' => $this->compareLessThan($left, $right) || $this->compareEquality($left, $right),
+            '>=' => $this->compareLessThan($right, $left) || $this->compareEquality($left, $right),
             default => false,
         };
     }
@@ -979,10 +952,7 @@ final class JsonCrawler implements JsonCrawlerInterface
         $leftIsNothing = Nothing::Nothing === $left;
         $rightIsNothing = Nothing::Nothing === $right;
 
-        if (
-            $leftIsNothing && $rightIsNothing
-            || ($leftIsNothing && 0 === $right || 0 === $left && $rightIsNothing)
-        ) {
+        if ($leftIsNothing && $rightIsNothing) {
             return true;
         }
 
@@ -1010,11 +980,6 @@ final class JsonCrawler implements JsonCrawlerInterface
         // objects must have identical names and equal corresponding values
         if ($left instanceof \stdClass && $right instanceof \stdClass) {
             return $this->compareObjectsDeep($left, $right);
-        }
-
-        // null (missing property) equals 0 when compared to function results
-        if (null === $left && 0 === $right || 0 === $left && null === $right) {
-            return true;
         }
 
         // different types are not equal
@@ -1058,30 +1023,17 @@ final class JsonCrawler implements JsonCrawlerInterface
         return true;
     }
 
-    private function compareOrdering(mixed $left, mixed $right, string $operator): bool
+    private function compareLessThan(mixed $left, mixed $right): bool
     {
-        if (null === $left || null === $right) {
-            return match ($operator) {
-                '>=', '<=' => $left === $right,
-                default => false,
-            };
+        if ((\is_int($left) || \is_float($left)) && (\is_int($right) || \is_float($right))) {
+            return $left < $right;
         }
 
-        if ((\is_int($left) || \is_float($left)) && (\is_int($right) || \is_float($right)) || \is_bool($left) && \is_bool($right)) {
-            $comparison = $left - $right;
-        } elseif (\is_string($left) && \is_string($right)) {
-            $comparison = strcmp($left, $right);
-        } else {
-            return false;
+        if (\is_string($left) && \is_string($right)) {
+            return 0 > strcmp($left, $right);
         }
 
-        return match ($operator) {
-            '>' => $comparison > 0,
-            '>=' => $comparison >= 0,
-            '<' => $comparison < 0,
-            '<=' => $comparison <= 0,
-            default => false,
-        };
+        return false;
     }
 
     private function isNonSingularQuery(string $expr): bool

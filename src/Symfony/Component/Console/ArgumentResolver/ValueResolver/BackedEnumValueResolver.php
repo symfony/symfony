@@ -66,8 +66,13 @@ final class BackedEnumValueResolver implements ValueResolverInterface
             throw InvalidArgumentException::fromEnumValue($argument->name, get_debug_type($value), $argument->suggestedValues);
         }
 
-        return $argument->typeName::tryFrom($value)
-            ?? throw InvalidArgumentException::fromEnumValue($argument->name, $value, $argument->suggestedValues);
+        try {
+            $enum = $argument->typeName::tryFrom($value);
+        } catch (\TypeError) {
+            $enum = null;
+        }
+
+        return $enum ?? throw InvalidArgumentException::fromEnumValue($argument->name, $value, $argument->suggestedValues);
     }
 
     private function resolveOption(Option $option, mixed $value): ?\BackedEnum
@@ -84,7 +89,12 @@ final class BackedEnumValueResolver implements ValueResolverInterface
             throw InvalidOptionException::fromEnumValue($option->name, get_debug_type($value), $option->suggestedValues);
         }
 
-        return $option->typeName::tryFrom($value)
-            ?? throw InvalidOptionException::fromEnumValue($option->name, $value, $option->suggestedValues);
+        try {
+            $enum = $option->typeName::tryFrom($value);
+        } catch (\TypeError) {
+            $enum = null;
+        }
+
+        return $enum ?? throw InvalidOptionException::fromEnumValue($option->name, $value, $option->suggestedValues);
     }
 }

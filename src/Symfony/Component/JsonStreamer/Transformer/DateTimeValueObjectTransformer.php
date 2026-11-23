@@ -64,6 +64,10 @@ final class DateTimeValueObjectTransformer implements ValueObjectTransformerInte
         $timezone = $this->getTimezone($options);
 
         if (null !== $dateTimeFormat) {
+            if (str_contains($scalar, "\0")) {
+                throw new InvalidArgumentException(\sprintf('Parsing datetime string "%s" using format "%s" failed: null bytes are not allowed.', $scalar, $dateTimeFormat));
+            }
+
             if ($dateTime = \DateTimeImmutable::createFromFormat($dateTimeFormat, $scalar, $timezone)) {
                 return $dateTime;
             }

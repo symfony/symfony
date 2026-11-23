@@ -13,7 +13,7 @@ namespace Symfony\Component\AssetMapper\Compiler;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
-use Symfony\Component\AssetMapper\Compiler\Parser\JavascriptSequenceParser;
+use Symfony\Component\AssetMapper\Compiler\Parser\JavaScriptImportScanner;
 use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
@@ -28,32 +28,6 @@ use Symfony\Component\Filesystem\Path;
  */
 final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 {
-    private const IMPORT_PATTERN = '/
-            ^(?:\/\/.*)                     # Lines that start with comments
-        |
-            (?:
-                \'(?:[^\'\\\\\n]|\\\\.)*+\'   # Strings enclosed in single quotes
-            |
-                "(?:[^"\\\\\n]|\\\\.)*+"      # Strings enclosed in double quotes
-            )
-        |
-            (?:                            # Import statements (script captured)
-                import\s*
-                    (?:
-                        (?:\*\s*as\s+\w+|\s+[\w\s{},*]+)
-                        \s*from\s*
-                    )?
-            |
-                export\s*
-                    (?:\*(?:\s*as\s+\w+)?|\{[^}]*+\})
-                    \s*from\s*
-            |
-                \bimport\(
-            )
-            \s*[\'"`](\.\/[^\'"`\n]++|(\.\.\/)*+[^\'"`\n]++)[\'"`]\s*[;\)]
-        ?
-    /mxu';
-
     public function __construct(
         private readonly ImportMapConfigReader $importMapConfigReader,
         private readonly string $missingImportMode = self::MISSING_IMPORT_WARN,
@@ -63,21 +37,12 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 
     public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
     {
-        $jsParser = new JavascriptSequenceParser($content);
+        $shift = 0;
 
-        return preg_replace_callback(self::IMPORT_PATTERN, function ($matches) use ($asset, $assetMapper, $jsParser) {
-            $fullImportString = $matches[0][0];
-
-            $jsParser->parseUntil($matches[0][1]);
-            if (!$jsParser->isExecutable()) {
-                return $fullImportString;
-            }
-
-            $importedModule = $matches[1][0];
-
+        foreach (JavaScriptImportScanner::scan($content) as [$offset, $importedModule, $isLazy]) {
             // we don't support absolute paths, so ignore completely
-            if (str_starts_with($importedModule, '/')) {
-                return $fullImportString;
+            if ('' === $importedModule || str_starts_with($importedModule, '/')) {
+                continue;
             }
 
             $isRelativeImport = str_starts_with($importedModule, '.');
@@ -89,18 +54,17 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             }
 
             if (!$dependentAsset) {
-                return $fullImportString;
+                continue;
             }
 
             // Ignore self-referencing import
             if ($dependentAsset->logicalPath === $asset->logicalPath) {
-                return $fullImportString;
+                continue;
             }
 
             // List as a JavaScript import.
             // This will cause the asset to be included in the importmap (for relative imports)
             // and will be used to generate the preloads in the importmap.
-            $isLazy = str_contains($fullImportString, 'import(');
             $addToImportMap = $isRelativeImport;
             $asset->addJavaScriptImport(new JavaScriptImport(
                 $addToImportMap ? $dependentAsset->publicPathWithoutDigest : $importedModule,
@@ -112,15 +76,20 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 
             if (!$addToImportMap) {
                 // only (potentially) adjust for automatic relative imports
-                return $fullImportString;
+                continue;
             }
 
             // support possibility where the final public files have moved relative to each other
             $relativeImportPath = Path::makeRelative($dependentAsset->publicPathWithoutDigest, \dirname($asset->publicPathWithoutDigest));
             $relativeImportPath = $this->makeRelativeForJavaScript($relativeImportPath);
 
-            return str_replace($importedModule, $relativeImportPath, $fullImportString);
-        }, $content, -1, $count, \PREG_OFFSET_CAPTURE) ?? throw new RuntimeException(\sprintf('Failed to compile JavaScript import paths in "%s". Error: "%s".', $asset->sourcePath, preg_last_error_msg()));
+            if ($relativeImportPath !== $importedModule) {
+                $content = substr_replace($content, $relativeImportPath, $offset + $shift, \strlen($importedModule));
+                $shift += \strlen($relativeImportPath) - \strlen($importedModule);
+            }
+        }
+
+        return $content;
     }
 
     public function supports(MappedAsset $asset): bool

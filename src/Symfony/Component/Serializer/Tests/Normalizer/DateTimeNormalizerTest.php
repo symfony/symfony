@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
@@ -468,6 +469,18 @@ class DateTimeNormalizerTest extends TestCase
     {
         $this->expectException(UnexpectedValueException::class);
         $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTimeInterface::class, null, [DateTimeNormalizer::FORMAT_KEY => 'Y-m-d|']);
+    }
+
+    public function testDenormalizeNullByteThrowsException()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->normalizer->denormalize("2016-01-01T00:00:00+00:00\0", \DateTimeInterface::class);
+    }
+
+    public function testDenormalizeNullByteUsingFormatPassedInContextThrowsException()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->normalizer->denormalize("2016-01-01\0", \DateTimeInterface::class, null, [DateTimeNormalizer::FORMAT_KEY => 'Y-m-d']);
     }
 }
 

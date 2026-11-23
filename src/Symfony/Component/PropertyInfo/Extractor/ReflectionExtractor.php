@@ -413,7 +413,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $nonCamelized = ucfirst($property);
 
         [$adderAccessName, $removerAccessName, $adderAndRemoverErrors] = $this->findAdderAndRemover($reflClass, $camelized);
-        if ($allowAdderRemover && null !== $adderAccessName && null !== $removerAccessName) {
+        if ($allowAdderRemover && null !== $adderAccessName && null !== $removerAccessName && !$this->isSingularWithExactMutator($reflClass, $camelized)) {
             $adderMethod = $reflClass->getMethod($adderAccessName);
             $removerMethod = $reflClass->getMethod($removerAccessName);
 
@@ -497,12 +497,13 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         if ($reflClass->hasProperty($property) && ($reflClass->getProperty($property)->getModifiers() & $this->propertyReflectionFlags)) {
             $reflProperty = $reflClass->getProperty($property);
-            if (!$reflProperty->isReadOnly()) {
+            if ($reflProperty->isReadOnly()) {
+                $errors[] = [\sprintf('The property "%s" in class "%s" is a promoted readonly property.', $property, $reflClass->getName())];
+                $allowMagicSet = $allowMagicCall = false;
+            } elseif ($reflProperty->isPublic() || !$allowMagicSet || !$this->isMethodAccessible($reflClass, '__set', 2)[0]) {
+                // PHP calls __set() for non-public properties, but never for public properties, even with private(set) or protected(set)
                 return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, $this->getWriteVisibilityForProperty($reflProperty), $reflProperty->isStatic());
             }
-
-            $errors[] = [\sprintf('The property "%s" in class "%s" is a promoted readonly property.', $property, $reflClass->getName())];
-            $allowMagicSet = $allowMagicCall = false;
         }
 
         if ($allowMagicSet) {
@@ -923,5 +924,35 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         return PropertyWriteInfo::VISIBILITY_PUBLIC;
+    }
+
+    private function isSingularWithExactMutator(\ReflectionClass $reflClass, string $camelized): bool
+    {
+        foreach ($this->mutatorPrefixes as $mutatorPrefix) {
+            if (\in_array($mutatorPrefix, $this->arrayMutatorPrefixes, true)) {
+                continue;
+            }
+
+            [$accessible] = $this->isMethodAccessible($reflClass, $mutatorPrefix.$camelized, 1);
+            if (!$accessible) {
+                continue;
+            }
+
+            return $this->hasDistinctPluralProperty($reflClass, $camelized);
+        }
+
+        return false;
+    }
+
+    private function hasDistinctPluralProperty(\ReflectionClass $reflClass, string $camelized): bool
+    {
+        foreach ($reflClass->getProperties() as $reflectionProperty) {
+            $name = $this->camelize($reflectionProperty->name);
+            if ($name !== $camelized && \in_array($camelized, $this->inflector->singularize($name), true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

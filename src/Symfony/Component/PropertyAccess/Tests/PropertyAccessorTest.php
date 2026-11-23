@@ -1029,6 +1029,14 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'bar', [1, 2]);
     }
 
+    public function testErrorsAreJoinedWithSinglePeriods()
+    {
+        $this->expectException(NoSuchPropertyException::class);
+        $this->expectExceptionMessage('The method "addFoo" in class "Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidArgumentLength" requires 0 arguments, but should accept only 1. The method "removeFoo" in class "Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidArgumentLength" requires 2 arguments, but should accept only 1.');
+        $object = new TestAdderRemoverInvalidArgumentLength();
+        $this->propertyAccessor->setValue($object, 'foo', [1, 2]);
+    }
+
     public function testSetterNeedsPublicAccess()
     {
         $object = new TestClassSetValue(0);
@@ -1412,10 +1420,20 @@ class PropertyAccessorTest extends TestCase
     public static function setValueWithAsymmetricVisibilityDataProvider(): iterable
     {
         yield ['publicPublic', null];
-        yield ['publicProtected', \Error::class];
-        yield ['publicPrivate', \Error::class];
+        yield ['publicProtected', NoSuchPropertyException::class];
+        yield ['publicPrivate', NoSuchPropertyException::class];
         yield ['privatePrivate', NoSuchPropertyException::class];
-        yield ['virtualNoSetHook', \Error::class];
+        yield ['virtualNoSetHook', NoSuchPropertyException::class];
+    }
+
+    public function testSetValueWithAsymmetricVisibilityIgnoresInvalidProperty()
+    {
+        $object = new AsymmetricVisibility();
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::DO_NOT_THROW);
+
+        $propertyAccessor->setValue($object, 'publicPrivate', true);
+
+        $this->assertNull($object->publicPrivate);
     }
 
     public function testCustomPropertyPathImplementation()

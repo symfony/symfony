@@ -134,8 +134,6 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         $reflectionParameters = $reflectionFunction->getParameters();
         $checksCount = min($reflectionFunction->getNumberOfParameters(), \count($values));
 
-        $envPlaceholderUniquePrefix = $this->container->getParameterBag() instanceof EnvPlaceholderParameterBag ? $this->container->getParameterBag()->getEnvPlaceholderUniquePrefix() : null;
-
         for ($i = 0; $i < $checksCount; ++$i) {
             $p = $reflectionParameters[$i];
             if (!$p->hasType() || $p->isVariadic()) {
@@ -148,14 +146,14 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
                 continue;
             }
 
-            $this->checkType($checkedDefinition, $values[$key], $p, $envPlaceholderUniquePrefix);
+            $this->checkType($checkedDefinition, $values[$key], $p);
         }
 
         if ($reflectionFunction->isVariadic() && ($lastParameter = end($reflectionParameters))->hasType()) {
             $variadicParameters = \array_slice($values, $lastParameter->getPosition());
 
             foreach ($variadicParameters as $variadicParameter) {
-                $this->checkType($checkedDefinition, $variadicParameter, $lastParameter, $envPlaceholderUniquePrefix);
+                $this->checkType($checkedDefinition, $variadicParameter, $lastParameter);
             }
         }
     }
@@ -163,14 +161,14 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
     /**
      * @throws InvalidParameterTypeException When a parameter is not compatible with the declared type
      */
-    private function checkType(Definition $checkedDefinition, mixed $value, \ReflectionParameter $parameter, ?string $envPlaceholderUniquePrefix, ?\ReflectionType $reflectionType = null): void
+    private function checkType(Definition $checkedDefinition, mixed $value, \ReflectionParameter $parameter, ?\ReflectionType $reflectionType = null): void
     {
         $reflectionType ??= $parameter->getType();
 
         if ($reflectionType instanceof \ReflectionUnionType) {
             foreach ($reflectionType->getTypes() as $t) {
                 try {
-                    $this->checkType($checkedDefinition, $value, $parameter, $envPlaceholderUniquePrefix, $t);
+                    $this->checkType($checkedDefinition, $value, $parameter, $t);
 
                     return;
                 } catch (InvalidParameterTypeException $e) {
@@ -181,7 +179,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         }
         if ($reflectionType instanceof \ReflectionIntersectionType) {
             foreach ($reflectionType->getTypes() as $t) {
-                $this->checkType($checkedDefinition, $value, $parameter, $envPlaceholderUniquePrefix, $t);
+                $this->checkType($checkedDefinition, $value, $parameter, $t);
             }
 
             return;
@@ -240,16 +238,14 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
                 $value = $this->container->getParameter(substr($value, 1, -1));
             }
 
-            if ($envPlaceholderUniquePrefix && \is_string($value) && str_contains($value, 'env_')) {
-                // If the value is an env placeholder that is either mixed with a string or with another env placeholder, then its resolved value will always be a string, so we don't need to resolve it.
-                // We don't need to change the value because it is already a string.
-                if ('' === preg_replace('/'.$envPlaceholderUniquePrefix.'_\w+_[a-f0-9]{32}/U', '', $value, -1, $c) && 1 === $c) {
-                    try {
-                        $value = $this->container->resolveEnvPlaceholders($value, true);
-                    } catch (\Exception) {
-                        // If an env placeholder cannot be resolved, we skip the validation.
-                        return;
-                    }
+            // If the value is an env placeholder that is either mixed with a string or with another env placeholder, then its resolved value will always be a string, so we don't need to resolve it.
+            // We don't need to change the value because it is already a string.
+            if (\is_string($value) && str_contains($value, 'env_') && $this->isEnvPlaceholder($value)) {
+                try {
+                    $value = $this->container->resolveEnvPlaceholders($value, true);
+                } catch (\Exception) {
+                    // If an env placeholder cannot be resolved, we skip the validation.
+                    return;
                 }
             }
         }
@@ -327,6 +323,26 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         }
 
         throw new InvalidParameterTypeException($this->currentId, \is_object($value) ? $class : get_debug_type($value), $parameter);
+    }
+
+    /**
+     * Placeholders don't share a common prefix, as the configuration of extensions is resolved with dedicated parameter bags.
+     */
+    private function isEnvPlaceholder(string $value): bool
+    {
+        $parameterBag = $this->container->getParameterBag();
+
+        if (!$parameterBag instanceof EnvPlaceholderParameterBag) {
+            return false;
+        }
+
+        foreach ($parameterBag->getEnvPlaceholders() as $placeholders) {
+            if (isset($placeholders[$value])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function getExpressionLanguage(): ExpressionLanguage

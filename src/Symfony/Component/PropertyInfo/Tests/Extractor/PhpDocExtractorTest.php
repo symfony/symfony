@@ -527,6 +527,19 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals(Type::object('scalar'), $this->extractor->getType(PseudoTypeDummy::class, 'scalarPseudoType'));
     }
 
+    public function testDocBlocksCacheSizeLimit()
+    {
+        for ($i = 0; $i < 2000; ++$i) {
+            $this->assertNull($this->extractor->getType(Dummy::class, 'unknown'.$i));
+        }
+
+        $this->assertEquals(Type::string(), $this->extractor->getType(Dummy::class, 'bar'));
+
+        foreach (['docBlocks', 'promotedPropertyDocBlocks'] as $cache) {
+            $this->assertLessThanOrEqual(1001, \count((new \ReflectionProperty(PhpDocExtractor::class, $cache))->getValue($this->extractor)));
+        }
+    }
+
     public function testIntersectionTypesAreIgnored()
     {
         $this->assertNull($this->extractor->getType(DummyIntersectionType::class, 'objects'));

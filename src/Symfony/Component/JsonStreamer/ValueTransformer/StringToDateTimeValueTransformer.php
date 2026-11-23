@@ -39,6 +39,10 @@ final class StringToDateTimeValueTransformer implements ValueTransformerInterfac
         $dateTimeFormat = $options[self::FORMAT_KEY] ?? null;
 
         if (null !== $dateTimeFormat) {
+            if (str_contains($value, "\0")) {
+                throw new InvalidArgumentException(\sprintf('Parsing datetime string "%s" using format "%s" failed: null bytes are not allowed.', $value, $dateTimeFormat));
+            }
+
             if (false !== $dateTime = \DateTimeImmutable::createFromFormat($dateTimeFormat, $value)) {
                 return $dateTime;
             }

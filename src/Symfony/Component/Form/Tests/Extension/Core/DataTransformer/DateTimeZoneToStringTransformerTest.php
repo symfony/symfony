@@ -50,4 +50,10 @@ class DateTimeZoneToStringTransformerTest extends TestCase
         $this->expectException(TransformationFailedException::class);
         (new DateTimeZoneToStringTransformer(true))->reverseTransform(['Foo/Bar']);
     }
+
+    public function testTimezoneWithNullByte()
+    {
+        $this->expectException(TransformationFailedException::class);
+        (new DateTimeZoneToStringTransformer())->reverseTransform("Europe/Amsterdam\0");
+    }
 }

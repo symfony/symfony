@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\IntegerToLocalizedStringTransformer;
@@ -109,6 +110,16 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
         $transformer = new IntegerToLocalizedStringTransformer();
 
         $this->assertNull($transformer->reverseTransform(''));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testReverseTransformIntegerLimits()
+    {
+        $transformer = new IntegerToLocalizedStringTransformer();
+
+        foreach ([\PHP_INT_MAX, -\PHP_INT_MAX, \PHP_INT_MIN] as $number) {
+            $this->assertSame($number, $transformer->reverseTransform($transformer->transform($number)));
+        }
     }
 
     public function testReverseTransformWithGrouping()

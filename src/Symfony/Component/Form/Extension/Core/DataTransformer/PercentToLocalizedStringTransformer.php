@@ -191,8 +191,17 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
             $roundingCoef *= 100;
         }
 
-        // string representation to avoid rounding errors, similar to bcmul()
-        $number = (string) ($number * $roundingCoef);
+        if (1 === $roundingCoef && \is_float($number) && ($number >= \PHP_INT_MAX || $number <= -\PHP_INT_MAX)) {
+            throw new TransformationFailedException('I don\'t have a clear idea what infinity looks like.');
+        }
+
+        // a float has 15 significant digits, so a shifted number of 1e15 or more has no decimals left to round
+        if (abs($number * $roundingCoef) >= 1e15) {
+            return 1 === $roundingCoef ? (int) $number : (float) $number;
+        }
+
+        // keep 15 significant digits to avoid rounding errors, similar to bcmul()
+        $number = (float) \sprintf('%.15H', $number * $roundingCoef);
 
         $number = match ($this->roundingMode) {
             \NumberFormatter::ROUND_CEILING => ceil($number),

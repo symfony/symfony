@@ -134,4 +134,27 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
 
         $transformer->reverseTransform(111111111111111110.00);
     }
+
+    public function testReverseTransformBigNumbers()
+    {
+        if (4 === \PHP_INT_SIZE) {
+            $this->markTestSkipped('This test requires a 64bit PHP.');
+        }
+
+        \Locale::setDefault('en');
+
+        $this->assertSame(1234567890123.45, (new MoneyToLocalizedStringTransformer())->reverseTransform('1234567890123.45'));
+        $this->assertSame(12345678901234.56, (new MoneyToLocalizedStringTransformer())->reverseTransform('12345678901234.56'));
+        $this->assertSame(123456789012345.0, (new MoneyToLocalizedStringTransformer(null, null, null, 100))->reverseTransform('1234567890123.45'));
+        $this->assertSame(123456789012345, (new MoneyToLocalizedStringTransformer(null, null, null, 100, null, 'integer'))->reverseTransform('1234567890123.45'));
+    }
+
+    public function testReverseTransformDisallowsIntegerOverflow()
+    {
+        $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100, null, 'integer');
+
+        $this->expectException(TransformationFailedException::class);
+
+        $transformer->reverseTransform('92233720368547758.08');
+    }
 }

@@ -538,7 +538,11 @@ class PropertyAccessor implements PropertyAccessorInterface
                 if (PropertyWriteInfo::TYPE_METHOD === $type) {
                     $object->{$mutator->getName()}($value);
                 } elseif (PropertyWriteInfo::TYPE_PROPERTY === $type) {
-                    $object->{$mutator->getName()} = $value;
+                    if (PropertyWriteInfo::VISIBILITY_PUBLIC === $mutator->getVisibility()) {
+                        $object->{$mutator->getName()} = $value;
+                    } elseif (!$this->ignoreInvalidProperty) {
+                        throw new NoSuchPropertyException(\sprintf('The property "%s" in class "%s" is not publicly writable.', $mutator->getName(), get_debug_type($object)));
+                    }
                 } elseif (PropertyWriteInfo::TYPE_ADDER_AND_REMOVER === $type) {
                     $this->writeCollection($zval, $property, $value, $mutator->getAdderInfo(), $mutator->getRemoverInfo());
                 }
@@ -546,7 +550,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 $object->$property = $value;
             } elseif (!$this->ignoreInvalidProperty) {
                 if ($mutator->hasErrors()) {
-                    throw new NoSuchPropertyException(implode('. ', $mutator->getErrors()).'.');
+                    throw new NoSuchPropertyException(implode('. ', array_map(static fn (string $error): string => rtrim($error, '.'), $mutator->getErrors())).'.');
                 }
 
                 throw new NoSuchPropertyException(\sprintf('Could not determine access type for property "%s" in class "%s".', $property, get_debug_type($object)));

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
@@ -46,6 +47,15 @@ class UriSignerTest extends TestCase
         // "0" is a real expiration date, not the absence of one
         $this->assertFalse($signer->check($signer->sign('http://example.com/foo', 0)));
         $this->assertFalse($signer->check($signer->sign('http://example.com/foo', new \DateTimeImmutable('@0'))));
+    }
+
+    public function testSignPreservesNetworkPath()
+    {
+        $signer = new UriSigner('foobar');
+        $signed = $signer->sign('//example.com/foo?foo=bar', new \DateTimeImmutable('2099-01-01 00:00:00'));
+
+        $this->assertStringStartsWith('//example.com/foo?', $signed);
+        $this->assertTrue($signer->check($signed));
     }
 
     public function testCheck()
@@ -104,6 +114,28 @@ class UriSignerTest extends TestCase
 
         $this->assertSame([], $warnings);
         $this->assertFalse($result);
+    }
+
+    #[DataProvider('provideUrisWithZeroComponents')]
+    public function testSignKeepsZeroComponents(string $uri, string $expectedFormat)
+    {
+        $signer = new UriSigner('foobar');
+        $signed = $signer->sign($uri, new \DateTimeImmutable('2099-01-01 00:00:00'));
+
+        $this->assertStringMatchesFormat($expectedFormat, $signed);
+        $this->assertTrue($signer->check($signed));
+    }
+
+    public static function provideUrisWithZeroComponents(): iterable
+    {
+        yield 'user' => ['http://0@example.com/', 'http://0@example.com/?_expiration=%d&_hash=%s'];
+        yield 'user and pass' => ['http://0:0@example.com/', 'http://0:0@example.com/?_expiration=%d&_hash=%s'];
+        yield 'pass' => ['http://:0@example.com/', 'http://:0@example.com/?_expiration=%d&_hash=%s'];
+        yield 'host' => ['http://0/', 'http://0/?_expiration=%d&_hash=%s'];
+        yield 'port' => ['http://example.com:0/', 'http://example.com:0/?_expiration=%d&_hash=%s'];
+        yield 'path' => ['http://example.com/0', 'http://example.com/0?_expiration=%d&_hash=%s'];
+        yield 'query' => ['http://example.com/?0', 'http://example.com/?0=&_expiration=%d&_hash=%s'];
+        yield 'fragment' => ['http://example.com/#0', 'http://example.com/?_expiration=%d&_hash=%s#0'];
     }
 
     public function testCheckWithNonStringHash()

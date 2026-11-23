@@ -152,10 +152,12 @@ class ConfigDebugCommand extends AbstractConfigCommand
     private function compileContainer(): ContainerBuilder
     {
         $kernel = clone $this->getApplication()->getKernel();
-        $kernel->boot();
+        $buildContainer = \Closure::bind(function (): ContainerBuilder {
+            $this->initializeBundles();
 
-        $method = new \ReflectionMethod($kernel, 'buildContainer');
-        $container = $method->invoke($kernel);
+            return $this->buildContainer();
+        }, $kernel, $kernel::class);
+        $container = $buildContainer();
         if ($this->envVarProcessors) {
             $container->set('container.env_var_processors_locator', $this->envVarProcessors);
         }

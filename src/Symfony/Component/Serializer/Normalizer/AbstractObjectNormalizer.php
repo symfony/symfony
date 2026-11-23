@@ -311,6 +311,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return $this->attributesCache[$key];
         }
 
+        if (1000 < \count($this->attributesCache)) {
+            // stop memory leak if there are many keys
+            $this->attributesCache = \array_slice($this->attributesCache, 500, null, true);
+        }
+
         $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
 
         if (false !== $allowedAttributes) {

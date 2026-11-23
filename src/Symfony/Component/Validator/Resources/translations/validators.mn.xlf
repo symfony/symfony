@@ -248,7 +248,7 @@
             </trans-unit>
             <trans-unit id="65">
                 <source>This value should be equal to {{ compared_value }}.</source>
-                <target>Энэ утга {{ compared_value }} -тaй тэнцүү байх ёстой.</target>
+                <target>Энэ утга {{ compared_value }} -тай тэнцүү байх ёстой.</target>
             </trans-unit>
             <trans-unit id="66">
                 <source>This value should be greater than {{ compared_value }}.</source>

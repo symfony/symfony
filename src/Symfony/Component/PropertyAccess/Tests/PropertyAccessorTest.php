@@ -47,6 +47,7 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedObjectProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\UntypedVirtualProperty;
 use Symfony\Component\PropertyInfo\PropertyReadInfo;
 use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
 
@@ -443,6 +444,16 @@ class PropertyAccessorTest extends TestCase
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
         $this->assertNull($this->propertyAccessor->getValue(['index' => ['nullable' => null]], '[index][nullable]'));
+    }
+
+    public function testGetValueReadsUntypedNullPropertyOfArrayObjectSubclass()
+    {
+        $object = new class(['storage' => 'value']) extends \ArrayObject {
+            public $untypedNull;
+        };
+
+        $this->assertTrue($this->propertyAccessor->isReadable($object, 'untypedNull'));
+        $this->assertNull($this->propertyAccessor->getValue($object, 'untypedNull'));
     }
 
     #[DataProvider('getValidReadPropertyPaths')]
@@ -1435,6 +1446,14 @@ class PropertyAccessorTest extends TestCase
         $this->expectException(NoSuchPropertyException::class);
 
         $propertyAccessor->getValue($object, 'virtualNoGetHook');
+    }
+
+    public function testGetValueReadsUntypedVirtualPropertyThatReturnsNull()
+    {
+        $object = new UntypedVirtualProperty();
+
+        $this->assertTrue($this->propertyAccessor->isReadable($object, 'virtualNull'));
+        $this->assertNull($this->propertyAccessor->getValue($object, 'virtualNull'));
     }
 
     public function testGetValueOnPropertyThatIsNotPubliclyReadableThrows()

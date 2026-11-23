@@ -12,8 +12,10 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\TypeInfo\Type;
 
 class ArrayDenormalizerTest extends TestCase
 {
@@ -195,6 +197,27 @@ class ArrayDenormalizerTest extends TestCase
         $this->assertTrue(
             $denormalizer->supportsDenormalization([], __NAMESPACE__.'\ArrayDummy[]')
         );
+    }
+
+    public function testDenormalizeWithMixedAndTemplateKeyTypes()
+    {
+        $nestedDenormalizer = $this->createStub(DenormalizerInterface::class);
+        $nestedDenormalizer->method('denormalize')->willReturnCallback(static fn ($data) => new ArrayDummy($data['foo'], $data['bar']));
+
+        $denormalizer = new ArrayDenormalizer();
+        $denormalizer->setDenormalizer($nestedDenormalizer);
+
+        $input = ['a' => ['foo' => 'one', 'bar' => 'two'], 0 => ['foo' => 'three', 'bar' => 'four']];
+        $expected = ['a' => new ArrayDummy('one', 'two'), 0 => new ArrayDummy('three', 'four')];
+
+        $this->assertEquals($expected, $denormalizer->denormalize($input, ArrayDummy::class.'[]', null, ['key_type' => Type::mixed()]));
+        $this->assertEquals($expected, $denormalizer->denormalize($input, ArrayDummy::class.'[]', null, ['key_type' => Type::template('TKey')]));
+        $this->assertEquals($expected, $denormalizer->denormalize($input, ArrayDummy::class.'[]', null, ['key_type' => Type::template('TKey', Type::union(Type::int(), Type::string()))]));
+        $this->assertEquals(['a' => new ArrayDummy('one', 'two')], $denormalizer->denormalize(['a' => ['foo' => 'one', 'bar' => 'two']], ArrayDummy::class.'[]', null, ['key_type' => Type::template('TKey', Type::string())]));
+
+        $this->expectException(NotNormalizableValueException::class);
+
+        $denormalizer->denormalize([0 => ['foo' => 'one', 'bar' => 'two']], ArrayDummy::class.'[]', null, ['key_type' => Type::template('TKey', Type::string())]);
     }
 }
 

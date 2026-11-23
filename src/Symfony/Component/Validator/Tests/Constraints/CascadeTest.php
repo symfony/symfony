@@ -16,6 +16,8 @@ use Symfony\Component\Validator\Constraints\Cascade;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Validator\Tests\Fixtures\WriteOnlyVirtualPropertyEntity;
+use Symfony\Component\Validator\Validation;
 
 class CascadeTest extends TestCase
 {
@@ -33,6 +35,22 @@ class CascadeTest extends TestCase
         $constraint = new Cascade(['foo', 'bar']);
 
         self::assertSame(['foo' => 0, 'bar' => 1], $constraint->exclude);
+    }
+
+    public function testCascadeSkipsWriteOnlyVirtualProperties()
+    {
+        $validator = Validation::createValidatorBuilder()
+            ->enableAttributeMapping()
+            ->getValidator();
+
+        $entity = new WriteOnlyVirtualPropertyEntity();
+
+        self::assertCount(0, $validator->validate($entity));
+
+        /** @var ClassMetadata $metadata */
+        $metadata = $validator->getMetadataFor($entity);
+        self::assertTrue($metadata->hasPropertyMetadata('child'));
+        self::assertFalse($metadata->hasPropertyMetadata('writeOnlyChild'));
     }
 }
 

@@ -40,6 +40,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithScalarPropertie
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueObjects;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithVirtualProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\DivideStringAndCastToIntValueTransformer;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\HeightValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\StringToBooleanValueTransformer;
@@ -617,6 +618,16 @@ class JsonStreamReaderTest extends TestCase
             $this->assertInstanceOf(DummyWithSyntheticProperties::class, $read);
             $this->assertSame([], get_object_vars($read));
         }, '{"synthetic":true}', Type::object(DummyWithSyntheticProperties::class));
+    }
+
+    public function testReadObjectWithVirtualProperties()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertInstanceOf(DummyWithVirtualProperties::class, $read);
+            $this->assertSame('Bob', $read->name);
+        }, '{"upperName":"ALICE","writeOnlyName":"Bob"}', Type::object(DummyWithVirtualProperties::class));
     }
 
     public function testCreateStreamReaderFile()

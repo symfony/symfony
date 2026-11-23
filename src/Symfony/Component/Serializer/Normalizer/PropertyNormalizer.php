@@ -114,6 +114,12 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
             return false;
         }
 
+        if ($reflectionProperty->isVirtual()) {
+            if (($context['_read_attributes'] ?? true) ? !$reflectionProperty->hasHook(\PropertyHookType::Get) : !$reflectionProperty->hasHook(\PropertyHookType::Set)) {
+                return false;
+            }
+        }
+
         $normalizeVisibility = $context[self::NORMALIZE_VISIBILITY] ?? $this->defaultContext[self::NORMALIZE_VISIBILITY];
 
         if ((self::NORMALIZE_PUBLIC & $normalizeVisibility) && $reflectionProperty->isPublic()) {
@@ -157,6 +163,10 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
             return null;
         }
 
+        if ($reflectionProperty->isVirtual()) {
+            return $reflectionProperty->hasHook(\PropertyHookType::Get) ? $reflectionProperty->getValue($object) : null;
+        }
+
         if ($reflectionProperty->hasType()) {
             if (!$reflectionProperty->isInitialized($object)) {
                 throw new UninitializedPropertyException(\sprintf('The property "%s::$%s" is not initialized.', $object::class, $reflectionProperty->name));
@@ -166,7 +176,7 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
         }
 
         if (!method_exists($object, '__get') && !isset($object->$attribute)) {
-            $propertyValues = (array) $object;
+            $propertyValues = get_mangled_object_vars($object);
 
             if (($reflectionProperty->isPublic() && !\array_key_exists($reflectionProperty->name, $propertyValues))
                 || ($reflectionProperty->isProtected() && !\array_key_exists("\0*\0{$reflectionProperty->name}", $propertyValues))
@@ -191,8 +201,16 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
             return;
         }
 
+        if ($reflectionProperty->isVirtual() && !$reflectionProperty->hasHook(\PropertyHookType::Set)) {
+            return;
+        }
+
         try {
             if (!$reflectionProperty->isReadOnly()) {
+                if ($reflectionProperty->isPrivateSet()) {
+                    $reflectionProperty = $reflectionProperty->getDeclaringClass()->getProperty($reflectionProperty->name);
+                }
+
                 $reflectionProperty->setValue($object, $value);
 
                 return;

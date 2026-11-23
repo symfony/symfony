@@ -155,6 +155,10 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
                     continue;
                 }
 
+                if ($property->isVirtual() && !$property->hasHook(\PropertyHookType::Get)) {
+                    continue;
+                }
+
                 if ($this->canCascade($property->getType())) {
                     $this->addPropertyConstraint($property->getName(), new Valid());
                 }

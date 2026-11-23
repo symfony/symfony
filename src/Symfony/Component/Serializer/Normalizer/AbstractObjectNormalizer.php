@@ -40,6 +40,7 @@ use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
@@ -478,17 +479,31 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     {
         $expectedTypes = [];
 
+        while ($type instanceof TemplateType) {
+            $type = $type->getWrappedType();
+        }
+
+        $types = [];
+        $queue = [$type];
+        while ($candidate = array_shift($queue)) {
+            if ($candidate instanceof TemplateType) {
+                array_unshift($queue, $candidate->getWrappedType());
+                continue;
+            }
+
+            if ($candidate instanceof UnionType) {
+                array_unshift($queue, ...$candidate->getTypes());
+                continue;
+            }
+
+            $types[] = $candidate;
+        }
+
         $e = null;
         $extraAttributesException = null;
         $missingConstructorArgumentsException = null;
         $filterBoolFailed = false;
         $enforceTypes = !($context[self::DISABLE_TYPE_ENFORCEMENT] ?? $this->defaultContext[self::DISABLE_TYPE_ENFORCEMENT] ?? false);
-
-        $types = match (true) {
-            $type instanceof IntersectionType => throw new LogicException('Unable to handle intersection type.'),
-            $type instanceof UnionType => $type->getTypes(),
-            default => [$type],
-        };
 
         $originalData = $data;
         foreach ($types as $t) {
@@ -507,6 +522,25 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             while ($t instanceof WrappingTypeInterface) {
                 $t = $t->getWrappedType();
+            }
+
+            if ($t instanceof IntersectionType) {
+                if (\is_object($data)) {
+                    $matchesIntersection = true;
+                    foreach ($t->getTypes() as $intersectedType) {
+                        if (!$intersectedType instanceof ObjectType || !is_a($data, $intersectedType->getClassName())) {
+                            $matchesIntersection = false;
+                            break;
+                        }
+                    }
+
+                    if ($matchesIntersection) {
+                        return $data;
+                    }
+                }
+
+                $expectedTypes[(string) $t] = true;
+                continue;
             }
 
             // Fix a collection that contains the only one element

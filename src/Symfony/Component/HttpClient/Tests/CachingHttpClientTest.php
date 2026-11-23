@@ -21,6 +21,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\HttpClient\CachingHttpClient;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
@@ -113,6 +114,120 @@ class CachingHttpClientTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('foo', $response->getContent());
         $this->assertSame('2', $response->getHeaders()['age'][0]);
+    }
+
+    #[DataProvider('provideMissingCachedChunk')]
+    public function testItTreatsMissingCachedChunkAsCacheMiss(array $options, int $status)
+    {
+        $items = new ArrayAdapter(0, false);
+        $mockClient = new MockHttpClient([
+            new MockResponse(['first ', 'second'], ['response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('replacement', ['response_headers' => ['Cache-Control' => 'max-age=300']]),
+        ]);
+        $client = new CachingHttpClient($mockClient, new TagAwareAdapter($items));
+        $url = 'https://example.com/resource';
+
+        $this->assertSame('first second', $client->request('GET', $url)->getContent());
+
+        self::deleteCachedChunk($items, 'second');
+
+        $response = $client->request('GET', $url, $options);
+        $this->assertSame($status, $response->getStatusCode());
+
+        if (200 === $status) {
+            $this->assertSame('replacement', $response->getContent());
+            $this->assertSame('replacement', $client->request('GET', $url)->getContent());
+            $this->assertSame(2, $mockClient->getRequestsCount());
+        } else {
+            $this->assertSame('', $response->getContent(false));
+            $this->assertSame(1, $mockClient->getRequestsCount());
+        }
+    }
+
+    public static function provideMissingCachedChunk(): iterable
+    {
+        yield 'origin fallback' => [[], 200];
+        yield 'cache only' => [['headers' => ['Cache-Control' => 'only-if-cached']], 504];
+    }
+
+    public function testItRefetchesWithoutValidatorsWhenRevalidatedCachedChunkIsMissing()
+    {
+        $items = new ArrayAdapter(0, false);
+        $replacement = new MockResponse('replacement', ['response_headers' => ['Cache-Control' => 'max-age=300']]);
+        $mockClient = new MockHttpClient([
+            new MockResponse(['first ', 'second'], ['response_headers' => ['Cache-Control' => 'max-age=0', 'ETag' => '"abc"']]),
+            new MockResponse('', ['http_code' => 304, 'response_headers' => ['ETag' => '"abc"']]),
+            $replacement,
+        ]);
+        $client = new CachingHttpClient($mockClient, new TagAwareAdapter($items));
+        $url = 'https://example.com/resource';
+
+        $this->assertSame('first second', $client->request('GET', $url)->getContent());
+        self::deleteCachedChunk($items, 'second');
+
+        $response = $client->request('GET', $url);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('replacement', $response->getContent());
+        $this->assertArrayNotHasKey('if-none-match', $replacement->getRequestOptions()['normalized_headers']);
+        $this->assertCount(1, self::getCachedChunkKeys($items, 'replacement'));
+
+        $this->assertSame('replacement', $client->request('GET', $url)->getContent());
+        $this->assertSame(3, $mockClient->getRequestsCount());
+    }
+
+    public function testItDoesNotRevalidateTheRefetchOfAMissingCachedChunk()
+    {
+        $items = new ArrayAdapter(0, false);
+        $mockClient = new MockHttpClient([
+            new MockResponse(['first ', 'second'], ['response_headers' => ['Cache-Control' => 'max-age=0', 'ETag' => '"abc"']]),
+            new MockResponse('', ['http_code' => 304, 'response_headers' => ['ETag' => '"abc"']]),
+            new MockResponse('', ['http_code' => 304, 'response_headers' => ['ETag' => '"abc"']]),
+        ]);
+        $client = new CachingHttpClient($mockClient, new TagAwareAdapter($items));
+        $url = 'https://example.com/resource';
+
+        $this->assertSame('first second', $client->request('GET', $url)->getContent());
+        self::deleteCachedChunk($items, 'second');
+
+        $this->assertSame(304, $client->request('GET', $url)->getStatusCode());
+        $this->assertSame(3, $mockClient->getRequestsCount());
+    }
+
+    public function testItForwardsServerErrorWhenStaleCachedChunkIsMissing()
+    {
+        $items = new ArrayAdapter(0, false);
+        $mockClient = new MockHttpClient([
+            new MockResponse(['first ', 'second'], ['response_headers' => ['Cache-Control' => 'max-age=0, stale-if-error=60']]),
+            new MockResponse('error', ['http_code' => 500]),
+        ]);
+        $client = new CachingHttpClient($mockClient, new TagAwareAdapter($items));
+        $url = 'https://example.com/resource';
+
+        $this->assertSame('first second', $client->request('GET', $url)->getContent());
+        self::deleteCachedChunk($items, 'second');
+
+        $response = $client->request('GET', $url);
+        $this->assertSame(500, $response->getStatusCode());
+        $this->assertSame('error', $response->getContent(false));
+    }
+
+    public function testItForwardsTransportErrorWhenStaleCachedChunkIsMissing()
+    {
+        $items = new ArrayAdapter(0, false);
+        $mockClient = new MockHttpClient([
+            new MockResponse(['first ', 'second'], ['response_headers' => ['Cache-Control' => 'max-age=0, stale-if-error=60']]),
+            new MockResponse('', ['error' => 'Connection refused']),
+        ]);
+        $client = new CachingHttpClient($mockClient, new TagAwareAdapter($items));
+        $url = 'https://example.com/resource';
+
+        $this->assertSame('first second', $client->request('GET', $url)->getContent());
+        self::deleteCachedChunk($items, 'second');
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Connection refused');
+
+        $client->request('GET', $url)->getStatusCode();
     }
 
     public function testItComputesAgeFromOldDateHeaderWhenNoAgeHeader()
@@ -2568,6 +2683,71 @@ class CachingHttpClientTest extends TestCase
         $this->assertSame(2, $requestCount);
     }
 
+    #[DataProvider('provideRevalidationValidators')]
+    public function testConditional304ExtendsTheLifetimeOfCachedChunks(array $options, int $status)
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse(['first ', 'second'], ['response_headers' => ['ETag' => '"abc"', 'Cache-Control' => 'max-age=1']]),
+            new MockResponse('', ['http_code' => 304, 'response_headers' => ['ETag' => '"abc"', 'Cache-Control' => 'max-age=60']]),
+        ]);
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter, [], true, 3);
+        $url = 'https://example.com/resource';
+
+        $this->assertSame('first second', $client->request('GET', $url)->getContent());
+
+        sleep(2);
+        $this->assertSame($status, $client->request('GET', $url, $options)->getStatusCode());
+
+        sleep(2);
+        $this->assertSame('first second', $client->request('GET', $url)->getContent());
+    }
+
+    public static function provideRevalidationValidators(): iterable
+    {
+        yield 'cache validators' => [[], 200];
+        yield 'request validators' => [['headers' => ['If-None-Match' => '"abc"']], 304];
+    }
+
+    public function testConditional304DoesNotExtendTheLifetimeOfCachedChunksOfAnUncacheableResponse()
+    {
+        $items = new ArrayAdapter(0, false);
+        $mockClient = new MockHttpClient([
+            new MockResponse('body', ['response_headers' => ['ETag' => '"abc"', 'Cache-Control' => 'max-age=1']]),
+            new MockResponse('', ['http_code' => 304, 'response_headers' => ['ETag' => '"abc"', 'Cache-Control' => 'no-store']]),
+        ]);
+        $client = new CachingHttpClient($mockClient, new TagAwareAdapter($items), [], true, 3);
+        $url = 'https://example.com/resource';
+
+        $this->assertSame('body', $client->request('GET', $url)->getContent());
+        [$chunkKey] = self::getCachedChunkKeys($items, 'body');
+
+        sleep(2);
+        $this->assertSame(304, $client->request('GET', $url, ['headers' => ['If-None-Match' => '"abc"']])->getStatusCode());
+
+        sleep(2);
+        $this->assertFalse($items->hasItem($chunkKey));
+    }
+
+    #[DataProvider('provideRevalidationValidators')]
+    public function testConditional304KeepsTheTagsOfCachedChunks(array $options, int $status)
+    {
+        $items = new ArrayAdapter(0, false);
+        $mockClient = new MockHttpClient([
+            new MockResponse('body', ['response_headers' => ['ETag' => '"abc"', 'Cache-Control' => 'max-age=0']]),
+            new MockResponse('', ['http_code' => 304, 'response_headers' => ['ETag' => '"abc"', 'Cache-Control' => 'max-age=60']]),
+            new MockResponse('created', ['http_code' => 201]),
+        ]);
+        $client = new CachingHttpClient($mockClient, $cache = new TagAwareAdapter($items));
+        $url = 'https://example.com/resource';
+
+        $this->assertSame('body', $client->request('GET', $url)->getContent());
+        [$chunkKey] = self::getCachedChunkKeys($items, 'body');
+        $this->assertSame($status, $client->request('GET', $url, $options)->getStatusCode());
+        $this->assertSame(201, $client->request('POST', $url, ['body' => 'data'])->getStatusCode());
+
+        $this->assertFalse($cache->hasItem($chunkKey));
+    }
+
     public function testConditional304FromCacheRevalidationIsPassedThroughWhenResponseValidatorsDoNotMatch()
     {
         $mockClient = new MockHttpClient([
@@ -2758,5 +2938,17 @@ class CachingHttpClientTest extends TestCase
             $sharedCache,
             $maxTtl,
         );
+    }
+
+    private static function deleteCachedChunk(ArrayAdapter $items, string $content): void
+    {
+        $keys = self::getCachedChunkKeys($items, $content);
+        self::assertCount(1, $keys);
+        self::assertTrue($items->deleteItem($keys[0]));
+    }
+
+    private static function getCachedChunkKeys(ArrayAdapter $items, string $content): array
+    {
+        return array_keys(array_filter($items->getValues(), static fn ($value) => $content === (($value['value'] ?? $value)['content'] ?? null)));
     }
 }

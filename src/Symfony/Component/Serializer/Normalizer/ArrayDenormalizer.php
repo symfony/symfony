@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\UnionType;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
@@ -54,10 +55,24 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
 
         $typeIdentifiers = [];
         if (null !== $keyType = ($context['key_type'] ?? null)) {
-            /** @var list<BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>> */
+            while ($keyType instanceof WrappingTypeInterface) {
+                $keyType = $keyType->getWrappedType();
+            }
+
             $keyTypes = $keyType instanceof UnionType ? $keyType->getTypes() : [$keyType];
 
-            $typeIdentifiers = array_map(static fn ($t) => $t->getTypeIdentifier()->value, $keyTypes);
+            foreach ($keyTypes as $t) {
+                while ($t instanceof WrappingTypeInterface) {
+                    $t = $t->getWrappedType();
+                }
+
+                if (!$t instanceof BuiltinType || TypeIdentifier::MIXED === $t->getTypeIdentifier()) {
+                    $typeIdentifiers = [];
+                    break;
+                }
+
+                $typeIdentifiers[] = $t->getTypeIdentifier()->value;
+            }
         }
 
         $valueType = $context['value_type'] ?? null;

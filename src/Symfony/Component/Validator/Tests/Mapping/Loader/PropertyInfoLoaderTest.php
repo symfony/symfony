@@ -31,6 +31,7 @@ use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderChildEntity;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderNoAutoMappingEntity;
+use Symfony\Component\Validator\Tests\Fixtures\WriteOnlyVirtualPropertyEntity;
 use Symfony\Component\Validator\Validation;
 
 /**
@@ -414,5 +415,45 @@ class PropertyInfoLoaderTest extends TestCase
         $propertyInfoLoader = new PropertyInfoLoader($propertyListExtractor, $propertyTypeExtractor, $propertyAccessExtractor);
 
         $this->assertFalse($propertyInfoLoader->loadClassMetadata(new ClassMetadata(PropertyInfoLoaderEntity::class)));
+    }
+
+    public function testSkipWriteOnlyVirtualProperties()
+    {
+        $propertyListExtractor = $this->createStub(PropertyListExtractorInterface::class);
+        $propertyListExtractor
+            ->method('getProperties')
+            ->willReturn(['name', 'writeOnlyChild', 'writeOnlyString']);
+
+        $propertyTypeExtractor = new class implements PropertyTypeExtractorInterface {
+            public function getType(string $class, string $property, array $context = []): ?Type
+            {
+                return Type::string();
+            }
+
+            public function getTypes(string $class, string $property, array $context = []): ?array
+            {
+                return [new LegacyType('string')];
+            }
+        };
+
+        $propertyAccessExtractor = $this->createStub(PropertyAccessExtractorInterface::class);
+        $propertyAccessExtractor
+            ->method('isWritable')
+            ->willReturn(true);
+
+        $propertyInfoLoader = new PropertyInfoLoader($propertyListExtractor, $propertyTypeExtractor, $propertyAccessExtractor, '{^'.preg_quote(WriteOnlyVirtualPropertyEntity::class).'$}');
+        $validator = Validation::createValidatorBuilder()
+            ->addLoader($propertyInfoLoader)
+            ->getValidator();
+
+        $entity = new WriteOnlyVirtualPropertyEntity();
+
+        $this->assertCount(0, $validator->validate($entity));
+
+        /** @var ClassMetadata $metadata */
+        $metadata = $validator->getMetadataFor($entity);
+        $this->assertTrue($metadata->hasPropertyMetadata('name'));
+        $this->assertFalse($metadata->hasPropertyMetadata('writeOnlyChild'));
+        $this->assertFalse($metadata->hasPropertyMetadata('writeOnlyString'));
     }
 }

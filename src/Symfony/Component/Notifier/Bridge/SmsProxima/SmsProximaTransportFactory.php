@@ -31,9 +31,10 @@ final class SmsProximaTransportFactory extends AbstractTransportFactory
 
         $token = $this->getUser($dsn);
         $from = $dsn->getOption('from', '');
+        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
 
         return (new SmsProximaTransport($token, $from, $this->client, $this->dispatcher))
-            ->setHost($dsn->getHost())
+            ->setHost($host)
             ->setPort($dsn->getPort())
             ->setSsl($this->getSsl($dsn));
     }

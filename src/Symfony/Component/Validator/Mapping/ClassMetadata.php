@@ -195,6 +195,10 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
                     continue;
                 }
 
+                if (\PHP_VERSION_ID >= 80400 && $property->isVirtual() && !$property->hasHook(\PropertyHookType::Get)) {
+                    continue;
+                }
+
                 if ($this->canCascade($property->getType())) {
                     $this->addPropertyConstraint($property->getName(), new Valid());
                 }

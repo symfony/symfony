@@ -2812,6 +2812,71 @@ class CachingHttpClientTest extends TestCase
         $this->assertSame(2, $requestCount);
     }
 
+    #[DataProvider('provideRevalidationValidators')]
+    public function testConditional304ExtendsTheLifetimeOfCachedChunks(array $options, int $status)
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse(['first ', 'second'], ['response_headers' => ['ETag' => '"abc"', 'Cache-Control' => 'max-age=1']]),
+            new MockResponse('', ['http_code' => 304, 'response_headers' => ['ETag' => '"abc"', 'Cache-Control' => 'max-age=60']]),
+        ]);
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter, [], true, 3);
+        $url = 'https://example.com/resource';
+
+        $this->assertSame('first second', $client->request('GET', $url)->getContent());
+
+        sleep(2);
+        $this->assertSame($status, $client->request('GET', $url, $options)->getStatusCode());
+
+        sleep(2);
+        $this->assertSame('first second', $client->request('GET', $url)->getContent());
+    }
+
+    public static function provideRevalidationValidators(): iterable
+    {
+        yield 'cache validators' => [[], 200];
+        yield 'request validators' => [['headers' => ['If-None-Match' => '"abc"']], 304];
+    }
+
+    public function testConditional304DoesNotExtendTheLifetimeOfCachedChunksOfAnUncacheableResponse()
+    {
+        $items = new ArrayAdapter(0, false);
+        $mockClient = new MockHttpClient([
+            new MockResponse('body', ['response_headers' => ['ETag' => '"abc"', 'Cache-Control' => 'max-age=1']]),
+            new MockResponse('', ['http_code' => 304, 'response_headers' => ['ETag' => '"abc"', 'Cache-Control' => 'no-store']]),
+        ]);
+        $client = new CachingHttpClient($mockClient, new TagAwareAdapter($items), [], true, 3);
+        $url = 'https://example.com/resource';
+
+        $this->assertSame('body', $client->request('GET', $url)->getContent());
+        [$chunkKey] = self::getCachedChunkKeys($items, 'body');
+
+        sleep(2);
+        $this->assertSame(304, $client->request('GET', $url, ['headers' => ['If-None-Match' => '"abc"']])->getStatusCode());
+
+        sleep(2);
+        $this->assertFalse($items->hasItem($chunkKey));
+    }
+
+    #[DataProvider('provideRevalidationValidators')]
+    public function testConditional304KeepsTheTagsOfCachedChunks(array $options, int $status)
+    {
+        $items = new ArrayAdapter(0, false);
+        $mockClient = new MockHttpClient([
+            new MockResponse('body', ['response_headers' => ['ETag' => '"abc"', 'Cache-Control' => 'max-age=0']]),
+            new MockResponse('', ['http_code' => 304, 'response_headers' => ['ETag' => '"abc"', 'Cache-Control' => 'max-age=60']]),
+            new MockResponse('created', ['http_code' => 201]),
+        ]);
+        $client = new CachingHttpClient($mockClient, $cache = new TagAwareAdapter($items));
+        $url = 'https://example.com/resource';
+
+        $this->assertSame('body', $client->request('GET', $url)->getContent());
+        [$chunkKey] = self::getCachedChunkKeys($items, 'body');
+        $this->assertSame($status, $client->request('GET', $url, $options)->getStatusCode());
+        $this->assertSame(201, $client->request('POST', $url, ['body' => 'data'])->getStatusCode());
+
+        $this->assertFalse($cache->hasItem($chunkKey));
+    }
+
     public function testConditional304FromCacheRevalidationIsPassedThroughWhenResponseValidatorsDoNotMatch()
     {
         $mockClient = new MockHttpClient([

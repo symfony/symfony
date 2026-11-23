@@ -350,8 +350,10 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
                     }
 
                     if ($hasClientConditionalValidator) {
+                        // the body is not sent, but its chunks must not expire before the metadata
+                        $updatedMetadataIsCacheable && $this->readCachedBody($updatedCachedData, $metadataKey, $expiresAt, [$fullUrlTag, $metadataKey]);
                         $context->passthru();
-                    } elseif ($cachedResponse = $this->createResponseFromCache($updatedCachedData, $method, $url, $options, $metadataKey, $expiresAt)) {
+                    } elseif ($cachedResponse = $this->createResponseFromCache($updatedCachedData, $method, $url, $options, $metadataKey, $expiresAt, [$fullUrlTag, $metadataKey])) {
                         $context->passthru();
                         $context->replaceResponse($cachedResponse);
                     } else {
@@ -1208,7 +1210,29 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
      *
      * @param array{next_chunk: string, status_code: int, initial_age: int, headers: array<string, string|string[]>, stored_at: int} $cachedData
      */
-    private function createResponseFromCache(array $cachedData, string $method, string $url, array $options, string $metadataKey, \DateTimeImmutable|false|null $newExpiresAt = false): ?MockResponse
+    private function createResponseFromCache(array $cachedData, string $method, string $url, array $options, string $metadataKey, \DateTimeImmutable|false|null $newExpiresAt = false, array $newTags = []): ?MockResponse
+    {
+        if (null === $body = $this->readCachedBody($cachedData, $metadataKey, $newExpiresAt, $newTags)) {
+            return null;
+        }
+
+        return MockResponse::fromRequest($method, $url, $options, new MockResponse($body, [
+            'http_code' => $cachedData['status_code'],
+            'response_headers' => [
+                'age' => $this->getCachedResponseAge($cachedData),
+            ] + $cachedData['headers'],
+        ]));
+    }
+
+    /**
+     * Reads the chunks of a cached body, and moves their expiration to $newExpiresAt unless it is false.
+     *
+     * @param array{next_chunk: ?string} $cachedData
+     * @param list<string>               $newTags    The tags to set again on the chunks when they are rewritten, as rewriting an item drops its tags
+     *
+     * @return list<string>|null The content of the chunks, or null when one of them is missing from the cache
+     */
+    private function readCachedBody(array $cachedData, string $metadataKey, \DateTimeImmutable|false|null $newExpiresAt = false, array $newTags = []): ?array
     {
         $cache = $this->cache;
 
@@ -1221,12 +1245,12 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
 
         if (false !== $newExpiresAt) {
             $beta = \INF;
-            $callback = static function (ItemInterface $item) use ($callback, $newExpiresAt): array {
+            $callback = static function (ItemInterface $item) use ($callback, $newExpiresAt, $newTags): array {
                 if (!$item->isHit()) {
                     $callback($item);
                 }
 
-                $item->expiresAt($newExpiresAt);
+                $item->tag($newTags)->expiresAt($newExpiresAt);
 
                 return $item->get();
             };
@@ -1247,12 +1271,7 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
             return null;
         }
 
-        return MockResponse::fromRequest($method, $url, $options, new MockResponse($body, [
-            'http_code' => $cachedData['status_code'],
-            'response_headers' => [
-                'age' => $this->getCachedResponseAge($cachedData),
-            ] + $cachedData['headers'],
-        ]));
+        return $body;
     }
 
     private static function createGatewayTimeoutResponse(string $method, string $url, array $options): MockResponse

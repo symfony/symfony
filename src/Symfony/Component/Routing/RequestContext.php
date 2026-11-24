@@ -56,7 +56,7 @@ class RequestContext
         }
 
         $uri = parse_url($uri);
-        $scheme = $uri['scheme'] ?? $scheme;
+        $scheme = strtolower($uri['scheme'] ?? $scheme);
         $host = $uri['host'] ?? $host;
 
         if (isset($uri['port'])) {

@@ -24,8 +24,8 @@ final class RuntimeModeErrorRendererSelector
      * @param \Closure(): ErrorRendererInterface $htmlErrorRenderer
      * @param \Closure(): ErrorRendererInterface $cliErrorRenderer
      */
-    public static function select(bool $isWebMode, \Closure $htmlErrorRenderer, \Closure $cliErrorRenderer): ErrorRendererInterface
+    public static function select(bool $isWebMode, \Closure $htmlErrorRenderer, \Closure $cliErrorRenderer, bool $debug = false): ErrorRendererInterface
     {
-        return ($isWebMode ? $htmlErrorRenderer : $cliErrorRenderer)();
+        return ($isWebMode || !$debug ? $htmlErrorRenderer : $cliErrorRenderer)();
     }
 }

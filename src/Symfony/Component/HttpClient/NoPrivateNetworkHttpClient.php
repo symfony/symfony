@@ -34,6 +34,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, ResetInte
     use HttpClientTrait;
 
     private array $defaultOptions = self::OPTIONS_DEFAULTS;
+    private array $configuredOptions = [];
     private HttpClientInterface $client;
     private ?array $subnets;
     private array $allowList;
@@ -70,13 +71,28 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, ResetInte
         $this->client = $client;
         $this->subnets = null !== $subnets ? (array) $subnets : null;
         $this->allowList = (array) $allowList;
+
+        if (\FILTER_FLAG_IPV6 === $ipFlags) {
+            // Block IPv4-mapped addresses too, since they reach IPv4 hosts
+            $this->subnets[] = '::ffff:0:0/96';
+        }
+
         $this->ipFlags = $ipFlags;
         $this->dnsCache = new \ArrayObject();
     }
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
+        $givenOptions = $options;
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions, true);
+
+        // Pass only the options given to this decorator and the ones it needs, so that the decorated client applies its default options to the others
+        $options = array_intersect_key($options, $givenOptions + $this->configuredOptions + ['headers' => true, 'normalized_headers' => true, 'body' => true, 'resolve' => true, 'max_redirects' => true]);
+
+        if (!isset(self::normalizeHeaders($givenOptions['headers'] ?? [])['accept'])) {
+            unset($options['normalized_headers']['accept']);
+            $options['headers'] = array_merge([], ...array_values($options['normalized_headers']));
+        }
 
         $host = parse_url($url['authority'], \PHP_URL_HOST);
         $url = implode('', $url);
@@ -113,6 +129,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, ResetInte
         $clone = clone $this;
         $clone->client = $this->client->withOptions($options);
         $clone->defaultOptions = self::mergeDefaultOptions($options, $this->defaultOptions);
+        $clone->configuredOptions = $options + $this->configuredOptions;
 
         return $clone;
     }

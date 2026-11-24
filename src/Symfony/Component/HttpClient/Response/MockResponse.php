@@ -15,6 +15,7 @@ use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -289,6 +290,21 @@ class MockResponse implements ResponseInterface, StreamableInterface
 
         if (null !== $response->info['error']) {
             throw new TransportException($response->info['error']);
+        }
+
+        if (!\array_key_exists('redirect_url', $info) && 300 <= $response->info['http_code'] && $response->info['http_code'] < 400 && null !== $location = $response->headers['location'][0] ?? null) {
+            $urlResolver = new class {
+                use HttpClientTrait {
+                    parseUrl as public;
+                    resolveUrl as public;
+                }
+            };
+
+            try {
+                $response->info['redirect_url'] = implode('', $urlResolver::resolveUrl($urlResolver::parseUrl($location), $urlResolver::parseUrl($response->info['url'])));
+            } catch (InvalidArgumentException) {
+                // Like the transports, ignore locations that are not valid URLs
+            }
         }
 
         if (!isset($response->info['total_time'])) {

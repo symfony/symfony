@@ -37,6 +37,7 @@
         "psr/http-client": "^1.0",
         "symfony/dependency-injection": "^7.4|^8.0",
         "symfony/cache": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4.23|^8.1.11",
         "symfony/http-kernel": "^7.4|^8.0",
         "symfony/messenger": "^7.4|^8.0",
         "symfony/process": "^7.4|^8.0",

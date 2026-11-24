@@ -2877,8 +2877,11 @@ class FrameworkExtension extends Extension
             $container->removeAlias(HttpClient::class);
         }
 
+        $cachePools = [];
+
         if ($this->readConfigEnabled('http_client.caching', $container, $cachingOptions)) {
             $this->registerCachingHttpClient($cachingOptions, $options, 'http_client', $container);
+            $cachePools['http_client'] = $cachingOptions['cache_pool'];
         }
 
         if (null !== $rateLimiter) {
@@ -2981,7 +2984,9 @@ class FrameworkExtension extends Extension
             }
 
             if ($this->readConfigEnabled('http_client.scoped_clients.'.$name.'.caching', $container, $cachingOptions)) {
-                $this->registerCachingHttpClient($cachingOptions, $scopeConfig, $name, $container);
+                // ScopingHttpClient applies the options of the scope, and only to the URLs in the scope
+                $this->registerCachingHttpClient($cachingOptions, [], $name, $container);
+                $cachePools[$name] = $cachingOptions['cache_pool'];
             }
 
             if (null !== $rateLimiter) {
@@ -3015,6 +3020,19 @@ class FrameworkExtension extends Extension
                     ->replaceArgument(0, new Reference($name));
 
                 $container->registerAliasForArgument('httplug.'.$name, HttpAsyncClient::class, $name);
+            }
+        }
+
+        if (method_exists(TagAwareAdapter::class, 'withSubNamespace')) {
+            $clientsPerPool = array_count_values($cachePools);
+
+            foreach ($cachePools as $name => $cachePool) {
+                if (1 < $clientsPerPool[$cachePool]) {
+                    // Clients don't share cached responses, since the cache key doesn't contain all their options, like custom headers
+                    $container->getDefinition($name.'.caching')->replaceArgument(1, (new Definition(TagAwareCacheInterface::class))
+                        ->setFactory([new Reference($cachePool), 'withSubNamespace'])
+                        ->setArguments([rawurlencode($name)]));
+                }
             }
         }
     }

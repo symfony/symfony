@@ -487,6 +487,7 @@ class Parser
     private function checkDepth(Node\Node $node): void
     {
         $nodes = [[$node, 1]];
+        $depths = [];
 
         while ($nodes) {
             [$node, $depth] = array_pop($nodes);
@@ -494,6 +495,12 @@ class Parser
             if (self::MAX_NESTING_LEVEL < $depth) {
                 throw new SyntaxError(\sprintf('Expression is nested too deeply, the maximum nesting level is %d', self::MAX_NESTING_LEVEL), $this->stream->current->cursor, $this->stream->getExpression());
             }
+
+            // "a ?: b" uses the node of "a" twice, so skip the nodes already checked at the same depth or deeper
+            if (($depths[$id = spl_object_id($node)] ?? 0) >= $depth) {
+                continue;
+            }
+            $depths[$id] = $depth;
 
             foreach ($node->nodes as $child) {
                 $nodes[] = [$child, $depth + 1];

@@ -210,6 +210,12 @@ trait HttpClientTrait
     {
         $options['normalized_headers'] = self::normalizeHeaders($options['headers'] ?? []);
 
+        if ($options['extra']['skip_default_credentials'] ?? false) {
+            // Set by NoPrivateNetworkHttpClient on redirects to other origins, for the decorated client and the ones it decorates
+            $options['normalized_headers'] += ['authorization' => [], 'cookie' => []];
+            $options += ['auth_basic' => null, 'auth_bearer' => null, 'auth_ntlm' => null];
+        }
+
         if ($defaultOptions['headers'] ?? false) {
             $options['normalized_headers'] += self::normalizeHeaders($defaultOptions['headers']);
         }
@@ -269,6 +275,11 @@ trait HttpClientTrait
             }
 
             if ('auth_ntlm' === $name) {
+                if (null === $v) {
+                    // Decorators can unset NTLM credentials without knowing if the decorated client supports NTLM
+                    continue;
+                }
+
                 if (!\extension_loaded('curl')) {
                     $msg = 'try installing the "curl" extension to use "%s" instead.';
                 } else {
@@ -843,8 +854,10 @@ trait HttpClientTrait
             return $proxy;
         }
 
-        // Ignore HTTP_PROXY except on the CLI to work around httpoxy set of vulnerabilities
-        $proxy = $_SERVER['http_proxy'] ?? (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? $_SERVER['HTTP_PROXY'] ?? null : null) ?? $_SERVER['all_proxy'] ?? $_SERVER['ALL_PROXY'] ?? null;
+        // Ignore HTTP_PROXY except on the CLI to work around httpoxy set of vulnerabilities, and read it from
+        // the environment there, since HTTP workers that run on the CLI put request headers in $_SERVER
+        $httpProxy = \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? $_ENV['HTTP_PROXY'] ?? getenv('HTTP_PROXY', true) : false;
+        $proxy = $_SERVER['http_proxy'] ?? (false !== $httpProxy ? $httpProxy : null) ?? $_SERVER['all_proxy'] ?? $_SERVER['ALL_PROXY'] ?? null;
 
         if ('https:' === $url['scheme']) {
             $proxy = $_SERVER['https_proxy'] ?? $_SERVER['HTTPS_PROXY'] ?? $proxy;

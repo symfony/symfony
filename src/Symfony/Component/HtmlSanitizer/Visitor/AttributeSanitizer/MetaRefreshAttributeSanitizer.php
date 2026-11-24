@@ -28,6 +28,19 @@ use Symfony\Component\HtmlSanitizer\TextSanitizer\UrlSanitizer;
  */
 final class MetaRefreshAttributeSanitizer implements AttributeSanitizerInterface
 {
+    /**
+     * Controls, and Unicode whitespace and invisible characters, matched as UTF-8 byte
+     * sequences so that malformed UTF-8 cannot make the match fail.
+     */
+    private const SKIPPABLE_CHARS_PATTERN = '/[\x00-\x20\x7F]'
+        .'|\xC2[\x80-\xA0]'               // U+0080-U+00A0
+        .'|\xE1\x9A\x80'                  // U+1680
+        .'|\xE1\xA0\x8E'                  // U+180E
+        .'|\xE2\x80[\x80-\x8F\xA8-\xAF]'  // U+2000-U+200F, U+2028-U+202F
+        .'|\xE2\x81[\x9F-\xAF]'           // U+205F-U+206F
+        .'|\xE3\x80\x80'                  // U+3000
+        .'|\xEF\xBB\xBF/';                // U+FEFF
+
     public function getSupportedElements(): ?array
     {
         return ['meta'];
@@ -41,13 +54,19 @@ final class MetaRefreshAttributeSanitizer implements AttributeSanitizerInterface
     public function sanitizeAttribute(string $element, string $attribute, string $value, HtmlSanitizerConfig $config): ?string
     {
         // A leading time is the only marker of a refresh directive: without one, the value
-        // cannot trigger a navigation and belongs to another meta type. Whitespace means
-        // the ASCII whitespace of the specification, which \s does not match exactly.
-        if (!preg_match('/^([ \t\n\f\r]*(?:\d[\d.]*|\.[\d.]*))(.*)$/s', $value, $m)) {
+        // cannot trigger a navigation and belongs to another meta type.
+        if (!preg_match('/^(([\x00-\x20\x7F-\xFF]*+)(?:\d[\d.]*|\.[\d.]*))(.*)$/s', $value, $m)) {
             return $value;
         }
 
-        [, $time, $rest] = $m;
+        [, $time, $leading, $rest] = $m;
+
+        // Browsers can skip more than ASCII whitespace before the time. The characters are
+        // removed one at a time: a repeated group in the expression above would make it fail
+        // on long values.
+        if ('' !== preg_replace(self::SKIPPABLE_CHARS_PATTERN, '', $leading)) {
+            return $value;
+        }
 
         // Nothing follows the time: the directive reloads the current document.
         if ('' === $rest) {
@@ -80,7 +99,8 @@ final class MetaRefreshAttributeSanitizer implements AttributeSanitizerInterface
             $quote = $first;
             $url = substr($url, 1);
 
-            // Everything after the closing quote is ignored by browsers.
+            // Everything after the closing quote is dropped: browsers disagree on whether the
+            // first or the last quote closes the URL.
             if (false !== $end = strpos($url, $quote)) {
                 $url = substr($url, 0, $end);
             }
@@ -93,7 +113,7 @@ final class MetaRefreshAttributeSanitizer implements AttributeSanitizerInterface
         // An empty URL resolves to the document's own URL: the directive reloads the
         // current document, exactly like a directive made of a time only.
         if ('' === $url) {
-            return $value;
+            return $time.$separator.$keyword.$quote.$quote;
         }
 
         $sanitized = UrlSanitizer::sanitize(

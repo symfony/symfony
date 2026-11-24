@@ -131,6 +131,66 @@ class SubRequestHandlerTest extends TestCase
         $this->assertSame($globalState, $this->getGlobalState());
     }
 
+    public function testOtherRequestsFromLocalhostAreNotTrusted()
+    {
+        $mainRequest = Request::create('https://example.com/');
+        $mainRequest->server->set('REMOTE_ADDR', '127.0.0.1');
+        $mainRequest->headers->set('X-Forwarded-For', '10.0.0.2');
+        $mainRequest->headers->set('X-Forwarded-Host', 'evil.example');
+        $mainRequest->headers->set('X-Forwarded-Proto', 'http');
+        $mainRequest->headers->set('X-Forwarded-Prefix', '//evil.example');
+
+        $kernel = new TestSubRequestHandlerKernel(function ($request) use ($mainRequest) {
+            $this->assertSame('example.com', $request->getHost());
+            $this->assertSame('127.0.0.1', $mainRequest->getClientIp());
+            $this->assertSame('example.com', $mainRequest->getHost());
+            $this->assertTrue($mainRequest->isSecure());
+            $this->assertSame('', $mainRequest->getBaseUrl());
+        });
+
+        $subRequest = Request::create('/_fragment', 'GET', [], [], [], $mainRequest->server->all());
+        SubRequestHandler::handle($kernel, $subRequest, HttpKernelInterface::SUB_REQUEST, false);
+
+        $this->assertSame(self::$globalState, $this->getGlobalState());
+    }
+
+    public function testRequestsCopiedFromTheSubRequestAreTrusted()
+    {
+        Request::setTrustedProxies(['10.0.0.1'], -1);
+
+        $request = Request::create('/');
+        $request->server->set('REMOTE_ADDR', '10.0.0.1');
+        $request->headers->set('X-Forwarded-For', '10.0.0.2');
+        $request->headers->set('X-Forwarded-Host', 'foo.bar');
+
+        $kernel = new TestSubRequestHandlerKernel(function ($request) {
+            $copy = Request::create('/login', 'GET', [], [], [], $request->server->all());
+            $this->assertSame('10.0.0.2', $copy->getClientIp());
+            $this->assertSame('foo.bar', $copy->getHost());
+            $this->assertSame('10.0.0.2', $request->duplicate()->getClientIp());
+        });
+
+        SubRequestHandler::handle($kernel, $request, HttpKernelInterface::MAIN_REQUEST, true);
+    }
+
+    public function testNestedSubRequestsKeepTheClientIp()
+    {
+        $request = Request::create('/');
+        $request->server->set('REMOTE_ADDR', '10.0.0.1');
+
+        $kernel = new TestSubRequestHandlerKernel(function ($request) {
+            $fragmentKernel = new TestSubRequestHandlerKernel(function ($fragment) {
+                $this->assertSame('127.0.0.1', $fragment->server->get('REMOTE_ADDR'));
+                $this->assertSame('10.0.0.1', $fragment->getClientIp());
+            });
+
+            $fragment = Request::create('/_fragment', 'GET', [], [], [], $request->server->all());
+            SubRequestHandler::handle($fragmentKernel, $fragment, HttpKernelInterface::SUB_REQUEST, false);
+        });
+
+        SubRequestHandler::handle($kernel, $request, HttpKernelInterface::MAIN_REQUEST, true);
+    }
+
     private function getGlobalState(): array
     {
         return [

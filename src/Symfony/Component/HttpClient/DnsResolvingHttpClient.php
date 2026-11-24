@@ -37,6 +37,7 @@ final class DnsResolvingHttpClient implements HttpClientInterface, ResetInterfac
     use HttpClientTrait;
 
     private array $defaultOptions = self::OPTIONS_DEFAULTS;
+    private array $configuredOptions = [];
 
     /** @var callable(string): ?string */
     private $resolver;
@@ -54,7 +55,16 @@ final class DnsResolvingHttpClient implements HttpClientInterface, ResetInterfac
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
+        $givenOptions = $options;
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions, true);
+
+        // Pass only the options given to this decorator and the ones it needs, so that the decorated client applies its default options to the others
+        $options = array_intersect_key($options, $givenOptions + $this->configuredOptions + ['headers' => true, 'normalized_headers' => true, 'body' => true, 'resolve' => true, 'max_redirects' => true]);
+
+        if (!isset(self::normalizeHeaders($givenOptions['headers'] ?? [])['accept'])) {
+            unset($options['normalized_headers']['accept']);
+            $options['headers'] = array_merge([], ...array_values($options['normalized_headers']));
+        }
 
         $host = parse_url($url['authority'], \PHP_URL_HOST);
         $url = implode('', $url);
@@ -80,6 +90,7 @@ final class DnsResolvingHttpClient implements HttpClientInterface, ResetInterfac
         $clone = clone $this;
         $clone->client = $this->client->withOptions($options);
         $clone->defaultOptions = self::mergeDefaultOptions($options, $this->defaultOptions);
+        $clone->configuredOptions = $options + $this->configuredOptions;
 
         return $clone;
     }

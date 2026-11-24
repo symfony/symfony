@@ -60,6 +60,46 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider provideLeadingDoubleSlash
+     */
+    public function testTrailingSlashRedirectEncodesLeadingDoubleSlash(string $pathinfo, string $redirectPath, string $slug)
+    {
+        $routes = new RouteCollection();
+        $routes->add('foo', new Route('/{slug}/edit', [], ['slug' => '.+']));
+
+        $matcher = $this->getMatcher($routes, new RequestContext());
+
+        $this->assertSame($redirectPath, $matcher->match($pathinfo.'/')['path']);
+        $this->assertSame(['_route' => 'foo', 'slug' => $slug], $matcher->match($redirectPath));
+    }
+
+    /**
+     * @dataProvider provideLeadingDoubleSlash
+     */
+    public function testSchemeRedirectEncodesLeadingDoubleSlash(string $pathinfo, string $redirectPath, string $slug)
+    {
+        $routes = new RouteCollection();
+        $routes->add('foo', new Route('/{slug}/edit', [], ['slug' => '.+'], [], '', ['https']));
+
+        $matcher = $this->getMatcher($routes, new RequestContext());
+
+        $parameters = $matcher->match($pathinfo);
+        $this->assertSame($redirectPath, $parameters['path']);
+        $this->assertSame('https', $parameters['scheme']);
+
+        $matcher = $this->getMatcher($routes, new RequestContext('', 'GET', 'localhost', 'https'));
+        $this->assertSame(['_route' => 'foo', 'slug' => $slug], $matcher->match($redirectPath));
+    }
+
+    public static function provideLeadingDoubleSlash(): iterable
+    {
+        yield ['//evil.example/edit', '/%2Fevil.example/edit', '/evil.example'];
+        yield ['///evil.example/edit', '/%2F/evil.example/edit', '//evil.example'];
+        yield ['/\\evil.example/edit', '/%5Cevil.example/edit', '\\evil.example'];
+        yield ["/\t/evil.example/edit", "/\t%2Fevil.example/edit", "\t/evil.example"];
+    }
+
     private function getMatcher(RouteCollection $routes, RequestContext $context)
     {
         $dumper = new CompiledUrlMatcherDumper($routes);

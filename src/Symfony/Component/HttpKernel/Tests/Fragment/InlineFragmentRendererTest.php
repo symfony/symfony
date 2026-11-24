@@ -75,7 +75,7 @@ class InlineFragmentRendererTest extends TestCase
         $expectedSubRequest->headers->set('x-forwarded-for', ['127.0.0.1']);
         $expectedSubRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
 
-        $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($expectedSubRequest));
+        $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($expectedSubRequest, Request::HEADER_X_FORWARDED_FOR));
         $this->assertSame('foo', $strategy->render('/', Request::create('/'))->getContent());
 
         Request::setTrustedProxies([], -1);
@@ -186,7 +186,7 @@ class InlineFragmentRendererTest extends TestCase
         $expectedSubRequest->headers->set('forwarded', ['for="127.0.0.1";host="localhost";proto=http']);
         $expectedSubRequest->server->set('HTTP_FORWARDED', 'for="127.0.0.1";host="localhost";proto=http');
 
-        $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($expectedSubRequest));
+        $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($expectedSubRequest, Request::getTrustedHeaderSet()));
 
         $request = Request::create('/');
         $request->attributes->set('_format', 'foo');
@@ -207,7 +207,7 @@ class InlineFragmentRendererTest extends TestCase
         $expectedSubRequest->headers->set('forwarded', ['for="127.0.0.1";host="localhost";proto=http']);
         $expectedSubRequest->server->set('HTTP_FORWARDED', 'for="127.0.0.1";host="localhost";proto=http');
 
-        $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($expectedSubRequest));
+        $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($expectedSubRequest, Request::getTrustedHeaderSet()));
 
         $request = Request::create('/');
         $request->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
@@ -405,8 +405,10 @@ class InlineFragmentRendererTest extends TestCase
     /**
      * Creates a Kernel expecting a request equals to $request.
      */
-    private function getKernelExpectingRequest(Request $expectedRequest)
+    private function getKernelExpectingRequest(Request $expectedRequest, int $trustedHeaderSet = -1)
     {
+        $expectedRequest->server->set(Request::SUB_REQUEST_TRUSTED_HEADER_SET, $trustedHeaderSet);
+
         $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel
             ->expects($this->once())

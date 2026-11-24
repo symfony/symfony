@@ -187,7 +187,21 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                         return '';
                     }
 
-                    $url = $token[1].$mergedParams[$varName].$url;
+                    // browsers resolve "." and ".." path segments even when they are percent-encoded
+                    $value = (string) $mergedParams[$varName];
+                    if (false !== strpbrk($value, './') && preg_match('#(?:^|/)\.\.?(?:/|$)#D', $token[1].$value.explode('/', $url, 2)[0])) {
+                        $message = 'Parameter "{parameter}" for route "{route}" must not add "." or ".." segments to the path ("{given}" given) to generate a corresponding URL.';
+
+                        if ($this->strictRequirements) {
+                            throw new InvalidParameterException(strtr($message, ['{parameter}' => $varName, '{route}' => $name, '{given}' => $mergedParams[$varName]]));
+                        }
+
+                        $this->logger?->error($message, ['parameter' => $varName, 'route' => $name, 'given' => $mergedParams[$varName]]);
+
+                        return '';
+                    }
+
+                    $url = $token[1].$value.$url;
                     $optional = false;
                 }
             } else {
@@ -245,6 +259,21 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                         return '';
                     }
 
+                    // characters that are forbidden in a host, or that IDNA maps to ".", can change which host the URL points to
+                    // only IPv6 literals like "[::1]" can contain some of them
+                    $value = $mergedParams[$token[3]] ?? '';
+                    if (preg_match('/[\x00-\x20#%\/:<>?@\[\\\\\]^|\x7F]|\xE3\x80\x82|\xEF\xBC\x8E|\xEF\xBD\xA1/', $value) && !(str_starts_with($value, '[') && str_ends_with($value, ']') && filter_var(substr($value, 1, -1), \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6))) {
+                        $message = 'Parameter "{parameter}" for route "{route}" must not contain characters that are forbidden in a host ("{given}" given) to generate a corresponding URL.';
+
+                        if ($this->strictRequirements) {
+                            throw new InvalidParameterException(strtr($message, ['{parameter}' => $token[3], '{route}' => $name, '{given}' => $mergedParams[$token[3]]]));
+                        }
+
+                        $this->logger?->error($message, ['parameter' => $token[3], 'route' => $name, 'given' => $mergedParams[$token[3]]]);
+
+                        return '';
+                    }
+
                     $routeHost = $token[1].$mergedParams[$token[3]].$routeHost;
                 } else {
                     $routeHost = $token[1].$routeHost;
@@ -277,6 +306,11 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             $url = self::getRelativePath($this->context->getPathInfo(), $url);
         } else {
             $url = $schemeAuthority.$this->context->getBaseUrl().$url;
+
+            // without scheme and host, a URL that starts with "//" would point to another host
+            if ('' === $schemeAuthority && str_starts_with($url, '//')) {
+                $url = '/%2F'.substr($url, 2);
+            }
         }
 
         // add a query string if needed
@@ -364,7 +398,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         // This also applies to a segment with a colon character (e.g., "file:colon") that cannot be used
         // as the first segment of a relative-path reference, as it would be mistaken for a scheme name
         // (see http://tools.ietf.org/html/rfc3986#section-4.2).
-        return '' === $path || '/' === $path[0]
+        // A leading backslash, space or control character needs the prefix too,
+        // since browsers read a backslash as a slash and ignore leading spaces and control characters.
+        return '' === $path || '/' === $path[0] || '\\' === $path[0] || \ord($path[0]) <= 0x20
             || false !== ($colonPos = strpos($path, ':')) && ($colonPos < ($slashPos = strpos($path, '/')) || false === $slashPos)
             ? "./$path" : $path;
     }

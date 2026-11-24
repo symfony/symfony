@@ -52,6 +52,8 @@ class Request
     public const HEADER_X_FORWARDED_AWS_ELB = 0b0011010; // AWS ELB doesn't send X-Forwarded-Host
     public const HEADER_X_FORWARDED_TRAEFIK = 0b0111110; // All "X-Forwarded-*" headers sent by Traefik reverse proxy
 
+    public const SUB_REQUEST_TRUSTED_HEADER_SET = 'SYMFONY_SUB_REQUEST_TRUSTED_HEADER_SET';
+
     public const METHOD_HEAD = 'HEAD';
     public const METHOD_GET = 'GET';
     public const METHOD_POST = 'POST';
@@ -1126,7 +1128,9 @@ class Request
         // This also applies to a segment with a colon character (e.g., "file:colon") that cannot be used
         // as the first segment of a relative-path reference, as it would be mistaken for a scheme name
         // (see https://tools.ietf.org/html/rfc3986#section-4.2).
-        return !isset($path[0]) || '/' === $path[0]
+        // A leading backslash, space or control character needs the prefix too,
+        // since browsers read a backslash as a slash and ignore leading spaces and control characters.
+        return !isset($path[0]) || '/' === $path[0] || '\\' === $path[0] || \ord($path[0]) <= 0x20
             || false !== ($colonPos = strpos($path, ':')) && ($colonPos < ($slashPos = strpos($path, '/')) || false === $slashPos)
             ? "./$path" : $path;
     }
@@ -2052,7 +2056,19 @@ class Request
      */
     public function isFromTrustedProxy(): bool
     {
-        return self::$trustedProxies && IpUtils::checkIp($this->server->get('REMOTE_ADDR', ''), self::$trustedProxies);
+        return null !== $this->getSubRequestTrustedHeaderSet() || (self::$trustedProxies && IpUtils::checkIp($this->server->get('REMOTE_ADDR', ''), self::$trustedProxies));
+    }
+
+    /**
+     * Returns the trusted header set of a request built by HttpKernel's SubRequestHandler, which comes from 127.0.0.1.
+     */
+    private function getSubRequestTrustedHeaderSet(): ?int
+    {
+        if ('127.0.0.1' !== $this->server->get('REMOTE_ADDR') || !$this->server->has(self::SUB_REQUEST_TRUSTED_HEADER_SET)) {
+            return null;
+        }
+
+        return (int) $this->server->get(self::SUB_REQUEST_TRUSTED_HEADER_SET);
     }
 
     /**
@@ -2071,14 +2087,15 @@ class Request
 
         $clientValues = [];
         $forwardedValues = [];
+        $trustedHeaderSet = $this->getSubRequestTrustedHeaderSet() ?? self::$trustedHeaderSet;
 
-        if ((self::$trustedHeaderSet & $type) && $this->headers->has(self::TRUSTED_HEADERS[$type])) {
+        if (($trustedHeaderSet & $type) && $this->headers->has(self::TRUSTED_HEADERS[$type])) {
             foreach (explode(',', $this->headers->get(self::TRUSTED_HEADERS[$type])) as $v) {
                 $clientValues[] = (self::HEADER_X_FORWARDED_PORT === $type ? '0.0.0.0:' : '').trim($v);
             }
         }
 
-        if ((self::$trustedHeaderSet & self::HEADER_FORWARDED) && (isset(self::FORWARDED_PARAMS[$type])) && $this->headers->has(self::TRUSTED_HEADERS[self::HEADER_FORWARDED])) {
+        if (($trustedHeaderSet & self::HEADER_FORWARDED) && (isset(self::FORWARDED_PARAMS[$type])) && $this->headers->has(self::TRUSTED_HEADERS[self::HEADER_FORWARDED])) {
             $forwarded = $this->headers->get(self::TRUSTED_HEADERS[self::HEADER_FORWARDED]);
             $parts = HeaderUtils::split($forwarded, ',;=');
             $param = self::FORWARDED_PARAMS[$type];
@@ -2143,7 +2160,7 @@ class Request
                 continue;
             }
 
-            if (IpUtils::checkIp($clientIp, self::$trustedProxies)) {
+            if (IpUtils::checkIp($clientIp, self::$trustedProxies) || ('127.0.0.1' === $clientIp && null !== $this->getSubRequestTrustedHeaderSet())) {
                 unset($clientIps[$key]);
 
                 // Fallback to this when the client IP falls into the range of trusted proxies

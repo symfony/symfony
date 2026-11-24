@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Doctrine\Persistence\Proxy as DoctrineProxy;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
@@ -342,7 +343,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         unset($context['_union_member']);
 
-        $allowedAttributes = $this->getAllowedAttributes($type, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
         $extraAttributes = [];
 
@@ -363,6 +363,43 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         $normalizedData = $nestedData + $normalizedData;
+
+        // Nested discriminator maps pick the class one level at a time
+        $visitedClasses = [$mappedClass => true];
+        while (!isset($visitedClasses[$nextClass = $this->getMappedClass($normalizedData, $mappedClass, $format, $context)])) {
+            $visitedClasses[$nextClass] = true;
+            $mappedClass = $nextClass;
+        }
+
+        $allowedAttributes = $this->getAllowedAttributes($mappedClass, $context, true);
+        $excludedTypeProperties = [];
+
+        if (false !== $allowedAttributes && null !== $this->classDiscriminatorResolver) {
+            $typeProperties = [];
+
+            if (null !== $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($mappedClass)) {
+                $typeProperties[] = $mapping->getTypeProperty();
+            }
+
+            foreach ([$mappedClass => $mappedClass] + class_parents($mappedClass) + class_implements($mappedClass) as $declaringClass) {
+                if (is_a($declaringClass, $type, true) && null !== $mapping = $this->classDiscriminatorResolver->getMappingForClass($declaringClass)) {
+                    $allowedAttributes[] = $typeProperties[] = $mapping->getTypeProperty();
+                }
+            }
+
+            // A type property is read to pick the class, but it's written only when the metadata of the class allows it
+            $groups = $this->getGroups($context);
+
+            foreach ($typeProperties as $typeProperty) {
+                $attributeMetadata = $this->getAttributeMetadata($mappedClass, $typeProperty);
+
+                if ($attributeMetadata && ($attributeMetadata->isIgnored() || ($groups && $attributeMetadata->getGroups() && !array_intersect(array_merge($attributeMetadata->getGroups(), ['*']), $groups)))) {
+                    $excludedTypeProperties[$typeProperty] = true;
+                }
+            }
+
+            $allowedAttributes = array_diff($allowedAttributes, array_keys($excludedTypeProperties));
+        }
 
         $originalNormalizedData = $normalizedData;
         $object = $this->instantiateObject($normalizedData, $mappedClass, $context, new \ReflectionClass($mappedClass), $allowedAttributes, $format);
@@ -398,7 +435,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $attributeContext = $this->getAttributeDenormalizationContext($resolvedClass, $attribute, $context);
 
             if ((false !== $allowedAttributes && !\in_array($attribute, $allowedAttributes)) || !$this->isAllowedAttribute($resolvedClass, $attribute, $format, $context)) {
-                if (!($context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES])) {
+                if (!($context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES]) && !isset($excludedTypeProperties[$attribute])) {
                     $extraAttributes[] = $attribute;
                 }
 
@@ -880,35 +917,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             if (null !== $discriminatorMapping = $this->classDiscriminatorResolver->getMappingForMappedObject($classOrObject)) {
                 $allowedAttributes[] = $attributesAsString ? $discriminatorMapping->getTypeProperty() : new AttributeMetadata($discriminatorMapping->getTypeProperty());
             }
-
-            // A class name can be denormalized into any of the mapped classes, so their attributes
-            // are all allowed. The class of an object is known and the others cannot be read from it.
-            if (!\is_object($classOrObject) && null !== $discriminatorMapping = $this->classDiscriminatorResolver->getMappingForClass($classOrObject)) {
-                $attributes = [];
-                $mappedClasses = array_values($discriminatorMapping->getTypesMapping());
-                $visited = [$classOrObject => true];
-
-                // Forcing extra attributes off makes the mapped classes return their attributes instead of false
-                $mappedContext = [self::ALLOW_EXTRA_ATTRIBUTES => false] + $context;
-
-                while (null !== $mappedClass = array_shift($mappedClasses)) {
-                    if (isset($visited[$mappedClass])) {
-                        continue;
-                    }
-                    $visited[$mappedClass] = true;
-
-                    $attributes[] = parent::getAllowedAttributes($mappedClass, $mappedContext, $attributesAsString);
-
-                    // Mapped classes can declare a discriminator map of their own
-                    if (null !== $nestedMapping = $this->classDiscriminatorResolver->getMappingForClass($mappedClass)) {
-                        $typeProperty = $nestedMapping->getTypeProperty();
-                        $attributes[] = [$attributesAsString ? $typeProperty : new AttributeMetadata($typeProperty)];
-                        $mappedClasses = array_merge($mappedClasses, array_values($nestedMapping->getTypesMapping()));
-                    }
-                }
-
-                $allowedAttributes = array_merge($allowedAttributes, ...$attributes);
-            }
         }
 
         return $allowedAttributes;
@@ -1018,7 +1026,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     private function getMappedClass(array $data, string $class, ?string $format, array $context): string
     {
         if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
-            return $object::class;
+            $resolvedClass = ($this->objectClassResolver)($object);
+
+            if (!$object instanceof $resolvedClass) {
+                // instantiateObject() populates the object only when it's an instance of the returned class
+                return $object::class;
+            }
+
+            // Doctrine proxies declare public properties that the proxied class doesn't have
+            return $object::class === $resolvedClass && $object instanceof DoctrineProxy ? get_parent_class($object) : $resolvedClass;
         }
 
         if (!$mapping = $this->classDiscriminatorResolver?->getMappingForClass($class)) {

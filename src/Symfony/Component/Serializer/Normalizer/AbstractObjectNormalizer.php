@@ -12,6 +12,8 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
@@ -144,6 +146,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     private array $typeCache = [];
     private array $attributesCache = [];
     private array $typePropertiesCache = [];
+    /**
+     * @var array<string, bool>
+     */
+    private array $propertyPathClassesCache = [];
+    /**
+     * @var list<array<string, array>>
+     */
+    private array $constructorPropertyPathContexts = [];
     private ?TypeContextFactory $typeContextFactory = null;
     private ?PropertyAccessorInterface $nestedAttributesReader = null;
     private ?PropertyAccessor $serializedPathWriter = null;
@@ -400,10 +410,29 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $normalizedData = $nestedData + $normalizedData;
 
         $originalNormalizedData = $normalizedData;
-        $object = $this->instantiateObject($normalizedData, $mappedClass, $context, new \ReflectionClass($mappedClass), $allowedAttributes, $format);
+        $reflectionClass = new \ReflectionClass($mappedClass);
+        $instantiateAllowedAttributes = $allowedAttributes;
+        $instantiateContext = $context;
+        $constructorPropertyPathContexts = [];
+        if ($this->hasPropertyPathAttributes($mappedClass) && null === $this->extractObjectToPopulate($mappedClass, $context, self::OBJECT_TO_POPULATE)) {
+            $constructorPropertyPathContexts = $this->prepareConstructorPropertyPaths($normalizedData, $originalNormalizedData, $mappedClass, $reflectionClass, $instantiateAllowedAttributes, $format, $instantiateContext);
+        }
+
+        if ($constructorPropertyPathContexts || $this->constructorPropertyPathContexts) {
+            $this->constructorPropertyPathContexts[] = $constructorPropertyPathContexts;
+            try {
+                $object = $this->instantiateObject($normalizedData, $mappedClass, $instantiateContext, $reflectionClass, $instantiateAllowedAttributes, $format);
+            } finally {
+                array_pop($this->constructorPropertyPathContexts);
+            }
+            unset($context[self::OBJECT_TO_POPULATE]);
+        } else {
+            $object = $this->instantiateObject($normalizedData, $mappedClass, $context, $reflectionClass, $allowedAttributes, $format);
+        }
         unset($context['template_types']);
         $resolvedClass = ($this->objectClassResolver)($object);
         $skipInvalidAttributes = $context[self::SKIP_INVALID_ATTRIBUTES] ?? $this->defaultContext[self::SKIP_INVALID_ATTRIBUTES] ?? false;
+        $propertyPathEntries = [];
 
         foreach ($normalizedData as $attribute => $value) {
             $convertedKey = null;
@@ -436,7 +465,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
             }
 
-            $attributeContext = $this->getAttributeDenormalizationContext($resolvedClass, $attribute, $context);
+            $attributeContext = $this->applyPropertyPathContext($attribute, $this->getAttributeDenormalizationContext($resolvedClass, $attribute, $context));
 
             if ((false !== $allowedAttributes && !\in_array($attribute, $allowedAttributes, true)) || !$this->isAllowedAttribute($resolvedClass, $attribute, $format, $context)) {
                 if (!($context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES])) {
@@ -448,6 +477,25 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             if (null !== $convertedKey) {
                 trigger_deprecation('symfony/serializer', '8.2', 'Denormalizing the "%s" property of class "%s" from its PHP name is deprecated and the key will be ignored in 9.0, use the "%s" key instead.', $attribute, $resolvedClass, $convertedKey);
+            }
+
+            if ((str_contains($attribute, '.') || str_contains($attribute, '[')) && class_exists(PropertyPath::class)) {
+                try {
+                    $propertyPath = new PropertyPath($attribute);
+                } catch (InvalidPropertyPathException) {
+                    $propertyPath = null;
+                }
+
+                if (null !== $propertyPath && $propertyPath->getLength() > 1 && !$propertyPath->isIndex(0)) {
+                    $propertyPathEntries[] = [
+                        'attribute' => $attribute,
+                        'path' => $propertyPath,
+                        'value' => $value,
+                        'context' => $attributeContext,
+                    ];
+
+                    continue;
+                }
             }
 
             $type = $this->getType($resolvedClass, $attribute);
@@ -503,6 +551,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
                 throw $exception;
             }
+        }
+
+        if ($propertyPathEntries) {
+            $this->applyPropertyPathEntries($object, $resolvedClass, $resolvedClass, null, '', $context['deserialization_path'] ?? '', $propertyPathEntries, 0, $format, $context, $skipInvalidAttributes, $templateTypes);
         }
 
         if ($extraAttributes) {
@@ -947,11 +999,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, string $parameterName, mixed $parameterData, array $context, ?string $format = null): mixed
     {
+        $templateTypes = $context['template_types'] ?? [];
+        $context = $this->applyPropertyPathContext($parameterName, $context, true);
+
         if ($parameter->isVariadic() || null === $this->propertyTypeExtractor || null === $type = $this->getType($class->getName(), $parameterName)) {
             return parent::denormalizeParameter($class, $parameter, $parameterName, $parameterData, $context, $format);
         }
 
-        if ($templateTypes = $context['template_types'] ?? []) {
+        if ($templateTypes) {
             $type = $this->replaceTemplateTypes($type, $templateTypes);
         }
 
@@ -1503,6 +1558,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         unset($context['not_normalizable_value_exceptions']); // grows with every collected error
         unset($context['debug_trace_id']); // unique per call when the serializer is traced
         unset($context['deserialization_path']); // differs for each item of a collection
+        unset($context['_property_path_contexts']);
 
         try {
             return hash('xxh128', $format.serialize([
@@ -1581,5 +1637,592 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         return $mappedClass;
+    }
+
+    private function applyPropertyPathContext(string $attribute, array $context, bool $forConstructor = false): array
+    {
+        if ($forConstructor && $this->constructorPropertyPathContexts) {
+            $top = $this->constructorPropertyPathContexts[\count($this->constructorPropertyPathContexts) - 1];
+            if (isset($top[$attribute])) {
+                return $top[$attribute];
+            }
+        }
+
+        $pathContexts = $context['_property_path_contexts'] ?? null;
+        unset($context['_property_path_contexts']);
+
+        if (isset($pathContexts[$attribute])) {
+            if (isset($pathContexts[$attribute]['_context'])) {
+                $extra = $pathContexts[$attribute]['_context'];
+                if (isset($extra[self::CALLBACKS], $context[self::CALLBACKS])) {
+                    $extra[self::CALLBACKS] = array_merge($context[self::CALLBACKS], $extra[self::CALLBACKS]);
+                }
+                $context = array_merge($context, $extra);
+            }
+            if (isset($pathContexts[$attribute]['_children'])) {
+                $context['_property_path_contexts'] = $pathContexts[$attribute]['_children'];
+            }
+        }
+
+        return $context;
+    }
+
+    private function hasPropertyPathAttributes(string $class): bool
+    {
+        if (isset($this->propertyPathClassesCache[$class])) {
+            return $this->propertyPathClassesCache[$class];
+        }
+
+        if (!$this->classMetadataFactory?->hasMetadataFor($class) || !class_exists(PropertyPath::class)) {
+            return $this->propertyPathClassesCache[$class] = false;
+        }
+
+        foreach ($this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata() as $name => $metadata) {
+            if (str_contains($name, '.') || str_contains($name, '[')) {
+                return $this->propertyPathClassesCache[$class] = true;
+            }
+        }
+
+        return $this->propertyPathClassesCache[$class] = false;
+    }
+
+    /**
+     * Groups incoming mapped property paths whose root is a constructor parameter
+     * into nested payloads on $normalizedData so instantiateObject() denormalizes
+     * them before construction, returning per-parameter denormalization contexts.
+     *
+     * @return array<string, array>
+     */
+    private function prepareConstructorPropertyPaths(array &$normalizedData, array $originalNormalizedData, string $mappedClass, \ReflectionClass $reflectionClass, array|bool &$allowedAttributes, ?string $format, array &$context): array
+    {
+        if (!$this->classMetadataFactory?->hasMetadataFor($mappedClass)) {
+            return [];
+        }
+
+        $constructor = $this->getConstructor($normalizedData, $mappedClass, $context, $reflectionClass, $allowedAttributes);
+        if (!$constructor?->isPublic()) {
+            return [];
+        }
+
+        $className = $reflectionClass->getName();
+        $declaredAttributes = $this->classMetadataFactory->getMetadataFor($mappedClass)->getAttributesMetadata();
+        $grouped = [];
+
+        foreach ($normalizedData as $rawKey => $value) {
+            $attribute = $this->nameConverter ? $this->nameConverter->denormalize($rawKey, $mappedClass, $format, $context) : $rawKey;
+
+            if (!isset($declaredAttributes[$attribute]) || (!str_contains($attribute, '.') && !str_contains($attribute, '['))) {
+                continue;
+            }
+
+            if ($this->nameConverter && $attribute === $rawKey && ($normalizedAttribute = $this->nameConverter->normalize($attribute, $mappedClass, $format, $context)) !== $attribute) {
+                if (!($context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES])
+                    && (false === $allowedAttributes || \in_array($attribute, $allowedAttributes, true))
+                ) {
+                    continue;
+                }
+
+                if (\array_key_exists($normalizedAttribute, $originalNormalizedData)) {
+                    continue;
+                }
+            }
+
+            if ((false !== $allowedAttributes && !\in_array($attribute, $allowedAttributes, true)) || !$this->isAllowedAttribute($className, $attribute, $format, $context)) {
+                continue;
+            }
+
+            try {
+                $propertyPath = new PropertyPath($attribute);
+            } catch (InvalidPropertyPathException) {
+                continue;
+            }
+
+            if ($propertyPath->getLength() > 1 && !$propertyPath->isIndex(0)) {
+                $grouped[$propertyPath->getElement(0)][] = [
+                    'rawKey' => $rawKey,
+                    'attribute' => $attribute,
+                    'path' => $propertyPath,
+                    'value' => $value,
+                ];
+            }
+        }
+
+        if (!$grouped) {
+            return [];
+        }
+
+        $constructorContexts = [];
+        foreach ($constructor->getParameters() as $constructorParameter) {
+            if ($constructorParameter->isVariadic()) {
+                continue;
+            }
+
+            $paramName = $constructorParameter->name;
+            if (!isset($grouped[$paramName])) {
+                continue;
+            }
+
+            $paramKey = $this->nameConverter ? $this->nameConverter->normalize($paramName, $mappedClass, $format, $context) : $paramName;
+            if (\array_key_exists($paramKey, $normalizedData)
+                || \array_key_exists($paramKey, $context[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$mappedClass] ?? [])
+                || \array_key_exists($paramKey, $this->defaultContext[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$mappedClass] ?? [])
+            ) {
+                continue;
+            }
+
+            $candidateContext = $context;
+            if (isset($candidateContext[self::ATTRIBUTES]) && \is_array($candidateContext[self::ATTRIBUTES]) && !\in_array($paramName, $candidateContext[self::ATTRIBUTES], true)) {
+                $candidateContext[self::ATTRIBUTES][] = $paramName;
+            }
+            if (!$this->isAllowedAttribute($className, $paramName, $format, $candidateContext)) {
+                continue;
+            }
+
+            $entries = $grouped[$paramName];
+
+            if ($this->isNullSafeAllNull($entries, 0) && $constructorParameter->allowsNull()) {
+                $context = $candidateContext;
+                if (\is_array($allowedAttributes) && !\in_array($paramName, $allowedAttributes, true)) {
+                    $allowedAttributes[] = $paramName;
+                }
+                $normalizedData[$paramKey] = null;
+                foreach ($entries as $entry) {
+                    unset($normalizedData[$entry['rawKey']]);
+                }
+
+                continue;
+            }
+
+            $paramType = $this->getType($className, $paramName);
+            $targetClass = $this->extractObjectClassFromType($paramType, $entries, 1);
+            $isArrayParam = false;
+            if (null === $targetClass && ($reflectionType = $constructorParameter->getType()) instanceof \ReflectionNamedType) {
+                if (!$reflectionType->isBuiltin()) {
+                    $targetClass = match ($reflectionType->getName()) {
+                        'self' => ($declaringClass = $constructorParameter->getDeclaringClass()) ? $declaringClass->name : $className,
+                        'parent' => ($declaringClass = $constructorParameter->getDeclaringClass()) && ($parentClass = $declaringClass->getParentClass()) ? $parentClass->name : $reflectionType->getName(),
+                        'static' => $className,
+                        default => $reflectionType->getName(),
+                    };
+                } elseif (\in_array($reflectionType->getName(), ['array', 'iterable'], true)) {
+                    $isArrayParam = true;
+                }
+            }
+
+            if (null === $paramType && null === $targetClass && !$isArrayParam) {
+                continue;
+            }
+
+            $paramDeserializationPath = ($context['deserialization_path'] ?? false) ? $context['deserialization_path'].'.'.$paramName : $paramName;
+            $nestedContext = $this->createPropertyPathNestedContext($className, $paramDeserializationPath, $entries, 1, $context);
+            $nestedPayload = $this->buildPropertyPathPayload($entries, 1, $targetClass, $paramType, $format, $nestedContext);
+
+            $context = $candidateContext;
+            if (\is_array($allowedAttributes) && !\in_array($paramName, $allowedAttributes, true)) {
+                $allowedAttributes[] = $paramName;
+            }
+            $constructorContexts[$paramName] = $nestedContext;
+            $normalizedData[$paramKey] = $nestedPayload;
+            foreach ($entries as $entry) {
+                unset($normalizedData[$entry['rawKey']]);
+            }
+        }
+
+        return $constructorContexts;
+    }
+
+    /**
+     * @param list<array{attribute: string, path: PropertyPath, value: mixed, context: array}> $entries
+     * @param array<string, Type>                                                              $templateTypes
+     */
+    private function applyPropertyPathEntries(object $object, string $rootClass, ?string $currentClass, ?Type $currentType, string $pathPrefix, string $deserializationPrefix, array $entries, int $depth, ?string $format, array &$context, bool $skipInvalidAttributes, array $templateTypes = []): void
+    {
+        foreach ($this->groupPropertyPathEntries($entries, $depth) as $group) {
+            $segment = $group['segment'];
+            $isIndex = $group['isIndex'];
+            $stepPath = '' === $pathPrefix
+                ? ($isIndex ? '['.$segment.']' : $segment)
+                : ($isIndex ? $pathPrefix.'['.$segment.']' : $pathPrefix.'.'.$segment);
+            $nextDeserializationPath = '' === $deserializationPrefix
+                ? ($isIndex ? '['.$segment.']' : $segment)
+                : ($isIndex ? $deserializationPrefix.'['.$segment.']' : $deserializationPrefix.'.'.$segment);
+
+            $leaves = [];
+            $deeper = [];
+            foreach ($group['entries'] as $entry) {
+                if ($depth === $entry['path']->getLength() - 1) {
+                    $leaves[] = $entry;
+                } else {
+                    $deeper[] = $entry;
+                }
+            }
+
+            foreach ($leaves as $entry) {
+                $leafType = $isIndex
+                    ? $this->extractCollectionValueType($currentType)
+                    : (null !== $currentClass ? $this->getType($currentClass, $segment) : null);
+                $leafContext = $entry['context'];
+                $leafContext['deserialization_path'] = $nextDeserializationPath;
+                $value = $entry['value'];
+
+                if (null !== $leafType && ($leafContext[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false)) {
+                    $existing = $this->readPropertyPathValue($object, $stepPath, $format, $leafContext);
+                    if (null !== $existing) {
+                        $leafContext[self::OBJECT_TO_POPULATE] = $existing;
+                    }
+                }
+
+                if (null !== $leafType) {
+                    if ($templateTypes) {
+                        $leafType = $this->replaceTemplateTypes($leafType, $templateTypes);
+                    }
+                    if (!$isIndex && null !== $currentClass) {
+                        $leafType = $this->adaptTypeToWriteTarget($leafType, $currentClass, $segment, $leafContext);
+                    }
+
+                    try {
+                        $value = $this->validateAndDenormalize($leafType, $currentClass ?? $rootClass, $segment, $value, $format, $leafContext);
+                    } catch (NotNormalizableValueException $exception) {
+                        if ($skipInvalidAttributes) {
+                            continue;
+                        }
+                        if (isset($context['not_normalizable_value_exceptions'])) {
+                            $context['not_normalizable_value_exceptions'][] = $exception;
+                            continue;
+                        }
+                        throw $exception;
+                    }
+                }
+
+                $value = $this->applyCallbacks($value, $rootClass, $entry['attribute'], $format, $entry['context']);
+
+                try {
+                    $this->setAttributeValue($object, $stepPath, $value, $format, $leafContext);
+                } catch (NotNormalizableValueException $exception) {
+                    if ($skipInvalidAttributes) {
+                        continue;
+                    }
+                    if (isset($context['not_normalizable_value_exceptions'])) {
+                        $context['not_normalizable_value_exceptions'][] = $exception;
+                        continue;
+                    }
+                    throw $exception;
+                }
+            }
+
+            if (!$deeper) {
+                continue;
+            }
+
+            $childValue = $this->readPropertyPathValue($object, $stepPath, $format, $context);
+            $childType = $isIndex
+                ? $this->extractCollectionValueType($currentType)
+                : (null !== $currentClass ? $this->getType($currentClass, $segment) : null);
+
+            if (null !== $childType && $templateTypes) {
+                $childType = $this->replaceTemplateTypes($childType, $templateTypes);
+            }
+
+            if (\is_object($childValue)) {
+                $childClass = ($this->objectClassResolver)($childValue);
+                $declaredChildClass = null !== $childType ? $this->extractObjectClassFromType($childType, $deeper, $depth + 1) : null;
+                $childTemplateTypes = null !== $declaredChildClass ? $this->getTemplateTypes($declaredChildClass, $childType) : [];
+                $this->applyPropertyPathEntries($object, $rootClass, $childClass, $childType, $stepPath, $nextDeserializationPath, $deeper, $depth + 1, $format, $context, $skipInvalidAttributes, $childTemplateTypes);
+                continue;
+            }
+
+            if (\is_array($childValue)) {
+                $this->applyPropertyPathEntries($object, $rootClass, null, $childType, $stepPath, $nextDeserializationPath, $deeper, $depth + 1, $format, $context, $skipInvalidAttributes);
+                continue;
+            }
+
+            if ($this->isNullSafeAllNull($deeper, $depth) && (null === $childType || $childType->isNullable())) {
+                continue;
+            }
+
+            if (null !== $childType) {
+                if (!$isIndex && null !== $currentClass) {
+                    $childType = $this->adaptTypeToWriteTarget($childType, $currentClass, $segment, $context);
+                }
+
+                $childClass = $this->extractObjectClassFromType($childType, $deeper, $depth + 1);
+                $nestedContext = $this->createPropertyPathNestedContext($rootClass, $nextDeserializationPath, $deeper, $depth + 1, $context);
+                $nestedPayload = $this->buildPropertyPathPayload($deeper, $depth + 1, $childClass, $childType, $format, $nestedContext);
+
+                try {
+                    $denormalized = $this->validateAndDenormalize($childType, $currentClass ?? $rootClass, $segment, $nestedPayload, $format, $nestedContext);
+                    $this->setAttributeValue($object, $stepPath, $denormalized, $format, $nestedContext);
+                } catch (NotNormalizableValueException $exception) {
+                    if ($skipInvalidAttributes) {
+                        continue;
+                    }
+                    if (isset($context['not_normalizable_value_exceptions'])) {
+                        $context['not_normalizable_value_exceptions'][] = $exception;
+                        continue;
+                    }
+                    throw $exception;
+                }
+
+                continue;
+            }
+
+            foreach ($deeper as $entry) {
+                $value = $this->applyCallbacks($entry['value'], $rootClass, $entry['attribute'], $format, $entry['context']);
+
+                try {
+                    $this->setAttributeValue($object, $this->formatSubPath($pathPrefix, $entry['path'], $depth), $value, $format, $entry['context']);
+                } catch (NotNormalizableValueException $exception) {
+                    if ($skipInvalidAttributes) {
+                        continue;
+                    }
+                    if (isset($context['not_normalizable_value_exceptions'])) {
+                        $context['not_normalizable_value_exceptions'][] = $exception;
+                        continue;
+                    }
+                    throw $exception;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param list<array{attribute: string, path: PropertyPath, value: mixed, ...}> $entries
+     */
+    private function buildPropertyPathPayload(array $entries, int $depth, ?string $currentClass, ?Type $containerType, ?string $format, array $context): array
+    {
+        $payload = [];
+        foreach ($this->groupPropertyPathEntries($entries, $depth) as $group) {
+            $segment = $group['segment'];
+            $isIndex = $group['isIndex'];
+            $key = !$isIndex && null !== $currentClass && $this->nameConverter
+                ? $this->nameConverter->normalize($segment, $currentClass, $format, $context)
+                : $segment;
+
+            $deeper = [];
+            foreach ($group['entries'] as $entry) {
+                if ($depth === $entry['path']->getLength() - 1) {
+                    $payload[$key] = $entry['value'];
+                } else {
+                    $deeper[] = $entry;
+                }
+            }
+
+            if (!$deeper) {
+                continue;
+            }
+
+            $childType = $isIndex
+                ? $this->extractCollectionValueType($containerType)
+                : (null !== $currentClass ? $this->getType($currentClass, $segment) : null);
+
+            if ($this->isNullSafeAllNull($deeper, $depth) && (null === $childType || $childType->isNullable())) {
+                $payload[$key] = null;
+                continue;
+            }
+
+            $childClass = $this->extractObjectClassFromType($childType, $deeper, $depth + 1);
+            $payload[$key] = $this->buildPropertyPathPayload($deeper, $depth + 1, $childClass, $childType, $format, $context);
+        }
+
+        return $payload;
+    }
+
+    /**
+     * @template TEntry of array{attribute: string, path: PropertyPath, value: mixed, ...}
+     *
+     * @param list<TEntry> $entries
+     *
+     * @return array<string, array{segment: string, isIndex: bool, entries: list<TEntry>}>
+     */
+    private function groupPropertyPathEntries(array $entries, int $depth): array
+    {
+        $bySegment = [];
+        foreach ($entries as $entry) {
+            $path = $entry['path'];
+            $segment = $path->getElement($depth);
+            $isIndex = $path->isIndex($depth);
+            $key = ($isIndex ? '[' : '.').$segment;
+            $bySegment[$key]['segment'] = $segment;
+            $bySegment[$key]['isIndex'] = $isIndex;
+            $bySegment[$key]['entries'][] = $entry;
+        }
+
+        return $bySegment;
+    }
+
+    /**
+     * Builds a denormalization context for instantiating a missing intermediate
+     * object from mapped property paths: drops parent GROUPS/ATTRIBUTES so only
+     * the mapped properties are written regardless of the nested class's groups,
+     * and carries per-path denormalization contexts and callbacks down to leaves.
+     *
+     * @param list<array{attribute: string, path: PropertyPath, value: mixed, ...}> $entries
+     */
+    private function createPropertyPathNestedContext(string $rootClass, string $deserializationPath, array $entries, int $depth, array $context): array
+    {
+        $groups = $this->getGroups($context);
+        $nestedContext = $context;
+        unset($nestedContext[self::ATTRIBUTES], $nestedContext[self::OBJECT_TO_POPULATE], $nestedContext['cache_key'], $nestedContext['_property_path_contexts']);
+        $nestedContext[self::GROUPS] = [];
+        $nestedContext[self::ALLOW_EXTRA_ATTRIBUTES] = true;
+        $nestedContext['deserialization_path'] = $deserializationPath;
+
+        /** @var array<string, array{_context?: array, _children?: array}> $pathContexts */
+        $pathContexts = [];
+        foreach ($entries as $entry) {
+            $attribute = $entry['attribute'];
+            $metadataContext = $this->getAttributeMetadata($rootClass, $attribute)?->getDenormalizationContextForGroups($groups) ?? [];
+            $callback = $context[self::CALLBACKS][$attribute] ?? $this->defaultContext[self::CALLBACKS][$attribute] ?? null;
+
+            if (!$metadataContext && null === $callback) {
+                continue;
+            }
+
+            $path = $entry['path'];
+            $length = $path->getLength();
+            if ($length <= $depth) {
+                continue;
+            }
+
+            $leafSegment = $path->getElement($length - 1);
+            if ($path->isIndex($length - 1)) {
+                continue;
+            }
+
+            $leafExtra = $metadataContext;
+            if (null !== $callback) {
+                $leafExtra[self::CALLBACKS] = ($leafExtra[self::CALLBACKS] ?? []) + [$leafSegment => $callback];
+            }
+
+            $cursor = &$pathContexts;
+            for ($i = $depth; $i < $length - 1; ++$i) {
+                if ($path->isIndex($i)) {
+                    unset($cursor);
+                    continue 2;
+                }
+                $seg = $path->getElement($i);
+                if (!isset($cursor[$seg]['_children'])) {
+                    $cursor[$seg]['_children'] = [];
+                }
+                $cursor = &$cursor[$seg]['_children'];
+            }
+            $cursor[$leafSegment]['_context'] = array_merge($cursor[$leafSegment]['_context'] ?? [], $leafExtra);
+            unset($cursor);
+        }
+
+        if ($pathContexts) {
+            $nestedContext['_property_path_contexts'] = $pathContexts;
+        }
+
+        return $nestedContext;
+    }
+
+    /**
+     * @param list<array{attribute: string, path: PropertyPath, value: mixed, ...}> $entries
+     */
+    private function isNullSafeAllNull(array $entries, int $depth): bool
+    {
+        foreach ($entries as $entry) {
+            if (!$entry['path']->isNullSafe($depth) || null !== $entry['value']) {
+                return false;
+            }
+        }
+
+        return (bool) $entries;
+    }
+
+    private function readPropertyPathValue(object $object, string $path, ?string $format, array $context): mixed
+    {
+        try {
+            return $this->getAttributeValue($object, $path, $format, $context);
+        } catch (AccessException) {
+            return null;
+        }
+    }
+
+    /**
+     * @param list<array{attribute: string, path: PropertyPath, value: mixed, ...}> $entries
+     */
+    private function extractObjectClassFromType(?Type $type, array $entries, int $depth): ?string
+    {
+        if (null === $type) {
+            return null;
+        }
+
+        $classes = [];
+        $queue = [$type];
+        while ($candidate = array_shift($queue)) {
+            if ($candidate instanceof UnionType) {
+                array_unshift($queue, ...$candidate->getTypes());
+                continue;
+            }
+            if ($candidate instanceof CollectionType) {
+                continue;
+            }
+            while ($candidate instanceof WrappingTypeInterface && !$candidate instanceof CollectionType) {
+                $candidate = $candidate->getWrappedType();
+            }
+            if ($candidate instanceof ObjectType) {
+                $classes[$candidate->getClassName()] = true;
+            }
+        }
+
+        if (1 !== \count($classes)) {
+            return null;
+        }
+
+        $class = array_key_first($classes);
+
+        if (null !== $mapping = $this->classDiscriminatorResolver?->getMappingForClass($class)) {
+            $typeProperty = $mapping->getTypeProperty();
+            foreach ($entries as $entry) {
+                if ($depth === $entry['path']->getLength() - 1 && !$entry['path']->isIndex($depth) && $typeProperty === $entry['path']->getElement($depth) && \is_string($entry['value'])) {
+                    return $mapping->getClassForType($entry['value']) ?? $class;
+                }
+            }
+        }
+
+        return $class;
+    }
+
+    private function extractCollectionValueType(?Type $type): ?Type
+    {
+        if (null === $type) {
+            return null;
+        }
+
+        $queue = [$type];
+        while ($candidate = array_shift($queue)) {
+            if ($candidate instanceof UnionType) {
+                array_unshift($queue, ...$candidate->getTypes());
+                continue;
+            }
+            if ($candidate instanceof CollectionType) {
+                $valueType = $candidate->getCollectionValueType();
+
+                return $valueType->isIdentifiedBy(TypeIdentifier::MIXED) ? null : $valueType;
+            }
+            if ($candidate instanceof WrappingTypeInterface) {
+                $queue[] = $candidate->getWrappedType();
+            }
+        }
+
+        return null;
+    }
+
+    private function formatSubPath(string $pathPrefix, PropertyPath $path, int $startDepth): string
+    {
+        $result = $pathPrefix;
+        for ($i = $startDepth, $length = $path->getLength(); $i < $length; ++$i) {
+            $element = $path->getElement($i);
+            $suffix = $path->isNullSafe($i) ? '?' : '';
+            if ($path->isIndex($i)) {
+                $result .= '['.$element.']'.$suffix;
+            } else {
+                $result = '' === $result ? $element.$suffix : $result.'.'.$element.$suffix;
+            }
+        }
+
+        return $result;
     }
 }

@@ -1,0 +1,61 @@
+Symfony\Component\Serializer\Tests\Normalizer\PropertyPathPerson:
+    attributes:
+        name:
+            groups: [ 'api' ]
+        company.name:
+            serialized_name: company_name
+            groups: [ 'api' ]
+        company.foundedAt:
+            serialized_name: company_founded_at
+            groups: [ 'api' ]
+        company.address.city:
+            serialized_name: company_city
+            groups: [ 'api' ]
+        company.address.zip:
+            serialized_name: company_zip
+            groups: [ 'api' ]
+Symfony\Component\Serializer\Tests\Normalizer\PropertyPathNullSafePerson:
+    attributes:
+        name:
+            groups: [ 'api' ]
+        company?.name:
+            serialized_name: company_name
+            groups: [ 'api' ]
+        company?.foundedAt:
+            serialized_name: company_founded_at
+            groups: [ 'api' ]
+        company?.address?.city:
+            serialized_name: company_city
+            groups: [ 'api' ]
+Symfony\Component\Serializer\Tests\Normalizer\PropertyPathReadonlyPerson:
+    attributes:
+        name:
+            groups: [ 'api' ]
+        company?.name:
+            serialized_name: company_name
+            groups: [ 'api' ]
+        company?.foundedAt:
+            serialized_name: company_founded_at
+            groups: [ 'api' ]
+            contexts:
+                - denormalization_context:
+                      datetime_format: 'd/m/Y'
+Symfony\Component\Serializer\Tests\Normalizer\PropertyPathTypedCollections:
+    attributes:
+        dates[start]:
+            serialized_name: start_date
+            groups: [ 'api' ]
+        companies[primary].name:
+            serialized_name: primary_company_name
+            groups: [ 'api' ]
+        companies[primary].foundedAt:
+            serialized_name: primary_company_founded_at
+            groups: [ 'api' ]
+Symfony\Component\Serializer\Tests\Normalizer\PropertyPathUninitializedPerson:
+    attributes:
+        company.name:
+            serialized_name: company_name
+            groups: [ 'api' ]
+        company.foundedAt:
+            serialized_name: company_founded_at
+            groups: [ 'api' ]

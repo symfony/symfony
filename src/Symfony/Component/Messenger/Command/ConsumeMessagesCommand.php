@@ -35,6 +35,7 @@ use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnFailureLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMemoryLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
+use Symfony\Component\Messenger\Execution\MessageExecutionStrategyFactoryInterface;
 use Symfony\Component\Messenger\Execution\ParallelExecutionStrategy;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
@@ -65,6 +66,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
         private ?array $signals = null,
         private string $console = '',
         private ?ContainerInterface $cooldownStrategyLocator = null,
+        private ?MessageExecutionStrategyFactoryInterface $executionStrategyFactory = null,
     ) {
         parent::__construct();
     }
@@ -344,7 +346,11 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 
         $messageExecutionStrategy = null;
 
-        if (1 < $concurrency = (int) $input->getOption('concurrency')) {
+        $concurrency = (int) $input->getOption('concurrency');
+
+        if ($this->executionStrategyFactory) {
+            $messageExecutionStrategy = $this->executionStrategyFactory->create($bus, $concurrency, $this->logger);
+        } elseif (1 < $concurrency) {
             if (!class_exists(ContextWorkerFactory::class)) {
                 throw new RuntimeException('Parallel message execution requires the "amphp/parallel" package. Try running "composer require amphp/parallel".');
             }

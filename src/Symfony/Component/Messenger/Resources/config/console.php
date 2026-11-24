@@ -36,6 +36,7 @@ return static function (ContainerConfigurator $container) {
                 null,
                 param('kernel.project_dir').'/bin/console',
                 service('messenger.cooldown_strategy_locator'),
+                service('messenger.execution_strategy_factory')->nullOnInvalid(),
             ])
             ->tag('console.command')
             ->tag('monolog.logger', ['channel' => 'messenger'])

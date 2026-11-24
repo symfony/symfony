@@ -292,6 +292,11 @@ class MessengerBundle extends AbstractBundle
                     ->info('Adds a message id and a causation id to dispatched messages, and a correlation id at the start of each flow.')
                 ->end()
                 ->scalarNode('default_bus')->resolvesAtCompileTime()->defaultNull()->end()
+                ->scalarNode('execution_strategy_factory')
+                    ->resolvesAtCompileTime()
+                    ->defaultNull()
+                    ->info('Service id of the MessageExecutionStrategyFactoryInterface the messenger:consume command creates its message execution strategy with, instead of the default one.')
+                ->end()
                 ->arrayNode('buses', 'bus')
                     ->defaultValue(['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => [], 'messages' => [], 'unwrap_exceptions' => false]])
                     ->normalizeKeys(false)
@@ -441,6 +446,10 @@ class MessengerBundle extends AbstractBundle
 
         if (ContainerBuilder::willBeAvailable('symfony/mongodb-messenger', Bridge\MongoDb\Transport\MongoDbTransportFactory::class, ['symfony/messenger'])) {
             $container->getDefinition('messenger.transport.mongodb.factory')->addTag('messenger.transport_factory');
+        }
+
+        if ($config['execution_strategy_factory']) {
+            $container->setAlias('messenger.execution_strategy_factory', $config['execution_strategy_factory']);
         }
 
         if ($config['stop_worker_on_signals'] && $hasConsole) {

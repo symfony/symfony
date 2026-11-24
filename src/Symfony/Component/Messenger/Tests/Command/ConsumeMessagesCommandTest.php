@@ -35,6 +35,8 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
+use Symfony\Component\Messenger\Execution\MessageExecutionStrategyFactoryInterface;
+use Symfony\Component\Messenger\Execution\MessageExecutionStrategyInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\RoutableMessageBus;
@@ -332,6 +334,85 @@ class ConsumeMessagesCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         $this->assertSame([8], $receiver->getFetchSizes());
+    }
+
+    public function testRunWithExecutionStrategyFactory()
+    {
+        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver = new DummyReceiver([[$envelope]]);
+
+        $receiverLocator = new Container();
+        $receiverLocator->set('dummy-receiver', $receiver);
+
+        $bus = new MessageBus();
+        $busLocator = new Container();
+        $busLocator->set('dummy-bus', $bus);
+
+        $strategy = new class implements MessageExecutionStrategyInterface {
+            public array $executed = [];
+            public bool $shutdown = false;
+
+            public function execute(Envelope $envelope, string $transportName, callable $onHandled): void
+            {
+                $this->executed[] = $transportName;
+                $acked = false;
+                $onHandled($envelope, $transportName, $acked, null);
+            }
+
+            public function shouldPauseConsumption(): bool
+            {
+                return false;
+            }
+
+            public function wait(callable $onHandled, ?float $timeout = null): bool
+            {
+                return false;
+            }
+
+            public function flush(callable $onHandled, bool|float $force = false): bool
+            {
+                return false;
+            }
+
+            public function shutdown(): void
+            {
+                $this->shutdown = true;
+            }
+        };
+
+        $factory = new class($strategy) implements MessageExecutionStrategyFactoryInterface {
+            public array $calls = [];
+
+            public function __construct(private MessageExecutionStrategyInterface $strategy)
+            {
+            }
+
+            public function create(MessageBusInterface $bus, int $concurrency, ?LoggerInterface $logger = null): MessageExecutionStrategyInterface
+            {
+                $this->calls[] = [$bus, $concurrency];
+
+                return $this->strategy;
+            }
+        };
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher(), null, [], null, [], null, null, '', null, $factory);
+
+        $application = new Application();
+        $application->addCommand($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--concurrency' => '3',
+            '--limit' => 1,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertCount(1, $factory->calls);
+        $this->assertSame(3, $factory->calls[0][1]);
+        $this->assertSame(['dummy-receiver'], $strategy->executed);
+        $this->assertTrue($strategy->shutdown);
+        $this->assertSame([3], $receiver->getFetchSizes());
     }
 
     public function testRunWithoutReceiverInNonInteractiveMode()

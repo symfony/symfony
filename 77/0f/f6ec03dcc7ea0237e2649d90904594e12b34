@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by vasikmansuri at 2026-11-24T06:50:21Z
+
+The failing checks are unrelated: Unit Tests fail only on `RedisProxiesTest::testRelayProxy` (Relay 0.62, addressed in #68361), and Integration fails on Cache/Lock/Messenger tests that need external services. `src/Symfony/Bridge/PsrHttpMessage` passes in every job.

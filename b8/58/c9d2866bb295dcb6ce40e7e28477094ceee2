@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-24T15:44:42Z
+
+PR updated. I removed the `@` so that the warning still shows the broken line, like the `IniFileLoader` of DependencyInjection does.

@@ -43,6 +43,7 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.runtime_mode.web'),
                 service_closure('error_renderer.html'),
                 service_closure('error_renderer.cli'),
+                param('kernel.debug'),
             ])
 
         ->alias('error_renderer.html', 'error_handler.error_renderer.html')

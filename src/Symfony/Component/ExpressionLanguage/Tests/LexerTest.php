@@ -76,6 +76,22 @@ class LexerTest extends TestCase
         $this->lexer->tokenize($expression);
     }
 
+    #[DataProvider('getUnclosedComments')]
+    public function testTokenizeThrowsErrorOnUnclosedComment($expression, $position)
+    {
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage(\sprintf('Unclosed comment around position %d for expression `', $position));
+
+        $this->lexer->tokenize($expression);
+    }
+
+    public static function getUnclosedComments()
+    {
+        yield ['1 /* 2 * 3', 2];
+        yield ['1 /* 2 */ + 3 /* 4', 14];
+        yield [str_repeat('/* ', 10000), 0];
+    }
+
     public function testTokenizeOnNotOpenedBracket()
     {
         $this->expectException(SyntaxError::class);

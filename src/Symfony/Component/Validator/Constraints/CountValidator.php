@@ -38,7 +38,7 @@ class CountValidator extends ConstraintValidator
         $count = \count($value);
 
         if (null !== $constraint->max && $count > $constraint->max) {
-            $exactlyOptionEnabled = $constraint->min == $constraint->max;
+            $exactlyOptionEnabled = $constraint->min === $constraint->max;
 
             $this->context->buildViolation($exactlyOptionEnabled ? $constraint->exactMessage : $constraint->maxMessage)
                 ->setParameter('{{ count }}', $count)
@@ -52,7 +52,7 @@ class CountValidator extends ConstraintValidator
         }
 
         if (null !== $constraint->min && $count < $constraint->min) {
-            $exactlyOptionEnabled = $constraint->min == $constraint->max;
+            $exactlyOptionEnabled = $constraint->min === $constraint->max;
 
             $this->context->buildViolation($exactlyOptionEnabled ? $constraint->exactMessage : $constraint->minMessage)
                 ->setParameter('{{ count }}', $count)

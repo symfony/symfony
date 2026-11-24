@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Doctrine\Common\Persistence\Proxy as LegacyDoctrineProxy;
+use Doctrine\Persistence\Proxy as DoctrineProxy;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException as PropertyAccessInvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
@@ -382,9 +384,40 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $data = ['#' => $data];
         }
 
-        $allowedAttributes = $this->getAllowedAttributes($type, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
         $extraAttributes = [];
+
+        $mappedClass = $this->getMappedClass($normalizedData, $type, $context);
+        $allowedAttributes = $this->getAllowedAttributes($mappedClass, $context, true);
+        $excludedTypeProperties = [];
+
+        if (false !== $allowedAttributes && null !== $this->classDiscriminatorResolver) {
+            $typeProperties = [];
+
+            if (null !== $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($mappedClass)) {
+                $typeProperties[] = $mapping->getTypeProperty();
+            }
+
+            foreach ([$mappedClass => $mappedClass] + class_parents($mappedClass) + class_implements($mappedClass) as $declaringClass) {
+                if (is_a($declaringClass, $type, true) && null !== $mapping = $this->classDiscriminatorResolver->getMappingForClass($declaringClass)) {
+                    $allowedAttributes[] = $typeProperties[] = $mapping->getTypeProperty();
+                }
+            }
+
+            // A type property is read to pick the class, but it's written only when the metadata of the class allows it
+            $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($mappedClass)->getAttributesMetadata() : [];
+            $groups = $this->getGroups($context);
+
+            foreach ($typeProperties as $typeProperty) {
+                $attributeMetadata = $attributesMetadata[$typeProperty] ?? null;
+
+                if ($attributeMetadata && ($attributeMetadata->isIgnored() || ($groups && $attributeMetadata->getGroups() && !array_intersect(array_merge($attributeMetadata->getGroups(), ['*']), $groups)))) {
+                    $excludedTypeProperties[$typeProperty] = true;
+                }
+            }
+
+            $allowedAttributes = array_diff($allowedAttributes, array_keys($excludedTypeProperties));
+        }
 
         $reflectionClass = new \ReflectionClass($type);
         $object = $this->instantiateObject($normalizedData, $type, $context, $reflectionClass, $allowedAttributes, $format);
@@ -398,7 +431,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $attributeContext = $this->getAttributeDenormalizationContext($resolvedClass, $attribute, $context);
 
             if ((false !== $allowedAttributes && !\in_array($attribute, $allowedAttributes)) || !$this->isAllowedAttribute($resolvedClass, $attribute, $format, $context)) {
-                if (!($context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES])) {
+                if (!($context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES]) && !isset($excludedTypeProperties[$attribute])) {
                     $extraAttributes[] = $attribute;
                 }
 
@@ -898,5 +931,36 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return \PHP_VERSION_ID >= 70400
             && str_starts_with($e->getMessage(), 'Typed property')
             && str_ends_with($e->getMessage(), 'must not be accessed before initialization');
+    }
+
+    /**
+     * Returns the class instantiateObject() creates or populates for the given data.
+     */
+    private function getMappedClass(array $data, string $class, array $context): string
+    {
+        $visitedClasses = [];
+
+        while (!isset($visitedClasses[$class])) {
+            $visitedClasses[$class] = true;
+
+            if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
+                $resolvedClass = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
+
+                // Doctrine proxies declare public properties that the proxied class doesn't have
+                return \get_class($object) === $resolvedClass && ($object instanceof DoctrineProxy || $object instanceof LegacyDoctrineProxy) ? get_parent_class($object) : $resolvedClass;
+            }
+
+            if (!$this->classDiscriminatorResolver || !$mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
+                break;
+            }
+
+            if (!isset($data[$mapping->getTypeProperty()]) || null === $mappedClass = $mapping->getClassForType($data[$mapping->getTypeProperty()])) {
+                break;
+            }
+
+            $class = $mappedClass;
+        }
+
+        return $class;
     }
 }

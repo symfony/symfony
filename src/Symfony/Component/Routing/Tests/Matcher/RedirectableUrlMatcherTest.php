@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Matcher;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcher;
 use Symfony\Component\Routing\RequestContext;
@@ -132,6 +133,37 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $matcher = $this->getUrlMatcher($coll, null, true);
         $matcher->expects($this->once())->method('redirect')->with('/foo%3Abar/')->willReturn([]);
         $matcher->match('/foo%3Abar');
+    }
+
+    #[DataProvider('provideLeadingDoubleSlash')]
+    public function testSlashRedirectEncodesLeadingDoubleSlash(string $pathinfo, string $redirectPath)
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/{path}/edit/', [], ['path' => '.+']));
+
+        $matcher = $this->getUrlMatcher($coll, null, true);
+        $matcher->expects($this->once())->method('redirect')->with($redirectPath.'/', 'foo')->willReturn([]);
+        $matcher->match($pathinfo);
+    }
+
+    #[DataProvider('provideLeadingDoubleSlash')]
+    public function testSchemeRedirectEncodesLeadingDoubleSlash(string $pathinfo, string $redirectPath)
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/{path}/edit', [], ['path' => '.+'], [], '', ['https']));
+
+        $matcher = $this->getUrlMatcher($coll, null, true);
+        $matcher->expects($this->once())->method('redirect')->with($redirectPath, 'foo', 'https')->willReturn([]);
+        $matcher->match($pathinfo);
+    }
+
+    public static function provideLeadingDoubleSlash(): iterable
+    {
+        yield ['//evil.example/edit', '/%2Fevil.example/edit'];
+        yield ['///evil.example/edit', '/%2F/evil.example/edit'];
+        yield ['/\\evil.example/edit', '/%5Cevil.example/edit'];
+        yield ["/\t/evil.example/edit", "/\t%2Fevil.example/edit"];
+        yield ["/\r\n\\evil.example/edit", "/\r\n%5Cevil.example/edit"];
     }
 
     public function testSchemeRequirement()

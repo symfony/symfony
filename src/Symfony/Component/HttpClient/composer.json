@@ -39,6 +39,7 @@
         "symfony/amphp-http-client-meta": "^1.0|^2.0",
         "symfony/cache": "^6.4|^7.0|^8.0",
         "symfony/dependency-injection": "^6.4|^7.0|^8.0",
+        "symfony/http-foundation": "^6.4.50|^7.4.23|^8.1.11",
         "symfony/http-kernel": "^6.4|^7.0|^8.0",
         "symfony/messenger": "^6.4|^7.0|^8.0",
         "symfony/process": "^6.4|^7.0|^8.0",

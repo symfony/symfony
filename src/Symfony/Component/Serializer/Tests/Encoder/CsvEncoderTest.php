@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
@@ -682,6 +683,53 @@ class CsvEncoderTest extends TestCase
             CSV,
             'csv'
         ));
+    }
+
+    public function testDecodeHeadersNestedUpToTheMaximumDepth()
+    {
+        $item = 'a';
+        for ($i = 0; $i < 512; ++$i) {
+            $item = ['k' => $item];
+        }
+
+        $this->assertSame([$item], $this->encoder->decode(str_repeat('k.', 511)."k\na\n", 'csv'));
+    }
+
+    public function testDecodeRejectsHeadersNestedDeeperThanTheMaximumDepth()
+    {
+        $this->expectException(NotEncodableValueException::class);
+        $this->expectExceptionMessage('CSV headers cannot be nested more than 512 levels deep.');
+
+        $this->encoder->decode('foo,'.str_repeat('k.', 512)."k\na,b\n", 'csv');
+    }
+
+    public function testDecodeNestedHeadersOnManyRows()
+    {
+        $rows = $this->encoder->decode("a.b.c,a.b.d,e.f.g,h\n".str_repeat(",,,\n", 10000), 'csv');
+
+        $this->assertCount(10000, $rows);
+        $this->assertSame(['a' => ['b' => ['c' => '', 'd' => '']], 'e' => ['f' => ['g' => '']], 'h' => ''], $rows[9999]);
+    }
+
+    public function testDecodeRejectsRowsCreatingTooManyArraysForTheSizeOfTheData()
+    {
+        $this->expectException(NotEncodableValueException::class);
+        $this->expectExceptionMessage('CSV headers are nested too deeply for the size of the data.');
+
+        $this->encoder->decode(str_repeat('k.', 511)."k\n".str_repeat(str_repeat('a', 39)."\n", 100), 'csv');
+    }
+
+    public function testDecodeRejectsRowsWalkingTooManyLevelsForTheSizeOfTheData()
+    {
+        $this->expectException(NotEncodableValueException::class);
+        $this->expectExceptionMessage('CSV headers are nested too deeply for the size of the data.');
+
+        $headers = [];
+        for ($i = 0; $i < 64; ++$i) {
+            $headers[] = str_repeat('k.', 63).$i;
+        }
+
+        $this->encoder->decode(implode(',', $headers)."\n".str_repeat(str_repeat(',', 63)."\n", 100), 'csv');
     }
 
     public function testDecodeCustomSettings()

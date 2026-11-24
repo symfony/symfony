@@ -21,6 +21,7 @@ class ConditionalNodeTest extends AbstractNodeTestCase
         return [
             [1, new ConditionalNode(new ConstantNode(true), new ConstantNode(1), new ConstantNode(2))],
             [2, new ConditionalNode(new ConstantNode(false), new ConstantNode(1), new ConstantNode(2))],
+            [3, new ConditionalNode($node = new ConstantNode(3), $node, new ConstantNode(2))],
         ];
     }
 
@@ -29,6 +30,7 @@ class ConditionalNodeTest extends AbstractNodeTestCase
         return [
             ['((true) ? (1) : (2))', new ConditionalNode(new ConstantNode(true), new ConstantNode(1), new ConstantNode(2))],
             ['((false) ? (1) : (2))', new ConditionalNode(new ConstantNode(false), new ConstantNode(1), new ConstantNode(2))],
+            ['((3) ?: (2))', new ConditionalNode($node = new ConstantNode(3), $node, new ConstantNode(2))],
         ];
     }
 
@@ -37,6 +39,7 @@ class ConditionalNodeTest extends AbstractNodeTestCase
         return [
             ['(true ? 1 : 2)', new ConditionalNode(new ConstantNode(true), new ConstantNode(1), new ConstantNode(2))],
             ['(false ? 1 : 2)', new ConditionalNode(new ConstantNode(false), new ConstantNode(1), new ConstantNode(2))],
+            ['(3 ?: 2)', new ConditionalNode($node = new ConstantNode(3), $node, new ConstantNode(2))],
         ];
     }
 }

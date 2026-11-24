@@ -105,6 +105,48 @@ class MockResponseTest extends TestCase
         ];
     }
 
+    public function testRedirectUrlIsResolvedFromTheLocationHeader()
+    {
+        $response = MockResponse::fromRequest('GET', 'https://example.com/foo/bar?a=b', [], new MockResponse('', [
+            'http_code' => 302,
+            'response_headers' => ['Location' => '../baz?c=d'],
+        ]));
+
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('https://example.com/baz?c=d', $response->getInfo('redirect_url'));
+
+        $response = MockResponse::fromRequest('GET', 'https://example.com/', [], new MockResponse('', [
+            'http_code' => 307,
+            'response_headers' => ['Location' => 'https://example.org/'],
+            'redirect_url' => 'https://example.net/',
+        ]));
+
+        $this->assertSame(307, $response->getStatusCode());
+        $this->assertSame('https://example.net/', $response->getInfo('redirect_url'));
+
+        $response = MockResponse::fromRequest('GET', 'https://example.com/', [], new MockResponse('', [
+            'http_code' => 301,
+            'response_headers' => ['Location' => 'https://example.org/'],
+            'redirect_url' => null,
+        ]));
+
+        $this->assertSame(301, $response->getStatusCode());
+        $this->assertNull($response->getInfo('redirect_url'));
+
+        $response = MockResponse::fromRequest('GET', 'https://example.com/', [], new MockResponse('', [
+            'http_code' => 201,
+            'response_headers' => ['Location' => 'https://example.org/'],
+        ]));
+
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertNull($response->getInfo('redirect_url'));
+
+        $response = MockResponse::fromRequest('GET', 'https://example.com/', [], new MockResponse('', ['http_code' => 302]));
+
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertNull($response->getInfo('redirect_url'));
+    }
+
     public function testErrorIsTakenIntoAccountInInitialization()
     {
         $this->expectException(TransportException::class);

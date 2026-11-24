@@ -189,6 +189,27 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    public function testShortTernaryUsesItsConditionOnce()
+    {
+        $counter = new class {
+            public $calls = 0;
+
+            public function next()
+            {
+                return ++$this->calls;
+            }
+        };
+        $expression = '((counter.next() ?: 0) ?: 0) ?: 0';
+        $expressionLanguage = new ExpressionLanguage();
+
+        $this->assertSame(1, $expressionLanguage->evaluate($expression, ['counter' => $counter]));
+
+        $result = null;
+        $counter->calls = 0;
+        eval(\sprintf('$result = %s;', $expressionLanguage->compile($expression, ['counter'])));
+        $this->assertSame(1, $result);
+    }
+
     public function testParseThrowsInsteadOfNotice()
     {
         $this->expectException(SyntaxError::class);

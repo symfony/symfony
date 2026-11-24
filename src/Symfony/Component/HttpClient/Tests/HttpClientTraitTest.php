@@ -19,11 +19,14 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\HttpClientTrait;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class HttpClientTraitTest extends TestCase
 {
     use HttpClientTrait;
+    use TestServerPortTrait;
 
     private const RFC3986_BASE = 'http://a/b/c/d;p?q';
 
@@ -347,6 +350,16 @@ b'])]
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => 'foo', 'auth_basic' => 'foo:bar'], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
+    public function testNullAuthNtlmOptionWithoutNtlmSupport()
+    {
+        [, $options] = self::prepareRequest('GET', 'http://example.com', ['auth_ntlm' => null], HttpClientInterface::OPTIONS_DEFAULTS);
+        $this->assertNull($options['auth_ntlm']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "auth_ntlm" is not supported by');
+        self::prepareRequest('GET', 'http://example.com', ['auth_ntlm' => 'foo:bar'], HttpClientInterface::OPTIONS_DEFAULTS);
+    }
+
     public function testSetJSONAndBodyOptions()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -433,5 +446,82 @@ b'])]
         $fingerprint = new \stdClass();
 
         $this->normalizePeerFingerprint($fingerprint);
+    }
+
+    #[DataProvider('provideProxyUrlFromEnvironment')]
+    public function testProxyUrlFromEnvironment(?string $expected, string $scheme, array $server, array $env, array $getenv = [])
+    {
+        $backup = [];
+
+        foreach (['http_proxy', 'HTTP_PROXY', 'https_proxy', 'HTTPS_PROXY', 'all_proxy', 'ALL_PROXY'] as $name) {
+            $backup[$name] = [$_SERVER[$name] ?? null, $_ENV[$name] ?? null, getenv($name, true)];
+            unset($_SERVER[$name], $_ENV[$name]);
+            putenv($name);
+        }
+
+        try {
+            foreach ($server as $name => $value) {
+                $_SERVER[$name] = $value;
+            }
+            foreach ($env as $name => $value) {
+                $_ENV[$name] = $value;
+            }
+            foreach ($getenv as $name => $value) {
+                putenv($name.'='.$value);
+            }
+
+            $this->assertSame($expected, self::getProxyUrl(null, ['scheme' => $scheme]));
+        } finally {
+            foreach ($backup as $name => [$serverValue, $envValue, $getenvValue]) {
+                unset($_SERVER[$name], $_ENV[$name]);
+
+                if (null !== $serverValue) {
+                    $_SERVER[$name] = $serverValue;
+                }
+                if (null !== $envValue) {
+                    $_ENV[$name] = $envValue;
+                }
+
+                false === $getenvValue ? putenv($name) : putenv($name.'='.$getenvValue);
+            }
+        }
+    }
+
+    public static function provideProxyUrlFromEnvironment(): iterable
+    {
+        yield 'HTTP_PROXY only in $_SERVER' => [null, 'http:', ['HTTP_PROXY' => 'http://header.example:3128'], []];
+        yield 'HTTP_PROXY only in $_SERVER, https' => [null, 'https:', ['HTTP_PROXY' => 'http://header.example:3128'], []];
+        yield 'HTTP_PROXY from getenv()' => ['http://env.example:3128', 'http:', [], [], ['HTTP_PROXY' => 'http://env.example:3128']];
+        yield 'HTTP_PROXY from getenv(), https' => ['http://env.example:3128', 'https:', [], [], ['HTTP_PROXY' => 'http://env.example:3128']];
+        yield 'HTTP_PROXY from $_ENV' => ['http://env.example:3128', 'http:', [], ['HTTP_PROXY' => 'http://env.example:3128']];
+        yield 'HTTP_PROXY from getenv() over $_SERVER' => ['http://env.example:3128', 'http:', ['HTTP_PROXY' => 'http://header.example:3128'], [], ['HTTP_PROXY' => 'http://env.example:3128']];
+        yield 'http_proxy' => ['http://lower.example:3128', 'http:', ['http_proxy' => 'http://lower.example:3128'], []];
+        yield 'http_proxy over HTTP_PROXY' => ['http://lower.example:3128', 'http:', ['http_proxy' => 'http://lower.example:3128'], [], ['HTTP_PROXY' => 'http://env.example:3128']];
+        yield 'https_proxy' => ['http://secure.example:3128', 'https:', ['https_proxy' => 'http://secure.example:3128'], []];
+        yield 'HTTPS_PROXY' => ['http://secure.example:3128', 'https:', ['HTTPS_PROXY' => 'http://secure.example:3128'], []];
+        yield 'https_proxy is not used for http' => [null, 'http:', ['https_proxy' => 'http://secure.example:3128'], []];
+        yield 'all_proxy' => ['http://all.example:3128', 'http:', ['all_proxy' => 'http://all.example:3128'], []];
+        yield 'ALL_PROXY' => ['http://all.example:3128', 'https:', ['ALL_PROXY' => 'http://all.example:3128'], []];
+        yield 'all_proxy when HTTP_PROXY is only in $_SERVER' => ['http://all.example:3128', 'http:', ['all_proxy' => 'http://all.example:3128', 'HTTP_PROXY' => 'http://header.example:3128'], []];
+    }
+
+    public function testHttpProxyIsIgnoredOnOtherSapis()
+    {
+        $finder = new PhpExecutableFinder();
+        $env = ['HTTP_PROXY' => 'http://env.example:3128', 'http_proxy' => false, 'https_proxy' => false, 'HTTPS_PROXY' => false, 'all_proxy' => false, 'ALL_PROXY' => false];
+        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', '127.0.0.1:'.self::port(8098)]), __DIR__.'/Fixtures/proxy-url', $env);
+        $process->start();
+
+        try {
+            do {
+                usleep(50000);
+            } while ($process->isRunning() && !@fopen('http://127.0.0.1:'.self::port(8098), 'r'));
+
+            $context = stream_context_create(['http' => ['header' => 'Proxy: http://header.example:3128']]);
+
+            $this->assertSame('{"sapi":"cli-server","http":null,"https":null}', file_get_contents('http://127.0.0.1:'.self::port(8098).'/', false, $context));
+        } finally {
+            $process->stop();
+        }
     }
 }

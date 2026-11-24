@@ -51,10 +51,12 @@ class HttpUtils
      */
     public function createRedirectResponse(Request $request, string $path, int $status = 302): RedirectResponse
     {
-        if (null !== $this->secureDomainRegexp && 'https' === $this->urlMatcher->getContext()->getScheme() && preg_match('#^https?:[/\\\\]{2,}+[^/]++#i', $path, $host) && !preg_match(\sprintf($this->secureDomainRegexp, preg_quote($request->getHttpHost())), $host[0])) {
+        // The host ends at the first "/", "\", "?" or "#", as in browsers.
+        // A "\" right after the host fails the check, because other URL parsers don't end the host there.
+        if (null !== $this->secureDomainRegexp && 'https' === $this->urlMatcher->getContext()->getScheme() && preg_match('#^https?:[/\\\\]{2,}+[^/\\\\?\#]*+\\\\?#i', $path, $host) && !preg_match(\sprintf($this->secureDomainRegexp, preg_quote($request->getHttpHost())), $host[0])) {
             $path = '/';
         }
-        if (null !== $this->domainRegexp && preg_match('#^https?:[/\\\\]{2,}+[^/]++#i', $path, $host) && !preg_match(\sprintf($this->domainRegexp, preg_quote($request->getHttpHost())), $host[0])) {
+        if (null !== $this->domainRegexp && preg_match('#^https?:[/\\\\]{2,}+[^/\\\\?\#]*+\\\\?#i', $path, $host) && !preg_match(\sprintf($this->domainRegexp, preg_quote($request->getHttpHost())), $host[0])) {
             $path = '/';
         }
 
@@ -68,9 +70,12 @@ class HttpUtils
      */
     public function createRequest(Request $request, string $path): Request
     {
+        $server = $request->server->all();
+
         if ($trustedProxies = Request::getTrustedProxies()) {
             Request::setTrustedProxies([], Request::getTrustedHeaderSet());
         }
+        $request->server->remove('SYMFONY_SUB_REQUEST_TRUSTED_HEADER_SET');
 
         // Trusted proxies are disabled above, so getBaseUrl() now returns only the
         // webserver-derived portion of the base URL (e.g. an Apache "Alias /myapp …"
@@ -86,10 +91,13 @@ class HttpUtils
         }
 
         try {
-            $newRequest = Request::create($this->generateUri($request, $path), 'get', [], $request->cookies->all(), [], $request->server->all());
+            $newRequest = Request::create($this->generateUri($request, $path), 'get', [], $request->cookies->all(), [], $server);
         } finally {
             if ($trustedProxies) {
                 Request::setTrustedProxies($trustedProxies, Request::getTrustedHeaderSet());
+            }
+            if (isset($server['SYMFONY_SUB_REQUEST_TRUSTED_HEADER_SET'])) {
+                $request->server->set('SYMFONY_SUB_REQUEST_TRUSTED_HEADER_SET', $server['SYMFONY_SUB_REQUEST_TRUSTED_HEADER_SET']);
             }
             if ($resetBaseUrl) {
                 $context->setBaseUrl($contextBaseUrl);

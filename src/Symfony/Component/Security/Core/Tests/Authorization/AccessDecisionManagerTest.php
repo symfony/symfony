@@ -17,7 +17,12 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
+use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
+use Symfony\Component\Security\Core\Authorization\Strategy\ConsensusStrategy;
+use Symfony\Component\Security\Core\Authorization\Strategy\PriorityStrategy;
+use Symfony\Component\Security\Core\Authorization\Strategy\UnanimousStrategy;
 use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AccessDecisionManagerTest extends TestCase
@@ -346,6 +351,78 @@ class AccessDecisionManagerTest extends TestCase
 
         $manager = new AccessDecisionManager([$voter]);
         $this->assertTrue($manager->decide($token, ['foo', 1337], 'bar', true));
+    }
+
+    /**
+     * @dataProvider provideMultipleAttributesWithRoleVoter
+     */
+    public function testMultipleAttributesWithRoleVoter(AccessDecisionStrategyInterface $strategy, array $roles, bool $expected)
+    {
+        $token = $this->createStub(TokenInterface::class);
+        $token->method('getRoleNames')->willReturn($roles);
+
+        $manager = new AccessDecisionManager([new RoleVoter()], $strategy);
+
+        $this->assertSame($expected, $manager->decide($token, ['ROLE_ADMIN', 'ROLE_AUDITOR'], null, true));
+    }
+
+    public static function provideMultipleAttributesWithRoleVoter(): iterable
+    {
+        yield [new UnanimousStrategy(), ['ROLE_ADMIN', 'ROLE_AUDITOR'], true];
+        yield [new UnanimousStrategy(), ['ROLE_ADMIN'], false];
+        yield [new UnanimousStrategy(), ['ROLE_AUDITOR'], false];
+        yield [new UnanimousStrategy(), ['ROLE_USER'], false];
+
+        foreach ([new AffirmativeStrategy(), new ConsensusStrategy(), new PriorityStrategy()] as $strategy) {
+            yield [$strategy, ['ROLE_ADMIN', 'ROLE_AUDITOR'], true];
+            yield [$strategy, ['ROLE_ADMIN'], true];
+            yield [$strategy, ['ROLE_AUDITOR'], true];
+            yield [$strategy, ['ROLE_USER'], false];
+        }
+    }
+
+    public function testUnanimousStrategyAsksVotersAboutEachAttribute()
+    {
+        $token = $this->createStub(TokenInterface::class);
+        $calls = [];
+
+        $voter = $this->createMock(VoterInterface::class);
+        $voter
+            ->expects($this->exactly(2))
+            ->method('vote')
+            ->willReturnCallback(static function (TokenInterface $token, $subject, array $attributes) use (&$calls) {
+                $calls[] = $attributes;
+
+                return ['foo'] === $attributes ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_ABSTAIN;
+            });
+
+        $manager = new AccessDecisionManager([$voter], new UnanimousStrategy());
+
+        $this->assertTrue($manager->decide($token, ['foo', 'bar'], 'subject', true));
+        $this->assertSame([['foo'], ['bar']], $calls);
+    }
+
+    public function testUnanimousStrategyWithCacheableVoters()
+    {
+        $token = $this->createStub(TokenInterface::class);
+        $voter = $this->createMock(CacheableVoterInterface::class);
+        $voter
+            ->expects($this->exactly(2))
+            ->method('supportsAttribute')
+            ->willReturnMap([['foo', true], ['bar', false]]);
+        $voter
+            ->expects($this->once())
+            ->method('supportsType')
+            ->with('string')
+            ->willReturn(true);
+        $voter
+            ->expects($this->once())
+            ->method('vote')
+            ->with($token, 'bar', ['foo'])
+            ->willReturn(VoterInterface::ACCESS_GRANTED);
+
+        $manager = new AccessDecisionManager([$voter], new UnanimousStrategy());
+        $this->assertTrue($manager->decide($token, ['foo', 'bar'], 'bar', true));
     }
 
     protected static function getVoters($grants, $denies, $abstains): array

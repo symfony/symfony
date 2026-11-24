@@ -420,6 +420,9 @@ class PathTest extends TestCase
 
         yield ['phar:///css/style.css', 'phar:///'];
         yield ['phar:///', 'phar:///'];
+        yield ['phar://', ''];
+        yield ['file://', ''];
+        yield ['https://', ''];
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             yield ['\\css\\style.css', '/'];

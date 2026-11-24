@@ -733,6 +733,36 @@ class JsonCrawlerTest extends TestCase
         (new JsonCrawler('[1]'))->find('$[?'.str_repeat('!', 1000).'@.a]');
     }
 
+    public function testTooLongFilterExpressionIsRejectedWhileParsing()
+    {
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('JSONPath syntax error at position 10003: filter expression is too long.');
+
+        (new JsonCrawler('[1]'))->find('$[?'.implode('&&', array_fill(0, 2000, '@.a==1')).']');
+    }
+
+    #[DataProvider('provideTooLongQueries')]
+    public function testTooLongQueryIsRejectedBeforeBeingParsed(string|JsonPath $query)
+    {
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('the query is longer than 100000 bytes');
+
+        (new JsonCrawler('{"a":1}'))->find($query);
+    }
+
+    public static function provideTooLongQueries(): iterable
+    {
+        yield 'whitespace' => ['$.a'.str_repeat(' ', 1000000)];
+        yield 'union of filters' => ['$['.implode(',', array_fill(0, 30000, '?@.a')).']'];
+        yield 'one byte too many' => ['$.a'.str_repeat(' ', 99998)];
+        yield 'JsonPath' => [(new JsonPath())->key(str_repeat('a', 100000))];
+    }
+
+    public function testLongestQueryIsAccepted()
+    {
+        $this->assertSame([1], (new JsonCrawler('{"a":1}'))->find('$.a'.str_repeat(' ', 99997)));
+    }
+
     #[DataProvider('provideLongFilterExpressions')]
     public function testLongFilterExpressionsAreEvaluatedCorrectly(string $path, array $expected)
     {
@@ -1045,6 +1075,159 @@ class JsonCrawlerTest extends TestCase
 
         $this->assertSame([1], $crawler->find($query));
         $this->assertLessThan(8 * 1024 * 1024, memory_get_peak_usage() - $memory);
+    }
+
+    public function testNodesSelectedSeveralTimesAreConvertedToArraysOnce()
+    {
+        $crawler = new JsonCrawler(self::createNestedJson(40));
+
+        memory_reset_peak_usage();
+        $memory = memory_get_usage();
+
+        $this->assertCount(19760, $crawler->find('$..*..*..*'));
+        $this->assertLessThan(4 * 1024 * 1024, memory_get_peak_usage() - $memory);
+    }
+
+    #[DataProvider('provideQueriesVisitingTooManyNodes')]
+    public function testQueryVisitingTooManyNodesThrows(string $query)
+    {
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage(\sprintf('Error while crawling JSON with JSON path "%s": the query visits more nodes than allowed.', $query));
+
+        (new JsonCrawler(self::createNestedJson(40)))->find($query);
+    }
+
+    public static function provideQueriesVisitingTooManyNodes(): iterable
+    {
+        yield 'chained descents' => ['$..*..*..*..*'];
+        yield 'chained descents in an existence test' => ['$[?$..*..*..*..*]'];
+        yield 'chained relative descents in an existence test' => ['$[?@..*..*..*..*]'];
+        yield 'chained descents in a function argument' => ['$[?count($..*..*..*..*) > 0]'];
+        yield 'long union after descents' => ['$..*..*['.implode(',', array_fill(0, 2500, "'x'")).']'];
+        yield 'long filter after descents' => ['$..*..*[?@'.str_repeat('.x', 2000).']'];
+        yield 'deep comparisons after a descent' => ['$..*[?'.implode(' && ', array_fill(0, 100, '@ == value(@)')).']'];
+        yield 'nested function calls' => ['$[?'.str_repeat('length(', 400).'@.a'.str_repeat(')', 400).' == 1]'];
+    }
+
+    public function testConversionOfTheNodesToArraysIsBounded()
+    {
+        // unlike objects, an array is converted again each time the query selects it
+        $crawler = new JsonCrawler(json_encode([range(1, 100000)]));
+
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('the query visits more nodes than allowed');
+
+        $crawler->find('$['.implode(',', array_fill(0, 2500, '0')).']');
+    }
+
+    public function testRegularExpressionsTakenFromTheDocumentAreBounded()
+    {
+        $crawler = new JsonCrawler(json_encode(['items' => array_map(static fn (int $i) => ['s' => 'a', 'p' => str_repeat('a', 10000).$i], range(1, 1000))]));
+
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('the query visits more nodes than allowed');
+
+        $crawler->find('$.items[?match(@.s, @.p)]');
+    }
+
+    #[DataProvider('provideQueriesRepeatingWorkForEachNode')]
+    public function testQueryRepeatingWorkForEachNodeThrows(string $json, string $query)
+    {
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('the query visits more nodes than allowed');
+
+        (new JsonCrawler($json))->find($query);
+    }
+
+    public static function provideQueriesRepeatingWorkForEachNode(): iterable
+    {
+        yield 'long name' => [json_encode(array_fill(0, 16000, ['a' => 1])), '$[*][\''.str_repeat('x', 10000).'\']'];
+        yield 'repeated indexes' => ['[[[[[[[[[[0]]]]]]]]]]', '$'.str_repeat('[0,0,0,0,0]', 8)];
+    }
+
+    #[DataProvider('provideOperandsThatDoNotDependOnTheNode')]
+    public function testOperandsThatDoNotDependOnTheNodeAreEvaluatedOnce(string $json, string $query, int $count)
+    {
+        $this->assertCount($count, (new JsonCrawler($json))->find($query));
+    }
+
+    public static function provideOperandsThatDoNotDependOnTheNode(): iterable
+    {
+        // each of these would take more from the budgets than allowed if evaluated for each item
+        $json = json_encode(['text' => str_repeat('lorem ipsum ', 2520), 'a' => array_fill(0, 2000, ['x' => 1]), 'items' => array_fill(0, 3000, 1)]);
+
+        yield 'regular expression' => [$json, '$.items[?search($.text, "zz")]', 0];
+        yield 'two spellings of a large node' => [$json, '$.items[?$.a && $[\'a\']]', 3000];
+        yield 'function of a large node' => [$json, '$.items[?length($.a) > @ && length($[\'a\']) > @]', 3000];
+        yield 'comparison of the document with itself' => [json_encode(array_fill(0, 8000, ['a' => 1])), '$[?$ == $]', 8000];
+    }
+
+    public function testOperandComparedWithItselfIsNotComparedDeeply()
+    {
+        $this->assertCount(78, (new JsonCrawler(self::createNestedJson(40)))->find('$..*[?'.implode(' && ', array_fill(0, 100, '@ == @')).']'));
+    }
+
+    #[DataProvider('provideLongRegularExpressions')]
+    public function testRegularExpressionIsTransformedOncePerQuery(string $pattern)
+    {
+        $crawler = new JsonCrawler(json_encode(['pattern' => $pattern, 'items' => array_fill(0, 2000, 'b')]));
+
+        $this->assertSame([], $crawler->find('$.items[?match(@, $.pattern)]'));
+        $this->assertSame([], $crawler->find('$.items[?search(@, $.pattern)]'));
+    }
+
+    public static function provideLongRegularExpressions(): iterable
+    {
+        yield 'compiled' => [str_repeat('a', 10000)];
+        yield 'too large to be compiled' => [str_repeat('a', 100000)];
+    }
+
+    public function testLengthOfAValueIsComputedOncePerQuery()
+    {
+        $crawler = new JsonCrawler(json_encode(['s' => ['text' => str_repeat('é', 250000), 'object' => array_fill_keys(range('a', 'z'), 1)]]));
+        $query = '$['.implode(',', array_fill(0, 1000, "'s'")).'][?length(@) > 1]';
+
+        $this->assertCount(2000, $crawler->find($query));
+    }
+
+    #[DataProvider('provideQueriesVisitingTooManyNodesOfAStream')]
+    public function testQueryVisitingTooManyNodesOfAStreamThrows(string $query)
+    {
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('the query visits more nodes than allowed');
+
+        (new JsonCrawler(self::createStream(self::createNestedJson(40))))->find($query);
+    }
+
+    public static function provideQueriesVisitingTooManyNodesOfAStream(): iterable
+    {
+        yield 'whole document' => ['$..*..*..*..*'];
+        yield 'part of the document' => ['$.a..*..*..*..*'];
+        yield 'absolute query in a filter' => ['$.a[?$..*..*..*..*]'];
+    }
+
+    public function testNodeBudgetGrowsWithTheDocument()
+    {
+        $this->assertCount(300000, (new JsonCrawler(json_encode(range(1, 300000))))->find('$..*'));
+        $this->assertCount(60000, (new JsonCrawler(self::createStream(json_encode(['a' => range(1, 60000)]))))->find('$.a..*'));
+    }
+
+    #[DataProvider('provideQueriesOnLargeDocuments')]
+    public function testQueriesOnLargeDocumentsStayUnderTheNodeBudget(string $query, int $count)
+    {
+        $books = array_map(static fn (int $i) => ['title' => 't'.$i, 'price' => $i % 50, 'tags' => ['a', 'b'], 'author' => ['name' => 'a'.$i, 'born' => 1900 + $i % 100]], range(0, 4999));
+        $crawler = new JsonCrawler(json_encode(['store' => ['book' => $books, 'bicycle' => ['color' => 'red', 'price' => 399]]]));
+
+        $this->assertCount($count, $crawler->find($query));
+    }
+
+    public static function provideQueriesOnLargeDocuments(): iterable
+    {
+        yield 'recursive wildcard' => ['$..*', 45005];
+        yield 'nested descents' => ['$..book..price', 5000];
+        yield 'descent from all nodes' => ['$..*..name', 20000];
+        yield 'filter' => ['$..book[?@.price < 10 && @.author.born >= 1950].title', 500];
+        yield 'existence tests' => ['$.store.book[?@..name && $..bicycle].title', 5000];
     }
 
     public function testAcceptsJsonPath()
@@ -1383,6 +1566,19 @@ class JsonCrawlerTest extends TestCase
         ];
 
         return new JsonCrawler(json_encode($json));
+    }
+
+    /**
+     * Nests objects of two members, the first one holding the next level.
+     */
+    private static function createNestedJson(int $depth): string
+    {
+        $json = 'null';
+        for ($i = 0; $i < $depth; ++$i) {
+            $json = '{"a":'.$json.',"b":1}';
+        }
+
+        return $json;
     }
 
     /**

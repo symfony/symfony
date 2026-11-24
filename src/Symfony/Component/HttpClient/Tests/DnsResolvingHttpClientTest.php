@@ -13,9 +13,13 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\DnsResolvingHttpClient;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpClient\Tests\Fixtures\ShutdownAwareClient;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -93,6 +97,113 @@ class DnsResolvingHttpClientTest extends TestCase
         $client = new DnsResolvingHttpClient(new MockHttpClient($responses), static fn (string $host): ?string => '1.2.3.4');
 
         $this->assertSame('Redirected', $client->request('POST', 'http://example.com/', ['body' => 'foo'])->getContent());
+    }
+
+    public function testRedirectToAnotherOriginDropsDefaultCredentials()
+    {
+        $requests = [];
+        $mockClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$requests) {
+            $requests[] = [$url, $options['normalized_headers']['authorization'][0] ?? null, $options['normalized_headers']['cookie'][0] ?? null, $options['auth_ntlm'] ?? null];
+
+            return match (\count($requests) % 3) {
+                1 => new MockResponse('', ['http_code' => 302, 'redirect_url' => 'https://other.example.com/']),
+                2 => new MockResponse('', ['http_code' => 302, 'redirect_url' => 'https://example.com/back']),
+                default => new MockResponse('OK'),
+            };
+        });
+        $resolver = static fn (string $host): ?string => null;
+
+        $client = new DnsResolvingHttpClient($mockClient->withOptions([
+            'auth_basic' => 'foo:bar',
+            'headers' => ['Cookie' => 'a=b'],
+            'auth_ntlm' => 'foo:bar',
+        ]), $resolver);
+        $client->request('GET', 'https://example.com/')->getContent();
+
+        $client = (new DnsResolvingHttpClient($mockClient, $resolver))->withOptions([
+            'auth_bearer' => 'foo',
+            'headers' => ['Cookie' => 'a=b'],
+        ]);
+        $client->request('GET', 'https://example.com/')->getContent();
+
+        $this->assertSame([
+            ['https://example.com/', 'Authorization: Basic Zm9vOmJhcg==', 'Cookie: a=b', 'foo:bar'],
+            ['https://other.example.com/', null, null, null],
+            ['https://example.com/back', 'Authorization: Basic Zm9vOmJhcg==', 'Cookie: a=b', 'foo:bar'],
+            ['https://example.com/', 'Authorization: Bearer foo', 'Cookie: a=b', null],
+            ['https://other.example.com/', null, null, null],
+            ['https://example.com/back', 'Authorization: Bearer foo', 'Cookie: a=b', null],
+        ], $requests);
+    }
+
+    public function testDecoratedClientAppliesItsDefaultOptions()
+    {
+        $requests = [];
+        $mockClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$requests) {
+            $requests[] = [$url, $options['cafile'] ?? null, $options['proxy'] ?? null, $options['timeout'], $options['max_redirects'], $options['normalized_headers']['accept']];
+
+            return 1 === \count($requests) % 2 ? new MockResponse('', ['http_code' => 302, 'redirect_url' => 'https://104.26.14.7/']) : new MockResponse('OK');
+        });
+        $resolver = static fn (string $host): ?string => null;
+
+        $client = new DnsResolvingHttpClient($mockClient->withOptions([
+            'cafile' => '/path/to/ca.pem',
+            'proxy' => 'http://proxy.example:3128',
+            'timeout' => 7,
+            'headers' => ['Accept' => 'application/json'],
+        ]), $resolver);
+        $client->request('GET', 'https://104.26.14.6/')->getContent();
+
+        $client = new DnsResolvingHttpClient(ScopingHttpClient::forBaseUri($mockClient, 'https://104.26.14.6/', ['cafile' => '/path/to/ca.pem']), $resolver);
+        $client->request('GET', 'https://104.26.14.6/')->getContent();
+
+        $progress = false;
+        $client = (new DnsResolvingHttpClient($mockClient, $resolver))->withOptions([
+            'max_redirects' => 0,
+            'user_data' => 'foo',
+            'on_progress' => static function () use (&$progress) { $progress = true; },
+        ]);
+        $response = $client->request('GET', 'https://104.26.14.6/');
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('foo', $response->getInfo('user_data'));
+        $this->assertTrue($progress);
+
+        $this->assertSame([
+            ['https://104.26.14.6/', '/path/to/ca.pem', 'http://proxy.example:3128', 7.0, 0, ['Accept: application/json']],
+            ['https://104.26.14.7/', '/path/to/ca.pem', 'http://proxy.example:3128', 7.0, 0, ['Accept: application/json']],
+            ['https://104.26.14.6/', '/path/to/ca.pem', null, (float) \ini_get('default_socket_timeout'), 0, ['Accept: */*']],
+            ['https://104.26.14.7/', null, null, (float) \ini_get('default_socket_timeout'), 0, ['Accept: */*']],
+            ['https://104.26.14.6/', null, null, (float) \ini_get('default_socket_timeout'), 0, ['Accept: */*']],
+        ], $requests);
+    }
+
+    public function testRedirectToAnotherOriginDropsDefaultCredentialsBehindOtherDecorators()
+    {
+        $requests = [];
+        $mockClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$requests) {
+            $requests[] = [$url, $options['normalized_headers']['authorization'][0] ?? null, $options['normalized_headers']['cookie'][0] ?? null];
+
+            return 1 === \count($requests) % 2 ? new MockResponse('', ['http_code' => 302, 'redirect_url' => 'https://other.example.com/']) : new MockResponse('OK');
+        });
+        $mockClient = $mockClient->withOptions([
+            'auth_bearer' => 'foo',
+            'headers' => ['Cookie' => 'a=b'],
+        ]);
+
+        $decorators = [
+            new ScopingHttpClient($mockClient, ['https://other\.example\.com/' => []]),
+            new CachingHttpClient($mockClient, new TagAwareAdapter(new ArrayAdapter())),
+        ];
+
+        foreach ($decorators as $decorator) {
+            $client = new DnsResolvingHttpClient($decorator, static fn (string $host): ?string => null);
+            $client->request('GET', 'https://example.com/', ['extra' => ['no_cache' => true]])->getContent();
+        }
+
+        $this->assertSame(array_merge(...array_fill(0, 2, [
+            ['https://example.com/', 'Authorization: Bearer foo', 'Cookie: a=b'],
+            ['https://other.example.com/', null, null],
+        ])), $requests);
     }
 
     #[TestWith(['http://93.184.216.34/'])]

@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Tests\Transport\Smtp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Exception\UnexpectedResponseException;
 use Symfony\Component\Mailer\Transport\Smtp\Auth\CramMd5Authenticator;
 use Symfony\Component\Mailer\Transport\Smtp\Auth\LoginAuthenticator;
 use Symfony\Component\Mailer\Transport\Smtp\Auth\XOAuth2Authenticator;
@@ -313,6 +314,95 @@ class EsmtpTransportTest extends TestCase
         $this->expectExceptionMessage('TLS required but neither TLS or STARTTLS are in use.');
 
         $transport->send($message);
+    }
+
+    public function testRequireTlsWhenServerRejectsEhlo()
+    {
+        $stream = new DummyStream();
+        $transport = new HeloOnlyEsmtpTransport('localhost', 0, null, null, null, $stream);
+        $transport->setRequireTls(true);
+
+        $message = new Email();
+        $message->from('sender@example.org');
+        $message->addTo('recipient@example.org');
+        $message->text('.');
+
+        try {
+            $transport->send($message);
+            $this->fail('A TransportException should have been thrown.');
+        } catch (TransportException $e) {
+            $this->assertSame('TLS required but neither TLS or STARTTLS are in use.', $e->getMessage());
+        }
+
+        $this->assertSame([], $stream->getCommands());
+    }
+
+    public function testStartTlsFailsWhenTheServerSendsDataBeforeTheHandshake()
+    {
+        $stream = new PendingDataAfterStartTlsStream();
+        $transport = new EsmtpTransport('localhost', 0, null, null, null, $stream);
+        $transport->setRequireTls(true);
+
+        $message = new Email();
+        $message->from('sender@example.org');
+        $message->addTo('recipient@example.org');
+        $message->text('.');
+
+        try {
+            $transport->send($message);
+            $this->fail('A TransportException should have been thrown.');
+        } catch (TransportException $e) {
+            $this->assertSame('Unable to connect with STARTTLS: the server sent unexpected data before the TLS handshake.', $e->getMessage());
+        }
+
+        $this->assertFalse($stream->tlsStarted);
+        $this->assertSame(["EHLO [127.0.0.1]\r\n", "STARTTLS\r\n"], $stream->getCommands());
+    }
+}
+
+class PendingDataAfterStartTlsStream extends DummyStream
+{
+    public bool $tlsStarted = false;
+    private array $responses = [];
+    private bool $pendingData = false;
+
+    public function write(string $bytes, $debug = true): void
+    {
+        parent::write($bytes, $debug);
+
+        $this->responses = match (true) {
+            str_starts_with($bytes, 'EHLO') => ["250-localhost\r\n", "250 STARTTLS\r\n"],
+            str_starts_with($bytes, 'STARTTLS') => ["220 2.0.0 Ready to start TLS\r\n"],
+            default => [],
+        };
+        $this->pendingData = str_starts_with($bytes, 'STARTTLS');
+    }
+
+    public function readLine(): string
+    {
+        return array_shift($this->responses) ?? parent::readLine();
+    }
+
+    public function hasPendingData(): bool
+    {
+        return $this->pendingData;
+    }
+
+    public function startTLS(): bool
+    {
+        return $this->tlsStarted = true;
+    }
+}
+
+class HeloOnlyEsmtpTransport extends EsmtpTransport
+{
+    public function executeCommand(string $command, array $codes): string
+    {
+        if (str_starts_with($command, 'EHLO ')) {
+            throw new UnexpectedResponseException('Expected response code "250" but got code "502", with message "502 5.5.2 Command not implemented".', 502);
+        }
+
+        return parent::executeCommand($command, $codes);
     }
 }
 

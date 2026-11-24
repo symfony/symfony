@@ -121,8 +121,11 @@ class RedirectController
             $path = $scheme.':'.$path;
         }
 
+        $urlParts = parse_url($path);
+
         // redirect if the path is a full URL
-        if (parse_url($path, \PHP_URL_SCHEME)) {
+        // a host is required for http(s) URLs, since browsers resolve "https:\\example.com" to another host
+        if (isset($urlParts['scheme']) && (isset($urlParts['host']) || !\in_array(strtolower($urlParts['scheme']), ['http', 'https'], true))) {
             return new RedirectResponse($path, $statusCode);
         }
 
@@ -159,6 +162,11 @@ class RedirectController
             if (null !== $httpsPort && 443 != $httpsPort) {
                 $port = ":$httpsPort";
             }
+        }
+
+        // a path that doesn't start with "/" would change the host
+        if (!str_starts_with($path, '/')) {
+            $path = '/'.$path;
         }
 
         $url = $scheme.'://'.$request->getHost().$port.$request->getBaseUrl().$path.$qs;

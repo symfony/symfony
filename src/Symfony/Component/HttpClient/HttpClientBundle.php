@@ -13,12 +13,14 @@ namespace Symfony\Component\HttpClient;
 
 use Http\Client\HttpAsyncClient;
 use Psr\Http\Client\ClientInterface;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ExceptionInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -31,6 +33,7 @@ use Symfony\Component\HttpClient\DependencyInjection\HttpClientPass;
 use Symfony\Component\HttpClient\Exception\ChunkCacheItemNotFoundException;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\RateLimiter\LimiterInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -254,8 +257,11 @@ class HttpClientBundle extends AbstractBundle
             $container->removeAlias(HttpAsyncClient::class);
         }
 
+        $cachePools = [];
+
         if ($cachingOptions['enabled']) {
             $this->registerCachingClient($cachingOptions, $options, 'http_client', $container);
+            $cachePools['http_client'] = $cachingOptions['cache_pool'];
         }
 
         if (null !== $rateLimiter) {
@@ -375,7 +381,9 @@ class HttpClientBundle extends AbstractBundle
             }
 
             if ($cachingOptions['enabled']) {
-                $this->registerCachingClient($cachingOptions, $scopeConfig, $name, $container);
+                // ScopingHttpClient applies the options of the scope, and only to the URLs in the scope
+                $this->registerCachingClient($cachingOptions, [], $name, $container);
+                $cachePools[$name] = $cachingOptions['cache_pool'];
             }
 
             if (null !== $rateLimiter) {
@@ -410,6 +418,19 @@ class HttpClientBundle extends AbstractBundle
                     ->replaceArgument(0, new Reference($name));
 
                 $container->registerAliasForArgument('httplug.'.$name, HttpAsyncClient::class, $name);
+            }
+        }
+
+        if (method_exists(TagAwareAdapter::class, 'withSubNamespace')) {
+            $clientsPerPool = array_count_values($cachePools);
+
+            foreach ($cachePools as $name => $cachePool) {
+                if (1 < $clientsPerPool[$cachePool]) {
+                    // Clients don't share cached responses, since the cache key doesn't contain all their options, like custom headers
+                    $container->getDefinition($name.'.caching')->replaceArgument(1, (new Definition(TagAwareCacheInterface::class))
+                        ->setFactory([new Reference($cachePool), 'withSubNamespace'])
+                        ->setArguments([rawurlencode($name)]));
+                }
             }
         }
 

@@ -32,6 +32,7 @@ final class JsonPathTokenizer
     ];
 
     private const BARE_LITERAL_REGEX = '(true|false|null|\d+(\.\d+)?([eE][+-]?\d+)?|\'[^\']*\'|"[^"]*")';
+    private const MAX_FILTER_EXPRESSION_LENGTH = 10000;
 
     /**
      * @return JsonPathToken[]
@@ -69,6 +70,10 @@ final class JsonPathTokenizer
         for ($i = 0; $i < $length; ++$i) {
             $char = $chars[$i];
             $position = $i;
+
+            if ($inFilter && \strlen($current) > self::MAX_FILTER_EXPRESSION_LENGTH) {
+                throw new InvalidJsonPathException('filter expression is too long.', $position);
+            }
 
             if (!$inQuote && !$inBracket && self::isWhitespace($char)) {
                 if ('' !== $current) {
@@ -331,7 +336,7 @@ final class JsonPathTokenizer
         foreach ($operators as $op) {
             $newTokens = [];
             foreach ($tokens as $token) {
-                $newTokens = array_merge($newTokens, explode($op, $token));
+                array_push($newTokens, ...explode($op, $token));
             }
 
             $tokens = $newTokens;

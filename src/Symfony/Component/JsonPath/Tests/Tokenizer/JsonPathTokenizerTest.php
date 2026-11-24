@@ -295,6 +295,21 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath('$.store[?(@.price > 10]'));
     }
 
+    public function testTokenizeThrowsExceptionForTooLongFilterExpression()
+    {
+        $this->expectException(InvalidJsonPathException::class);
+        $this->expectExceptionMessage('JSONPath syntax error at position 10003: filter expression is too long.');
+
+        JsonPathTokenizer::tokenize(new JsonPath('$[?'.implode('&&', array_fill(0, 20000, '@.a==1')).']'));
+    }
+
+    public function testTokenizeAcceptsFilterExpressionOfMaximumLength()
+    {
+        $filter = '?'.str_repeat('@.a==1&&', 1249).'@.a==12';
+
+        $this->assertSame([$filter], array_map(static fn ($token) => $token->value, JsonPathTokenizer::tokenize(new JsonPath('$['.$filter.']'))));
+    }
+
     public function testTokenizeThrowsExceptionForConsecutiveDotsWithoutRecursive()
     {
         $this->expectException(InvalidJsonPathException::class);

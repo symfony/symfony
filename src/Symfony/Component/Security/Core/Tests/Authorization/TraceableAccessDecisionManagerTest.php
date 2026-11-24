@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\Security\Core\Authorization\Strategy\UnanimousStrategy;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
@@ -342,5 +343,41 @@ class TraceableAccessDecisionManagerTest extends TestCase
         $this->assertSame([['attr2']], array_column($sut->getDecisionLog(), 'attributes'));
         $this->assertSame('affirmative', $sut->getStrategy());
         $this->assertContains($voter, $sut->getVoters());
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testUnanimousStrategyLogsVotesForEachAttribute()
+    {
+        $voter = $this->createMock(VoterInterface::class);
+        $sut = new TraceableAccessDecisionManager(new AccessDecisionManager([$voter], new UnanimousStrategy()));
+
+        $roleVoter = new RoleVoter();
+        $voter
+            ->expects($this->exactly(2))
+            ->method('vote')
+            ->willReturnCallback(static function (TokenInterface $token, $subject, array $attributes) use ($sut, $voter, $roleVoter) {
+                $vote = $roleVoter->vote($token, $subject, $attributes);
+                $sut->addVoterVote($voter, $attributes, $vote);
+
+                return $vote;
+            });
+
+        $token = $this->createStub(TokenInterface::class);
+        $token->method('getRoleNames')->willReturn(['ROLE_ADMIN']);
+
+        $this->assertFalse($sut->decide($token, ['ROLE_ADMIN', 'ROLE_AUDITOR'], null, true));
+
+        $this->assertEquals([
+            [
+                'attributes' => ['ROLE_ADMIN', 'ROLE_AUDITOR'],
+                'object' => null,
+                'voterDetails' => [
+                    ['voter' => $voter, 'attributes' => ['ROLE_ADMIN'], 'vote' => VoterInterface::ACCESS_GRANTED, 'reasons' => []],
+                    ['voter' => $voter, 'attributes' => ['ROLE_AUDITOR'], 'vote' => VoterInterface::ACCESS_DENIED, 'reasons' => []],
+                ],
+                'result' => false,
+            ],
+        ], $sut->getDecisionLog());
     }
 }

@@ -135,6 +135,12 @@ class ImpersonateUrlGenerator
         $parameters = [$switchUserConfig['parameter'] => $identifier];
         $csrfParameter = null;
 
+        // a leading "//" would make the path point to another host
+        $requestUri = $request->getRequestUri();
+        if (str_starts_with($requestUri, '//')) {
+            $requestUri = '/%2F'.substr($requestUri, 2);
+        }
+
         if ($switchUserConfig['enable_csrf'] ?? false) {
             if (null === $this->csrfTokenManager) {
                 throw new \LogicException('Unable to generate the impersonate URLs without a CSRF token manager.');
@@ -148,7 +154,7 @@ class ImpersonateUrlGenerator
         if (null !== $path = $switchUserConfig['path'] ?? null) {
             // the switch happens on a dedicated endpoint, so the page to come back to is carried explicitly,
             // unless the listener is left to redirect to the configured target route
-            $targetUri ??= SwitchUserListener::EXIT_VALUE === $identifier || !isset($switchUserConfig['target_route']) ? $request->getRequestUri() : null;
+            $targetUri ??= SwitchUserListener::EXIT_VALUE === $identifier || !isset($switchUserConfig['target_route']) ? $requestUri : null;
 
             if (null !== $targetUri) {
                 $parameters['_target_path'] = $targetUri;
@@ -165,7 +171,7 @@ class ImpersonateUrlGenerator
 
             $url = UrlGeneratorInterface::ABSOLUTE_URL === $referenceType ? $request->getUriForPath($path) : $request->getBaseUrl().$path;
         } else {
-            $url = $targetUri ?? $request->getRequestUri();
+            $url = $targetUri ?? $requestUri;
 
             if (UrlGeneratorInterface::ABSOLUTE_URL === $referenceType) {
                 $url = $request->getUriForPath($url);

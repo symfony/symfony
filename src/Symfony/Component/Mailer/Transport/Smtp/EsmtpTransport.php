@@ -160,6 +160,13 @@ class EsmtpTransport extends SmtpTransport
         try {
             $response = $this->executeCommand(\sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
         } catch (TransportExceptionInterface $e) {
+            /** @var SocketStream $stream */
+            $stream = $this->getStream();
+
+            if ($this->isTlsRequired() && !$stream->isTLS()) {
+                throw new TransportException('TLS required but neither TLS or STARTTLS are in use.', 0, $e);
+            }
+
             try {
                 return parent::executeCommand(\sprintf("HELO %s\r\n", $this->getLocalDomain()), [250]);
             } catch (TransportExceptionInterface $ex) {
@@ -181,6 +188,10 @@ class EsmtpTransport extends SmtpTransport
         // if doing so "fixes" your issue then it probably means your SMTP server behaves incorrectly or is wrongly configured
         if ($this->autoTls && !$stream->isTLS() && \defined('OPENSSL_VERSION_NUMBER') && \array_key_exists('STARTTLS', $this->capabilities)) {
             $this->executeCommand("STARTTLS\r\n", [220]);
+
+            if ($stream->hasPendingData()) {
+                throw new TransportException('Unable to connect with STARTTLS: the server sent unexpected data before the TLS handshake.');
+            }
 
             if (!$stream->startTLS()) {
                 throw new TransportException('Unable to connect with STARTTLS.');

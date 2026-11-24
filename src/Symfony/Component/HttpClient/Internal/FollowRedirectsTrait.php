@@ -24,6 +24,8 @@ use Symfony\Contracts\HttpClient\ChunkInterface;
  */
 trait FollowRedirectsTrait
 {
+    private array $noAuthOptions;
+
     /**
      * @param string                                                     $url        An already prepared, absolute URL
      * @param string                                                     $host       The host name found in $url
@@ -51,7 +53,20 @@ trait FollowRedirectsTrait
             $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], static fn ($h) => 0 !== stripos($h, 'Host:') && 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:'));
         }
 
-        return new AsyncResponse($this->client, $method, $url, $options, static function (ChunkInterface $chunk, AsyncContext $context) use (&$method, &$options, $maxRedirects, &$redirectHeaders, $onRedirect, $bodyOffset): \Generator {
+        if (!isset($this->noAuthOptions)) {
+            $this->noAuthOptions = ['auth_basic' => null, 'auth_bearer' => null];
+
+            try {
+                $this->client->withOptions(['auth_ntlm' => null]);
+                $this->noAuthOptions['auth_ntlm'] = null;
+            } catch (\InvalidArgumentException) {
+                // The decorated client doesn't support NTLM
+            }
+        }
+
+        $noAuthOptions = $this->noAuthOptions;
+
+        return new AsyncResponse($this->client, $method, $url, $options, static function (ChunkInterface $chunk, AsyncContext $context) use (&$method, &$options, $maxRedirects, &$redirectHeaders, $noAuthOptions, $onRedirect, $bodyOffset): \Generator {
             if (null !== $chunk->getError() || $chunk->isTimeout() || !$chunk->isFirst()) {
                 yield $chunk;
 
@@ -88,12 +103,17 @@ trait FollowRedirectsTrait
 
             // Authorization and Cookie headers MUST NOT follow except for the initial scheme, host and port
             $port = parse_url($url, \PHP_URL_PORT);
-            $options['headers'] = parse_url($url, \PHP_URL_SCHEME) === $redirectHeaders['scheme'] && $redirectHeaders['host'] === $host && ($redirectHeaders['port'] ?? null) === $port ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
+            $sameOrigin = parse_url($url, \PHP_URL_SCHEME) === $redirectHeaders['scheme'] && $redirectHeaders['host'] === $host && ($redirectHeaders['port'] ?? null) === $port;
+            $options['headers'] = $sameOrigin ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
 
             static $redirectCount = 0;
             $context->setInfo('redirect_count', ++$redirectCount);
 
-            $context->replaceRequest($method, $url, $options);
+            // The decorated client must not add its default credentials either
+            $context->replaceRequest($method, $url, $sameOrigin ? $options : [
+                'headers' => $options['headers'] + ['Authorization' => [], 'Cookie' => []],
+                'extra' => ['skip_default_credentials' => true] + ($options['extra'] ?? []),
+            ] + $noAuthOptions + $options);
 
             if ($redirectCount >= $maxRedirects) {
                 $context->passthru();

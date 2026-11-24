@@ -38,6 +38,11 @@ final class JsonCrawler implements JsonCrawlerInterface
     private const REGEX_WORK_PER_BYTE = 16;
     private const REGEX_WORK_ESCALATION = 8;
 
+    private const NODE_BUDGET = 100_000;
+    private const NODE_BUDGET_PER_VALUE = 32;
+    private const QUERY_BYTES_PER_NODE = 4;
+
+    private const MAX_QUERY_LENGTH = 100_000;
     private const MAX_FILTER_EXPRESSION_LENGTH = 10000;
     private const MAX_FILTER_EXPRESSION_DEPTH = 100;
     private const MAX_PARSED_FILTER_EXPRESSIONS = 64;
@@ -55,6 +60,20 @@ final class JsonCrawler implements JsonCrawlerInterface
     ];
 
     private int $regexBudget = self::REGEX_WORK_BUDGET;
+
+    /**
+     * How many more nodes the current find() call may visit, see self::chargeNodeBudget().
+     */
+    private int $nodeBudget = self::NODE_BUDGET;
+
+    /**
+     * The data decoded by the current find() call whose values do not count in $nodeBudget yet.
+     *
+     * @var list<mixed>
+     */
+    private array $uncountedData = [];
+
+    private string $query = '';
 
     /**
      * Filter expressions parsed so far, so that a filter applied to many nodes is parsed once.
@@ -79,6 +98,29 @@ final class JsonCrawler implements JsonCrawlerInterface
     private array $absoluteQueries = [];
 
     /**
+     * The results of the filter operands that do not refer to the node being filtered, computed once per find() call.
+     *
+     * @var array<string, bool>
+     */
+    private array $operandResults = [];
+
+    /**
+     * The values of the parts of filter operands that do not refer to the node being filtered, computed once per
+     * find() call, except arrays.
+     *
+     * @var array<string, mixed>
+     */
+    private array $scalarResults = [];
+
+    /**
+     * The lengths of the strings and objects passed to length(), and the regular expressions of match() and search()
+     * once transformed, by value, so that a node visited several times does not cost its size each time.
+     *
+     * @var array{lengths: array<int|string, int>, sizes: array<int, int>, match: array<string, string>, search: array<string, string>, invalid: array<string, true>}
+     */
+    private array $valueResults = ['lengths' => [], 'sizes' => [], 'match' => [], 'search' => [], 'invalid' => []];
+
+    /**
      * @param resource|string                                                                        $raw
      * @param ContainerInterface|ServiceProviderInterface<callable(mixed ...$arguments): mixed>|null $functionsProvider
      * @param array<string, array{arity?: int|null, return_type?: FunctionReturnType|null}>          $functionsMetadata
@@ -96,11 +138,17 @@ final class JsonCrawler implements JsonCrawlerInterface
     public function find(string|JsonPath $query): array
     {
         $this->regexBudget = self::REGEX_WORK_BUDGET;
+        $this->nodeBudget = self::NODE_BUDGET;
+
+        if (\strlen($this->query = (string) $query) > self::MAX_QUERY_LENGTH) {
+            throw new JsonCrawlerException($this->query, \sprintf('the query is longer than %d bytes', self::MAX_QUERY_LENGTH));
+        }
 
         try {
             return $this->normalizeStorage($this->evaluate(\is_string($query) ? new JsonPath($query) : $query));
         } finally {
-            $this->document = $this->absoluteQueries = [];
+            $this->document = $this->absoluteQueries = $this->uncountedData = $this->operandResults = $this->scalarResults = [];
+            $this->valueResults = ['lengths' => [], 'sizes' => [], 'match' => [], 'search' => [], 'invalid' => []];
         }
     }
 
@@ -146,6 +194,8 @@ final class JsonCrawler implements JsonCrawlerInterface
                 throw new InvalidJsonStringInputException($e->getMessage(), $e);
             }
 
+            $this->uncountedData[] = $data;
+
             return $this->evaluateTokensOnDecodedData($tokens, $data);
         } catch (InvalidArgumentException $e) {
             throw $e;
@@ -176,6 +226,8 @@ final class JsonCrawler implements JsonCrawlerInterface
             throw new InvalidJsonStringInputException($e->getMessage(), $e);
         }
 
+        $this->uncountedData[] = $this->document[0];
+
         return $this->document[0];
     }
 
@@ -199,6 +251,20 @@ final class JsonCrawler implements JsonCrawlerInterface
         }
 
         return $this->absoluteQueries[$expr] = [$nodes[0] ?? null, \count($nodes)];
+    }
+
+    /**
+     * Counts the values in a decoded container and in its descendants, like count() does with COUNT_RECURSIVE.
+     */
+    private function countNestedValues(array|\stdClass $container): int
+    {
+        $count = 0;
+
+        foreach ($container as $value) {
+            $count += $this->isArrayOrObject($value) ? 1 + $this->countNestedValues($value) : 1;
+        }
+
+        return $count;
     }
 
     private function isComplexBracketExpression(JsonPath $query): bool
@@ -257,11 +323,15 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     private function evaluateToken(JsonPathToken $token, mixed $value): array
     {
-        return match ($token->type) {
+        $nodes = match ($token->type) {
             TokenType::Name => $this->evaluateName($token->value, $value),
             TokenType::Bracket => $this->evaluateBracket($token->value, $value),
             TokenType::Recursive => $this->evaluateRecursive($value),
         };
+
+        $this->chargeNodeBudget(\count($nodes) + intdiv(\strlen($token->value), self::QUERY_BYTES_PER_NODE));
+
+        return $nodes;
     }
 
     private function evaluateName(string $name, mixed $value): array
@@ -282,6 +352,8 @@ final class JsonCrawler implements JsonCrawlerInterface
         if (!$this->isArrayOrObject($value)) {
             return [];
         }
+
+        $this->chargeNodeBudget(\count((array) $value));
 
         if (str_contains($expr, ',') && (str_starts_with($trimmed = trim($expr), ',') || str_ends_with($trimmed, ','))) {
             throw new JsonCrawlerException($expr, 'Expression cannot have leading or trailing commas');
@@ -433,13 +505,12 @@ final class JsonCrawler implements JsonCrawlerInterface
                 $part = trim($part);
 
                 if (preg_match('/^\?(.*)$/', $part, $matches)) {
-                    $result = array_merge($result, $this->evaluateFilter($this->getParsedFilterExpression(trim($matches[1])), $value));
+                    array_push($result, ...$this->evaluateFilter($this->getParsedFilterExpression(trim($matches[1])), $value));
 
                     continue;
                 }
 
-                $selectorResult = $this->evaluateBracket($part, $value);
-                $result = array_merge($result, $selectorResult);
+                array_push($result, ...$this->evaluateBracket($part, $value));
             }
 
             return $result;
@@ -493,7 +564,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                         }
 
                         $key = JsonPathUtils::unescapeString($matches[2], $matches[1]);
-                        $result = array_merge($result, $this->getValueIfKeyExists($value, $key));
+                        array_push($result, ...$this->getValueIfKeyExists($value, $key));
                     }
 
                     return $result;
@@ -511,7 +582,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                         }
 
                         $key = JsonPathUtils::unescapeString($matches[2], $matches[1]);
-                        $result = array_merge($result, $this->getValueIfKeyExists($item, $key));
+                        array_push($result, ...$this->getValueIfKeyExists($item, $key));
                     }
                 }
 
@@ -522,11 +593,10 @@ final class JsonCrawler implements JsonCrawlerInterface
                 $part = trim($part);
 
                 if ('*' === $part) {
-                    $result = array_merge($result, array_values((array) $value));
+                    array_push($result, ...array_values((array) $value));
                 } elseif (preg_match('/^(-?\d*+)\s*+:\s*+(-?\d*+)(?:\s*+:\s*+(-?\d++))?$/', $part, $matches)) {
                     // slice notation
-                    $sliceResult = $this->evaluateBracket($part, $value);
-                    $result = array_merge($result, $sliceResult);
+                    array_push($result, ...$this->evaluateBracket($part, $value));
                 } elseif (preg_match('/^([\'"])(.*)\1$/', $part, $matches)) {
                     $key = JsonPathUtils::unescapeString($matches[2], $matches[1]);
 
@@ -538,7 +608,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                             }
                         }
                     } else {
-                        $result = array_merge($result, $this->getValueIfKeyExists($value, $key));
+                        array_push($result, ...$this->getValueIfKeyExists($value, $key));
                     }
                 } elseif (preg_match('/^-?\d+$/', $part)) {
                     // numeric index
@@ -647,22 +717,32 @@ final class JsonCrawler implements JsonCrawlerInterface
             'or' => $this->evaluateFilterExpression($expr['left'], $context) || $this->evaluateFilterExpression($expr['right'], $context),
             'not' => !$this->evaluateFilterExpression($expr['operand'], $context),
             'too-complex' => throw new JsonCrawlerException($expr['operand'], 'filter expression is too long or too deeply nested'),
-            default => $this->evaluateFilterOperand($expr['operand'], $context),
+            default => str_contains($expr['operand'], '@')
+                ? $this->evaluateFilterOperand($expr['operand'], $context)
+                : ($this->operandResults[$expr['operand']] ??= $this->evaluateFilterOperand($expr['operand'], $context)),
         };
     }
 
     private function evaluateFilterOperand(string $expr, mixed $context): bool
     {
+        $this->chargeNodeBudget(1 + intdiv(\strlen($expr), self::QUERY_BYTES_PER_NODE));
+
         foreach (self::COMPARISON_OPERATORS as $op => $len) {
             if (str_contains($expr, $op)) {
                 if (false === $opPos = $this->findOperatorPosition($expr, $op)) {
                     continue;
                 }
 
-                $leftValue = $this->evaluateScalar(trim(substr($expr, 0, $opPos)), $context);
-                $rightValue = $this->evaluateScalar(trim(substr($expr, $opPos + $len)), $context);
+                $left = trim(substr($expr, 0, $opPos));
+                $right = trim(substr($expr, $opPos + $len));
+                $leftValue = $this->evaluateScalar($left, $context);
 
-                return $this->compare($leftValue, $rightValue, $op);
+                // a value equals itself, however large it is
+                if ($left === $right && ('==' === $op || '!=' === $op)) {
+                    return '==' === $op;
+                }
+
+                return $this->compare($leftValue, $this->evaluateScalar($right, $context), $op);
             }
         }
 
@@ -674,7 +754,7 @@ final class JsonCrawler implements JsonCrawlerInterface
             try {
                 return 0 < $this->evaluateAbsoluteQuery($expr)[1];
             } catch (JsonCrawlerException $e) {
-                if (0 > $this->regexBudget) {
+                if (0 > $this->regexBudget || 0 > $this->nodeBudget) {
                     throw $e;
                 }
 
@@ -763,7 +843,25 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     private function evaluateScalar(string $expr, mixed $context): mixed
     {
+        if (str_contains($expr, '@')) {
+            return $this->computeScalar($expr, $context);
+        }
+
+        if (\array_key_exists($expr, $this->scalarResults)) {
+            return $this->scalarResults[$expr];
+        }
+
+        if (!\is_array($value = $this->computeScalar($expr, $context))) {
+            $this->scalarResults[$expr] = $value;
+        }
+
+        return $value;
+    }
+
+    private function computeScalar(string $expr, mixed $context): mixed
+    {
         $expr = JsonPathUtils::normalizeWhitespace($expr);
+        $this->chargeNodeBudget(intdiv(\strlen($expr), self::QUERY_BYTES_PER_NODE));
 
         if (JsonPathUtils::isJsonNumber($expr)) {
             return str_contains($expr, '.') || str_contains(strtolower($expr), 'e') ? (float) $expr : (int) $expr;
@@ -894,18 +992,18 @@ final class JsonCrawler implements JsonCrawlerInterface
 
         return match ($name) {
             'length' => match (true) {
-                \is_string($value) => mb_strlen($value),
+                \is_string($value) => $this->valueResults['lengths'][$value] ??= mb_strlen($value),
                 \is_array($value) => \count($value),
-                $value instanceof \stdClass => \count(get_object_vars($value)),
+                $value instanceof \stdClass => $this->valueResults['sizes'][spl_object_id($value)] ??= \count(get_object_vars($value)),
                 default => Nothing::Nothing,
             },
             'count' => $nodelistSize,
             'match' => match (true) {
-                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch(\sprintf('/\A(?:%s)\z/u', $this->transformJsonPathRegex($argList[1])), $value, $argList[1]),
+                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch($this->valueResults['match'][$argList[1]] ??= \sprintf('/\A(?:%s)\z/u', $this->transformJsonPathRegex($argList[1])), $value, $argList[1]),
                 default => false,
             },
             'search' => match (true) {
-                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch("/{$this->transformJsonPathRegex($argList[1])}/u", $value, $argList[1]),
+                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch($this->valueResults['search'][$argList[1]] ??= "/{$this->transformJsonPathRegex($argList[1])}/u", $value, $argList[1]),
                 default => false,
             },
             'value' => 1 === $nodelistSize ? $value : Nothing::Nothing,
@@ -920,6 +1018,7 @@ final class JsonCrawler implements JsonCrawlerInterface
         }
 
         $result[] = $value;
+        $this->chargeNodeBudget(\count((array) $value));
 
         foreach ($value as $item) {
             if ($this->isArrayOrObject($item)) {
@@ -992,6 +1091,8 @@ final class JsonCrawler implements JsonCrawlerInterface
             return false;
         }
 
+        $this->chargeNodeBudget($leftCount);
+
         foreach ($left as $key => $value) {
             if (!\array_key_exists($key, $right) || !$this->compareEquality($value, $right[$key])) {
                 return false;
@@ -1009,6 +1110,8 @@ final class JsonCrawler implements JsonCrawlerInterface
         if (\count($leftVars) !== \count($rightVars)) {
             return false;
         }
+
+        $this->chargeNodeBudget(\count($leftVars));
 
         foreach ($leftVars as $key => $value) {
             if (!property_exists($right, $key) || !$this->compareEquality($value, $rightVars[$key])) {
@@ -1286,6 +1389,10 @@ final class JsonCrawler implements JsonCrawlerInterface
      */
     private function safeRegexMatch(string $pattern, string $subject, string $regex): bool
     {
+        if (isset($this->valueResults['invalid'][$pattern])) {
+            return false;
+        }
+
         $startingPositions = 1 + \strlen($subject);
         $limit = min(self::REGEX_BACKTRACK_LIMIT, intdiv(self::REGEX_WORK_PER_CALL + self::REGEX_WORK_PER_BYTE * \strlen($subject), $startingPositions));
 
@@ -1302,6 +1409,11 @@ final class JsonCrawler implements JsonCrawlerInterface
             }
 
             if (false !== $result || \PREG_BACKTRACK_LIMIT_ERROR !== preg_last_error()) {
+                if (false === $result && \PREG_INTERNAL_ERROR === preg_last_error()) {
+                    // a pattern that does not compile is not compiled again for each node
+                    $this->valueResults['invalid'][$pattern] = true;
+                }
+
                 return (bool) $result;
             }
 
@@ -1318,12 +1430,40 @@ final class JsonCrawler implements JsonCrawlerInterface
     }
 
     /**
+     * Takes nodes from the budget of the current find() call.
+     *
+     * RFC 9535 keeps duplicates in node lists, so that segments selecting the descendants or several children of
+     * each node, like chained recursive descents, multiply the nodes to visit. The nodes selected count, as do the
+     * children looked at or converted to arrays and the length of the segments, filter operands and their parts,
+     * and regular expressions, which are parsed again for each node.
+     * The budget starts at a floor and, once that is spent, grows with the number of values decoded by the call,
+     * which are counted only then.
+     */
+    private function chargeNodeBudget(int $nodes): void
+    {
+        if (0 <= $this->nodeBudget -= $nodes) {
+            return;
+        }
+
+        foreach ($this->uncountedData as $data) {
+            $this->nodeBudget += self::NODE_BUDGET_PER_VALUE * ($this->isArrayOrObject($data) ? $this->countNestedValues($data) : 1);
+        }
+        $this->uncountedData = [];
+
+        if (0 > $this->nodeBudget) {
+            throw new JsonCrawlerException($this->query, 'the query visits more nodes than allowed');
+        }
+    }
+
+    /**
      * Transforms JSONPath regex patterns to comply with RFC 9485.
      *
      * @see https://www.rfc-editor.org/rfc/rfc9485.html#name-pcre-re2-and-ruby-regexps
      */
     private function transformJsonPathRegex(string $pattern): string
     {
+        $this->chargeNodeBudget(intdiv(\strlen($pattern), self::QUERY_BYTES_PER_NODE));
+
         $result = '';
         $inCharClass = false;
         $i = -1;
@@ -1373,9 +1513,23 @@ final class JsonCrawler implements JsonCrawlerInterface
         return \is_array($value) || $value instanceof \stdClass;
     }
 
-    private function normalizeStorage(\stdClass|array $data): array
+    /**
+     * @param array<int, array> $normalized The objects converted so far by id, to share their conversion between the nodes that hold them
+     */
+    private function normalizeStorage(\stdClass|array $data, array &$normalized = []): array
     {
-        return array_map(fn ($value) => $value instanceof \stdClass || $value && \is_array($value) ? $this->normalizeStorage($value) : $value, (array) $data);
+        $result = (array) $data;
+        $this->chargeNodeBudget(\count($result));
+
+        foreach ($result as $key => $value) {
+            if ($value instanceof \stdClass) {
+                $result[$key] = $normalized[spl_object_id($value)] ??= $this->normalizeStorage($value, $normalized);
+            } elseif ($value && \is_array($value)) {
+                $result[$key] = $this->normalizeStorage($value, $normalized);
+            }
+        }
+
+        return $result;
     }
 
     private function isValidMixedBracketExpression(string $expr): bool
@@ -1404,6 +1558,10 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     private function getValueIfKeyExists(mixed $value, string $key): array
     {
-        return $this->isArrayOrObject($value) && \array_key_exists($key, $arrayValue = (array) $value) ? [$arrayValue[$key]] : [];
+        if ($value instanceof \stdClass) {
+            return property_exists($value, $key) ? [$value->$key] : [];
+        }
+
+        return \is_array($value) && \array_key_exists($key, $value) ? [$value[$key]] : [];
     }
 }

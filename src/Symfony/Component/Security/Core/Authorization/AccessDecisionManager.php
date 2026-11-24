@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Core\Authorization;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
 use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
+use Symfony\Component\Security\Core\Authorization\Strategy\UnanimousStrategy;
 use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
@@ -89,6 +90,15 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     private function collectResults(TokenInterface $token, array $attributes, mixed $object, AccessDecision $accessDecision): \Traversable
     {
+        // Voters are asked about each attribute separately so that the unanimous strategy denies access if any of them is denied
+        if (\count($attributes) > 1 && $this->strategy instanceof UnanimousStrategy) {
+            foreach ($attributes as $attribute) {
+                yield from $this->collectResults($token, [$attribute], $object, $accessDecision);
+            }
+
+            return;
+        }
+
         foreach ($this->getVoters($attributes, $object) as $voter) {
             $vote = new Vote();
             $result = $voter->vote($token, $object, $attributes, $vote);

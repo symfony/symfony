@@ -62,6 +62,19 @@ class ImpersonateUrlGeneratorTest extends TestCase
         $this->assertSame('/profile?page=2&_switch_user=_exit', $generator->generateExitPath());
     }
 
+    public function testExitUrlsEncodeTheLeadingDoubleSlashOfTheCurrentUri()
+    {
+        $generator = $this->createGenerator(['parameter' => '_switch_user'], true, requestUri: '//example.com/profile');
+
+        $this->assertSame('/%2Fexample.com/profile?_switch_user=_exit', $generator->generateExitPath());
+        $this->assertSame('http://localhost/%2Fexample.com/profile?_switch_user=_exit', $generator->generateExitUrl());
+        $this->assertSame('//example.com/profile?_switch_user=_exit', $generator->generateExitPath('//example.com/profile'));
+
+        $generator = $this->createGenerator(['parameter' => '_switch_user', 'path' => '/switch-user'], true, requestUri: '//example.com/profile');
+
+        $this->assertSame('/switch-user?_switch_user=_exit&_target_path=%2F%252Fexample.com%2Fprofile', $generator->generateExitPath());
+    }
+
     public function testUrlsAreBuiltFromTheConfiguredPath()
     {
         $generator = $this->createGenerator(['parameter' => '_switch_user', 'path' => '/switch-user']);
@@ -260,10 +273,10 @@ class ImpersonateUrlGeneratorTest extends TestCase
         ], $generator->generateImpersonationForm('kuba'));
     }
 
-    private function createGenerator(array $switchUser, bool $impersonating = false, ?CsrfTokenManagerInterface $csrfTokenManager = null): ImpersonateUrlGenerator
+    private function createGenerator(array $switchUser, bool $impersonating = false, ?CsrfTokenManagerInterface $csrfTokenManager = null, ?string $requestUri = null): ImpersonateUrlGenerator
     {
         $requestStack = new RequestStack();
-        $requestStack->push(Request::create('/profile?page=2'));
+        $requestStack->push(null === $requestUri ? Request::create('/profile?page=2') : new Request([], [], [], [], [], ['HTTP_HOST' => 'localhost', 'REQUEST_URI' => $requestUri]));
 
         $firewallMap = $this->createStub(FirewallMap::class);
         $firewallMap->method('getFirewallConfig')->willReturn(new FirewallConfig('main', 'security.user_checker', switchUser: $switchUser));

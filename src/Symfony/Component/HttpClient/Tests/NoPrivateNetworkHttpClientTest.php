@@ -16,13 +16,19 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DnsMock;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\CurlHttpClient;
+use Symfony\Component\HttpClient\DnsResolvingHttpClient;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Component\HttpClient\Tests\Fixtures\ResettableClient;
 use Symfony\Component\HttpClient\Tests\Fixtures\ShutdownAwareClient;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
@@ -51,9 +57,12 @@ class NoPrivateNetworkHttpClientTest extends TestCase
             ['10.0.0.1',    '10.0.0.1',    true],
             ['fc00::1',     'fc00::1/120', true],
             ['fc00::1',     'fc00::1',     true],
+            ['::ffff:127.0.0.1', ['127.0.0.0/8', '::1/128'], true],
+            ['::ffff:7f00:1',    ['127.0.0.0/8', '::1/128'], true],
 
             ['172.16.0.1',  ['10.0.0.0/8', '192.168.0.0/16'], false],
             ['fc00::1',     ['fe80::/10', '::ffff:0:0/96'],   false],
+            ['::ffff:172.16.0.1', ['127.0.0.0/8', '::1/128'], false],
 
             // public
             ['104.26.14.6',            null,                false],
@@ -74,6 +83,8 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         // weird scenarios (e.g.: when trying to match ipv4 address on ipv6 subnet)
         yield ['10.0.0.1', 'fc00::/7',   true];
         yield ['fc00::1',  '10.0.0.0/8', true];
+        yield ['::ffff:10.0.0.1',    'fc00::/7',              true];
+        yield ['::ffff:104.26.14.6', ['fc00::/7', '::1/128'], true];
     }
 
     #[DataProvider('getExcludeIpData')]
@@ -246,6 +257,27 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $this->assertSame([['example.com' => '104.26.14.6'], ['example.com' => '104.26.14.6']], $resolved);
     }
 
+    #[DataProvider('getIpv4MappedRequestData')]
+    public function testIpv4MappedAddressIsCheckedAgainstCustomIpv4Subnets(string $url, array $options, string $message)
+    {
+        $client = new NoPrivateNetworkHttpClient(new MockHttpClient([
+            new MockResponse('', ['http_code' => 302, 'redirect_url' => 'http://[::ffff:127.0.0.1]/']),
+            new MockResponse('internal'),
+        ]), ['10.0.0.0/8', '127.0.0.0/8', 'fc00::/7', '::1/128']);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage($message);
+
+        $client->request('GET', $url, $options)->getContent();
+    }
+
+    public static function getIpv4MappedRequestData(): iterable
+    {
+        yield 'url' => ['http://[::ffff:127.0.0.1]/', [], 'Host "[::ffff:127.0.0.1]" is blocked for "http://[::ffff:127.0.0.1]/".'];
+        yield 'resolve option' => ['http://example.com/', ['resolve' => ['example.com' => '::ffff:127.0.0.1']], 'Host "example.com" is blocked for "http://example.com/".'];
+        yield 'redirect' => ['http://104.26.14.6/', [], 'Host "[::ffff:127.0.0.1]" is blocked for "http://[::ffff:127.0.0.1]/".'];
+    }
+
     public function testCustomOnProgressCallback()
     {
         $ipAddr = '104.26.14.6';
@@ -315,6 +347,106 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $this->assertArrayNotHasKey('cookie', $headers);
     }
 
+    #[RequiresPhpExtension('openssl')]
+    public function testRedirectToADifferentSchemeDropsTheDefaultCredentialsOfTheDecoratedClient()
+    {
+        TestSocketServer::start('tls/redirect-server.php', self::port(8059));
+        $client = new NoPrivateNetworkHttpClient(new NativeHttpClient([
+            'auth_bearer' => 'foo',
+            'headers' => ['Cookie' => 'a=b', 'X-Custom' => 'kept'],
+        ]), '10.0.0.0/8');
+
+        $response = $client->request('GET', 'http://127.0.0.1:'.self::port(8059).'/upgrade', [
+            'verify_peer' => false,
+            'verify_host' => false,
+        ]);
+        $headers = $response->toArray();
+
+        $this->assertSame('https://127.0.0.1:'.self::port(8059).'/echo', $response->getInfo('url'));
+        $this->assertSame('kept', $headers['x-custom']);
+        $this->assertArrayNotHasKey('authorization', $headers);
+        $this->assertArrayNotHasKey('cookie', $headers);
+    }
+
+    public function testRedirectToAnotherOriginDropsDefaultCredentials()
+    {
+        $requests = [];
+        $mockClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$requests) {
+            $requests[] = [$url, $options['normalized_headers']['authorization'][0] ?? null, $options['normalized_headers']['cookie'][0] ?? null, $options['auth_ntlm'] ?? null];
+
+            switch (\count($requests) % 4) {
+                case 1: return new MockResponse('', ['http_code' => 302, 'redirect_url' => 'https://104.26.14.6/same-origin']);
+                case 2: return new MockResponse('', ['http_code' => 302, 'redirect_url' => 'https://104.26.14.7/other-origin']);
+                case 3: return new MockResponse('', ['http_code' => 302, 'redirect_url' => 'https://104.26.14.6/back']);
+                default: return new MockResponse('OK');
+            }
+        });
+
+        $client = new NoPrivateNetworkHttpClient($mockClient->withOptions([
+            'auth_basic' => 'foo:bar',
+            'headers' => ['Cookie' => 'a=b'],
+            'auth_ntlm' => 'foo:bar',
+        ]));
+        $client->request('GET', 'https://104.26.14.6/')->getContent();
+
+        $client = (new NoPrivateNetworkHttpClient($mockClient))->withOptions([
+            'auth_bearer' => 'foo',
+            'headers' => ['Cookie' => 'a=b'],
+        ]);
+        $client->request('GET', 'https://104.26.14.6/')->getContent();
+
+        $client = new NoPrivateNetworkHttpClient(new TraceableHttpClient($mockClient->withOptions(['headers' => ['Authorization' => 'Bearer foo']])));
+        $client->request('GET', 'https://104.26.14.6/', ['auth_ntlm' => 'foo:bar'])->getContent();
+
+        $this->assertSame([
+            ['https://104.26.14.6/', 'Authorization: Basic Zm9vOmJhcg==', 'Cookie: a=b', 'foo:bar'],
+            ['https://104.26.14.6/same-origin', 'Authorization: Basic Zm9vOmJhcg==', 'Cookie: a=b', 'foo:bar'],
+            ['https://104.26.14.7/other-origin', null, null, null],
+            ['https://104.26.14.6/back', 'Authorization: Basic Zm9vOmJhcg==', 'Cookie: a=b', 'foo:bar'],
+            ['https://104.26.14.6/', 'Authorization: Bearer foo', 'Cookie: a=b', null],
+            ['https://104.26.14.6/same-origin', 'Authorization: Bearer foo', 'Cookie: a=b', null],
+            ['https://104.26.14.7/other-origin', null, null, null],
+            ['https://104.26.14.6/back', 'Authorization: Bearer foo', 'Cookie: a=b', null],
+            ['https://104.26.14.6/', 'Authorization: Bearer foo', null, 'foo:bar'],
+            ['https://104.26.14.6/same-origin', 'Authorization: Bearer foo', null, 'foo:bar'],
+            ['https://104.26.14.7/other-origin', null, null, null],
+            ['https://104.26.14.6/back', 'Authorization: Bearer foo', null, 'foo:bar'],
+        ], $requests);
+    }
+
+    public function testRedirectToAnotherOriginDropsDefaultCredentialsBehindOtherDecorators()
+    {
+        $requests = [];
+        $mockClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$requests) {
+            $requests[] = [$url, $options['normalized_headers']['authorization'][0] ?? null, $options['normalized_headers']['cookie'][0] ?? null, $options['auth_ntlm'] ?? null];
+
+            return 1 === \count($requests) % 2 ? new MockResponse('', ['http_code' => 302, 'redirect_url' => 'https://104.26.14.7/other-origin']) : new MockResponse('OK');
+        });
+        $mockClient = $mockClient->withOptions([
+            'auth_bearer' => 'foo',
+            'headers' => ['Cookie' => 'a=b'],
+            'auth_ntlm' => 'foo:bar',
+        ]);
+
+        $decorators = [
+            new ScopingHttpClient($mockClient, ['https://104\.26\.14\.7/' => ['headers' => ['X-Scope' => 'b']]]),
+            new CachingHttpClient($mockClient, new TagAwareAdapter(new ArrayAdapter())),
+            new NoPrivateNetworkHttpClient($mockClient),
+            new NoPrivateNetworkHttpClient(new ScopingHttpClient($mockClient, ['https://104\.26\.14\.7/' => []])),
+            new DnsResolvingHttpClient($mockClient, static fn (string $host): ?string => null),
+        ];
+
+        foreach ($decorators as $decorator) {
+            $client = new NoPrivateNetworkHttpClient($decorator);
+            $client->request('GET', 'https://104.26.14.6/', ['extra' => ['no_cache' => true]])->getContent();
+        }
+
+        $this->assertSame(array_merge(...array_fill(0, 5, [
+            ['https://104.26.14.6/', 'Authorization: Bearer foo', 'Cookie: a=b', 'foo:bar'],
+            ['https://104.26.14.7/other-origin', null, null, null],
+        ])), $requests);
+    }
+
     public function testRedirectDoesNotRepeatTheQueryOption()
     {
         TestHttpServer::start();
@@ -346,6 +478,58 @@ class NoPrivateNetworkHttpClientTest extends TestCase
 
             $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $response->toArray(), $type);
         }
+    }
+
+    #[RequiresPhpExtension('openssl')]
+    public function testDecoratedClientAppliesItsDefaultPeerFingerprint()
+    {
+        TestSocketServer::start('tls/redirect-server.php', self::port(8059));
+        $client = new NoPrivateNetworkHttpClient(new NativeHttpClient(['peer_fingerprint' => ['sha256' => str_repeat('0', 64)]]), '10.0.0.0/8');
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('peer_fingerprint match failure');
+
+        $client->request('GET', 'https://127.0.0.1:'.self::port(8059).'/', ['verify_peer' => false, 'verify_host' => false])->getHeaders();
+    }
+
+    public function testDecoratedClientAppliesItsDefaultOptions()
+    {
+        $requests = [];
+        $mockClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$requests) {
+            $requests[] = [$url, $options['cafile'] ?? null, $options['proxy'] ?? null, $options['timeout'], $options['max_redirects'], $options['normalized_headers']['accept']];
+
+            return 1 === \count($requests) % 2 ? new MockResponse('', ['http_code' => 302, 'redirect_url' => 'https://104.26.14.7/']) : new MockResponse('OK');
+        });
+
+        $client = new NoPrivateNetworkHttpClient($mockClient->withOptions([
+            'cafile' => '/path/to/ca.pem',
+            'proxy' => 'http://proxy.example:3128',
+            'timeout' => 7,
+            'headers' => ['Accept' => 'application/json'],
+        ]));
+        $client->request('GET', 'https://104.26.14.6/')->getContent();
+
+        $client = new NoPrivateNetworkHttpClient(ScopingHttpClient::forBaseUri($mockClient, 'https://104.26.14.6/', ['cafile' => '/path/to/ca.pem']));
+        $client->request('GET', 'https://104.26.14.6/')->getContent();
+
+        $progress = false;
+        $client = (new NoPrivateNetworkHttpClient($mockClient))->withOptions([
+            'max_redirects' => 0,
+            'user_data' => 'foo',
+            'on_progress' => static function () use (&$progress) { $progress = true; },
+        ]);
+        $response = $client->request('GET', 'https://104.26.14.6/');
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('foo', $response->getInfo('user_data'));
+        $this->assertTrue($progress);
+
+        $this->assertSame([
+            ['https://104.26.14.6/', '/path/to/ca.pem', 'http://proxy.example:3128', 7.0, 0, ['Accept: application/json']],
+            ['https://104.26.14.7/', '/path/to/ca.pem', 'http://proxy.example:3128', 7.0, 0, ['Accept: application/json']],
+            ['https://104.26.14.6/', '/path/to/ca.pem', null, (float) \ini_get('default_socket_timeout'), 0, ['Accept: */*']],
+            ['https://104.26.14.7/', null, null, (float) \ini_get('default_socket_timeout'), 0, ['Accept: */*']],
+            ['https://104.26.14.6/', null, null, (float) \ini_get('default_socket_timeout'), 0, ['Accept: */*']],
+        ], $requests);
     }
 
     public function testHeadersArePassedOnRedirect()

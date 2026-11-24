@@ -61,6 +61,35 @@ class PoFileLoaderTest extends TestCase
         (new PoFileLoader())->load(__DIR__.'/../Fixtures/non-existing.po', 'en', 'domain1');
     }
 
+    public function testLoadZeroMessages()
+    {
+        $resource = tempnam(sys_get_temp_dir(), 'translation');
+
+        try {
+            file_put_contents($resource, <<<'PO'
+                msgid ""
+                msgstr "header"
+
+                msgid "0"
+                msgstr "zero"
+
+                msgid "count"
+                msgstr "0"
+
+                msgid "empty"
+                msgstr ""
+
+                msgid "normal"
+                msgstr "text"
+                PO
+            );
+
+            $this->assertSame([0 => 'zero', 'count' => '0', 'empty' => '', 'normal' => 'text'], (new PoFileLoader())->load($resource, 'en')->all('messages'));
+        } finally {
+            unlink($resource);
+        }
+    }
+
     public function testLoadEmptyTranslation()
     {
         $loader = new PoFileLoader();

@@ -13,9 +13,11 @@ namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Translation\Dumper\MoFileDumper;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Loader\MoFileLoader;
+use Symfony\Component\Translation\MessageCatalogue;
 
 class MoFileLoaderTest extends TestCase
 {
@@ -56,6 +58,26 @@ class MoFileLoaderTest extends TestCase
         $this->expectException(InvalidResourceException::class);
 
         (new MoFileLoader())->load(__DIR__.'/../Fixtures/empty.mo', 'en', 'domain1');
+    }
+
+    public function testLoadZeroMessages()
+    {
+        $catalogue = new MessageCatalogue('en', ['messages' => [
+            '' => 'header',
+            '0' => 'zero',
+            'count' => '0',
+            'empty' => '',
+            'normal' => 'text',
+        ]]);
+        $resource = tempnam(sys_get_temp_dir(), 'translation');
+
+        try {
+            file_put_contents($resource, (new MoFileDumper())->formatCatalogue($catalogue, 'messages'));
+
+            $this->assertSame([0 => 'zero', 'count' => '0', 'normal' => 'text'], (new MoFileLoader())->load($resource, 'en')->all('messages'));
+        } finally {
+            unlink($resource);
+        }
     }
 
     public function testLoadEmptyTranslation()

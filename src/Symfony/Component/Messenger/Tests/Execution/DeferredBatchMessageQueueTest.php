@@ -60,4 +60,70 @@ class DeferredBatchMessageQueueTest extends TestCase
         $this->assertFalse($queue->hasPending());
         $this->assertEquals(new DeferredBatchMessage(2, $waitingEnvelope, $waitingAcked, 19.5), $remaining[$waitingHandler]);
     }
+
+    public function testItFlushesWithAMessageThatIsStillPendingWhenTheLastOneReportedWasAcked()
+    {
+        $queue = new DeferredBatchMessageQueue();
+        $batchHandler = new \stdClass();
+        $pendingAcked = false;
+        $flusherAcked = false;
+        $pending = new Envelope(new DummyMessage('pending'));
+        $flusher = new Envelope(new DummyMessage('flusher'));
+
+        // the message that flushed the batch is reported after the ones that came next, and its flush acked it
+        $queue->add($batchHandler, 1, $pending, $pendingAcked, 10.0);
+        $queue->add($batchHandler, 1, $flusher, $flusherAcked, 11.0);
+        $flusherAcked = true;
+
+        $flushable = $queue->popFlushable(true, 12.0);
+
+        $this->assertCount(1, $flushable);
+        $this->assertSame($pending, $flushable[$batchHandler]->envelope);
+        $this->assertFalse($queue->hasPending());
+    }
+
+    public function testItFlushesWithTheLastMessageWhenAllOfThemAreAcked()
+    {
+        $queue = new DeferredBatchMessageQueue();
+        $batchHandler = new \stdClass();
+        $firstAcked = false;
+        $lastAcked = false;
+        $last = new Envelope(new DummyMessage('last'));
+
+        $queue->add($batchHandler, 1, new Envelope(new DummyMessage('first')), $firstAcked, 10.0);
+        $queue->add($batchHandler, 1, $last, $lastAcked, 11.0);
+        $firstAcked = $lastAcked = true;
+
+        $this->assertSame($last, $queue->popFlushable(true, 12.0)[$batchHandler]->envelope);
+    }
+
+    public function testItForgetsTheMessagesThatGotTheirOutcomeWhenAddingAnother()
+    {
+        $queue = new DeferredBatchMessageQueue();
+        $batchHandler = new \stdClass();
+        $firstAcked = false;
+        $secondAcked = false;
+        $second = new Envelope(new DummyMessage('second'));
+
+        $queue->add($batchHandler, 1, new Envelope(new DummyMessage('first')), $firstAcked, 10.0);
+        $firstAcked = true;
+        $queue->add($batchHandler, 1, $second, $secondAcked, 11.0);
+
+        $this->assertSame($second, $queue->popFlushable(true, 12.0)[$batchHandler]->envelope);
+    }
+
+    public function testItKeepsTheEntryOfAHandlerUntilItsLastMessageWaitedLongEnough()
+    {
+        $queue = new DeferredBatchMessageQueue();
+        $batchHandler = new \stdClass();
+        $firstAcked = false;
+        $lastAcked = false;
+
+        $queue->add($batchHandler, 1, new Envelope(new DummyMessage('first')), $firstAcked, 10.0);
+        $queue->add($batchHandler, 1, new Envelope(new DummyMessage('last')), $lastAcked, 19.5);
+
+        $this->assertCount(0, $queue->popFlushable(5.0, 20.0));
+        $this->assertTrue($queue->hasPending());
+        $this->assertCount(1, $queue->popFlushable(5.0, 25.0));
+    }
 }

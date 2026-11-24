@@ -635,6 +635,23 @@ class EnvVarProcessorTest extends TestCase
         $processor->getEnv('enum', StringBackedEnum::class.':foo', static fn () => 'bogus');
     }
 
+    public function testGetEnvEnumInvalidIntegerBackedValue()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Enum value "bogus" is not backed by "'.IntBackedEnum::class.'".');
+
+        $processor->getEnv('enum', IntBackedEnum::class.':foo', static fn () => 'bogus');
+    }
+
+    public function testGetEnvEnumNumericString()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->assertSame(IntBackedEnum::Nine, $processor->getEnv('enum', IntBackedEnum::class.':foo', static fn () => '9'));
+    }
+
     #[DataProvider('validNullables')]
     public function testGetEnvNullable($value, $processed)
     {

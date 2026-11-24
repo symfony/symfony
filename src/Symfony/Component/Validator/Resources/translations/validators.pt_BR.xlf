@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>O arquivo não pode ser enviado.</target>
+                <target>O arquivo não pôde ser enviado.</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
@@ -156,7 +156,7 @@
             </trans-unit>
             <trans-unit id="42">
                 <source>The size of the image could not be detected.</source>
-                <target>O tamanho da imagem não pode ser detectado.</target>
+                <target>Não foi possível detectar o tamanho da imagem.</target>
             </trans-unit>
             <trans-unit id="43">
                 <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
@@ -244,7 +244,7 @@
             </trans-unit>
             <trans-unit id="64">
                 <source>This value is not a valid currency.</source>
-                <target>Este não é um valor monetário válido.</target>
+                <target>Este valor não é uma moeda válida.</target>
             </trans-unit>
             <trans-unit id="65">
                 <source>This value should be equal to {{ compared_value }}.</source>
@@ -288,15 +288,15 @@
             </trans-unit>
             <trans-unit id="75">
                 <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
-                <target>A imagem está num formato quadrado ({{ width }}x{{ height }}px). Imagens com formato quadrado não são permitidas.</target>
+                <target>A imagem é quadrada ({{ width }}x{{ height }}px). Imagens quadradas não são permitidas.</target>
             </trans-unit>
             <trans-unit id="76">
                 <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
-                <target>A imagem está orientada à paisagem ({{ width }}x{{ height }}px). Imagens orientadas à paisagem não são permitidas.</target>
+                <target>A imagem está no modo paisagem ({{ width }}x{{ height }}px). Imagens no modo paisagem não são permitidas.</target>
             </trans-unit>
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
-                <target>A imagem está orientada ao retrato ({{ width }}x{{ height }}px). Imagens orientadas ao retrato não são permitidas.</target>
+                <target>A imagem está no modo retrato ({{ width }}x{{ height }}px). Imagens no modo retrato não são permitidas.</target>
             </trans-unit>
             <trans-unit id="78">
                 <source>An empty file is not allowed.</source>
@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target>Este valor não é um Código de Identificação de Negócios (BIC) válido.</target>
+                <target>Este valor não é um Código Identificador Bancário (BIC) válido.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -360,7 +360,7 @@
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>Esta senha foi divulgada num vazamento de dados e não deve ser utilizada. Por favor, utilize outra senha.</target>
+                <target>Esta senha foi divulgada em um vazamento de dados e não deve ser utilizada. Por favor, utilize outra senha.</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
@@ -420,7 +420,7 @@
             </trans-unit>
             <trans-unit id="108">
                 <source>Mixing numbers from different scripts is not allowed.</source>
-                <target>Misturar números de scripts diferentes não é permitido.</target>
+                <target>Não é permitido misturar números de sistemas de escrita diferentes.</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
@@ -440,7 +440,7 @@
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL is missing a top-level domain.</source>
-                <target>Esta URL está faltando o domínio de nível superior.</target>
+                <target>Esta URL não possui um domínio de nível superior.</target>
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
@@ -464,7 +464,7 @@
             </trans-unit>
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
-                <target>Este valor não deve estar após a semana "{{ max }}".</target>
+                <target>Este valor não deve ser posterior à semana "{{ max }}".</target>
             </trans-unit>
             <trans-unit id="121">
                 <source>This value is not a valid Twig template.</source>
@@ -516,11 +516,11 @@
             </trans-unit>
             <trans-unit id="133">
                 <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
-                <target>O vídeo está no modo paisagem ({{ width }}x{{ height }}px). Vídeos em paisagem não são permitidos.</target>
+                <target>O vídeo está no modo paisagem ({{ width }}x{{ height }}px). Vídeos no modo paisagem não são permitidos.</target>
             </trans-unit>
             <trans-unit id="134">
                 <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
-                <target>O vídeo está em orientação vertical ({{ width }}x{{ height }}px). Vídeos em orientação vertical não são permitidos.</target>
+                <target>O vídeo está no modo retrato ({{ width }}x{{ height }}px). Vídeos no modo retrato não são permitidos.</target>
             </trans-unit>
             <trans-unit id="135">
                 <source>The video file is corrupted.</source>
@@ -544,7 +544,7 @@
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target>A imagem tem pixels de menos ({{ pixels }}). A quantidade mínima esperada é {{ min_pixels }}.</target>
+                <target>A imagem tem poucos pixels ({{ pixels }}). A quantidade mínima esperada é {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>

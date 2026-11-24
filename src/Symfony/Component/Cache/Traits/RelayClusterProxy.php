@@ -18,6 +18,7 @@ use Symfony\Component\Cache\Traits\Relay\RelayCluster40Trait;
 use Symfony\Component\Cache\Traits\Relay\RelayCluster50Trait;
 use Symfony\Component\Cache\Traits\Relay\RelayCluster502Trait;
 use Symfony\Component\Cache\Traits\Relay\RelayCluster61Trait;
+use Symfony\Component\Cache\Traits\Relay\RelayCluster62Trait;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -41,6 +42,7 @@ class RelayClusterProxy extends \Relay\Cluster implements ResetInterface, LazyOb
     use RelayCluster50Trait;
     use RelayCluster502Trait;
     use RelayCluster61Trait;
+    use RelayCluster62Trait;
 
     public function __construct($name, $seeds = null, $connect_timeout = 0, $command_timeout = 0, $persistent = false, #[\SensitiveParameter] $auth = null, $context = null)
     {
@@ -285,11 +287,6 @@ class RelayClusterProxy extends \Relay\Cluster implements ResetInterface, LazyOb
     public function evalsha_ro($sha, $args = [], $num_keys = 0): mixed
     {
         return $this->initializeLazyObject()->evalsha_ro(...\func_get_args());
-    }
-
-    public function exec(): array|false
-    {
-        return $this->initializeLazyObject()->exec(...\func_get_args());
     }
 
     public function exists(...$keys): \Relay\Cluster|bool|int

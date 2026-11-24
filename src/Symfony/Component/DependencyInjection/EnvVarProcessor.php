@@ -335,7 +335,11 @@ class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
         }
 
         if ('query_string' === $prefix) {
-            $queryString = parse_url($env, \PHP_URL_QUERY) ?: (parse_url($env, \PHP_URL_SCHEME) ? '' : $env);
+            $queryString = parse_url($env, \PHP_URL_QUERY);
+            if (null === $queryString || false === $queryString) {
+                $queryString = parse_url($env, \PHP_URL_SCHEME) ? '' : $env;
+            }
+
             parse_str($queryString, $result);
 
             return $result;

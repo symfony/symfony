@@ -1039,5 +1039,11 @@ class EnvVarProcessorTest extends TestCase
         yield 'url_with_empty_query' => ['https://example.com?', []];
         yield 'url_with_query' => ['https://example.com?foo=bar&baz=123', ['foo' => 'bar', 'baz' => '123']];
         yield 'raw_query_string' => ['foo=bar&test=1', ['foo' => 'bar', 'test' => '1']];
+        yield 'url_with_zero_query' => ['https://example.com?0', [0 => '']];
+        yield 'url_with_zero_query_and_fragment' => ['https://example.com?0#fragment', [0 => '']];
+        yield 'url_with_numeric_key' => ['https://example.com?0=value', [0 => 'value']];
+        yield 'raw_zero_query' => ['0', [0 => '']];
+        yield 'zero_query_with_separator' => ['?0', [0 => '']];
+        yield 'empty_query_with_separator' => ['?', []];
     }
 }

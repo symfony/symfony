@@ -224,7 +224,7 @@ class InputDefinition
             throw new LogicException(\sprintf('An option named "%s" already exists.', $option->getName()));
         }
 
-        if ($option->getShortcut()) {
+        if (null !== $option->getShortcut()) {
             foreach (explode('|', $option->getShortcut()) as $shortcut) {
                 if (isset($this->shortcuts[$shortcut]) && !$option->equals($this->options[$this->shortcuts[$shortcut]])) {
                     throw new LogicException(\sprintf('An option with shortcut "%s" already exists.', $shortcut));
@@ -233,7 +233,7 @@ class InputDefinition
         }
 
         $this->options[$option->getName()] = $option;
-        if ($option->getShortcut()) {
+        if (null !== $option->getShortcut()) {
             foreach (explode('|', $option->getShortcut()) as $shortcut) {
                 $this->shortcuts[$shortcut] = $option->getName();
             }
@@ -393,7 +393,7 @@ class InputDefinition
                     );
                 }
 
-                $shortcut = $option->getShortcut() ? \sprintf('-%s|', $option->getShortcut()) : '';
+                $shortcut = null !== $option->getShortcut() ? \sprintf('-%s|', $option->getShortcut()) : '';
                 $negation = $option->isNegatable() ? \sprintf('|--no-%s', $option->getName()) : '';
                 $elements[] = \sprintf('[%s--%s%s%s]', $shortcut, $option->getName(), $value, $negation);
             }

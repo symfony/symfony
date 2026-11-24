@@ -57,6 +57,10 @@ class DateComparatorTest extends TestCase
             ['> 2005-10-10', [strtotime('2005-10-15')], [strtotime('2005-10-09')]],
             ['after 2005-10-10', [strtotime('2005-10-15')], [strtotime('2005-10-09')]],
             ['since 2005-10-10', [strtotime('2005-10-15')], [strtotime('2005-10-09')]],
+            ['UNTIL 2005-10-10', [strtotime('2005-10-09')], [strtotime('2005-10-15'), strtotime('2005-10-10')]],
+            ['Before 2005-10-10', [strtotime('2005-10-09')], [strtotime('2005-10-15'), strtotime('2005-10-10')]],
+            ['AFTER 2005-10-10', [strtotime('2005-10-15')], [strtotime('2005-10-09'), strtotime('2005-10-10')]],
+            ['Since 2005-10-10', [strtotime('2005-10-15')], [strtotime('2005-10-09'), strtotime('2005-10-10')]],
             ['!= 2005-10-10', [strtotime('2005-10-11')], [strtotime('2005-10-10')]],
             ['2005-10-10', [strtotime('2005-10-10')], [strtotime('2005-10-11')]],
         ];

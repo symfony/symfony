@@ -28,6 +28,10 @@ class AcceptHeaderItemTest extends TestCase
     public static function provideFromStringData()
     {
         return [
+            [null, '', []],
+            ['', '', []],
+            ['   ', '', []],
+            [';;;', '', []],
             [
                 'text/html',
                 'text/html', [],

@@ -36,6 +36,14 @@ abstract class AbstractDescriptorTestCase extends TestCase
         $this->assertDescription($expectedDescription, $option);
     }
 
+    public function testDescribeInputOptionWithZeroShortcut()
+    {
+        $output = new BufferedOutput();
+        $this->getDescriptor()->describe($output, new InputOption('zero', '0'), ['raw_output' => true]);
+
+        $this->assertStringContainsString('-0', $output->fetch());
+    }
+
     #[DataProvider('getDescribeInputDefinitionTestData')]
     public function testDescribeInputDefinition(InputDefinition $definition, $expectedDescription)
     {

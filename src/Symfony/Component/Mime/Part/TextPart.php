@@ -138,7 +138,7 @@ class TextPart extends AbstractPart
             rewind($this->body);
         }
 
-        return stream_get_contents($this->body) ?: '';
+        return (string) stream_get_contents($this->body);
     }
 
     public function bodyToString(): string

@@ -355,7 +355,7 @@ final class Path
         }
 
         // No actual extension in path
-        if (!$actualExtension) {
+        if ('' === $actualExtension) {
             return $path.(str_ends_with($path, '.') ? '' : '.').$extension;
         }
 

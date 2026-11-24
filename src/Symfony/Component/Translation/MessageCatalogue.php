@@ -246,12 +246,12 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
 
     public function getCatalogueMetadata(string $key = '', string $domain = 'messages'): mixed
     {
-        if (!$domain) {
+        if ('' === $domain) {
             return $this->catalogueMetadata;
         }
 
         if (isset($this->catalogueMetadata[$domain])) {
-            if (!$key) {
+            if ('' === $key) {
                 return $this->catalogueMetadata[$domain];
             }
 
@@ -270,9 +270,9 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
 
     public function deleteCatalogueMetadata(string $key = '', string $domain = 'messages'): void
     {
-        if (!$domain) {
+        if ('' === $domain) {
             $this->catalogueMetadata = [];
-        } elseif (!$key) {
+        } elseif ('' === $key) {
             unset($this->catalogueMetadata[$domain]);
         } else {
             unset($this->catalogueMetadata[$domain][$key]);

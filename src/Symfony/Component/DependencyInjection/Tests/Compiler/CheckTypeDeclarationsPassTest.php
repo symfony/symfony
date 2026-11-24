@@ -930,7 +930,8 @@ class CheckTypeDeclarationsPassTest extends TestCase
 
         $container->register('foobar', BarMethodCall::class)
             ->addMethodCall('setString', ['%foo bar%'])
-            ->addMethodCall('setString', ["%foo\nbar%"]);
+            ->addMethodCall('setString', ["%foo\nbar%"])
+            ->addMethodCall('setString', ["%foo%\n"]);
 
         (new CheckTypeDeclarationsPass(true))->process($container);
 

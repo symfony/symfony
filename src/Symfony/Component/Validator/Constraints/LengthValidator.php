@@ -69,7 +69,7 @@ class LengthValidator extends ConstraintValidator
         }
 
         if (null !== $constraint->max && $length > $constraint->max) {
-            $exactlyOptionEnabled = $constraint->min == $constraint->max;
+            $exactlyOptionEnabled = $constraint->min === $constraint->max;
 
             $builder = $this->context->buildViolation($exactlyOptionEnabled ? $constraint->exactMessage : $constraint->maxMessage);
             if (null !== $constraint->min) {
@@ -90,7 +90,7 @@ class LengthValidator extends ConstraintValidator
         }
 
         if (null !== $constraint->min && $length < $constraint->min) {
-            $exactlyOptionEnabled = $constraint->min == $constraint->max;
+            $exactlyOptionEnabled = $constraint->min === $constraint->max;
 
             $builder = $this->context->buildViolation($exactlyOptionEnabled ? $constraint->exactMessage : $constraint->minMessage);
             if (null !== $constraint->max) {

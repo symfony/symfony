@@ -18,6 +18,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -55,6 +56,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\SignalRegistry\SignalRegistry;
 use Symfony\Component\Console\Terminal;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\Console\Tests\Fixtures\ClassWithOptionalDependency;
 use Symfony\Component\Console\Tests\Fixtures\InvokableExtendingCommandTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\MockableAppliationWithTerminalWidth;
@@ -2455,17 +2457,22 @@ class ApplicationTest extends TestCase
     public function testAlarmInterruptingTheAutoloadOfAClassNeededByTheSignalHandler()
     {
         $class = 'Symfony\\Component\\Console\\Tests\\AutoloadedDuringAlarmHandler'.bin2hex(random_bytes(4));
-        $autoloader = static function (string $name) use ($class) {
-            if ($class !== $name) {
-                return;
+        $autoloader = new class($class) {
+            public function __construct(private readonly string $class)
+            {
             }
-            // the alarm fires while this autoload is still in progress
-            posix_kill(posix_getpid(), \SIGALRM);
-            eval('namespace Symfony\\Component\\Console\\Tests; final class '.substr($class, strrpos($class, '\\') + 1).' {}');
+
+            public function loadClass(string $name): void
+            {
+                if ($this->class === $name) {
+                    posix_kill(posix_getpid(), \SIGALRM);
+                    eval('namespace Symfony\\Component\\Console\\Tests; final class '.substr($name, strrpos($name, '\\') + 1).' {}');
+                }
+            }
         };
 
         $command = new class($class) extends Command implements SignalableCommandInterface {
-            public bool $handled = false;
+            public int $handled = 0;
 
             public function __construct(private readonly string $autoloadedClass)
             {
@@ -2480,7 +2487,7 @@ class ApplicationTest extends TestCase
             public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
             {
                 new $this->autoloadedClass();
-                $this->handled = true;
+                ++$this->handled;
 
                 return false;
             }
@@ -2489,6 +2496,10 @@ class ApplicationTest extends TestCase
             {
                 new $this->autoloadedClass();
 
+                for ($i = 0; $i < 30 && !$this->handled; ++$i) {
+                    usleep(100000);
+                }
+
                 return Command::SUCCESS;
             }
         };
@@ -2496,17 +2507,18 @@ class ApplicationTest extends TestCase
         $application = $this->createSignalableApplication($command, null);
         $application->setCatchExceptions(false);
 
-        spl_autoload_register($autoloader);
+        spl_autoload_register([$autoloader, 'loadClass']);
         try {
             $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
         } finally {
-            spl_autoload_unregister($autoloader);
+            spl_autoload_unregister([$autoloader, 'loadClass']);
+            pcntl_alarm(0);
         }
-        $this->assertTrue($command->handled);
+        $this->assertSame(1, $command->handled);
     }
 
     #[RequiresPhpExtension('pcntl')]
-    public function testSignalsArrivingDuringAnAutoloadAreHandledInOrderWithoutNesting()
+    public function testSignalArrivingDuringARetriedAlarmIsHandledAfterItWithoutNesting()
     {
         $class = 'Symfony\\Component\\Console\\Tests\\AutoloadedDuringSignals'.bin2hex(random_bytes(4));
         $handlerClass = 'Symfony\\Component\\Console\\Tests\\AutoloadedBySignalHandler'.bin2hex(random_bytes(4));
@@ -2521,16 +2533,18 @@ class ApplicationTest extends TestCase
 
             public function getSubscribedSignals(): array
             {
-                return [\SIGUSR1, \SIGUSR2];
+                return [\SIGALRM, \SIGUSR1];
             }
 
             public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
             {
-                $this->trace[] = 'start';
-                if (\SIGUSR1 === $signal) {
+                $name = \SIGALRM === $signal ? 'alarm' : 'usr1';
+                $this->trace[] = $name.' start';
+                if (\SIGALRM === $signal) {
+                    new $this->autoloadedClass();
                     new $this->handlerClass();
                 }
-                $this->trace[] = 'end';
+                $this->trace[] = $name.' end';
 
                 return false;
             }
@@ -2538,34 +2552,73 @@ class ApplicationTest extends TestCase
             protected function execute(InputInterface $input, OutputInterface $output): int
             {
                 new $this->autoloadedClass();
+                $this->trace[] = 'loaded';
+
+                for ($i = 0; $i < 30 && \count($this->trace) < 6; ++$i) {
+                    usleep(100000);
+                }
 
                 return Command::SUCCESS;
             }
         };
 
-        $autoloader = static function (string $name) use ($class, $handlerClass, $command) {
-            if ($class === $name) {
-                // both signals arrive while this autoload is still in progress
-                posix_kill(posix_getpid(), \SIGUSR1);
-                posix_kill(posix_getpid(), \SIGUSR2);
-            } elseif ($handlerClass === $name) {
-                $command->trace[] = 'autoload';
-            } else {
-                return;
+        $autoloader = new class($class, $handlerClass, $command) {
+            public function __construct(private readonly string $class, private readonly string $handlerClass, private readonly object $command)
+            {
             }
-            eval('namespace Symfony\\Component\\Console\\Tests; final class '.substr($name, strrpos($name, '\\') + 1).' {}');
+
+            public function loadClass(string $name): void
+            {
+                if ($this->class === $name) {
+                    posix_kill(posix_getpid(), \SIGALRM);
+                } elseif ($this->handlerClass === $name) {
+                    $this->command->trace[] = 'autoload';
+                    posix_kill(posix_getpid(), \SIGUSR1);
+                } else {
+                    return;
+                }
+                eval('namespace Symfony\\Component\\Console\\Tests; final class '.substr($name, strrpos($name, '\\') + 1).' {}');
+            }
         };
 
         $application = $this->createSignalableApplication($command, null);
         $application->setCatchExceptions(false);
 
-        spl_autoload_register($autoloader);
+        spl_autoload_register([$autoloader, 'loadClass']);
         try {
             $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
         } finally {
-            spl_autoload_unregister($autoloader);
+            spl_autoload_unregister([$autoloader, 'loadClass']);
+            pcntl_alarm(0);
         }
-        $this->assertSame(['start', 'autoload', 'end', 'start', 'end'], $command->trace);
+        $this->assertSame(['loaded', 'alarm start', 'autoload', 'alarm end', 'usr1 start', 'usr1 end'], $command->trace);
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testOptionalClassCheckInACommandWithSignalHandlers()
+    {
+        $command = new class extends Command {
+            public ?bool $isFresh = null;
+
+            public function __construct()
+            {
+                parent::__construct('check-class');
+            }
+
+            protected function execute(InputInterface $input, OutputInterface $output): int
+            {
+                $this->isFresh = (new ClassExistenceResource(ClassWithOptionalDependency::class, false))->isFresh(0);
+
+                return Command::SUCCESS;
+            }
+        };
+
+        $application = $this->createSignalableApplication($command, new EventDispatcher());
+        $application->setCatchExceptions(false);
+
+        $this->assertSame(0, $application->run(new ArrayInput(['check-class'])));
+        $this->assertFalse($command->isFresh);
+        $this->assertTrue(class_exists(ClassWithOptionalDependency::class, false));
     }
 
     #[RequiresPhpExtension('pcntl')]

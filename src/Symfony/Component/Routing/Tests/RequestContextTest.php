@@ -83,6 +83,18 @@ class RequestContextTest extends TestCase
         $this->assertSame('/', $requestContext->getPathInfo());
     }
 
+    #[TestWith(['HTTP://test.com:8080/', 'http', 'http', 8080, 443])]
+    #[TestWith(['HtTpS://test.com:8443/', 'http', 'https', 80, 8443])]
+    #[TestWith(['//test.com:8443/', 'HTTPS', 'https', 80, 8443])]
+    public function testFromUriWithCaseInsensitiveScheme(string $uri, string $fallbackScheme, string $expectedScheme, int $httpPort, int $httpsPort)
+    {
+        $context = RequestContext::fromUri($uri, 'localhost', $fallbackScheme);
+
+        $this->assertSame($expectedScheme, $context->getScheme());
+        $this->assertSame($httpPort, $context->getHttpPort());
+        $this->assertSame($httpsPort, $context->getHttpsPort());
+    }
+
     public function testFromUriWithoutTrailingSlash()
     {
         $requestContext = RequestContext::fromUri('https://test.com');

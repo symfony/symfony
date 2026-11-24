@@ -294,6 +294,8 @@ abstract class AbstractAsciiTestCase extends TestCase
     public static function provideIndexOfLast(): array
     {
         return [
+            [4, 'abcdefghij', ['b', 'j', 'e'], -5],
+            [4, 'abcdefghij', ['e', 'j', 'b'], -5],
             [null, 'abc', '', 0],
             [null, 'abc', '', -2],
             [null, 'elegant', 'z', -1],
@@ -1000,6 +1002,16 @@ abstract class AbstractAsciiTestCase extends TestCase
         $result = static::createFromString($origin);
         $result = $before ? $result->beforeLast($needle, false, $offset) : $result->afterLast($needle, true, $offset);
         $this->assertEquals(static::createFromString($expected), $result);
+    }
+
+    public function testBeforeAndAfterLastWithMultipleNeedlesAndNegativeOffset()
+    {
+        $string = static::createFromString('abcdefghij');
+
+        foreach ([['b', 'j', 'e'], ['e', 'j', 'b']] as $needles) {
+            $this->assertSame('abcd', $string->beforeLast($needles, false, -5)->toString());
+            $this->assertSame('fghij', $string->afterLast($needles, false, -5)->toString());
+        }
     }
 
     public static function provideBeforeAfterLast()

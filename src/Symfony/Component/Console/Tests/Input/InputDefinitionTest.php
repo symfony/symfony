@@ -232,6 +232,20 @@ class InputDefinitionTest extends TestCase
         $this->assertSame(['foo' => $this->foo, 'bar' => $this->bar], $definition->getOptions(), '->addOption() adds a InputOption object');
     }
 
+    public function testZeroShortcut()
+    {
+        $option = new InputOption('zero', '0');
+        $definition = new InputDefinition([$option]);
+
+        $this->assertTrue($definition->hasShortcut('0'));
+        $this->assertSame($option, $definition->getOptionForShortcut('0'));
+        $this->assertSame('[-0|--zero]', $definition->getSynopsis());
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('An option with shortcut "0" already exists.');
+        $definition->addOption(new InputOption('other', '0'));
+    }
+
     public function testAddDuplicateOption()
     {
         $this->expectException(\LogicException::class);

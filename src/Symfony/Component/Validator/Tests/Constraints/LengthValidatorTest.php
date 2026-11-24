@@ -215,6 +215,41 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testInvalidValueWithZeroMaximumLength()
+    {
+        $constraint = new Length(max: 0, maxMessage: 'myMessage');
+
+        $this->validator->validate('a', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"a"')
+            ->setParameter('{{ limit }}', 0)
+            ->setParameter('{{ max }}', 0)
+            ->setParameter('{{ value_length }}', 1)
+            ->setInvalidValue('a')
+            ->setPlural(0)
+            ->setCode(Length::TOO_LONG_ERROR)
+            ->assertRaised();
+    }
+
+    public function testInvalidValueWithExactZeroLength()
+    {
+        $constraint = new Length(exactly: 0, exactMessage: 'myMessage');
+
+        $this->validator->validate('a', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"a"')
+            ->setParameter('{{ limit }}', 0)
+            ->setParameter('{{ min }}', 0)
+            ->setParameter('{{ max }}', 0)
+            ->setParameter('{{ value_length }}', 1)
+            ->setInvalidValue('a')
+            ->setPlural(0)
+            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
+            ->assertRaised();
+    }
+
     #[DataProvider('getFiveOrMoreCharacters')]
     public function testInvalidValuesMax(int|string $value, int $valueLength)
     {

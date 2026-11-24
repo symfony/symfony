@@ -1210,6 +1210,21 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
+    public function testRenderWithZeroPadding()
+    {
+        $style = (new TableStyle())
+            ->setCellRowContentFormat('%s')
+            ->setPaddingChar('0')
+            ->setPadType(\STR_PAD_LEFT)
+        ;
+
+        $table = new Table($output = $this->getOutputStream());
+        $table->setStyle($style)->setRows([['7'], ['123']]);
+        $table->render();
+
+        $this->assertSame("+---+\n|007|\n|123|\n+---+\n", $this->getOutputContent($output));
+    }
+
     public function testStyleWithoutPaddingAfterACellEndingWithABackslash()
     {
         $style = new TableStyle();

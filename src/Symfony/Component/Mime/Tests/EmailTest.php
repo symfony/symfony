@@ -575,6 +575,17 @@ class EmailTest extends TestCase
         $this->assertStringNotContainsString('name='.$inlinePart->getContentId(), $headers);
     }
 
+    public function testInlinedPartWithZeroName()
+    {
+        $e = (new Email())->from('me@example.com')->to('you@example.com');
+        $e->html('<img src="cid:0">');
+        $part = new DataPart('content', '0', 'image/gif');
+        $e->addPart($part->asInline());
+
+        $this->assertInlinedImagesAreReferencedViaTheirContentId($e, 1);
+        $this->assertSame('0', $part->getName());
+    }
+
     public function testGenerateBodyWithInlinedImagesWhoseCidNamesArePrefixesOfEachOther()
     {
         // "logo" is a strict prefix of "logo_2", the shorter one is added first

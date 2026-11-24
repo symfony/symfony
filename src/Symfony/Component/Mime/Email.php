@@ -478,7 +478,7 @@ class Email extends Message
                 preg_match_all('/'.$regex.'/i', $html, $tmpMatches);
                 $names = array_merge($names, $tmpMatches[2], $tmpMatches[3]);
             }
-            $names = array_filter(array_unique($names));
+            $names = array_filter(array_unique($names), 'strlen');
         }
 
         $otherParts = $relatedParts = [];

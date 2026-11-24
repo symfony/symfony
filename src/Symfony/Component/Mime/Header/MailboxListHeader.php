@@ -181,7 +181,7 @@ final class MailboxListHeader extends AbstractHeader
     private function createMailboxString(Address $address, bool $shorten): string
     {
         $str = $address->getEncodedAddress();
-        if ($name = $address->getName()) {
+        if ('' !== $name = $address->getName()) {
             $str = $this->createPhrase($this, $name, $this->getCharset(), $shorten).' <'.$str.'>';
         }
 

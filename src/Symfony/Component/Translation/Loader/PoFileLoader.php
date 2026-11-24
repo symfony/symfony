@@ -159,7 +159,7 @@ class PoFileLoader extends FileLoader
      */
     private function addMessage(array &$messages, array $item): void
     {
-        if (!empty($item['ids']['singular'])) {
+        if (isset($item['ids']['singular'][0])) {
             $id = stripcslashes($item['ids']['singular']);
             if (isset($item['ids']['plural'])) {
                 $id .= '|'.stripcslashes($item['ids']['plural']);

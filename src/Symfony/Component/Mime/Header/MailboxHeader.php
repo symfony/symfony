@@ -64,7 +64,7 @@ final class MailboxHeader extends AbstractHeader
     public function getBodyAsString(): string
     {
         $str = $this->address->getEncodedAddress();
-        if ($name = $this->address->getName()) {
+        if ('' !== $name = $this->address->getName()) {
             $str = $this->createPhrase($this, $name, $this->getCharset(), true).' <'.$str.'>';
         }
 

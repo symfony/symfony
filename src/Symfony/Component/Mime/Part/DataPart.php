@@ -28,7 +28,7 @@ class DataPart extends TextPart
      */
     public function __construct($body, ?string $filename = null, ?string $contentType = null, ?string $encoding = null)
     {
-        if ($body instanceof File && !$filename) {
+        if ($body instanceof File && !isset($filename[0])) {
             $filename = $body->getFilename();
         }
 

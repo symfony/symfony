@@ -39,6 +39,7 @@ class PathPackageTest extends TestCase
             ['/foo', '', '/bar', '/bar?v1'],
             ['/foo', '', 'bar', '/foo/bar?v1'],
             ['foo', '', 'bar', '/foo/bar?v1'],
+            ['0', '', 'bar', '/0/bar?v1'],
             ['foo/', '', 'bar', '/foo/bar?v1'],
             ['/foo/', '', 'bar', '/foo/bar?v1'],
 

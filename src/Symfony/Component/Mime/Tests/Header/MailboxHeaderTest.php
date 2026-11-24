@@ -58,6 +58,13 @@ class MailboxHeaderTest extends TestCase
         $this->assertEquals('Fabien =?'.$header->getCharset().'?Q?P=8Ftencier?= <fabien@symfony.com>', $header->getBodyAsString());
     }
 
+    public function testZeroDisplayName()
+    {
+        $header = new MailboxHeader('Sender', new Address('fabien@symfony.com', '0'));
+
+        $this->assertSame('0 <fabien@symfony.com>', $header->getBodyAsString());
+    }
+
     public function testUtf8CharsInLocalPart()
     {
         $header = new MailboxHeader('Sender', new Address('fabïen@symfony.com'));

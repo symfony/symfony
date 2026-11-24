@@ -41,6 +41,8 @@ class UrlPackageTest extends TestCase
 
             ['http://example.com', '', '/foo', 'http://example.com/foo?v1'],
             ['http://example.com', '', 'foo', 'http://example.com/foo?v1'],
+            ['http://example.com', '%s', '', 'http://example.com'],
+            ['http://example.com', '%s', '0', 'http://example.com/0'],
             ['http://example.com/', '', 'foo', 'http://example.com/foo?v1'],
             ['http://example.com/foo', '', 'foo', 'http://example.com/foo/foo?v1'],
             ['http://example.com/foo/', '', 'foo', 'http://example.com/foo/foo?v1'],

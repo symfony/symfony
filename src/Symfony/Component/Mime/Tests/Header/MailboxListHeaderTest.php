@@ -32,6 +32,13 @@ class MailboxListHeaderTest extends TestCase
         $this->assertEquals(['Chris Corbyn <chris@swiftmailer.org>'], $header->getAddressStrings());
     }
 
+    public function testZeroDisplayName()
+    {
+        $header = new MailboxListHeader('From', [new Address('chris@swiftmailer.org', '0'), new Address('mark@swiftmailer.org')]);
+
+        $this->assertSame(['0 <chris@swiftmailer.org>', 'mark@swiftmailer.org'], $header->getAddressStrings());
+    }
+
     public function testAddressCanBeReturnedForAddress()
     {
         $header = new MailboxListHeader('From', $addresses = [new Address('chris@swiftmailer.org')]);

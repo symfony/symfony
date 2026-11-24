@@ -60,6 +60,11 @@ class DateTimeZoneNormalizerTest extends TestCase
         $this->assertEquals(new \DateTimeZone('Asia/Tokyo'), $this->normalizer->denormalize('Asia/Tokyo', \DateTimeZone::class, null));
     }
 
+    public function testDenormalizeIntegerOffset()
+    {
+        $this->assertSame('-05:00', $this->normalizer->denormalize(-5, \DateTimeZone::class)->getName());
+    }
+
     public function testDenormalizeNullTimeZoneThrowsException()
     {
         $this->expectException(NotNormalizableValueException::class);
@@ -70,6 +75,26 @@ class DateTimeZoneNormalizerTest extends TestCase
     {
         $this->expectException(NotNormalizableValueException::class);
         $this->normalizer->denormalize('Jupiter/Europa', \DateTimeZone::class, null);
+    }
+
+    public function testDenormalizeArrayThrowsException()
+    {
+        try {
+            $this->normalizer->denormalize([], \DateTimeZone::class, null, ['deserialization_path' => 'timezone']);
+            $this->fail('Expected a NotNormalizableValueException.');
+        } catch (NotNormalizableValueException $e) {
+            $this->assertSame('array', $e->getCurrentType());
+            $this->assertSame(['string'], $e->getExpectedTypes());
+            $this->assertSame('timezone', $e->getPath());
+            $this->assertSame('The data is either not a string or an empty string, you should pass a string that can be parsed as a DateTimeZone.', $e->getMessage());
+        }
+    }
+
+    public function testDenormalizeInvalidObjectThrowsException()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+
+        $this->normalizer->denormalize(new \stdClass(), \DateTimeZone::class);
     }
 
     public function testDenormalizeNullByteThrowsException()

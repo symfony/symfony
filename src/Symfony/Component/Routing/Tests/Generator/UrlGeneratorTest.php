@@ -720,6 +720,100 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('', $generator->generate('test', ['foo' => 'baz'], UrlGeneratorInterface::ABSOLUTE_PATH));
     }
 
+    /**
+     * @dataProvider provideHostParametersWithForbiddenCharacters
+     */
+    public function testHostParameterWithForbiddenCharacters(string $value)
+    {
+        $routes = $this->getRoutes('test', new Route('/dashboard', [], [], [], '{tenant}.example.com'));
+
+        $this->expectException(InvalidParameterException::class);
+        $this->getGenerator($routes)->generate('test', ['tenant' => $value], UrlGeneratorInterface::ABSOLUTE_URL);
+    }
+
+    public static function provideHostParametersWithForbiddenCharacters()
+    {
+        yield ['evil%2Ecom#'];
+        yield ['3232235777/'];
+        yield ['evil?'];
+        yield ['user@evil'];
+        yield ['evil\\'];
+        yield ['evil:8080'];
+        yield ['evil example'];
+        yield ["evil\t"];
+        yield ["evil\n"];
+        yield ["evil\0"];
+        yield ["evil\x7F"];
+        yield ['evil<'];
+        yield ['evil>'];
+        yield ['evil^'];
+        yield ['evil|'];
+        yield ["evil\u{FF0E}com"];
+        yield ["evil\u{3002}com"];
+        yield ["evil\u{FF61}com"];
+    }
+
+    public function testHostParameterWithForbiddenCharactersAndPermissiveRequirement()
+    {
+        $routes = $this->getRoutes('test', new Route('/dashboard', [], ['tenant' => '.+'], [], '{tenant}.example.com'));
+
+        $this->expectException(InvalidParameterException::class);
+        $this->getGenerator($routes)->generate('test', ['tenant' => 'evil.example/'], UrlGeneratorInterface::ABSOLUTE_URL);
+    }
+
+    public function testHostParameterWithIpv6Literal()
+    {
+        $routes = $this->getRoutes('test', new Route('/dashboard', [], ['domain' => '.+'], [], '{domain}'));
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('http://[::1]/app.php/dashboard', $generator->generate('test', ['domain' => '[::1]'], UrlGeneratorInterface::ABSOLUTE_URL));
+
+        $generator->setStrictRequirements(null);
+        $this->assertSame('http://[::1]/app.php/dashboard', $generator->generate('test', ['domain' => '[::1]'], UrlGeneratorInterface::ABSOLUTE_URL));
+    }
+
+    /**
+     * @dataProvider provideHostParametersThatAreNotIpv6Literals
+     */
+    public function testHostParameterThatIsNotAnIpv6Literal(string $value)
+    {
+        $routes = $this->getRoutes('test', new Route('/dashboard', [], ['domain' => '.+'], [], '{domain}'));
+
+        $this->expectException(InvalidParameterException::class);
+        $this->getGenerator($routes)->generate('test', ['domain' => $value], UrlGeneratorInterface::ABSOLUTE_URL);
+    }
+
+    public static function provideHostParametersThatAreNotIpv6Literals()
+    {
+        yield ['[::1]:80'];
+        yield ['[evil.com]'];
+        yield ['[::1]x'];
+    }
+
+    /**
+     * @dataProvider provideNonStrictRequirements
+     */
+    public function testHostParameterWithForbiddenCharactersInNonStrictMode(?bool $strictRequirements)
+    {
+        $routes = $this->getRoutes('test', new Route('/dashboard', [], [], [], '{tenant}.example.com'));
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
+            ->method('error');
+        $generator = $this->getGenerator($routes, [], $logger);
+        $generator->setStrictRequirements($strictRequirements);
+
+        $this->assertSame('', $generator->generate('test', ['tenant' => 'evil%2Ecom#'], UrlGeneratorInterface::ABSOLUTE_URL));
+    }
+
+    public function testHostParameterWithValidCharacters()
+    {
+        $routes = $this->getRoutes('test', new Route('/dashboard', [], ['tenant' => '.+'], [], '{tenant}.example.com'));
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('http://a-b_c.d.example.com/app.php/dashboard', $generator->generate('test', ['tenant' => 'a-b_c.d'], UrlGeneratorInterface::ABSOLUTE_URL));
+        $this->assertSame('http://bücher.example.com/app.php/dashboard', $generator->generate('test', ['tenant' => 'bücher'], UrlGeneratorInterface::ABSOLUTE_URL));
+    }
+
     public function testHostIsCaseInsensitive()
     {
         $routes = $this->getRoutes('test', new Route('/', [], ['locale' => 'en|de|fr'], [], '{locale}.FooBar.com'));

@@ -56,7 +56,7 @@ class TableStyle
      */
     public function setPaddingChar(string $paddingChar): static
     {
-        if (!$paddingChar) {
+        if ('' === $paddingChar) {
             throw new LogicException('The padding char must not be empty.');
         }
 

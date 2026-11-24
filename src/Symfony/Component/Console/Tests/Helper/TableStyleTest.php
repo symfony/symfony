@@ -16,6 +16,22 @@ use Symfony\Component\Console\Helper\TableStyle;
 
 class TableStyleTest extends TestCase
 {
+    public function testSetZeroPaddingChar()
+    {
+        $style = new TableStyle();
+
+        $this->assertSame($style, $style->setPaddingChar('0'));
+        $this->assertSame('0', $style->getPaddingChar());
+    }
+
+    public function testSetEmptyPaddingChar()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The padding char must not be empty.');
+
+        (new TableStyle())->setPaddingChar('');
+    }
+
     public function testSetPadTypeWithInvalidType()
     {
         $this->expectException(\InvalidArgumentException::class);

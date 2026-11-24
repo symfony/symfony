@@ -38,6 +38,7 @@ class ParameterBag implements ParameterBagInterface
     {
         $this->parameters = [];
         $this->deprecatedParameters = [];
+        $this->nonEmptyParameters = [];
         $this->resolved = false;
     }
 

@@ -80,7 +80,7 @@ class UrlPackage extends Package
             return $url;
         }
 
-        if ($url && '/' != $url[0]) {
+        if ('' !== $url && '/' !== $url[0]) {
             $url = '/'.$url;
         }
 

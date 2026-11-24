@@ -185,6 +185,21 @@ class TextPartTest extends TestCase
         ), $p->getPreparedHeaders());
     }
 
+    public function testZeroName()
+    {
+        $p = (new TextPart('content'))->setName('0')->setDisposition('attachment');
+        $headers = $p->getPreparedHeaders();
+
+        $this->assertSame('0', $headers->getHeaderParameter('Content-Type', 'name'));
+        $this->assertSame('0', $headers->getHeaderParameter('Content-Disposition', 'name'));
+
+        $p->setDisposition('form-data');
+        $headers = $p->getPreparedHeaders();
+
+        $this->assertSame('', $headers->getHeaderParameter('Content-Type', 'name'));
+        $this->assertSame('0', $headers->getHeaderParameter('Content-Disposition', 'name'));
+    }
+
     public function testEncoding()
     {
         $p = new TextPart('content', 'utf-8', 'plain', 'base64');

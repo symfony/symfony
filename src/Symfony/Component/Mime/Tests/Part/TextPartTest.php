@@ -119,6 +119,33 @@ class TextPartTest extends TestCase
         fclose($f);
     }
 
+    #[DataProvider('provideResourceBodies')]
+    public function testResourceBody(string $body)
+    {
+        $f = fopen('php://memory', 'r+', false);
+
+        try {
+            fwrite($f, $body);
+            rewind($f);
+            $p = new TextPart($f);
+
+            $this->assertSame($body, $p->getBody());
+            $this->assertSame($body, $p->bodyToString());
+            $this->assertSame($body, implode('', iterator_to_array($p->bodyToIterable())));
+            $this->assertSame($body, unserialize(serialize($p))->getBody());
+        } finally {
+            fclose($f);
+        }
+    }
+
+    public static function provideResourceBodies(): iterable
+    {
+        yield 'empty' => [''];
+        yield 'zero' => ['0'];
+        yield 'multiple zeros' => ['00'];
+        yield 'non-empty' => ['content'];
+    }
+
     public function testConstructorWithFile()
     {
         $p = new TextPart(new File(\dirname(__DIR__).'/Fixtures/content.txt'));

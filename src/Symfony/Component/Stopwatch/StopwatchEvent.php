@@ -151,15 +151,17 @@ class StopwatchEvent
      */
     public function getStartTime(): int|float
     {
-        if (isset($this->periods[0])) {
-            return $this->periods[0]->getStartTime();
+        $startTime = null;
+
+        foreach ($this->periods as $period) {
+            $startTime = min($startTime ?? $period->getStartTime(), $period->getStartTime());
         }
 
         if ($this->started) {
-            return $this->started[0];
+            $startTime = min($startTime ?? $this->started[0], $this->started[0]);
         }
 
-        return 0;
+        return $startTime ?? 0;
     }
 
     /**

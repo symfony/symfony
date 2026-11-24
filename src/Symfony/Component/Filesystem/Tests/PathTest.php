@@ -337,6 +337,9 @@ class PathTest extends TestCase
     {
         yield ['/webmozart/symfony/style.css.twig', 'html', '/webmozart/symfony/style.css.html'];
         yield ['/webmozart/symfony/style.css', 'sass', '/webmozart/symfony/style.sass'];
+        yield ['archive.0', 'zip', 'archive.zip'];
+        yield ['archive.0', '0', 'archive.0'];
+        yield ['archive.0', '', 'archive.'];
         yield ['/webmozart/symfony/style.css', '.sass', '/webmozart/symfony/style.sass'];
         yield ['/webmozart/symfony/style.css', '', '/webmozart/symfony/style.'];
         yield ['/webmozart/symfony/style.css.', 'twig', '/webmozart/symfony/style.css.twig'];

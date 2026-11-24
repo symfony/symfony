@@ -55,6 +55,26 @@ class ParameterBagTest extends TestCase
         $this->assertTrue($bag->isResolved());
     }
 
+    public function testClearNonEmptyParameters()
+    {
+        $bag = new ParameterBag(['bar' => 'value']);
+        $bag->cannotBeEmpty('bar', 'Parameter "bar" cannot be empty.');
+
+        $bag->clear();
+
+        $this->assertSame([], $bag->allNonEmpty());
+
+        foreach ([null, '', []] as $value) {
+            $bag->set('bar', $value);
+            $this->assertSame($value, $bag->get('bar'));
+        }
+
+        $bag->cannotBeEmpty('bar', 'New constraint.');
+        $this->expectException(EmptyParameterValueException::class);
+        $this->expectExceptionMessage('New constraint.');
+        $bag->get('bar');
+    }
+
     public function testRemove()
     {
         $bag = new ParameterBag([
@@ -391,6 +411,25 @@ class ParameterBagTest extends TestCase
 
         $this->assertEquals('I\'m a %%foo%%', $bag->get('bar'), '->escapeValue() escapes % by doubling it');
         $this->assertEquals(['bar' => ['ding' => 'I\'m a bar %%foo %%bar', 'zero' => null]], $bag->get('foo'), '->escapeValue() escapes % by doubling it');
+    }
+
+    public function testResolveParameterWithTrailingNewline()
+    {
+        $bag = new ParameterBag(['foo' => 'bar', 'number' => 42]);
+
+        foreach ([false, true] as $resolved) {
+            if ($resolved) {
+                $bag->resolve();
+            }
+
+            $this->assertSame('bar', $bag->resolveValue('%foo%'));
+            $this->assertSame(42, $bag->resolveValue('%number%'));
+            $this->assertSame("bar\n", $bag->resolveValue("%foo%\n"));
+            $this->assertSame("42\n", $bag->resolveValue("%number%\n"));
+            $this->assertSame("bar\r\n", $bag->resolveValue("%foo%\r\n"));
+            $this->assertSame("bar\n\n", $bag->resolveValue("%foo%\n\n"));
+            $this->assertSame("prefix bar\n", $bag->resolveValue("prefix %foo%\n"));
+        }
     }
 
     #[DataProvider('stringsWithSpacesProvider')]

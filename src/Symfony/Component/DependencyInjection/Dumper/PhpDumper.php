@@ -2068,7 +2068,7 @@ class PhpDumper extends Dumper
         } elseif ($value instanceof Parameter) {
             return $this->dumpParameter($value);
         } elseif ($interpolate && \is_string($value)) {
-            if (preg_match('/^%([^%\s]+)%$/', $value, $match)) {
+            if (preg_match('/^%([^%\s]+)%$/D', $value, $match)) {
                 // we do this to deal with non string values (Boolean, integer, ...)
                 // the preg_replace_callback converts them to strings
                 return $this->dumpParameter($match[1]);

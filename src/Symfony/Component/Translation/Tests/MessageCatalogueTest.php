@@ -263,6 +263,46 @@ class MessageCatalogueTest extends TestCase
         $this->assertNull($catalogue->getMetadata('key2', 'domain'), 'Metadata key2 should is deleted.');
     }
 
+    public function testCatalogueMetadataWithZeroKey()
+    {
+        $catalogue = new MessageCatalogue('en');
+        $catalogue->setCatalogueMetadata('0', 'zero');
+        $catalogue->setCatalogueMetadata('other', 'value');
+
+        $this->assertSame('zero', $catalogue->getCatalogueMetadata('0'));
+        $this->assertSame([0 => 'zero', 'other' => 'value'], $catalogue->getCatalogueMetadata());
+
+        $catalogue->deleteCatalogueMetadata('0');
+
+        $this->assertNull($catalogue->getCatalogueMetadata('0'));
+        $this->assertSame('value', $catalogue->getCatalogueMetadata('other'));
+    }
+
+    public function testCatalogueMetadataWithZeroDomain()
+    {
+        $catalogue = new MessageCatalogue('en');
+        $catalogue->setCatalogueMetadata('key', 'zero domain', '0');
+        $catalogue->setCatalogueMetadata('other', 'keep', '0');
+        $catalogue->setCatalogueMetadata('key', 'default domain');
+
+        $this->assertSame('zero domain', $catalogue->getCatalogueMetadata('key', '0'));
+        $this->assertSame(['key' => 'zero domain', 'other' => 'keep'], $catalogue->getCatalogueMetadata('', '0'));
+
+        $catalogue->deleteCatalogueMetadata('key', '0');
+
+        $this->assertNull($catalogue->getCatalogueMetadata('key', '0'));
+        $this->assertSame('keep', $catalogue->getCatalogueMetadata('other', '0'));
+        $this->assertSame('default domain', $catalogue->getCatalogueMetadata('key'));
+
+        $catalogue->deleteCatalogueMetadata('', '0');
+
+        $this->assertSame(['messages' => ['key' => 'default domain']], $catalogue->getCatalogueMetadata('', ''));
+
+        $catalogue->deleteCatalogueMetadata('', '');
+
+        $this->assertSame([], $catalogue->getCatalogueMetadata('', ''));
+    }
+
     public function testMetadataMerge()
     {
         $cat1 = new MessageCatalogue('en');

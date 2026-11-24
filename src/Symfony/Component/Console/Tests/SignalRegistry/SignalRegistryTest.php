@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\SignalRegistry;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\SignalRegistry\SignalRegistry;
@@ -252,6 +253,90 @@ class SignalRegistryTest extends TestCase
         $registry->popPreviousHandlers();
 
         $this->assertEquals($original, pcntl_signal_get_handler($signal));
+    }
+
+    #[DataProvider('provideAutoloaders')]
+    public function testAlarmInterruptingAnAutoloadIsRetried(callable $autoloader, string $trigger)
+    {
+        $signalRegistry = new SignalRegistry();
+
+        $isHandled = false;
+        $signalRegistry->register(\SIGALRM, static function () use (&$isHandled) {
+            $isHandled = true;
+        });
+
+        $class = __NAMESPACE__.'\\AutoloadedDuringAlarm'.bin2hex(random_bytes(4));
+        spl_autoload_register($autoloader);
+        try {
+            $trigger($class);
+
+            $this->assertFalse($isHandled);
+            $this->assertSame(1, pcntl_alarm(0));
+        } finally {
+            spl_autoload_unregister($autoloader);
+            pcntl_alarm(0);
+        }
+        $this->assertTrue(class_exists($class, false));
+    }
+
+    public static function provideAutoloaders(): iterable
+    {
+        yield 'object method' => [[new class {
+            public function loadClass(string $class): void
+            {
+                SignalRegistryTest::loadClassDuringAlarm($class);
+            }
+        }, 'loadClass'], 'class_exists'];
+
+        yield 'static method' => [[self::class, 'loadClassDuringAlarm'], 'class_exists'];
+
+        yield 'invokable object' => [new class {
+            public function __invoke(string $class): void
+            {
+                SignalRegistryTest::loadClassDuringAlarm($class);
+            }
+        }, 'class_exists'];
+
+        yield 'spl_autoload_call()' => [static function (string $class): void {
+            self::loadClassDuringAlarm($class);
+        }, 'spl_autoload_call'];
+
+        yield 'closure' => [static function (string $class): void {
+            self::loadClassDuringAlarm($class);
+        }, 'class_exists'];
+    }
+
+    public function testAlarmInterruptingAnEngineCallbackIsHandled()
+    {
+        $signalRegistry = new SignalRegistry();
+
+        $isHandled = false;
+        $signalRegistry->register(\SIGALRM, static function () use (&$isHandled) {
+            $isHandled = true;
+        });
+
+        $autoloader = static function (string $class): void {};
+        spl_autoload_register($autoloader);
+        try {
+            $values = [2, 1];
+            usort($values, static function (int $a, int $b): int {
+                posix_kill(posix_getpid(), \SIGALRM);
+
+                return $a <=> $b;
+            });
+        } finally {
+            spl_autoload_unregister($autoloader);
+        }
+
+        $this->assertTrue($isHandled);
+    }
+
+    public static function loadClassDuringAlarm(string $class): void
+    {
+        if (str_starts_with($class, __NAMESPACE__.'\\AutoloadedDuringAlarm')) {
+            posix_kill(posix_getpid(), \SIGALRM);
+            eval('namespace '.__NAMESPACE__.'; final class '.substr($class, strrpos($class, '\\') + 1).' {}');
+        }
     }
 
     private function getHandlersForSignal(SignalRegistry $registry, int $signal): array

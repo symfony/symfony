@@ -72,7 +72,7 @@ class ReStructuredTextDescriptor extends Descriptor
         if ($option->isNegatable()) {
             $name .= '|\-\-no-'.$option->getName();
         }
-        if ($option->getShortcut()) {
+        if (null !== $option->getShortcut()) {
             $name .= '|-'.str_replace('|', '|-', $option->getShortcut());
         }
 

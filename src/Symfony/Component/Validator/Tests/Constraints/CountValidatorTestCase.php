@@ -222,4 +222,20 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
         $this->assertCount(1, $violations);
         $this->assertSame(['severity' => 'warning'], $violations[0]->getConstraint()->payload);
     }
+
+    public function testTooManyValuesWithZeroMax()
+    {
+        $value = static::createCollection(['foo']);
+        $constraint = new Count(max: 0, maxMessage: 'myMessage');
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ count }}', 1)
+            ->setParameter('{{ limit }}', 0)
+            ->setInvalidValue($value)
+            ->setPlural(0)
+            ->setCode(Count::TOO_MANY_ERROR)
+            ->assertRaised();
+    }
 }

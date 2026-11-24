@@ -220,7 +220,7 @@ final class Path
             $scheme = '';
         }
 
-        $firstCharacter = $path[0];
+        $firstCharacter = $path[0] ?? '';
 
         if ('/' === $firstCharacter) {
             return $scheme.'/';

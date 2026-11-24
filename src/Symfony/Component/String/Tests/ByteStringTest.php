@@ -22,6 +22,16 @@ class ByteStringTest extends AbstractAsciiTestCase
         return new ByteString($string);
     }
 
+    public function testToByteStringFromWindows1252()
+    {
+        $this->assertSame('é', (string) (new ByteString("\xE9"))->toByteString('UTF-8'));
+        $this->assertSame('€', (string) (new ByteString("\x80"))->toByteString('utf8'));
+        $this->assertSame("\xE9", (string) (new ByteString("\xE9"))->toByteString('Windows-1252'));
+        $this->assertSame("\xA4", (string) (new ByteString("\x80"))->toByteString('ISO-8859-15'));
+        $this->assertSame("\xE9", (string) (new ByteString("\xE9"))->toByteString());
+        $this->assertSame("\xE9", (string) (new ByteString('é'))->toByteString('Windows-1252'));
+    }
+
     public function testFromRandom()
     {
         $random = ByteString::fromRandom(32);

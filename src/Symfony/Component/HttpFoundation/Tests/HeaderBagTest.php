@@ -157,6 +157,27 @@ class HeaderBagTest extends TestCase
         $this->assertFalse($bag->has('foo'), '->replace() overrides previously set the input');
     }
 
+    public function testReplaceClearsCacheControlDirectives()
+    {
+        $bag = new HeaderBag(['Cache-Control' => 'public, max-age=600']);
+
+        $bag->replace(['X-Test' => 'value']);
+
+        $this->assertFalse($bag->has('Cache-Control'));
+        $this->assertFalse($bag->hasCacheControlDirective('public'));
+        $this->assertNull($bag->getCacheControlDirective('max-age'));
+
+        $bag->addCacheControlDirective('no-cache');
+
+        $this->assertSame('no-cache', $bag->get('Cache-Control'));
+
+        $bag->replace(['Cache-Control' => 'private, max-age=30']);
+
+        $this->assertSame('30', $bag->getCacheControlDirective('max-age'));
+        $this->assertTrue($bag->hasCacheControlDirective('private'));
+        $this->assertFalse($bag->hasCacheControlDirective('no-cache'));
+    }
+
     public function testGet()
     {
         $bag = new HeaderBag(['foo' => 'bar', 'fuzz' => 'bizz']);

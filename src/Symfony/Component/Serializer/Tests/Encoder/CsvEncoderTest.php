@@ -949,6 +949,17 @@ class CsvEncoderTest extends TestCase
         $this->assertSame("foo,bar\r\nhello,test\r\n", $this->encoder->encode($value, 'csv', [CsvEncoder::END_OF_LINE => "\r\n"]));
     }
 
+    public function testEmptyEndOfLine()
+    {
+        $value = ['foo' => 'hello', 'bar' => 'test'];
+
+        $this->assertSame('foo,barhello,test', $this->encoder->encode($value, 'csv', [CsvEncoder::END_OF_LINE => '']));
+        $this->assertSame('hello,test', $this->encoder->encode($value, 'csv', [CsvEncoder::END_OF_LINE => '', CsvEncoder::NO_HEADERS_KEY => true]));
+
+        $encoder = new CsvEncoder([CsvEncoder::END_OF_LINE => '']);
+        $this->assertSame('foo,barhello,test', $encoder->encode($value, 'csv'));
+    }
+
     public function testEndOfLinePassedInConstructor()
     {
         $value = ['foo' => 'hello', 'bar' => 'test'];

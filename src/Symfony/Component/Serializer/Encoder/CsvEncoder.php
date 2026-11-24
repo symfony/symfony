@@ -124,18 +124,12 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                     }
                 }
             }
-            fputcsv($handle, $headerRow, $delimiter, $enclosure, '');
-            if ("\n" !== $endOfLine && 0 === fseek($handle, -1, \SEEK_CUR)) {
-                fwrite($handle, $endOfLine);
-            }
+            fputcsv($handle, $headerRow, $delimiter, $enclosure, '', $endOfLine);
         }
 
         $headers = array_fill_keys($headers, '');
         foreach ($data as $row) {
-            fputcsv($handle, array_replace($headers, $row), $delimiter, $enclosure, '');
-            if ("\n" !== $endOfLine && 0 === fseek($handle, -1, \SEEK_CUR)) {
-                fwrite($handle, $endOfLine);
-            }
+            fputcsv($handle, array_replace($headers, $row), $delimiter, $enclosure, '', $endOfLine);
         }
 
         rewind($handle);

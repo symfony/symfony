@@ -90,6 +90,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
     public function replace(array $headers = []): void
     {
         $this->headers = [];
+        $this->cacheControl = [];
         $this->add($headers);
     }
 

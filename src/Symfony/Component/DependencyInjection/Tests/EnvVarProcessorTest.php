@@ -636,6 +636,23 @@ class EnvVarProcessorTest extends TestCase
         $processor->getEnv('enum', StringBackedEnum::class.':foo', static fn () => 'bogus');
     }
 
+    public function testGetEnvEnumInvalidIntegerBackedValue()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Enum value "bogus" is not backed by "'.IntBackedEnum::class.'".');
+
+        $processor->getEnv('enum', IntBackedEnum::class.':foo', static fn () => 'bogus');
+    }
+
+    public function testGetEnvEnumNumericString()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->assertSame(IntBackedEnum::Nine, $processor->getEnv('enum', IntBackedEnum::class.':foo', static fn () => '9'));
+    }
+
     #[DataProvider('validNullables')]
     public function testGetEnvNullable($value, $processed)
     {
@@ -1092,5 +1109,11 @@ class EnvVarProcessorTest extends TestCase
         yield 'url_with_empty_query' => ['https://example.com?', []];
         yield 'url_with_query' => ['https://example.com?foo=bar&baz=123', ['foo' => 'bar', 'baz' => '123']];
         yield 'raw_query_string' => ['foo=bar&test=1', ['foo' => 'bar', 'test' => '1']];
+        yield 'url_with_zero_query' => ['https://example.com?0', [0 => '']];
+        yield 'url_with_zero_query_and_fragment' => ['https://example.com?0#fragment', [0 => '']];
+        yield 'url_with_numeric_key' => ['https://example.com?0=value', [0 => 'value']];
+        yield 'raw_zero_query' => ['0', [0 => '']];
+        yield 'zero_query_with_separator' => ['?0', [0 => '']];
+        yield 'empty_query_with_separator' => ['?', []];
     }
 }

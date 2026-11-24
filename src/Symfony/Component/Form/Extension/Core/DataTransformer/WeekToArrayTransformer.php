@@ -33,7 +33,7 @@ class WeekToArrayTransformer implements DataTransformerInterface
             throw new TransformationFailedException(\sprintf('Value is expected to be a string but was "%s".', get_debug_type($value)));
         }
 
-        if (0 === preg_match('/^(?P<year>\d{4})-W(?P<week>\d{2})$/', $value, $matches)) {
+        if (0 === preg_match('/^(?P<year>\d{4,})-W(?P<week>\d{2})$/', $value, $matches)) {
             throw new TransformationFailedException('Given data does not follow the date format "Y-\WW".');
         }
 
@@ -77,11 +77,16 @@ class WeekToArrayTransformer implements DataTransformerInterface
             throw new TransformationFailedException(\sprintf('Week is expected to be an integer, but was "%s".', get_debug_type($value['week'])));
         }
 
+        if ($value['year'] < 1) {
+            throw new TransformationFailedException(\sprintf('Year "%d" is not a valid year.', $value['year']));
+        }
+
         // The 28th December is always in the last week of the year
-        if ($value['week'] < 1 || date('W', strtotime('28th December '.$value['year'])) < $value['week']) {
+        $lastWeek = (new \DateTimeImmutable('@0'))->setDate($value['year'], 12, 28)->format('W');
+        if ($value['week'] < 1 || $value['week'] > $lastWeek) {
             throw new TransformationFailedException(\sprintf('Week "%d" does not exist for year "%d".', $value['week'], $value['year']));
         }
 
-        return \sprintf('%d-W%02d', $value['year'], $value['week']);
+        return \sprintf('%04d-W%02d', $value['year'], $value['week']);
     }
 }

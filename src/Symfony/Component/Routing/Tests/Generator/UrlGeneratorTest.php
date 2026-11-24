@@ -430,6 +430,36 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/path-and-not-domain', $this->getGenerator($routes, ['BaseUrl' => ''])->generate('test'));
     }
 
+    /**
+     * @dataProvider provideParametersThatStartThePathWithTwoSlashes
+     */
+    public function testParametersThatStartThePathWithTwoSlashes(?bool $strictRequirements, string $routePath, array $requirements, array $parameters, string $path)
+    {
+        $routes = $this->getRoutes('test', new Route($routePath, [], $requirements));
+        $generator = $this->getGenerator($routes, ['BaseUrl' => '']);
+        $generator->setStrictRequirements($strictRequirements);
+
+        $this->assertSame('/%2F'.substr($path, 2), $generator->generate('test', $parameters));
+        $this->assertSame('http://localhost'.$path, $generator->generate('test', $parameters, UrlGeneratorInterface::ABSOLUTE_URL));
+
+        $generator->getContext()->setHost('');
+        $this->assertSame('/%2F'.substr($path, 2), $generator->generate('test', $parameters, UrlGeneratorInterface::ABSOLUTE_URL));
+
+        $generator->getContext()->setBaseUrl('/app.php');
+        $this->assertSame('/app.php'.$path, $generator->generate('test', $parameters));
+    }
+
+    public static function provideParametersThatStartThePathWithTwoSlashes()
+    {
+        yield [null, '/{_locale}/blog/rss.xml', ['_locale' => 'en|fr|vi|zh_CN'], ['_locale' => '/evil.com'], '//evil.com/blog/rss.xml'];
+
+        foreach ([true, false, null] as $strictRequirements) {
+            yield [$strictRequirements, '/{slug}', ['slug' => '.+'], ['slug' => '/evil.example'], '//evil.example'];
+            yield [$strictRequirements, '/{slug}', ['slug' => '.+'], ['slug' => '//evil.example'], '///evil.example'];
+            yield [$strictRequirements, '/{dir}/{slug}', ['dir' => '.*'], ['dir' => '', 'slug' => 'evil.example'], '//evil.example'];
+        }
+    }
+
     public function testNoTrailingSlashForMultipleOptionalParameters()
     {
         $routes = $this->getRoutes('test', new Route('/category/{slug1}/{slug2}/{slug3}', ['slug2' => null, 'slug3' => null]));
@@ -505,16 +535,62 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/app.php/a./.a/a../..a/...', $this->getGenerator($routes)->generate('test'));
     }
 
-    public function testEncodingOfChainedRelativePathSegments()
+    /**
+     * @dataProvider provideParametersThatMakeDotSegments
+     */
+    public function testParametersThatMakeDotSegments(string $routePath, array $requirements, array $parameters)
     {
-        $routes = $this->getRoutes('test', new Route('/foo/{path}/bar', [], ['path' => '.+']));
-        $this->assertSame('/app.php/foo/%2E%2E/%2E%2E/%2E%2E/bar', $this->getGenerator($routes)->generate('test', ['path' => '../../..']));
-        $this->assertSame('/app.php/foo/%2E/%2E/%2E/bar', $this->getGenerator($routes)->generate('test', ['path' => '././.']));
-        $this->assertSame('/app.php/foo/%2E%2E/%2E/%2E/%2E%2E/bar', $this->getGenerator($routes)->generate('test', ['path' => '../././..']));
+        $routes = $this->getRoutes('test', new Route($routePath, [], $requirements));
 
+        $this->expectException(InvalidParameterException::class);
+        $this->getGenerator($routes)->generate('test', $parameters);
+    }
+
+    public static function provideParametersThatMakeDotSegments()
+    {
+        yield ['/foo/{path}/bar', ['path' => '.+'], ['path' => '../../..']];
+        yield ['/foo/{path}/bar', ['path' => '.+'], ['path' => '././.']];
+        yield ['/foo/{path}/bar', ['path' => '.+'], ['path' => '../././..']];
+        yield ['/foo/{path}', ['path' => '.+'], ['path' => '../../..']];
+        yield ['/foo/{path}', ['path' => '.+'], ['path' => '././.']];
+        yield ['/foo/{path}', ['path' => '.+'], ['path' => '../admin']];
+        yield ['/foo/{path}', ['path' => '.+'], ['path' => 'a/..']];
+        yield ['/{path}', ['path' => '.+'], ['path' => '/./evil.example']];
+        yield ['/user/{id}/edit', [], ['id' => '..']];
+        yield ['/user/{id}/edit', [], ['id' => '.']];
+        yield ['/foo/.{suffix}', [], ['suffix' => '.']];
+        yield ['/foo/.{suffix}', ['suffix' => '.+'], ['suffix' => '/bar']];
+        yield ['/foo/{path}./bar', ['path' => '.+'], ['path' => 'a/']];
+    }
+
+    /**
+     * @dataProvider provideNonStrictRequirements
+     */
+    public function testParametersThatMakeDotSegmentsInNonStrictMode(?bool $strictRequirements)
+    {
         $routes = $this->getRoutes('test', new Route('/foo/{path}', [], ['path' => '.+']));
-        $this->assertSame('/app.php/foo/%2E%2E/%2E%2E/%2E%2E', $this->getGenerator($routes)->generate('test', ['path' => '../../..']));
-        $this->assertSame('/app.php/foo/%2E/%2E/%2E', $this->getGenerator($routes)->generate('test', ['path' => '././.']));
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
+            ->method('error');
+        $generator = $this->getGenerator($routes, [], $logger);
+        $generator->setStrictRequirements($strictRequirements);
+
+        $this->assertSame('', $generator->generate('test', ['path' => '../admin']));
+    }
+
+    public static function provideNonStrictRequirements()
+    {
+        yield [false];
+        yield [null];
+    }
+
+    public function testParametersWithDotsThatDoNotMakeDotSegments()
+    {
+        $routes = $this->getRoutes('test', new Route('/foo/{path}.json', [], ['path' => '.+']));
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/foo/.../a../..a/.a/a..json', $generator->generate('test', ['path' => '.../a../..a/.a/a.']));
+        $this->assertSame('/app.php/foo/a/..json', $generator->generate('test', ['path' => 'a/.']));
     }
 
     public function testEncodingOfSlashInPath()

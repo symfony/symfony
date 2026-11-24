@@ -10,6 +10,7 @@ framework:
 services:
     logger: { class: Psr\Log\NullLogger }
     Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\GuardedBundle\AppCustomAuthenticator: ~
+    Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\GuardedBundle\AppUserChecker: ~
     Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\GuardedBundle\AuthenticationController:
         tags: [controller.service_arguments]
 
@@ -22,6 +23,7 @@ security:
             memory:
                 users:
                     Jane: { password: test, roles: [ROLE_USER] }
+                    Expired: { password: test, roles: [ROLE_USER] }
 
     firewalls:
         secure:
@@ -29,6 +31,7 @@ security:
             anonymous: ~
             lazy: true
             stateless: false
+            user_checker: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\GuardedBundle\AppUserChecker
             guard:
                 authenticators:
                     - Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\GuardedBundle\AppCustomAuthenticator

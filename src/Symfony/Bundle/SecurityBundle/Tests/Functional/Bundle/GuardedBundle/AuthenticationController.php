@@ -27,6 +27,13 @@ class AuthenticationController
         return new Response('Logged in.');
     }
 
+    public function manualLoginWithAuthenticatorAction(GuardAuthenticatorHandler $guardAuthenticatorHandler, AppCustomAuthenticator $authenticator, Request $request)
+    {
+        $guardAuthenticatorHandler->authenticateUserAndHandleSuccess(new InMemoryUser($request->query->get('username'), 'test', ['ROLE_USER']), $request, $authenticator, 'secure');
+
+        return new Response('Logged in.');
+    }
+
     public function profileAction(?UserInterface $user = null)
     {
         if (null === $user) {

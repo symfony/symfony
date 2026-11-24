@@ -12,3 +12,8 @@ manual_login:
     path: /manual_login
     defaults:
         _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\GuardedBundle\AuthenticationController::manualLoginAction
+
+manual_login_with_authenticator:
+    path: /manual_login_with_authenticator
+    defaults:
+        _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\GuardedBundle\AuthenticationController::manualLoginWithAuthenticatorAction

@@ -12,12 +12,17 @@
 namespace Symfony\Component\Security\Guard\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AccountExpiredException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
@@ -172,6 +177,98 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $handler->authenticateWithToken($this->token, $this->request, 'stateless_provider_key');
     }
 
+    public function testAuthenticateUserAndHandleSuccessRunsThePostAuthCheckOfTheUserChecker()
+    {
+        $user = $this->createMock(UserInterface::class);
+        $this->guardAuthenticator->method('createAuthenticatedToken')->willReturn($this->token);
+        $this->guardAuthenticator->expects($this->never())->method('onAuthenticationSuccess');
+
+        $userChecker = $this->createMock(UserCheckerInterface::class);
+        $userChecker->expects($this->once())->method('checkPostAuth')->with($user)->willThrowException(new AccountExpiredException());
+
+        $tokenStorage = new TokenStorage();
+        $handler = new GuardAuthenticatorHandler($tokenStorage, $this->dispatcher, [], $this->createUserCheckerLocator(['main' => $userChecker]));
+
+        try {
+            $handler->authenticateUserAndHandleSuccess($user, $this->request, $this->guardAuthenticator, 'main');
+            $this->fail('The user checker should have rejected the user.');
+        } catch (AccountExpiredException $e) {
+        }
+
+        $this->assertNull($tokenStorage->getToken());
+    }
+
+    public function testAuthenticateUserAndHandleSuccessRunsTheUserCheckerOfTheFirewallOnly()
+    {
+        $user = $this->createMock(UserInterface::class);
+        $response = new Response();
+        $this->guardAuthenticator->method('createAuthenticatedToken')->with($user, 'main')->willReturn($this->token);
+        $this->guardAuthenticator->method('onAuthenticationSuccess')->willReturn($response);
+
+        $userChecker = $this->createMock(UserCheckerInterface::class);
+        $userChecker->expects($this->never())->method('checkPreAuth');
+        $userChecker->expects($this->once())->method('checkPostAuth')->with($user);
+
+        $otherUserChecker = $this->createMock(UserCheckerInterface::class);
+        $otherUserChecker->expects($this->never())->method('checkPreAuth');
+        $otherUserChecker->expects($this->never())->method('checkPostAuth');
+
+        $tokenStorage = new TokenStorage();
+        $handler = new GuardAuthenticatorHandler($tokenStorage, $this->dispatcher, [], $this->createUserCheckerLocator(['main' => $userChecker, 'admin' => $otherUserChecker]));
+
+        $this->assertSame($response, $handler->authenticateUserAndHandleSuccess($user, $this->request, $this->guardAuthenticator, 'main'));
+        $this->assertSame($this->token, $tokenStorage->getToken());
+    }
+
+    public function testAuthenticateUserAndHandleSuccessRunsTheUserCheckerOfFirewallsWithDashesInTheirName()
+    {
+        $user = $this->createMock(UserInterface::class);
+        $this->guardAuthenticator->method('createAuthenticatedToken')->willReturn($this->token);
+
+        $userChecker = $this->createMock(UserCheckerInterface::class);
+        $userChecker->expects($this->once())->method('checkPostAuth')->with($user)->willThrowException(new AccountExpiredException());
+
+        $tokenStorage = new TokenStorage();
+        $handler = new GuardAuthenticatorHandler($tokenStorage, $this->dispatcher, [], $this->createUserCheckerLocator(['my_firewall' => $userChecker]));
+
+        try {
+            $handler->authenticateUserAndHandleSuccess($user, $this->request, $this->guardAuthenticator, 'my-firewall');
+            $this->fail('The user checker should have rejected the user.');
+        } catch (AccountExpiredException $e) {
+        }
+
+        $this->assertNull($tokenStorage->getToken());
+    }
+
+    public function testAuthenticateUserAndHandleSuccessPrefersTheUserCheckerOfTheExactFirewallName()
+    {
+        $user = $this->createMock(UserInterface::class);
+        $this->guardAuthenticator->method('createAuthenticatedToken')->willReturn($this->token);
+
+        $userChecker = $this->createMock(UserCheckerInterface::class);
+        $userChecker->expects($this->once())->method('checkPostAuth')->with($user);
+
+        $otherUserChecker = $this->createMock(UserCheckerInterface::class);
+        $otherUserChecker->expects($this->never())->method('checkPostAuth');
+
+        $handler = new GuardAuthenticatorHandler(new TokenStorage(), $this->dispatcher, [], $this->createUserCheckerLocator(['my-firewall' => $userChecker, 'my_firewall' => $otherUserChecker]));
+        $handler->authenticateUserAndHandleSuccess($user, $this->request, $this->guardAuthenticator, 'my-firewall');
+    }
+
+    public function testAuthenticateUserAndHandleSuccessWithoutUserCheckerLocator()
+    {
+        $user = $this->createMock(UserInterface::class);
+        $response = new Response();
+        $this->guardAuthenticator->method('createAuthenticatedToken')->with($user, 'main')->willReturn($this->token);
+        $this->guardAuthenticator->method('onAuthenticationSuccess')->willReturn($response);
+
+        $tokenStorage = new TokenStorage();
+        $handler = new GuardAuthenticatorHandler($tokenStorage, $this->dispatcher);
+
+        $this->assertSame($response, $handler->authenticateUserAndHandleSuccess($user, $this->request, $this->guardAuthenticator, 'main'));
+        $this->assertSame($this->token, $tokenStorage->getToken());
+    }
+
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
@@ -199,5 +296,18 @@ class GuardAuthenticatorHandlerTest extends TestCase
             ->willReturn('test_session_name');
         $this->request->setSession($session);
         $this->request->cookies->set('test_session_name', 'session_cookie_val');
+    }
+
+    private function createUserCheckerLocator(array $userCheckers): ContainerInterface
+    {
+        $locator = $this->createMock(ContainerInterface::class);
+        $locator->method('has')->willReturnCallback(static function ($id) use ($userCheckers) {
+            return isset($userCheckers[$id]);
+        });
+        $locator->method('get')->willReturnCallback(static function ($id) use ($userCheckers) {
+            return $userCheckers[$id];
+        });
+
+        return $locator;
     }
 }

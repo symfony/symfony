@@ -34,4 +34,25 @@ class GuardedTest extends AbstractWebTestCase
 
         $this->assertSame('Username: Jane', $client->getResponse()->getContent());
     }
+
+    public function testManualLoginWithAuthenticator()
+    {
+        $client = $this->createClient(['debug' => true, 'test_case' => 'Guarded', 'root_config' => 'config.yml']);
+
+        $client->request('GET', '/manual_login_with_authenticator?username=Jane');
+        $client->request('GET', '/profile');
+
+        $this->assertSame('Username: Jane', $client->getResponse()->getContent());
+    }
+
+    public function testManualLoginWithAuthenticatorRunsThePostAuthCheckOfTheUserChecker()
+    {
+        $client = $this->createClient(['debug' => true, 'test_case' => 'Guarded', 'root_config' => 'config.yml']);
+
+        $client->request('GET', '/manual_login_with_authenticator?username=Expired');
+        $this->assertSame(401, $client->getResponse()->getStatusCode());
+
+        $client->request('GET', '/profile');
+        $this->assertSame('Not logged in.', $client->getResponse()->getContent());
+    }
 }

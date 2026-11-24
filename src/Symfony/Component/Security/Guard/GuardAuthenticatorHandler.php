@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Guard;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -42,15 +43,18 @@ class GuardAuthenticatorHandler
     private $dispatcher;
     private $sessionStrategy;
     private $statelessProviderKeys;
+    private $userCheckerLocator;
 
     /**
-     * @param array $statelessProviderKeys An array of provider/firewall keys that are "stateless" and so do not need the session migrated on success
+     * @param array                   $statelessProviderKeys An array of provider/firewall keys that are "stateless" and so do not need the session migrated on success
+     * @param ContainerInterface|null $userCheckerLocator    A locator of the user checkers, indexed by provider/firewall key
      */
-    public function __construct(TokenStorageInterface $tokenStorage, ?EventDispatcherInterface $eventDispatcher = null, array $statelessProviderKeys = [])
+    public function __construct(TokenStorageInterface $tokenStorage, ?EventDispatcherInterface $eventDispatcher = null, array $statelessProviderKeys = [], ?ContainerInterface $userCheckerLocator = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->dispatcher = $eventDispatcher;
         $this->statelessProviderKeys = $statelessProviderKeys;
+        $this->userCheckerLocator = $userCheckerLocator;
     }
 
     /**
@@ -88,6 +92,15 @@ class GuardAuthenticatorHandler
      */
     public function authenticateUserAndHandleSuccess(UserInterface $user, Request $request, AuthenticatorInterface $authenticator, string $providerKey): ?Response
     {
+        if (null !== $this->userCheckerLocator) {
+            // the configuration turns dashes into underscores in firewall names
+            $firewallName = $this->userCheckerLocator->has($providerKey) ? $providerKey : str_replace('-', '_', $providerKey);
+
+            if ($this->userCheckerLocator->has($firewallName)) {
+                $this->userCheckerLocator->get($firewallName)->checkPostAuth($user);
+            }
+        }
+
         // create an authenticated token for the User
         $token = $authenticator->createAuthenticatedToken($user, $providerKey);
         // authenticate this in the system

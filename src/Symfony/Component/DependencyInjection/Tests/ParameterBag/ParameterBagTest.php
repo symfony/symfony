@@ -55,6 +55,26 @@ class ParameterBagTest extends TestCase
         $this->assertTrue($bag->isResolved());
     }
 
+    public function testClearNonEmptyParameters()
+    {
+        $bag = new ParameterBag(['bar' => 'value']);
+        $bag->cannotBeEmpty('bar', 'Parameter "bar" cannot be empty.');
+
+        $bag->clear();
+
+        $this->assertSame([], $bag->allNonEmpty());
+
+        foreach ([null, '', []] as $value) {
+            $bag->set('bar', $value);
+            $this->assertSame($value, $bag->get('bar'));
+        }
+
+        $bag->cannotBeEmpty('bar', 'New constraint.');
+        $this->expectException(EmptyParameterValueException::class);
+        $this->expectExceptionMessage('New constraint.');
+        $bag->get('bar');
+    }
+
     public function testRemove()
     {
         $bag = new ParameterBag([

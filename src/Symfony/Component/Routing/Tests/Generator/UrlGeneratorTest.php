@@ -985,6 +985,26 @@ class UrlGeneratorTest extends TestCase
                 '/dir/:subdir/',
                 './:subdir/',
             ],
+            [
+                '/dir/file',
+                '/dir/\\\\example.com',
+                './\\\\example.com',
+            ],
+            [
+                '/dir/file',
+                '/dir/\\/example.com',
+                './\\/example.com',
+            ],
+            [
+                '/dir/file',
+                '/dir/ //example.com',
+                './ //example.com',
+            ],
+            [
+                '/dir/file',
+                "/dir/\t//example.com",
+                "./\t//example.com",
+            ],
         ];
     }
 

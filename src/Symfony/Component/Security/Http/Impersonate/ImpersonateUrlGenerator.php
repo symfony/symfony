@@ -67,6 +67,11 @@ class ImpersonateUrlGenerator
 
         if (null === $targetUri) {
             $targetUri = $request->getRequestUri();
+
+            // a leading "//" would make the path point to another host
+            if (str_starts_with($targetUri, '//')) {
+                $targetUri = '/%2F'.substr($targetUri, 2);
+            }
         }
 
         $targetUri .= (str_contains($targetUri, '?') ? '&' : '?').http_build_query([$switchUserConfig['parameter'] => SwitchUserListener::EXIT_VALUE], '', '&');

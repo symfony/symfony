@@ -132,6 +132,41 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $matcher->match('/foo%3Abar');
     }
 
+    /**
+     * @dataProvider provideLeadingDoubleSlash
+     */
+    public function testSlashRedirectEncodesLeadingDoubleSlash(string $pathinfo, string $redirectPath)
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/{path}/edit/', [], ['path' => '.+']));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $matcher->expects($this->once())->method('redirect')->with($redirectPath.'/', 'foo')->willReturn([]);
+        $matcher->match($pathinfo);
+    }
+
+    /**
+     * @dataProvider provideLeadingDoubleSlash
+     */
+    public function testSchemeRedirectEncodesLeadingDoubleSlash(string $pathinfo, string $redirectPath)
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/{path}/edit', [], ['path' => '.+'], [], '', ['https']));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $matcher->expects($this->once())->method('redirect')->with($redirectPath, 'foo', 'https')->willReturn([]);
+        $matcher->match($pathinfo);
+    }
+
+    public static function provideLeadingDoubleSlash(): iterable
+    {
+        yield ['//evil.example/edit', '/%2Fevil.example/edit'];
+        yield ['///evil.example/edit', '/%2F/evil.example/edit'];
+        yield ['/\\evil.example/edit', '/%5Cevil.example/edit'];
+        yield ["/\t/evil.example/edit", "/\t%2Fevil.example/edit"];
+        yield ["/\r\n\\evil.example/edit", "/\r\n%5Cevil.example/edit"];
+    }
+
     public function testSchemeRequirement()
     {
         $coll = new RouteCollection();

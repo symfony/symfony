@@ -26,6 +26,9 @@ class RedirectableCompiledUrlMatcher extends CompiledUrlMatcher implements Redir
      */
     public function redirect(string $path, string $route, ?string $scheme = null): array
     {
+        // a leading "//" or "/\", even with tabs or newlines in between, would make the redirection point to another host
+        $path = preg_replace(['#^/[\t\n\r]*+\K/#', '#^/[\t\n\r]*+\K\\\\#'], ['%2F', '%5C'], $path);
+
         return [
             '_controller' => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController::urlRedirectAction',
             'path' => $path,

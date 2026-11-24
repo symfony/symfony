@@ -197,6 +197,46 @@ class RedirectControllerTest extends TestCase
         $this->assertSame(302, $returnResponse->getStatusCode());
     }
 
+    /**
+     * @dataProvider providePathWithoutLeadingSlash
+     */
+    public function testPathWithoutLeadingSlash(string $baseUrl, string $path, string $expectedUrl)
+    {
+        $request = $this->createRequestObject('http', 'www.example.com', 80, $baseUrl);
+        $controller = $this->createRedirectController();
+
+        $this->assertRedirectUrl($controller->urlRedirectAction($request, $path), $expectedUrl);
+
+        $request->attributes = new ParameterBag(['_route_params' => ['path' => $path]]);
+        $this->assertRedirectUrl($controller($request), $expectedUrl);
+    }
+
+    public static function providePathWithoutLeadingSlash(): iterable
+    {
+        yield ['', '@foo.bar', 'http://www.example.com/@foo.bar'];
+        yield ['', '.foo.bar', 'http://www.example.com/.foo.bar'];
+        yield ['/base', 'redirect-path', 'http://www.example.com/base/redirect-path'];
+    }
+
+    /**
+     * @dataProvider provideUrlWithoutHost
+     */
+    public function testUrlWithoutHost(string $path, string $expectedUrl)
+    {
+        $request = $this->createRequestObject('http', 'www.example.com', 80, '');
+        $controller = $this->createRedirectController();
+
+        $this->assertRedirectUrl($controller->urlRedirectAction($request, $path), $expectedUrl);
+    }
+
+    public static function provideUrlWithoutHost(): iterable
+    {
+        yield ['https:\\\\foo.bar', 'http://www.example.com/https:\\\\foo.bar'];
+        yield ['https:/foo.bar', 'http://www.example.com/https:/foo.bar'];
+        yield ['HTTP:foo.bar', 'http://www.example.com/HTTP:foo.bar'];
+        yield ['mailto:foo@bar.com', 'mailto:foo@bar.com'];
+    }
+
     public function testUrlRedirectDefaultPorts()
     {
         $host = 'www.example.com';

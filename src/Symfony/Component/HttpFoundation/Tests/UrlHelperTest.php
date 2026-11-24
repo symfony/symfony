@@ -170,6 +170,7 @@ class UrlHelperTest extends TestCase
             ['../foo.png', '/foo.png', '/foo/bar.html'],
             ['../baz/foo.png', '/baz/foo.png', '/foo/bar.html'],
             ['baz/foo.png', 'baz/foo.png', '/foo/bar.html'],
+            ['./\\\\example.com', '/foo/\\\\example.com', '/foo/bar.html'],
 
             ['http://example.com/baz', 'http://example.com/baz', '/'],
             ['https://example.com/baz', 'https://example.com/baz', '/'],

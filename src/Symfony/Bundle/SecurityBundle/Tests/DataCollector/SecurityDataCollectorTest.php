@@ -122,6 +122,32 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame('hhamon', $collector->getUser());
     }
 
+    /**
+     * @dataProvider provideImpersonationExitPath
+     */
+    public function testCollectImpersonationExitPath(string $requestUri, string $exitPath)
+    {
+        $adminToken = new UsernamePasswordToken(new InMemoryUser('yceruto', 'P4$$w0rD', ['ROLE_ADMIN']), 'provider', ['ROLE_ADMIN']);
+
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('hhamon', 'P4$$w0rD', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN']), 'provider', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $adminToken));
+
+        $firewallMap = $this->createMock(FirewallMap::class);
+        $firewallMap->method('getFirewallConfig')->willReturn(new FirewallConfig('dummy', 'security.user_checker.dummy', null, true, false, null, null, null, null, null, [], ['parameter' => '_switch_user']));
+
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, $firewallMap, null, true);
+        $collector->collect(new Request([], [], [], [], [], ['REQUEST_URI' => $requestUri]), new Response());
+        $collector->lateCollect();
+
+        $this->assertSame($exitPath, $collector->getImpersonationExitPath());
+    }
+
+    public static function provideImpersonationExitPath(): iterable
+    {
+        yield ['/profile', '/profile?_switch_user=_exit'];
+        yield ['//example.com/profile', '/%2Fexample.com/profile?_switch_user=_exit'];
+    }
+
     public function testGetFirewall()
     {
         $firewallConfig = new FirewallConfig('dummy', 'security.request_matcher.dummy', 'security.user_checker.dummy');

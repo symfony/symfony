@@ -69,6 +69,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
     private $subnets;
     private $ipFlags;
     private $dnsCache;
+    private $noAuthOptions = ['auth_basic' => null, 'auth_bearer' => null];
 
     /**
      * @param string|array|null $subnets String or array of subnets using CIDR notation that should be considered private.
@@ -107,6 +108,13 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
 
         $this->ipFlags = $ipFlags;
         $this->dnsCache = new \ArrayObject();
+
+        try {
+            $client->withOptions(['auth_ntlm' => null]);
+            $this->noAuthOptions['auth_ntlm'] = null;
+        } catch (\InvalidArgumentException $e) {
+            // The decorated client doesn't support NTLM
+        }
     }
 
     /**
@@ -154,7 +162,9 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
             });
         }
 
-        return new AsyncResponse($this->client, $method, $url, $options, static function (ChunkInterface $chunk, AsyncContext $context) use (&$method, &$options, $maxRedirects, &$redirectHeaders, $subnets, $ipFlags, $dnsCache): \Generator {
+        $noAuthOptions = $this->noAuthOptions;
+
+        return new AsyncResponse($this->client, $method, $url, $options, static function (ChunkInterface $chunk, AsyncContext $context) use (&$method, &$options, $maxRedirects, &$redirectHeaders, $noAuthOptions, $subnets, $ipFlags, $dnsCache): \Generator {
             if (null !== $chunk->getError() || $chunk->isTimeout() || !$chunk->isFirst()) {
                 yield $chunk;
 
@@ -192,12 +202,17 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
 
             // Authorization and Cookie headers MUST NOT follow except for the initial scheme, host and port
             $port = parse_url($url, \PHP_URL_PORT);
-            $options['headers'] = parse_url($url, \PHP_URL_SCHEME).':' === $redirectHeaders['scheme'] && $redirectHeaders['host'] === $host && ($redirectHeaders['port'] ?? null) === $port ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
+            $sameOrigin = parse_url($url, \PHP_URL_SCHEME).':' === $redirectHeaders['scheme'] && $redirectHeaders['host'] === $host && ($redirectHeaders['port'] ?? null) === $port;
+            $options['headers'] = $sameOrigin ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
 
             static $redirectCount = 0;
             $context->setInfo('redirect_count', ++$redirectCount);
 
-            $context->replaceRequest($method, $url, $options);
+            // The decorated client must not add its default credentials either
+            $context->replaceRequest($method, $url, $sameOrigin ? $options : [
+                'headers' => $options['headers'] + ['Authorization' => [], 'Cookie' => []],
+                'extra' => ['skip_default_credentials' => true] + ($options['extra'] ?? []),
+            ] + $noAuthOptions + $options);
 
             if ($redirectCount >= $maxRedirects) {
                 $context->passthru();

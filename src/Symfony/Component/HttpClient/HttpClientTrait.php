@@ -188,6 +188,12 @@ trait HttpClientTrait
     {
         $options['normalized_headers'] = self::normalizeHeaders($options['headers'] ?? []);
 
+        if ($options['extra']['skip_default_credentials'] ?? false) {
+            // Set by NoPrivateNetworkHttpClient on redirects to other origins, for the decorated client and the ones it decorates
+            $options['normalized_headers'] += ['authorization' => [], 'cookie' => []];
+            $options += ['auth_basic' => null, 'auth_bearer' => null, 'auth_ntlm' => null];
+        }
+
         if ($defaultOptions['headers'] ?? false) {
             $options['normalized_headers'] += self::normalizeHeaders($defaultOptions['headers']);
         }
@@ -247,6 +253,11 @@ trait HttpClientTrait
             }
 
             if ('auth_ntlm' === $name) {
+                if (null === $v) {
+                    // Decorators can unset NTLM credentials without knowing if the decorated client supports NTLM
+                    continue;
+                }
+
                 if (!\extension_loaded('curl')) {
                     $msg = 'try installing the "curl" extension to use "%s" instead.';
                 } else {

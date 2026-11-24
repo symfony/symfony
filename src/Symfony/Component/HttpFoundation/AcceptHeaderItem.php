@@ -41,7 +41,7 @@ class AcceptHeaderItem
         $part = array_shift($parts);
         $attributes = HeaderUtils::combine($parts);
 
-        return new self($part[0], $attributes);
+        return new self($part[0] ?? '', $attributes);
     }
 
     /**

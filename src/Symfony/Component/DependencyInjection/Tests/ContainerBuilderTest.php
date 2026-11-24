@@ -18,6 +18,8 @@ require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -1433,6 +1435,8 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame(realpath(__DIR__.'/Fixtures/includes/classes.php'), realpath($resource->getResource()));
     }
 
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function testGetReflectionClass()
     {
         $container = new ContainerBuilder();

@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerRateLimitedEvent;
+use Symfony\Component\Messenger\Event\WorkerMessagesCompletedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
@@ -32,6 +33,7 @@ use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Execution\DeferredBatchMessageQueue;
+use Symfony\Component\Messenger\Execution\InFlightMessageCountAwareInterface;
 use Symfony\Component\Messenger\Execution\MessageExecutionCallback;
 use Symfony\Component\Messenger\Execution\MessageExecutionStrategyInterface;
 use Symfony\Component\Messenger\Execution\SyncMessageExecutionStrategy;
@@ -147,6 +149,8 @@ class Worker
                     if ($this->messageExecutionStrategy->shouldPauseConsumption()
                         && $this->messageExecutionStrategy->wait($this->completionCallback)
                     ) {
+                        $this->notifyMessagesCompleted();
+
                         if ($this->shouldStop) {
                             break;
                         }
@@ -228,10 +232,16 @@ class Worker
                     }
 
                     if (!$envelopeHandled && $this->flush(false)) {
+                        $this->notifyMessagesCompleted();
+
                         continue;
                     }
 
-                    if (!$this->flush(30.0) && !$envelopeHandled) {
+                    if ($flushed = $this->flush(30.0)) {
+                        $this->notifyMessagesCompleted();
+                    }
+
+                    if (!$flushed && !$envelopeHandled) {
                         if ($options['stop_when_empty']) {
                             // the messages in flight and the pending batches can dispatch new messages
                             if ($this->flush(true)) {
@@ -575,6 +585,25 @@ class Worker
     public function getMetadata(): WorkerMetadata
     {
         return $this->metadata;
+    }
+
+    /**
+     * Returns the number of messages the worker started and did not finish handling yet.
+     */
+    public function getInFlightMessageCount(): int
+    {
+        return $this->messageExecutionStrategy instanceof InFlightMessageCountAwareInterface ? $this->messageExecutionStrategy->getInFlightMessageCount() : 0;
+    }
+
+    /**
+     * Lets the listeners that wait for a quiet moment, e.g. the one resetting the services, check for it
+     * after the strategy completed messages that were started earlier.
+     */
+    private function notifyMessagesCompleted(): void
+    {
+        if ($this->messageExecutionStrategy instanceof InFlightMessageCountAwareInterface) {
+            $this->eventDispatcher?->dispatch(new WorkerMessagesCompletedEvent($this));
+        }
     }
 
     private function now(): float

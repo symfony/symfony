@@ -61,6 +61,12 @@ class ArgvInputTest extends TestCase
     {
         return [
             [
+                ['cli.php', '-0'],
+                [new InputOption('zero', '0')],
+                ['zero' => true],
+                '->parse() parses a zero shortcut',
+            ],
+            [
                 ['cli.php', '--foo'],
                 [new InputOption('foo')],
                 ['foo' => true],

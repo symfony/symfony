@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-24T15:44:40Z
+
+PR updated: I applied the same fix to `CompiledUrlGeneratorDumper`, which is the code path of the compiled URL generator, so the one most apps run.

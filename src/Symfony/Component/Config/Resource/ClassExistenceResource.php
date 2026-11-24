@@ -195,6 +195,11 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             throw $e;
         }
 
+        while ('spl_autoload_call' === $callerFrame['function'] && !isset($callerFrame['class']) && isset($trace[$i + 1])) {
+            $callerFrame = $trace[++$i];
+            ++$i;
+        }
+
         if (isset($callerFrame['function']) && !isset($callerFrame['class'])) {
             switch ($callerFrame['function']) {
                 case 'get_class_methods':

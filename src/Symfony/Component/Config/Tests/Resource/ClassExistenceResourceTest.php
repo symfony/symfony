@@ -120,6 +120,48 @@ class ClassExistenceResourceTest extends TestCase
         $this->assertFalse($res->isFresh(0));
     }
 
+    /**
+     * @dataProvider provideClassesWithDelegatingAutoloader
+     *
+     * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
+     */
+    public function testClassWithDelegatingAutoloader(string $class, bool $required)
+    {
+        $loading = [];
+        $autoloader = static function (string $class) use (&$loading) {
+            if (isset($loading[$class])) {
+                return;
+            }
+
+            $loading[$class] = true;
+            try {
+                spl_autoload_call($class);
+            } finally {
+                unset($loading[$class]);
+            }
+        };
+        spl_autoload_register($autoloader, true, true);
+
+        try {
+            if ($required) {
+                $this->expectException(\ReflectionException::class);
+                $this->expectExceptionMessage('Class "Symfony\\Component\\Config\\Tests\\Fixtures\\MissingParent" not found while loading "Symfony\\Component\\Config\\Tests\\Fixtures\\BadParent".');
+            }
+
+            $this->assertFalse((new ClassExistenceResource($class, false))->isFresh(0));
+        } finally {
+            spl_autoload_unregister($autoloader);
+        }
+    }
+
+    public static function provideClassesWithDelegatingAutoloader(): iterable
+    {
+        yield 'optional dependency' => [ConditionalClass::class, false];
+        yield 'required parent' => [BadParent::class, true];
+    }
+
     public function testParseError()
     {
         $res = new ClassExistenceResource(ParseError::class, false);

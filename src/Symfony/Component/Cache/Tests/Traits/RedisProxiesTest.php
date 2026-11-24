@@ -121,4 +121,14 @@ class RedisProxiesTest extends TestCase
 
         $this->assertEquals($expectedProxy, $proxy);
     }
+
+    /**
+     * @requires extension relay
+     */
+    public function testCreateLazyRelayProxy()
+    {
+        $proxy = RelayProxy::createLazyProxy(static fn () => throw new \LogicException('The proxy should not be initialized.'));
+
+        $this->assertFalse($proxy->isLazyObjectInitialized());
+    }
 }

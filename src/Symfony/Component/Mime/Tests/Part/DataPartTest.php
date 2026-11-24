@@ -205,6 +205,17 @@ class DataPartTest extends TestCase
         self::assertSame('filename', $p->getFilename());
     }
 
+    public function testExplicitZeroFilename()
+    {
+        $path = \dirname(__DIR__).'/Fixtures/content.txt';
+        $p = DataPart::fromPath($path, '0', 'text/plain');
+
+        $this->assertSame('0', $p->getFilename());
+        $this->assertSame('0', $p->getPreparedHeaders()->getHeaderParameter('Content-Disposition', 'filename'));
+        $this->assertSame('content.txt', DataPart::fromPath($path, '', 'text/plain')->getFilename());
+        $this->assertSame('content.txt', DataPart::fromPath($path, null, 'text/plain')->getFilename());
+    }
+
     public function testGetContentType()
     {
         $p = new DataPart('content');

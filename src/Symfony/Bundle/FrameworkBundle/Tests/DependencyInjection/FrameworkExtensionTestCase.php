@@ -61,6 +61,7 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\Exception\ChunkCacheItemNotFoundException;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpFoundation\IpUtils;
@@ -2463,10 +2464,65 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('.inner', (string) $arguments[0]);
         $this->assertInstanceOf(Reference::class, $arguments[1]);
         $this->assertSame('baz', (string) $arguments[1]);
+        $this->assertSame([], $arguments[2]);
         $scopedClient = $container->getDefinition('bar.scoping');
 
         $this->assertSame('.inner', (string) $scopedClient->getArgument(0));
         $this->assertSame('bar', $scopedClient->getDecoratedService()[0]);
+    }
+
+    public function testScopedHttpClientWithCachingSendsTheOptionsOfTheScopeOnlyToUrlsInTheScope()
+    {
+        if (!class_exists(ChunkCacheItemNotFoundException::class)) {
+            $this->markTestSkipped('Caching requires version 7.4+ of the HttpClient component.');
+        }
+
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret']);
+        $container->registerExtension(new FrameworkExtension());
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new LoggerPass()]);
+        $container->loadFromExtension('framework', [
+            'annotations' => false,
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'http_client' => [
+                'mock_response_factory' => 'mock_response_factory',
+                'scoped_clients' => [
+                    'foo' => [
+                        'base_uri' => 'https://foo.example.com/api/',
+                        'auth_basic' => 'user:pass',
+                        'headers' => ['X-Api-Key' => 'SECRET'],
+                        'caching' => ['cache_pool' => 'foo.cache'],
+                    ],
+                ],
+            ],
+        ]);
+        $container->register('mock_response_factory')->setSynthetic(true);
+        $container->register('foo.cache', TagAwareAdapter::class)->setArguments([new Definition(ArrayAdapter::class)]);
+        $container->setAlias('test.foo', 'foo')->setPublic(true);
+        $container->compile();
+
+        $requests = [];
+        $container->set('mock_response_factory', static function (string $method, string $url, array $options) use (&$requests) {
+            $requests[] = [$url, $options['headers']];
+
+            return new MockResponse();
+        });
+
+        $client = $container->get('test.foo');
+        $client->request('GET', 'users')->getStatusCode();
+        $client->request('GET', 'https://foo.example.com/api/groups')->getStatusCode();
+        $client->request('GET', 'https://foo.example.com/admin')->getStatusCode();
+        $client->request('GET', 'https://evil.example.com/')->getStatusCode();
+        $client->request('GET', '//evil.example.com/path')->getStatusCode();
+
+        $this->assertSame([
+            ['https://foo.example.com/api/users', ['X-Api-Key: SECRET', 'Accept: */*', 'Authorization: Basic dXNlcjpwYXNz']],
+            ['https://foo.example.com/api/groups', ['X-Api-Key: SECRET', 'Accept: */*', 'Authorization: Basic dXNlcjpwYXNz']],
+            ['https://foo.example.com/admin', ['Accept: */*']],
+            ['https://evil.example.com/', ['Accept: */*']],
+            ['https://evil.example.com/path', ['Accept: */*']],
+        ], $requests);
     }
 
     public function testHttpClientRetry()

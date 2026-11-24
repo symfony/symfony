@@ -4,15 +4,15 @@
         <body>
             <trans-unit id="28">
                 <source>This form should not contain extra fields.</source>
-                <target>هذا النموذج يجب الا يحتوى على اى حقول اضافية.</target>
+                <target>يجب ألا يحتوي هذا النموذج على أي حقول إضافية.</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file.</source>
-                <target>مساحة الملف المرسل كبيرة. من فضلك حاول ارسال ملف اصغر.</target>
+                <target>حجم الملف المرفوع كبير جدًا. يرجى محاولة رفع ملف أصغر.</target>
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
-                <target>قيمة رمز الموقع غير صحيحة. من فضلك اعد ارسال النموذج.</target>
+                <target>رمز الحماية من تزوير الطلبات (CSRF) غير صالح. يرجى محاولة إعادة إرسال النموذج.</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid HTML5 color.</source>

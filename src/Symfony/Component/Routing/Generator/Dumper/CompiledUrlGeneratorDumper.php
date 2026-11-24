@@ -53,7 +53,7 @@ class CompiledUrlGeneratorDumper extends GeneratorDumper
             $currentId = $alias->getId();
             $visited = [];
             while (null !== $alias = $routes->getAlias($currentId) ?? null) {
-                if (false !== $searchKey = array_search($currentId, $visited)) {
+                if (false !== $searchKey = array_search($currentId, $visited, true)) {
                     $visited[] = $currentId;
 
                     throw new RouteCircularReferenceException($currentId, \array_slice($visited, $searchKey));

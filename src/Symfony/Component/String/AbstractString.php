@@ -140,7 +140,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
             $j = $this->indexOfLast($n, $offset);
 
             if (null !== $j && $j >= $i) {
-                $i = $offset = $j;
+                $i = $j;
                 $str->string = $n;
             }
         }
@@ -208,7 +208,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
             $j = $this->indexOfLast($n, $offset);
 
             if (null !== $j && $j >= $i) {
-                $i = $offset = $j;
+                $i = $j;
                 $str->string = $n;
             }
         }
@@ -371,7 +371,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
             $j = $this->indexOfLast((string) $n, $offset);
 
             if (null !== $j && $j >= $i) {
-                $i = $offset = $j;
+                $i = $j;
             }
         }
 

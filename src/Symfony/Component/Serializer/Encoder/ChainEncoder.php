@@ -65,15 +65,11 @@ class ChainEncoder implements ContextAwareEncoderInterface
             return $encoder->needsNormalization();
         }
 
-        if (!$encoder instanceof NormalizationAwareInterface) {
-            return true;
-        }
-
         if ($encoder instanceof self) {
             return $encoder->needsNormalization($format, $context);
         }
 
-        return false;
+        return !$encoder instanceof NormalizationAwareInterface;
     }
 
     /**

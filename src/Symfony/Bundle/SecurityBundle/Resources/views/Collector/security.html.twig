@@ -307,7 +307,7 @@
                 </div>
             </div>
 
-            <div class="tab {{ collector.token is empty ? 'disabled' : 'active' }}">
+            <div class="tab {{ collector.token or collector.deauthentication ? 'active' : (collector.deauthProfileToken ? '' : 'disabled') }}">
                 <h3 class="tab-title">Token</h3>
 
                 <div class="tab-content">

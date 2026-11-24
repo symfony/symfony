@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Tests\Transport\Smtp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Exception\UnexpectedResponseException;
 use Symfony\Component\Mailer\Transport\Smtp\Auth\CramMd5Authenticator;
 use Symfony\Component\Mailer\Transport\Smtp\Auth\LoginAuthenticator;
 use Symfony\Component\Mailer\Transport\Smtp\Auth\XOAuth2Authenticator;
@@ -313,6 +314,39 @@ class EsmtpTransportTest extends TestCase
         $this->expectExceptionMessage('TLS required but neither TLS or STARTTLS are in use.');
 
         $transport->send($message);
+    }
+
+    public function testRequireTlsWhenServerRejectsEhlo()
+    {
+        $stream = new DummyStream();
+        $transport = new HeloOnlyEsmtpTransport('localhost', 0, null, null, null, $stream);
+        $transport->setRequireTls(true);
+
+        $message = new Email();
+        $message->from('sender@example.org');
+        $message->addTo('recipient@example.org');
+        $message->text('.');
+
+        try {
+            $transport->send($message);
+            $this->fail('A TransportException should have been thrown.');
+        } catch (TransportException $e) {
+            $this->assertSame('TLS required but neither TLS or STARTTLS are in use.', $e->getMessage());
+        }
+
+        $this->assertSame([], $stream->getCommands());
+    }
+}
+
+class HeloOnlyEsmtpTransport extends EsmtpTransport
+{
+    public function executeCommand(string $command, array $codes): string
+    {
+        if (str_starts_with($command, 'EHLO ')) {
+            throw new UnexpectedResponseException('Expected response code "250" but got code "502", with message "502 5.5.2 Command not implemented".', 502);
+        }
+
+        return parent::executeCommand($command, $codes);
     }
 }
 

@@ -160,6 +160,13 @@ class EsmtpTransport extends SmtpTransport
         try {
             $response = $this->executeCommand(\sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
         } catch (TransportExceptionInterface $e) {
+            /** @var SocketStream $stream */
+            $stream = $this->getStream();
+
+            if ($this->isTlsRequired() && !$stream->isTLS()) {
+                throw new TransportException('TLS required but neither TLS or STARTTLS are in use.', 0, $e);
+            }
+
             try {
                 return parent::executeCommand(\sprintf("HELO %s\r\n", $this->getLocalDomain()), [250]);
             } catch (TransportExceptionInterface $ex) {

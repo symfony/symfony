@@ -196,7 +196,7 @@ class XmlDescriptor extends Descriptor
             $objectXML->setAttribute('shortcut', '-'.substr($option->getShortcut(), 0, $pos));
             $objectXML->setAttribute('shortcuts', '-'.str_replace('|', '|-', $option->getShortcut()));
         } else {
-            $objectXML->setAttribute('shortcut', $option->getShortcut() ? '-'.$option->getShortcut() : '');
+            $objectXML->setAttribute('shortcut', null !== $option->getShortcut() ? '-'.$option->getShortcut() : '');
         }
         $objectXML->setAttribute('accept_value', $option->acceptValue() ? 1 : 0);
         $objectXML->setAttribute('is_value_required', $option->isValueRequired() ? 1 : 0);

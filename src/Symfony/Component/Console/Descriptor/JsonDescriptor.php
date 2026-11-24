@@ -111,7 +111,7 @@ class JsonDescriptor extends Descriptor
             'default' => null === $option->getDefault() ? null : !$option->getDefault(),
         ] : [
             'name' => '--'.$option->getName(),
-            'shortcut' => $option->getShortcut() ? '-'.str_replace('|', '|-', $option->getShortcut()) : '',
+            'shortcut' => null !== $option->getShortcut() ? '-'.str_replace('|', '|-', $option->getShortcut()) : '',
             'accept_value' => $option->acceptValue(),
             'is_value_required' => $option->isValueRequired(),
             'is_multiple' => $option->isArray(),

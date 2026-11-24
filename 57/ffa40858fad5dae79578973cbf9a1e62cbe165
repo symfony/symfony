@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-24T15:44:38Z
+
+PR updated. I applied the same fix to `delayUntil()`, since it also dropped the microseconds of both dates.

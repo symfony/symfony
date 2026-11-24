@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 
@@ -66,6 +67,18 @@ class HelperTest extends TestCase
     public function testFormatTime(int|float $secs, string $expectedFormat, int $precision)
     {
         $this->assertEquals($expectedFormat, Helper::formatTime($secs, $precision));
+    }
+
+    public function testRemoveDecorationRestoresStateOnException()
+    {
+        $formatter = new OutputFormatter(true);
+
+        try {
+            Helper::removeDecoration($formatter, '<info>text</error>');
+            $this->fail('Expected an exception for incorrectly nested style tags.');
+        } catch (InvalidArgumentException) {
+            $this->assertTrue($formatter->isDecorated());
+        }
     }
 
     #[DataProvider('decoratedTextProvider')]

@@ -49,7 +49,6 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
 {
     use AsyncDecoratorTrait {
         stream as asyncStream;
-        AsyncDecoratorTrait::withOptions insteadof HttpClientTrait;
     }
     use HttpClientTrait;
     use HttpDateTrait;
@@ -79,6 +78,15 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
         'expect' => true,
         'host' => true,
         'user-agent' => true,
+    ];
+    /**
+     * Options that contain credentials.
+     */
+    private const CREDENTIAL_OPTIONS = [
+        'auth_ntlm' => true,
+        'local_cert' => true,
+        'local_pk' => true,
+        'proxy' => true,
     ];
     /**
      * Headers that MUST NOT be stored as per RFC 9111 Section 3.1.
@@ -161,10 +169,10 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
             return $this->legacyRequest($method, $url, $options);
         }
 
-        [$fullUrl, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
+        [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
 
-        $fullUrl = implode('', $fullUrl);
-        $fullUrlTag = self::hash($fullUrl);
+        $url = implode('', $url);
+        $fullUrlTag = self::hash($url);
         $requestCacheControl = self::parseRequestCacheControlHeader($options['normalized_headers']['cache-control'] ?? []);
 
         if ('' !== $options['body'] || ($options['extra']['no_cache'] ?? false) || isset($options['normalized_headers']['range']) || !\in_array($method, self::CACHEABLE_METHODS, true)) {
@@ -208,7 +216,8 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
             }
         }
 
-        $requestHash = self::hash($method.$fullUrl.serialize(array_intersect_key($options['normalized_headers'], self::RESPONSE_INFLUENCING_HEADERS)));
+        $credentials = array_filter(array_intersect_key($options, self::CREDENTIAL_OPTIONS));
+        $requestHash = self::hash($method.$url.serialize(array_intersect_key($options['normalized_headers'], self::RESPONSE_INFLUENCING_HEADERS) + $credentials));
         $varyKey = "vary_{$requestHash}";
         $varyFields = $this->cache->get($varyKey, static fn ($item, &$save): array => ($save = false) ?: [], 0);
 
@@ -337,7 +346,7 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
                     $newVaryFields = $this->parseVaryFields($updatedCachedData['headers']['vary'] ?? []);
                     $updatedMetadataIsCacheable = !\in_array('*', $newVaryFields, true)
                         && $varyFields === $newVaryFields
-                        && $this->isServerResponseCacheable($cachedData['status_code'], $options['normalized_headers'], $updatedCachedData['headers'], $updatedCacheControl);
+                        && $this->isServerResponseCacheable($cachedData['status_code'], $options, $updatedCachedData['headers'], $updatedCacheControl);
 
                     if (!$updatedMetadataIsCacheable) {
                         $this->cache->delete($metadataKey);
@@ -389,7 +398,7 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
 
                 $cacheControl = self::parseCacheControlHeader($headers['cache-control'] ?? []);
 
-                if (!$this->isServerResponseCacheable($statusCode, $options['normalized_headers'], $headers, $cacheControl)) {
+                if (!$this->isServerResponseCacheable($statusCode, $options, $headers, $cacheControl)) {
                     $context->passthru();
 
                     yield $chunk;
@@ -490,6 +499,27 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
         }
     }
 
+    public function withOptions(array $options): static
+    {
+        $clone = clone $this;
+
+        // "auth_ntlm" is for curl only, but caching needs it like the other credentials
+        $defaultOptions = array_intersect_key($options, self::OPTIONS_DEFAULTS + self::CREDENTIAL_OPTIONS);
+
+        // Base URIs for RetryableHttpClient replace the base URI, but only the decorated client can use them
+        if (\is_array($defaultOptions['base_uri'] ?? null)) {
+            $defaultOptions['base_uri'] = null;
+        }
+
+        $clone->defaultOptions = self::mergeDefaultOptions($defaultOptions, $this->defaultOptions, true);
+
+        // Requests are forwarded with the body computed from the "json" option, so the decorated client must not get it
+        unset($options['json']);
+        $clone->client = $this->client->withOptions($options);
+
+        return $clone;
+    }
+
     public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
     {
         if ($responses instanceof ResponseInterface) {
@@ -540,7 +570,7 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions, true);
         $url = implode('', $url);
 
-        if (!empty($options['body']) || !empty($options['extra']['no_cache']) || !\in_array($method, ['GET', 'HEAD', 'OPTIONS'], true)) {
+        if (!empty($options['body']) || !empty($options['extra']['no_cache']) || isset($options['auth_ntlm']) || !\in_array($method, ['GET', 'HEAD', 'OPTIONS'], true)) {
             return new AsyncResponse($this->client, $method, $url, $options);
         }
 
@@ -1103,11 +1133,11 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
      * This function will return true if the server response can be cached,
      * false otherwise.
      *
-     * @param array<string, string|string[]> $requestHeaders
+     * @param array<string, mixed>           $requestOptions
      * @param array<string, string|string[]> $responseHeaders
      * @param array<string, string|true>     $cacheControl
      */
-    private function isServerResponseCacheable(int $statusCode, array $requestHeaders, array $responseHeaders, array $cacheControl): bool
+    private function isServerResponseCacheable(int $statusCode, array $requestOptions, array $responseHeaders, array $cacheControl): bool
     {
         // Only final status codes are cacheable by RFC 9111 Section 3.
         if ($statusCode < 200 || $statusCode > 599 || self::isStatusCodeExcludedFromStorage($statusCode)) {
@@ -1122,7 +1152,7 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
         if ($this->sharedCache) {
             if (
                 !isset($cacheControl['public']) && !self::hasValidSharedMaxAge($cacheControl) && !isset($cacheControl['must-revalidate'])
-                && isset($requestHeaders['authorization'])
+                && (isset($requestOptions['normalized_headers']['authorization']) || isset($requestOptions['auth_ntlm']))
             ) {
                 return false;
             }

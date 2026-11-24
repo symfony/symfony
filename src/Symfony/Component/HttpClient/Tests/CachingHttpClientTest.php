@@ -20,11 +20,14 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\HttpClient\CachingHttpClient;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
+use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
@@ -2730,6 +2733,140 @@ class CachingHttpClientTest extends TestCase
         $response = $client->request('GET', 'http://example.com/lang-multi', ['headers' => ['Accept-Language' => 'fr']]);
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('response for fr', $response->getContent());
+    }
+
+    #[DataProvider('provideOptionsThatAffectCacheKey')]
+    public function testWithOptionsAffectsCacheKey(array $aliceOptions, array $bobOptions)
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('response for alice', ['response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('response for bob', ['response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('response for anonymous', ['response_headers' => ['Cache-Control' => 'max-age=300']]),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter, sharedCache: false);
+        $alice = $client->withOptions($aliceOptions);
+
+        $this->assertSame('response for alice', $alice->request('GET', 'http://example.com/foo-bar')->getContent());
+        $this->assertSame('response for bob', $client->withOptions($bobOptions)->request('GET', 'http://example.com/foo-bar')->getContent());
+        $this->assertSame('response for anonymous', $client->request('GET', 'http://example.com/foo-bar')->getContent());
+        $this->assertSame('response for alice', $alice->request('GET', 'http://example.com/foo-bar')->getContent());
+    }
+
+    public static function provideOptionsThatAffectCacheKey(): iterable
+    {
+        yield 'auth_bearer' => [['auth_bearer' => 'alice'], ['auth_bearer' => 'bob']];
+        yield 'auth_basic' => [['auth_basic' => 'alice:secret'], ['auth_basic' => ['bob', 'secret']]];
+        yield 'Authorization header' => [['headers' => ['Authorization' => 'Bearer alice']], ['headers' => ['Authorization' => 'Bearer bob']]];
+        yield 'Cookie header' => [['headers' => ['Cookie' => 'session=alice']], ['headers' => ['Cookie' => 'session=bob']]];
+        yield 'Accept-Language header' => [['headers' => ['Accept-Language' => 'fr']], ['headers' => ['Accept-Language' => 'de']]];
+        yield 'auth_ntlm' => [['auth_ntlm' => 'alice:secret'], ['auth_ntlm' => ['bob', 'secret']]];
+        yield 'local_cert' => [['local_cert' => '/path/to/alice.pem'], ['local_cert' => '/path/to/bob.pem']];
+        yield 'local_pk' => [['local_cert' => '/path/to/cert.pem', 'local_pk' => '/path/to/alice.key'], ['local_cert' => '/path/to/cert.pem', 'local_pk' => '/path/to/bob.key']];
+        yield 'proxy' => [['proxy' => 'http://alice:secret@proxy.example.com:3128'], ['proxy' => 'http://bob:secret@proxy.example.com:3128']];
+    }
+
+    #[DataProvider('provideCredentials')]
+    public function testASharedCacheDoesntStoreAResponseFromRequestWithAuthorizationFromWithOptions(array $options)
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('foo', ['response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('bar'),
+        ]);
+
+        $client = (new CachingHttpClient($mockClient, $this->cacheAdapter))->withOptions($options);
+
+        $this->assertSame('foo', $client->request('GET', 'http://example.com/foo-bar')->getContent());
+        $this->assertSame('bar', $client->request('GET', 'http://example.com/foo-bar')->getContent());
+    }
+
+    public static function provideCredentials(): iterable
+    {
+        yield 'auth_bearer' => [['auth_bearer' => 'foo']];
+        yield 'auth_basic' => [['auth_basic' => 'foo:bar']];
+        yield 'Authorization header' => [['headers' => ['Authorization' => 'Bearer foo']]];
+        yield 'auth_ntlm' => [['auth_ntlm' => 'foo:bar']];
+    }
+
+    public function testOptionsFromWithOptionsReachTheDecoratedClient()
+    {
+        $requestOptions = null;
+        $mockClient = new MockHttpClient(static function (string $method, string $url, array $options) use (&$requestOptions) {
+            $requestOptions = $options;
+
+            return new MockResponse();
+        });
+
+        $client = (new CachingHttpClient($mockClient, $this->cacheAdapter))->withOptions([
+            'max_redirects' => 0,
+            'timeout' => 1.5,
+            'proxy' => 'http://proxy.example.com:3128',
+            'peer_fingerprint' => ['pin-sha256' => ['AAAA']],
+            'json' => ['foo' => 'bar'],
+        ]);
+        $client->request('POST', 'http://example.com/foo-bar')->getContent();
+
+        $this->assertSame(0, $requestOptions['max_redirects']);
+        $this->assertSame(1.5, $requestOptions['timeout']);
+        $this->assertSame('http://proxy.example.com:3128', $requestOptions['proxy']);
+        $this->assertSame(['pin-sha256' => ['AAAA']], $requestOptions['peer_fingerprint']);
+        $this->assertSame('{"foo":"bar"}', $requestOptions['body']);
+    }
+
+    public function testBypassCacheWhenBodyComesFromWithOptions()
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('first response', ['response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('second response'),
+        ]);
+
+        $client = (new CachingHttpClient($mockClient, $this->cacheAdapter))->withOptions(['json' => ['foo' => 'bar']]);
+
+        $this->assertSame('first response', $client->request('GET', 'http://example.com/foo-bar')->getContent());
+        $this->assertSame('second response', $client->request('GET', 'http://example.com/foo-bar')->getContent());
+    }
+
+    public function testWithOptionsForwardsTheOptionsOfDecoratedClients()
+    {
+        $requestCount = 0;
+        $mockClient = new MockHttpClient(static function () use (&$requestCount) {
+            return new MockResponse('', ['http_code' => 3 > ++$requestCount ? 500 : 200]);
+        });
+
+        $client = new CachingHttpClient(new RetryableHttpClient($mockClient, new GenericRetryStrategy([500], 0), 2), $this->cacheAdapter);
+        $client = $client->withOptions(['max_retries' => 1, 'base_uri' => ['http://example.com/', 'http://example.org/']]);
+
+        $this->assertSame(500, $client->request('GET', 'http://example.com/foo-bar')->getStatusCode());
+        $this->assertSame(2, $requestCount);
+    }
+
+    public function testRelativeUrlsAreForwardedResolvedAgainstTheBaseUri()
+    {
+        $mockClient = new MockHttpClient(static fn (string $method, string $url) => new MockResponse('fetched from '.$url, [
+            'response_headers' => ['Cache-Control' => 'max-age=300'],
+        ]), 'https://a.example.com/');
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter, ['base_uri' => 'https://b.example.com/api/']);
+
+        $this->assertSame('fetched from https://b.example.com/api/foo', $client->request('GET', 'foo')->getContent());
+        $this->assertSame('fetched from https://c.example.com/bar', $client->request('GET', 'bar', ['base_uri' => 'https://c.example.com/'])->getContent());
+        $this->assertSame('fetched from https://a.example.com/foo', $client->request('GET', 'https://a.example.com/foo')->getContent());
+
+        $response = $client->request('GET', 'https://b.example.com/api/foo');
+        $this->assertSame('fetched from https://b.example.com/api/foo', $response->getContent());
+        $this->assertSame('https://b.example.com/api/foo', $response->getInfo('url'));
+    }
+
+    public function testRelativeUrlsArentResolvedAgainstABaseUriReplacedByBaseUrisForRetries()
+    {
+        $mockClient = new MockHttpClient(static fn (string $method, string $url) => new MockResponse('fetched from '.$url));
+        $client = new CachingHttpClient(new RetryableHttpClient($mockClient), $this->cacheAdapter, ['base_uri' => 'https://a.example.com/']);
+        $client = $client->withOptions(['base_uri' => ['https://b.example.com/', 'https://c.example.com/']]);
+
+        $this->assertSame('fetched from https://b.example.com/foo', $client->request('GET', 'https://b.example.com/foo')->getContent());
+
+        $this->expectException(InvalidArgumentException::class);
+        $client->request('GET', 'foo');
     }
 
     public function testETagRevalidationWithTraceableClient()

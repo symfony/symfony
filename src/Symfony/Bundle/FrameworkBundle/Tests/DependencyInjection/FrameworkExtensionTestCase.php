@@ -2434,6 +2434,70 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals($expected, $container->getDefinition('foo.scoping')->getArgument(2));
     }
 
+    public function testHttpClientsSharingACachePoolHaveTheirOwnNamespaceInIt()
+    {
+        if (!class_exists(ChunkCacheItemNotFoundException::class)) {
+            $this->markTestSkipped('Caching requires version 7.4+ of the HttpClient component.');
+        }
+
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret']);
+        $container->registerExtension(new FrameworkExtension());
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new LoggerPass()]);
+        $container->loadFromExtension('framework', [
+            'annotations' => false,
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'http_client' => [
+                'mock_response_factory' => 'mock_response_factory',
+                'default_options' => [
+                    'caching' => ['cache_pool' => 'shared.cache'],
+                ],
+                'scoped_clients' => [
+                    'tenant_a' => [
+                        'base_uri' => 'https://api.example.com/',
+                        'headers' => ['X-Api-Key' => 'A'],
+                        'caching' => ['cache_pool' => 'shared.cache'],
+                    ],
+                    'tenant_b' => [
+                        'base_uri' => 'https://api.example.com/',
+                        'headers' => ['X-Api-Key' => 'B'],
+                        'caching' => ['cache_pool' => 'shared.cache'],
+                    ],
+                    'App\Client' => [
+                        'base_uri' => 'https://api.example.com/',
+                        'headers' => ['X-Api-Key' => 'C'],
+                        'caching' => ['cache_pool' => 'shared.cache'],
+                    ],
+                ],
+            ],
+        ]);
+        $container->register('mock_response_factory')->setSynthetic(true);
+        $container->register('shared.cache', TagAwareAdapter::class)->setArguments([new Definition(ArrayAdapter::class)]);
+        $container->setAlias('test.default', 'http_client')->setPublic(true);
+        $container->setAlias('test.tenant_a', 'tenant_a')->setPublic(true);
+        $container->setAlias('test.tenant_b', 'tenant_b')->setPublic(true);
+        $container->setAlias('test.tenant_c', 'App\Client')->setPublic(true);
+        $container->compile();
+
+        $requestCount = 0;
+        $container->set('mock_response_factory', static function (string $method, string $url, array $options) use (&$requestCount) {
+            ++$requestCount;
+
+            return new MockResponse('invoices of '.($options['normalized_headers']['x-api-key'][0] ?? 'nobody'), [
+                'response_headers' => ['Cache-Control' => 'max-age=60'],
+            ]);
+        });
+
+        $this->assertSame('invoices of X-Api-Key: A', $container->get('test.tenant_a')->request('GET', 'invoices')->getContent());
+        $this->assertSame('invoices of X-Api-Key: B', $container->get('test.tenant_b')->request('GET', 'invoices')->getContent());
+        $this->assertSame('invoices of X-Api-Key: C', $container->get('test.tenant_c')->request('GET', 'invoices')->getContent());
+        $this->assertSame('invoices of nobody', $container->get('test.default')->request('GET', 'https://api.example.com/invoices')->getContent());
+        $this->assertSame('invoices of X-Api-Key: A', $container->get('test.tenant_a')->request('GET', 'invoices')->getContent());
+        $this->assertSame('invoices of nobody', $container->get('test.default')->request('GET', 'https://api.example.com/invoices')->getContent());
+        $this->assertSame(4, $requestCount);
+    }
+
     public function testCachingHttpClient()
     {
         if (!class_exists(ChunkCacheItemNotFoundException::class)) {

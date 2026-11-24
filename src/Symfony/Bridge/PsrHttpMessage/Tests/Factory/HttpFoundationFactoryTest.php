@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\PsrHttpMessage\Tests\Factory;
 
+use Nyholm\Psr7\Factory\Psr17Factory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UploadedFileInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
@@ -194,6 +196,30 @@ class HttpFoundationFactoryTest extends TestCase
         $this->expectExceptionMessage('The file "e" could not be written on disk.');
 
         $symfonyUploadedFile->move($this->tmpDir, 'shouldFail.txt');
+    }
+
+    #[DataProvider('provideUploadErrors')]
+    public function testCreateUploadedFileWithErrorDoesNotReadTheStream(int $error)
+    {
+        $psr17Factory = new Psr17Factory();
+        $uploadedFile = $psr17Factory->createUploadedFile($psr17Factory->createStream(), 0, $error, 'a.php', 'image/jpeg');
+
+        $symfonyUploadedFile = $this->callCreateUploadedFile($uploadedFile);
+
+        $this->assertSame($error, $symfonyUploadedFile->getError());
+        $this->assertFalse($symfonyUploadedFile->isValid());
+        $this->assertSame('a.php', $symfonyUploadedFile->getClientOriginalName());
+    }
+
+    public static function provideUploadErrors(): iterable
+    {
+        yield 'UPLOAD_ERR_INI_SIZE' => [\UPLOAD_ERR_INI_SIZE];
+        yield 'UPLOAD_ERR_FORM_SIZE' => [\UPLOAD_ERR_FORM_SIZE];
+        yield 'UPLOAD_ERR_PARTIAL' => [\UPLOAD_ERR_PARTIAL];
+        yield 'UPLOAD_ERR_NO_FILE' => [\UPLOAD_ERR_NO_FILE];
+        yield 'UPLOAD_ERR_NO_TMP_DIR' => [\UPLOAD_ERR_NO_TMP_DIR];
+        yield 'UPLOAD_ERR_CANT_WRITE' => [\UPLOAD_ERR_CANT_WRITE];
+        yield 'UPLOAD_ERR_EXTENSION' => [\UPLOAD_ERR_EXTENSION];
     }
 
     private function createUploadedFile(string $content, int $error, string $clientFileName, string $clientMediaType): UploadedFile

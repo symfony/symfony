@@ -223,7 +223,7 @@ class ParameterBag implements ParameterBagInterface
         // we do this to deal with non string values (Boolean, integer, ...)
         // as the preg_replace_callback throw an exception when trying
         // a non-string in a parameter value
-        if (preg_match('/^%([^%\s]+)%$/', $value, $match)) {
+        if (preg_match('/^%([^%\s]+)%$/D', $value, $match)) {
             $key = $match[1];
 
             if (isset($resolving[$key])) {

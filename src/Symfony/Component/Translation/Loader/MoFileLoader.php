@@ -109,7 +109,7 @@ class MoFileLoader extends FileLoader
             $ids = ['singular' => $singularId, 'plural' => $pluralId];
             $item = compact('ids', 'translated');
 
-            if (!empty($item['ids']['singular'])) {
+            if (isset($item['ids']['singular'][0])) {
                 $id = $item['ids']['singular'];
                 if (isset($item['ids']['plural'])) {
                     $id .= '|'.$item['ids']['plural'];
@@ -120,7 +120,7 @@ class MoFileLoader extends FileLoader
 
         fclose($stream);
 
-        return array_filter($messages);
+        return array_filter($messages, 'strlen');
     }
 
     /**

@@ -114,19 +114,19 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             throw new TransformationFailedException(\sprintf('The fields "%s" should not be empty.', implode('", "', $emptyFields)));
         }
 
-        if (isset($value['month']) && !ctype_digit((string) $value['month'])) {
+        if (isset($value['month']) && (!ctype_digit((string) $value['month']) || 0 === (int) $value['month'])) {
             throw new TransformationFailedException('This month is invalid.');
         }
 
-        if (isset($value['day']) && !ctype_digit((string) $value['day'])) {
+        if (isset($value['day']) && (!ctype_digit((string) $value['day']) || 0 === (int) $value['day'])) {
             throw new TransformationFailedException('This day is invalid.');
         }
 
-        if (isset($value['year']) && !ctype_digit((string) $value['year'])) {
+        if (isset($value['year']) && (!ctype_digit((string) $value['year']) || 0 === (int) $value['year'])) {
             throw new TransformationFailedException('This year is invalid.');
         }
 
-        if (!empty($value['month']) && !empty($value['day']) && !empty($value['year']) && !checkdate($value['month'], $value['day'], $value['year'])) {
+        if (isset($value['month'], $value['day'], $value['year']) && !checkdate($value['month'], $value['day'], $value['year'])) {
             throw new TransformationFailedException('This is an invalid date.');
         }
 
@@ -145,9 +145,9 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         try {
             $dateTime = new \DateTime(\sprintf(
                 '%s-%s-%s %s:%s:%s',
-                empty($value['year']) ? $this->referenceDate->format('Y') : $value['year'],
-                empty($value['month']) ? $this->referenceDate->format('m') : $value['month'],
-                empty($value['day']) ? $this->referenceDate->format('d') : $value['day'],
+                $value['year'] ?? $this->referenceDate->format('Y'),
+                $value['month'] ?? $this->referenceDate->format('m'),
+                $value['day'] ?? $this->referenceDate->format('d'),
                 $value['hour'] ?? $this->referenceDate->format('H'),
                 $value['minute'] ?? $this->referenceDate->format('i'),
                 $value['second'] ?? $this->referenceDate->format('s')

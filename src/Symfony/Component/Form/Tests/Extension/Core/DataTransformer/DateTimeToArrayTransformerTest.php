@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
@@ -338,6 +339,51 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTestCase
         $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform('12345');
+    }
+
+    #[DataProvider('provideZeroDateFields')]
+    public function testReverseTransformWithZeroDateField(string $field, int|string $value)
+    {
+        $transformer = new DateTimeToArrayTransformer('UTC', 'UTC');
+        $input = [
+            'year' => '2024',
+            'month' => '2',
+            'day' => '29',
+            'hour' => '0',
+            'minute' => '0',
+            'second' => '0',
+        ];
+        $input[$field] = $value;
+
+        $this->expectException(TransformationFailedException::class);
+
+        $transformer->reverseTransform($input);
+    }
+
+    #[DataProvider('provideZeroDateFields')]
+    public function testReverseTransformWithZeroPartialDateField(string $field, int|string $value)
+    {
+        $transformer = new DateTimeToArrayTransformer('UTC', 'UTC', [$field]);
+
+        $this->expectException(TransformationFailedException::class);
+
+        $transformer->reverseTransform([$field => $value]);
+    }
+
+    public static function provideZeroDateFields(): iterable
+    {
+        foreach (['year', 'month', 'day'] as $field) {
+            foreach ([0, '0', '00'] as $value) {
+                yield [$field, $value];
+            }
+        }
+    }
+
+    public function testReverseTransformWithMissingDateFields()
+    {
+        $transformer = new DateTimeToArrayTransformer('UTC', 'UTC', ['hour', 'minute', 'second'], false, new \DateTimeImmutable('2004-06-15 10:20:30 UTC'));
+
+        $this->assertEquals(new \DateTime('2004-06-15 00:00:00 UTC'), $transformer->reverseTransform(['hour' => '0', 'minute' => '0', 'second' => '0']));
     }
 
     public function testReverseTransformWithNegativeYear()

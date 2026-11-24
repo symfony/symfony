@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Use the status code's phrase as default title in `ProblemNormalizer` when the problem type is `about:blank`, as RFC 9457 expects
+
 8.2
 ---
 

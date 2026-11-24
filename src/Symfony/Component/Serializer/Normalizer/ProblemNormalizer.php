@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Messenger\Exception\ValidationFailedException as MessageValidationFailedException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -22,9 +23,9 @@ use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Normalizes errors according to the API Problem spec (RFC 7807).
+ * Normalizes errors according to the Problem Details for HTTP APIs spec (RFC 9457).
  *
- * @see https://tools.ietf.org/html/rfc7807
+ * @see https://www.rfc-editor.org/rfc/rfc9457
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Yonel Ceruto <yonelceruto@gmail.com>
@@ -105,10 +106,12 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
             }
         }
 
+        $type = $error[self::TYPE] ?? $context[self::TYPE] ?? 'https://tools.ietf.org/html/rfc2616#section-10';
+        $status = $context[self::STATUS] ?? $object->getStatusCode();
         $error = [
-            self::TYPE => $error[self::TYPE] ?? $context[self::TYPE] ?? 'https://tools.ietf.org/html/rfc2616#section-10',
-            self::TITLE => $error[self::TITLE] ?? $context[self::TITLE] ?? 'An error occurred',
-            self::STATUS => $context[self::STATUS] ?? $object->getStatusCode(),
+            self::TYPE => $type,
+            self::TITLE => $error[self::TITLE] ?? $context[self::TITLE] ?? ('about:blank' === $type ? self::getStatusPhrase($status) : null) ?? 'An error occurred',
+            self::STATUS => $status,
             'detail' => $error['detail'] ?? ($debug ? $object->getMessage() : $object->getStatusText()),
         ] + $error;
         if ($debug) {
@@ -117,6 +120,18 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
         }
 
         return $error;
+    }
+
+    /**
+     * With the "about:blank" type, RFC 9457 (section 4.2.1) expects the title to be the status code's phrase.
+     */
+    private static function getStatusPhrase(mixed $statusCode): ?string
+    {
+        if (!\is_int($statusCode) || !class_exists(Response::class)) {
+            return null;
+        }
+
+        return Response::$statusTexts[$statusCode] ?? null;
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

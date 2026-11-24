@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-24T15:44:35Z
+
+PR updated: I replaced catching `\TypeError` with a type check up front, like the sibling normalizers do. Integers keep working, as `-5` does today.

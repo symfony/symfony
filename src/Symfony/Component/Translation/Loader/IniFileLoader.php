@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation\Loader;
 
+use Symfony\Component\Translation\Exception\InvalidResourceException;
+
 /**
  * IniFileLoader loads translations from an ini file.
  *
@@ -20,6 +22,10 @@ class IniFileLoader extends FileLoader
 {
     protected function loadResource(string $resource): array
     {
-        return parse_ini_file($resource, true);
+        if (false === $messages = parse_ini_file($resource, true)) {
+            throw new InvalidResourceException(\sprintf('Unable to load file "%s".', $resource));
+        }
+
+        return $messages;
     }
 }

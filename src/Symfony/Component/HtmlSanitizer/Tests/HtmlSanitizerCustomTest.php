@@ -1018,6 +1018,12 @@ class HtmlSanitizerCustomTest extends TestCase
         yield 'unparsable directive' => ['0:https://evil.example/', '<meta http-equiv="refresh" />'];
         yield 'vertical tab in the url keyword' => ["0;url\x0B=https://trusted.example/x", '<meta http-equiv="refresh" />'];
         yield 'vertical tab as separator' => ["0\x0Bhttps://trusted.example/x", '<meta http-equiv="refresh" />'];
+        yield 'vertical tab before the time' => ["\x0B0;url=https://evil.example/", '<meta http-equiv="refresh" />'];
+        yield 'unicode whitespace before the time' => ["\u{3000}0;url=https://evil.example/", '<meta http-equiv="refresh" />'];
+        yield 'mixed whitespace before the time' => [" \u{2028}\x0B\u{205F}.5,https://evil.example/", '<meta http-equiv="refresh" />'];
+        yield 'control character before the time' => ["\x1F0;url=https://evil.example/", '<meta http-equiv="refresh" />'];
+        yield 'invisible character before the time' => ["\u{FEFF}0;url=https://evil.example/", '<meta http-equiv="refresh" />'];
+        yield 'long whitespace before the time' => [str_repeat(' ', 10000)."\u{3000}0;url=https://evil.example/", '<meta http-equiv="refresh" />'];
 
         yield 'allowed host' => [
             '0;url=https://trusted.example/x',
@@ -1026,6 +1032,10 @@ class HtmlSanitizerCustomTest extends TestCase
         yield 'allowed host without url keyword' => [
             '9 , https://trusted.example/x',
             '<meta http-equiv="refresh" content="9 , https://trusted.example/x" />',
+        ];
+        yield 'allowed host after unicode whitespace' => [
+            "\u{3000}0;url=https://trusted.example/x",
+            "<meta http-equiv=\"refresh\" content=\"\u{3000}0;url&#61;https://trusted.example/x\" />",
         ];
         yield 'long trailing whitespace' => [
             '0;url=https://trusted.example/x'.str_repeat(' ', 2000).'y',
@@ -1037,7 +1047,16 @@ class HtmlSanitizerCustomTest extends TestCase
             '0;url&#61;&#039;&#039;',
             '<meta http-equiv="refresh" content="0;url&#61;&#039;&#039;" />',
         ];
+        yield 'empty quoted url followed by another quote' => [
+            '0;url=&#039;&#039;/../admin/&#039;',
+            '<meta http-equiv="refresh" content="0;url&#61;&#039;&#039;" />',
+        ];
+        yield 'empty double quoted url followed by another quote' => [
+            '0;&#34;&#34;/../admin/&#34;',
+            '<meta http-equiv="refresh" content="0;&#34;&#34;" />',
+        ];
         yield 'not a refresh directive' => ['some text', '<meta http-equiv="refresh" content="some text" />'];
+        yield 'letters before a number' => ['第2回', '<meta http-equiv="refresh" content="第2回" />'];
     }
 
     /**

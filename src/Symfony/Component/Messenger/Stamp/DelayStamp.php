@@ -32,13 +32,17 @@ final class DelayStamp implements StampInterface
     public static function delayFor(\DateInterval $interval): self
     {
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-        $end = $now->add($interval);
 
-        return new self(($end->getTimestamp() - $now->getTimestamp()) * 1000);
+        return new self(self::getMilliseconds($now, $now->add($interval)));
     }
 
     public static function delayUntil(\DateTimeInterface $dateTime): self
     {
-        return new self(($dateTime->getTimestamp() - time()) * 1000);
+        return new self(self::getMilliseconds(\DateTimeImmutable::createFromFormat('U.u', \sprintf('%.6F', microtime(true))), $dateTime));
+    }
+
+    private static function getMilliseconds(\DateTimeInterface $from, \DateTimeInterface $to): int
+    {
+        return (int) round(($to->getTimestamp() - $from->getTimestamp()) * 1000 + ((int) $to->format('u') - (int) $from->format('u')) / 1000);
     }
 }

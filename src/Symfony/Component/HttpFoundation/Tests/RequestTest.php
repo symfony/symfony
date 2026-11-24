@@ -414,6 +414,11 @@ b'])]
         yield ['https://test.com:8080/foo', '/foo', $message];
         yield ['https://test.com:443/foo', '/foo', $message];
 
+        $message = 'Handle when the scheme and host are on REQUEST_URI without a path.';
+        yield ['http://test.com', '/', $message];
+        yield ['http://test.com?bar=baz', '/?bar=baz', $message];
+        yield ['http://test.com:8080?bar=baz', '/?bar=baz', $message];
+
         $message = 'Fragment should not be included in the URI';
         yield ['http://test.com/foo#bar', '/foo', $message];
         yield ['/foo#bar', '/foo', $message];

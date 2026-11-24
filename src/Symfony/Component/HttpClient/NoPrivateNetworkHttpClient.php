@@ -65,6 +65,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
     ];
 
     private $defaultOptions = self::OPTIONS_DEFAULTS;
+    private $configuredOptions = [];
     private $client;
     private $subnets;
     private $ipFlags;
@@ -122,7 +123,16 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
+        $givenOptions = $options;
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions, true);
+
+        // Pass only the options given to this decorator and the ones it needs, so that the decorated client applies its default options to the others
+        $options = array_intersect_key($options, $givenOptions + $this->configuredOptions + ['headers' => true, 'normalized_headers' => true, 'body' => true, 'resolve' => true, 'max_redirects' => true]);
+
+        if (!isset(self::normalizeHeaders($givenOptions['headers'] ?? [])['accept'])) {
+            unset($options['normalized_headers']['accept']);
+            $options['headers'] = array_merge([], ...array_values($options['normalized_headers']));
+        }
 
         $redirectHeaders = parse_url($url['authority']);
         $redirectHeaders['scheme'] = $url['scheme'];
@@ -238,6 +248,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         $clone = clone $this;
         $clone->client = $this->client->withOptions($options);
         $clone->defaultOptions = self::mergeDefaultOptions($options, $this->defaultOptions);
+        $clone->configuredOptions = $options + $this->configuredOptions;
 
         return $clone;
     }

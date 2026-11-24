@@ -4,7 +4,7 @@
         <body>
             <trans-unit id="1">
                 <source>An authentication exception occurred.</source>
-                <target>Uma exceção ocorreu durante a autenticação.</target>
+                <target>Ocorreu uma exceção durante a autenticação.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>Authentication credentials could not be found.</source>
@@ -60,7 +60,7 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>Account is locked.</source>
-                <target>A conta está travada.</target>
+                <target>A conta está bloqueada.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>Too many failed login attempts, please try again later.</source>
@@ -72,11 +72,11 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
-                <target>Muitas tentativas de login inválidas, por favor, tente novamente em um minuto.</target>
+                <target>Muitas tentativas de login malsucedidas, por favor, tente novamente em um minuto.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
-                <target>Muitas tentativas de login sem sucesso, por favor, tente novamente em %minutes% minutos.</target>
+                <target>Muitas tentativas de login malsucedidas, por favor, tente novamente em %minutes% minutos.</target>
             </trans-unit>
         </body>
     </file>

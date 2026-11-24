@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
@@ -46,6 +47,33 @@ class JsonFileLoaderTest extends TestCase
         $this->expectException(NotFoundResourceException::class);
 
         (new JsonFileLoader())->load(__DIR__.'/../Fixtures/non-existing.json', 'en', 'domain1');
+    }
+
+    #[DataProvider('provideScalarJsonResources')]
+    public function testLoadScalarJsonResource(string $contents)
+    {
+        $resource = tempnam(sys_get_temp_dir(), 'translation');
+
+        try {
+            file_put_contents($resource, $contents);
+
+            $this->expectException(InvalidResourceException::class);
+            $this->expectExceptionMessage(\sprintf('Unable to load file "%s".', $resource));
+
+            (new JsonFileLoader())->load($resource, 'en');
+        } finally {
+            unlink($resource);
+        }
+    }
+
+    public static function provideScalarJsonResources(): iterable
+    {
+        yield 'zero' => ['0'];
+        yield 'integer' => ['42'];
+        yield 'true' => ['true'];
+        yield 'false' => ['false'];
+        yield 'null' => ['null'];
+        yield 'string' => ['"foo"'];
     }
 
     public function testParseException()

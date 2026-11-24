@@ -23,12 +23,17 @@ class JsonFileLoader extends FileLoader
     protected function loadResource(string $resource): array
     {
         $messages = [];
-        if ($data = file_get_contents($resource)) {
+        $data = file_get_contents($resource);
+        if (false !== $data && '' !== $data) {
             $messages = json_decode($data, true);
 
             if (0 < $errorCode = json_last_error()) {
                 throw new InvalidResourceException('Error parsing JSON: '.$this->getJSONErrorMessage($errorCode));
             }
+        }
+
+        if (!\is_array($messages)) {
+            throw new InvalidResourceException(\sprintf('Unable to load file "%s".', $resource));
         }
 
         return $messages;

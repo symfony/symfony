@@ -1062,7 +1062,7 @@ class SerializerTest extends TestCase
                 ],
                 'path' => 'dateTimeZone',
                 'useMessageForUser' => true,
-                'message' => 'The data is either an empty string or null, you should pass a string that can be parsed as a DateTimeZone.',
+                'message' => 'The data is either not a string or an empty string, you should pass a string that can be parsed as a DateTimeZone.',
             ],
             [
                 'currentType' => 'null',

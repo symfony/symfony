@@ -108,6 +108,10 @@ class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
                 throw new RuntimeException(\sprintf('"%s" is not a "%s".', $backedEnumClassName, \BackedEnum::class));
             }
 
+            if (\is_string($backedEnumValue) && !is_numeric($backedEnumValue) && 'int' === (new \ReflectionEnum($backedEnumClassName))->getBackingType()->getName()) {
+                throw new RuntimeException(\sprintf('Enum value "%s" is not backed by "%s".', $backedEnumValue, $backedEnumClassName));
+            }
+
             return $backedEnumClassName::tryFrom($backedEnumValue) ?? throw new RuntimeException(\sprintf('Enum value "%s" is not backed by "%s".', $backedEnumValue, $backedEnumClassName));
         }
 
@@ -338,7 +342,11 @@ class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
         }
 
         if ('query_string' === $prefix) {
-            $queryString = parse_url($env, \PHP_URL_QUERY) ?: (parse_url($env, \PHP_URL_SCHEME) ? '' : $env);
+            $queryString = parse_url($env, \PHP_URL_QUERY);
+            if (null === $queryString || false === $queryString) {
+                $queryString = parse_url($env, \PHP_URL_SCHEME) ? '' : $env;
+            }
+
             parse_str($queryString, $result);
 
             return $result;

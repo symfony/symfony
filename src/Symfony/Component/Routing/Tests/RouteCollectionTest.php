@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Routing\Exception\RouteCircularReferenceException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -26,6 +27,30 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals(['foo' => $route], $collection->all(), '->add() adds a route');
         $this->assertEquals($route, $collection->get('foo'), '->get() returns a route by name');
         $this->assertNull($collection->get('bar'), '->get() returns null if a route does not exist');
+    }
+
+    public function testNumericAliasNamesAreDistinct()
+    {
+        $collection = new RouteCollection();
+        $route = new Route('/foo');
+        $collection->add('foo', $route);
+        $collection->addAlias('01', '1');
+        $collection->addAlias('1', 'foo');
+
+        $this->assertSame($route, $collection->get('01'));
+        $this->assertSame($route, $collection->get('1'));
+    }
+
+    public function testNumericAliasCircularReference()
+    {
+        $collection = new RouteCollection();
+        $collection->addAlias('01', '1');
+        $collection->addAlias('1', '01');
+
+        $this->expectException(RouteCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for route "01", path: "01 -> 1 -> 01".');
+
+        $collection->get('01');
     }
 
     public function testOverriddenRoute()

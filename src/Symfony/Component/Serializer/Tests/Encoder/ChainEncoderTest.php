@@ -88,6 +88,16 @@ class ChainEncoderTest extends TestCase
         $this->assertFalse($sut->needsNormalization(self::FORMAT_1));
     }
 
+    public function testNeedsNormalizationNestedChainEncoder()
+    {
+        $awareChain = new ChainEncoder([new NormalizationAwareEncoder()]);
+        $plainChain = new ChainEncoder([$this->createEncoder1()]);
+
+        $this->assertFalse((new ChainEncoder([$awareChain]))->needsNormalization(self::FORMAT_1));
+        $this->assertTrue((new ChainEncoder([$plainChain]))->needsNormalization(self::FORMAT_1));
+        $this->assertFalse((new ChainEncoder([new ChainEncoder([$awareChain])]))->needsNormalization(self::FORMAT_1));
+    }
+
     public function testNeedsNormalizationTraceableEncoder()
     {
         $traceableEncoder = $this->createStub(TraceableEncoder::class);

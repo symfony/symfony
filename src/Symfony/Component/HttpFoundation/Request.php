@@ -1822,6 +1822,8 @@ class Request
 
                 if (isset($uriComponents['path'])) {
                     $requestUri = $uriComponents['path'];
+                } elseif (false !== $uriComponents) {
+                    $requestUri = '/';
                 }
 
                 if (isset($uriComponents['query'])) {

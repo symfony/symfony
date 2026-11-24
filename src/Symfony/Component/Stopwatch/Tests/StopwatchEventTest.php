@@ -171,6 +171,32 @@ class StopwatchEventTest extends TestCase
         $this->assertEqualsWithDelta(0, $event->getStartTime(), self::DELTA);
     }
 
+    public function testStartTimeWithNestedPeriods()
+    {
+        $event = new class(0, null, true) extends StopwatchEvent {
+            public float $time = 0;
+
+            protected function getNow(): float
+            {
+                return $this->time;
+            }
+        };
+
+        $event->time = 10;
+        $event->start();
+        $event->time = 20;
+        $event->start();
+        $this->assertSame(10.0, $event->getStartTime());
+
+        $event->time = 30;
+        $event->stop();
+        $this->assertSame(10.0, $event->getStartTime());
+
+        $event->time = 40;
+        $event->stop();
+        $this->assertSame(10.0, $event->getStartTime());
+    }
+
     public function testStartTimeWhenStartedLater()
     {
         $event = new StopwatchEvent(microtime(true) * 1000);

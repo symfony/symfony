@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\HttpCache;
 
-use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -25,13 +24,11 @@ class SubRequestHandler
 {
     public static function handle(HttpKernelInterface $kernel, Request $request, int $type, bool $catch): Response
     {
-        // save global state related to trusted headers and proxies
-        $trustedProxies = Request::getTrustedProxies();
         $trustedHeaderSet = Request::getTrustedHeaderSet();
 
         // remove untrusted values
         $remoteAddr = $request->server->get('REMOTE_ADDR');
-        if (!$remoteAddr || !IpUtils::checkIp($remoteAddr, $trustedProxies)) {
+        if (!$remoteAddr || !$request->isFromTrustedProxy()) {
             $trustedHeaders = [
                 'FORWARDED' => $trustedHeaderSet & Request::HEADER_FORWARDED,
                 'X_FORWARDED_FOR' => $trustedHeaderSet & Request::HEADER_X_FORWARDED_FOR,
@@ -68,7 +65,7 @@ class SubRequestHandler
             $request->headers->set('X-Forwarded-For', $v = implode(', ', $trustedIps));
             $request->server->set('HTTP_X_FORWARDED_FOR', $v);
         } elseif (!(Request::HEADER_FORWARDED & $trustedHeaderSet)) {
-            Request::setTrustedProxies($trustedProxies, $trustedHeaderSet | Request::HEADER_X_FORWARDED_FOR);
+            $trustedHeaderSet |= Request::HEADER_X_FORWARDED_FOR;
             $request->headers->set('X-Forwarded-For', $v = implode(', ', $trustedIps));
             $request->server->set('HTTP_X_FORWARDED_FOR', $v);
         }
@@ -77,16 +74,10 @@ class SubRequestHandler
         // which is the core responsibility of this method
         $request->server->set('REMOTE_ADDR', '127.0.0.1');
 
-        // ensure 127.0.0.1 is set as trusted proxy
-        if (!IpUtils::checkIp('127.0.0.1', $trustedProxies)) {
-            Request::setTrustedProxies(array_merge($trustedProxies, ['127.0.0.1']), Request::getTrustedHeaderSet());
-        }
+        // trust 127.0.0.1 for this request and for the ones copied from it, but not globally:
+        // other requests coming from 127.0.0.1, like the main one, carry headers set by the client
+        $request->server->set(Request::SUB_REQUEST_TRUSTED_HEADER_SET, $trustedHeaderSet);
 
-        try {
-            return $kernel->handle($request, $type, $catch);
-        } finally {
-            // restore global state
-            Request::setTrustedProxies($trustedProxies, $trustedHeaderSet);
-        }
+        return $kernel->handle($request, $type, $catch);
     }
 }

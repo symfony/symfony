@@ -393,6 +393,25 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(['bar' => ['ding' => 'I\'m a bar %%foo %%bar', 'zero' => null]], $bag->get('foo'), '->escapeValue() escapes % by doubling it');
     }
 
+    public function testResolveParameterWithTrailingNewline()
+    {
+        $bag = new ParameterBag(['foo' => 'bar', 'number' => 42]);
+
+        foreach ([false, true] as $resolved) {
+            if ($resolved) {
+                $bag->resolve();
+            }
+
+            $this->assertSame('bar', $bag->resolveValue('%foo%'));
+            $this->assertSame(42, $bag->resolveValue('%number%'));
+            $this->assertSame("bar\n", $bag->resolveValue("%foo%\n"));
+            $this->assertSame("42\n", $bag->resolveValue("%number%\n"));
+            $this->assertSame("bar\r\n", $bag->resolveValue("%foo%\r\n"));
+            $this->assertSame("bar\n\n", $bag->resolveValue("%foo%\n\n"));
+            $this->assertSame("prefix bar\n", $bag->resolveValue("prefix %foo%\n"));
+        }
+    }
+
     #[DataProvider('stringsWithSpacesProvider')]
     public function testResolveStringWithSpacesReturnsString($expected, $test, $description)
     {

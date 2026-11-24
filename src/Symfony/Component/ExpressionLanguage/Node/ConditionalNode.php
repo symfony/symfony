@@ -29,6 +29,18 @@ class ConditionalNode extends Node
 
     public function compile(Compiler $compiler)
     {
+        if ($this->nodes['expr1'] === $this->nodes['expr2']) {
+            $compiler
+                ->raw('((')
+                ->compile($this->nodes['expr1'])
+                ->raw(') ?: (')
+                ->compile($this->nodes['expr3'])
+                ->raw('))')
+            ;
+
+            return;
+        }
+
         $compiler
             ->raw('((')
             ->compile($this->nodes['expr1'])
@@ -42,8 +54,8 @@ class ConditionalNode extends Node
 
     public function evaluate(array $functions, array $values)
     {
-        if ($this->nodes['expr1']->evaluate($functions, $values)) {
-            return $this->nodes['expr2']->evaluate($functions, $values);
+        if ($value = $this->nodes['expr1']->evaluate($functions, $values)) {
+            return $this->nodes['expr1'] === $this->nodes['expr2'] ? $value : $this->nodes['expr2']->evaluate($functions, $values);
         }
 
         return $this->nodes['expr3']->evaluate($functions, $values);
@@ -51,6 +63,10 @@ class ConditionalNode extends Node
 
     public function toArray()
     {
+        if ($this->nodes['expr1'] === $this->nodes['expr2']) {
+            return ['(', $this->nodes['expr1'], ' ?: ', $this->nodes['expr3'], ')'];
+        }
+
         return ['(', $this->nodes['expr1'], ' ? ', $this->nodes['expr2'], ' : ', $this->nodes['expr3'], ')'];
     }
 }

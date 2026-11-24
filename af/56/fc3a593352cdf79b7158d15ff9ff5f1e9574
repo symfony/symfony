@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-24T15:40:35Z
+
+Thanks for all these fixes! Could you group the next ones by component, with every occurrence of the same check fixed in one PR? That makes them faster to review. And please leave out the changes made only for Fabbot, like quoting `%d` in exception messages.
+
+---------------------------------------------------------------------------
+
+by malekkadri at 2026-11-24T15:44:29Z
+
+@nicolas-grekas Thank you for the feedback and for taking the time to review my contributions!
+Sorry about that. I was just a little worried about introducing regressions or making mistakes, so I tried to keep each change as small and focused as possible.
+I completely understand your point, though. I'll group similar fixes by component in future PRs and leave out unrelated Fabbot changes.
+I really appreciate your guidance and patience. I'm still learning how to contribute more effectively to Symfony.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-24T15:44:44Z
+
+PR updated: I replaced the `\TypeError` catch with an `is_numeric()` check up front. I also dropped the change to the `Key "%s" not found` message, since `%s` is a JSON string there.

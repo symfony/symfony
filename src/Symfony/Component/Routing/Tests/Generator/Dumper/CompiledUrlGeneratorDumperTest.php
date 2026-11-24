@@ -298,6 +298,21 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->assertSame('/sub', $compiledUrlGenerator->generate('sub_c'));
     }
 
+    public function testNumericAliasNamesAreDistinct()
+    {
+        $this->routeCollection->add('foo', new Route('/foo'));
+        $this->routeCollection->addAlias('a', '1');
+        $this->routeCollection->addAlias('1', '01');
+        $this->routeCollection->addAlias('01', 'foo');
+
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
+
+        $compiledUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext());
+
+        $this->assertSame('/foo', $compiledUrlGenerator->generate('a'));
+        $this->assertSame('/foo', $compiledUrlGenerator->generate('1'));
+    }
+
     public function testTargetAliasNotExisting()
     {
         $this->routeCollection->add('not-existing', new Route('/not-existing'));

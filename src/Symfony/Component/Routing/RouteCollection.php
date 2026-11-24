@@ -116,7 +116,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     {
         $visited = [];
         while (null !== $alias = $this->aliases[$name] ?? null) {
-            if (false !== $searchKey = array_search($name, $visited)) {
+            if (false !== $searchKey = array_search($name, $visited, true)) {
                 $visited[] = $name;
 
                 throw new RouteCircularReferenceException($name, \array_slice($visited, $searchKey));

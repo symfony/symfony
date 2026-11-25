@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-25T12:14:30Z
+
+PR updated: I applied the same fix to `PhpDumper`. Dumping the container failed with a TypeError when a service named "1" was part of a setter loop. I also moved the tests next to the classes they cover.

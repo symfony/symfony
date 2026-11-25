@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-25T12:34:55Z
+
+Thanks for the PR. #67883 was merged on 5.4 and shipped in 5.4.57, so all branches have this regression. I moved the PR to 5.4.

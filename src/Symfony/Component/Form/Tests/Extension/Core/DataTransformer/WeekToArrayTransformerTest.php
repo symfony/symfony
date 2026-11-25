@@ -62,6 +62,21 @@ class WeekToArrayTransformerTest extends TestCase
         $this->assertEquals('2019-W01', $transformer->reverseTransform($input));
     }
 
+    public function testRoundTripWithLeadingZerosInYear()
+    {
+        $transformer = new WeekToArrayTransformer();
+
+        $this->assertSame('0999-W01', $transformer->reverseTransform($transformer->transform('0999-W01')));
+        $this->assertSame('0071-W53', $transformer->reverseTransform($transformer->transform('0071-W53')));
+    }
+
+    public function testRoundTripWithMoreThanFourDigitsInYear()
+    {
+        $transformer = new WeekToArrayTransformer();
+
+        $this->assertSame('10000-W05', $transformer->reverseTransform($transformer->transform('10000-W05')));
+    }
+
     public function testReverseTransformCompletelyEmpty()
     {
         $transformer = new WeekToArrayTransformer();
@@ -106,8 +121,11 @@ class WeekToArrayTransformerTest extends TestCase
             'integer instead of array' => [0, 'Value is expected to be an array, but was "int"'],
             'string instead of array' => ['12345', 'Value is expected to be an array, but was "string"'],
             'week invalid' => [['year' => 2019, 'week' => 66], 'Week "66" does not exist for year "2019".'],
+            'week 53 in a short year' => [['year' => 70, 'week' => 53], 'Week "53" does not exist for year "70".'],
             'week zero' => [['year' => 2019, 'week' => 0], 'Week "0" does not exist for year "2019".'],
             'week negative' => [['year' => 2019, 'week' => -1], 'Week "-1" does not exist for year "2019".'],
+            'year zero' => [['year' => 0, 'week' => 1], 'Year "0" is not a valid year.'],
+            'year negative' => [['year' => -5, 'week' => 1], 'Year "-5" is not a valid year.'],
             'year null' => [['year' => null, 'week' => 1], 'Year is expected to be an integer, but was "null".'],
             'week null' => [['year' => 2019, 'week' => null], 'Week is expected to be an integer, but was "null".'],
             'year non-integer' => [['year' => '2019', 'week' => 1], 'Year is expected to be an integer, but was "string".'],

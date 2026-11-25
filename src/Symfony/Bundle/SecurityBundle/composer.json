@@ -28,7 +28,7 @@
         "symfony/password-hasher": "^7.4|^8.0",
         "symfony/security-core": "^8.1.10",
         "symfony/security-csrf": "^7.4|^8.0",
-        "symfony/security-http": "^8.1.9",
+        "symfony/security-http": "^8.1.12",
         "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {

@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="tg" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="1">
+                <source>This value should be false.</source>
+                <target>Ин қимат бояд false бошад.</target>
+            </trans-unit>
+            <trans-unit id="2">
+                <source>This value should be true.</source>
+                <target>Ин қимат бояд true бошад.</target>
+            </trans-unit>
+            <trans-unit id="3">
+                <source>This value should be of type {{ type }}.</source>
+                <target>Ин қимат бояд аз навъи {{ type }} бошад.</target>
+            </trans-unit>
+            <trans-unit id="4">
+                <source>This value should be blank.</source>
+                <target>Ин қимат бояд холӣ бошад.</target>
+            </trans-unit>
+            <trans-unit id="5">
+                <source>The value you selected is not a valid choice.</source>
+                <target>Қимати интихобкардаи шумо нодуруст аст.</target>
+            </trans-unit>
+            <trans-unit id="6">
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <target>Шумо бояд ҳадди ақал {{ limit }} вариант интихоб кунед.|Шумо бояд ҳадди ақал {{ limit }} вариант интихоб кунед.</target>
+            </trans-unit>
+            <trans-unit id="7">
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <target>Шумо бояд на зиёда аз {{ limit }} вариант интихоб кунед.|Шумо бояд на зиёда аз {{ limit }} вариант интихоб кунед.</target>
+            </trans-unit>
+            <trans-unit id="8">
+                <source>One or more of the given values is invalid.</source>
+                <target>Як ё якчанд қимати додашуда нодуруст аст.</target>
+            </trans-unit>
+            <trans-unit id="9">
+                <source>This field was not expected.</source>
+                <target>Ин майдон пешбинӣ нашудааст.</target>
+            </trans-unit>
+            <trans-unit id="10">
+                <source>This field is missing.</source>
+                <target>Ин майдон мавҷуд нест.</target>
+            </trans-unit>
+            <trans-unit id="11">
+                <source>This value is not a valid date.</source>
+                <target>Ин қимат санаи дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="12">
+                <source>This value is not a valid datetime.</source>
+                <target>Ин қимат сана ва вақти дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="13">
+                <source>This value is not a valid email address.</source>
+                <target>Ин қимат суроғаи электронии дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="14">
+                <source>The file could not be found.</source>
+                <target>Файл ёфт нашуд.</target>
+            </trans-unit>
+            <trans-unit id="15">
+                <source>The file is not readable.</source>
+                <target>Файлро хондан ғайриимкон аст.</target>
+            </trans-unit>
+            <trans-unit id="16">
+                <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Файл хеле калон аст ({{ size }} {{ suffix }}). Ҳаҷми ҳадди аксари иҷозатдодашуда {{ limit }} {{ suffix }} аст.</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
+                <target>Навъи MIME-и файл нодуруст аст ({{ type }}). Навъҳои MIME-и иҷозатдодашуда: {{ types }}.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>This value should be {{ limit }} or less.</source>
+                <target>Ин қимат бояд {{ limit }} ё камтар бошад.</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
+                <target>Ин қимат хеле дароз аст. Он бояд {{ limit }} аломат ё камтар дошта бошад.|Ин қимат хеле дароз аст. Он бояд {{ limit }} аломат ё камтар дошта бошад.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>This value should be {{ limit }} or more.</source>
+                <target>Ин қимат бояд {{ limit }} ё зиёдтар бошад.</target>
+            </trans-unit>
+            <trans-unit id="21">
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
+                <target>Ин қимат хеле кӯтоҳ аст. Он бояд {{ limit }} аломат ё зиёдтар дошта бошад.|Ин қимат хеле кӯтоҳ аст. Он бояд {{ limit }} аломат ё зиёдтар дошта бошад.</target>
+            </trans-unit>
+            <trans-unit id="22">
+                <source>This value should not be blank.</source>
+                <target>Ин қимат набояд холӣ бошад.</target>
+            </trans-unit>
+            <trans-unit id="23">
+                <source>This value should not be null.</source>
+                <target>Ин қимат набояд null бошад.</target>
+            </trans-unit>
+            <trans-unit id="24">
+                <source>This value should be null.</source>
+                <target>Ин қимат бояд null бошад.</target>
+            </trans-unit>
+            <trans-unit id="25">
+                <source>This value is not valid.</source>
+                <target>Ин қимат нодуруст аст.</target>
+            </trans-unit>
+            <trans-unit id="26">
+                <source>This value is not a valid time.</source>
+                <target>Ин қимат вақти дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="27">
+                <source>This value is not a valid URL.</source>
+                <target>Ин қимат URL-и дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="31">
+                <source>The two values should be equal.</source>
+                <target>Ҳарду қимат бояд баробар бошанд.</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Файл хеле калон аст. Ҳаҷми ҳадди аксари иҷозатдодашуда {{ limit }} {{ suffix }} аст.</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large.</source>
+                <target>Файл хеле калон аст.</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded.</source>
+                <target>Файлро боргузорӣ кардан муяссар нашуд.</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number.</source>
+                <target>Ин қимат бояд адади дуруст бошад.</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image.</source>
+                <target>Ин файл расми дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target>Ин суроғаи дурусти IP нест.</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language.</source>
+                <target>Ин қимат забони дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale.</source>
+                <target>Ин қимат локали дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country.</source>
+                <target>Ин қимат кишвари дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used.</source>
+                <target>Ин қимат аллакай истифода шудааст.</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>The size of the image could not be detected.</source>
+                <target>Андозаи расмро муайян кардан муяссар нашуд.</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>Бари расм хеле калон аст ({{ width }}px). Ҳадди аксари бари иҷозатдодашуда {{ max_width }}px аст.</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>Бари расм хеле хурд аст ({{ width }}px). Ҳадди ақали бари интизоршаванда {{ min_width }}px аст.</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>Баландии расм хеле калон аст ({{ height }}px). Ҳадди аксари баландии иҷозатдодашуда {{ max_height }}px аст.</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>Баландии расм хеле хурд аст ({{ height }}px). Ҳадди ақали баландии интизоршаванда {{ min_height }}px аст.</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user's current password.</source>
+                <target>Ин қимат бояд пароли ҷории истифодабаранда бошад.</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
+                <target>Ин қимат бояд дақиқан {{ limit }} аломат дошта бошад.|Ин қимат бояд дақиқан {{ limit }} аломат дошта бошад.</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded.</source>
+                <target>Файл танҳо қисман боргузорӣ шуд.</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded.</source>
+                <target>Ягон файл боргузорӣ нашуд.</target>
+            </trans-unit>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target>Дар php.ini ҷузвдони муваққатӣ танзим нашудааст.</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk.</source>
+                <target>Файли муваққатиро ба диск навиштан ғайриимкон аст.</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail.</source>
+                <target>Васеъшавии PHP боиси нокомии боргузорӣ гардид.</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
+                <target>Ин маҷмӯа бояд {{ limit }} элемент ё зиёдтар дошта бошад.|Ин маҷмӯа бояд {{ limit }} элемент ё зиёдтар дошта бошад.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
+                <target>Ин маҷмӯа бояд {{ limit }} элемент ё камтар дошта бошад.|Ин маҷмӯа бояд {{ limit }} элемент ё камтар дошта бошад.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
+                <target>Ин маҷмӯа бояд дақиқан {{ limit }} элемент дошта бошад.|Ин маҷмӯа бояд дақиқан {{ limit }} элемент дошта бошад.</target>
+            </trans-unit>
+            <trans-unit id="57">
+                <source>Invalid card number.</source>
+                <target>Рақами корт нодуруст аст.</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>Unsupported card type or invalid card number.</source>
+                <target>Навъи корт дастгирӣ намешавад ё рақами корт нодуруст аст.</target>
+            </trans-unit>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target>Ин рақами дурусти байналмилалии суратҳисоби бонкӣ (IBAN) нест.</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Ин қимат ISBN-10-и дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Ин қимат ISBN-13-и дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Ин қимат на ISBN-10-и дуруст аст, на ISBN-13-и дуруст.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Ин қимат ISSN-и дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>Ин қимат асъори дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>This value should be equal to {{ compared_value }}.</source>
+                <target>Ин қимат бояд ба {{ compared_value }} баробар бошад.</target>
+            </trans-unit>
+            <trans-unit id="66">
+                <source>This value should be greater than {{ compared_value }}.</source>
+                <target>Ин қимат бояд аз {{ compared_value }} зиёд бошад.</target>
+            </trans-unit>
+            <trans-unit id="67">
+                <source>This value should be greater than or equal to {{ compared_value }}.</source>
+                <target>Ин қимат бояд аз {{ compared_value }} зиёд ё баробар бошад.</target>
+            </trans-unit>
+            <trans-unit id="68">
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Ин қимат бояд бо {{ compared_value_type }} {{ compared_value }} айнан якхела бошад.</target>
+            </trans-unit>
+            <trans-unit id="69">
+                <source>This value should be less than {{ compared_value }}.</source>
+                <target>Ин қимат бояд аз {{ compared_value }} камтар бошад.</target>
+            </trans-unit>
+            <trans-unit id="70">
+                <source>This value should be less than or equal to {{ compared_value }}.</source>
+                <target>Ин қимат бояд аз {{ compared_value }} камтар ё баробар бошад.</target>
+            </trans-unit>
+            <trans-unit id="71">
+                <source>This value should not be equal to {{ compared_value }}.</source>
+                <target>Ин қимат набояд ба {{ compared_value }} баробар бошад.</target>
+            </trans-unit>
+            <trans-unit id="72">
+                <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Ин қимат набояд бо {{ compared_value_type }} {{ compared_value }} айнан якхела бошад.</target>
+            </trans-unit>
+            <trans-unit id="73">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>Таносуби тарафҳои расм хеле калон аст ({{ ratio }}). Ҳадди аксари таносуби иҷозатдодашуда {{ max_ratio }} аст.</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>Таносуби тарафҳои расм хеле хурд аст ({{ ratio }}). Ҳадди ақали таносуби интизоршаванда {{ min_ratio }} аст.</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>Расм мураббаъ аст ({{ width }}x{{ height }}px). Расмҳои мураббаъ иҷозат дода намешаванд.</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>Расм уфуқӣ аст ({{ width }}x{{ height }}px). Расмҳои уфуқӣ иҷозат дода намешаванд.</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
+                <target>Расм амудӣ аст ({{ width }}x{{ height }}px). Расмҳои амудӣ иҷозат дода намешаванд.</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>Файли холӣ иҷозат дода намешавад.</target>
+            </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>Хостро муайян кардан муяссар нашуд.</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Ин қимат ба рамзгузории интизоршавандаи {{ charset }} мувофиқат намекунад.</target>
+            </trans-unit>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target>Ин рамзи дурусти мушаххаскунандаи бизнес (BIC) нест.</target>
+            </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Хато</target>
+            </trans-unit>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target>Ин UUID-и дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="84">
+                <source>This value should be a multiple of {{ compared_value }}.</source>
+                <target>Ин қимат бояд ба {{ compared_value }} бе боқимонда тақсим шавад.</target>
+            </trans-unit>
+            <trans-unit id="85">
+                <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
+                <target>Ин рамзи мушаххаскунандаи бизнес (BIC) бо IBAN {{ iban }} алоқаманд нест.</target>
+            </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>Ин қимат бояд JSON-и дуруст бошад.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Ин маҷмӯа бояд танҳо элементҳои такрорнашаванда дошта бошад.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>Ин қимат бояд мусбат бошад.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>Ин қимат бояд мусбат ё ба сифр баробар бошад.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>Ин қимат бояд манфӣ бошад.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>Ин қимат бояд манфӣ ё ба сифр баробар бошад.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Ин қимат минтақаи вақти дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>Ин парол дар маълумоти ифшошуда дида шудааст ва набояд истифода шавад. Лутфан пароли дигарро истифода баред.</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Ин қимат бояд байни {{ min }} ва {{ max }} бошад.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Ин қимат номи хости дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Миқдори элементҳои ин маҷмӯа бояд ба {{ compared_value }} бе боқимонда тақсим шавад.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Ин қимат бояд ҳадди ақал ба яке аз маҳдудиятҳои зерин мувофиқат кунад:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Ҳар як элементи ин маҷмӯа бояд ба маҷмӯи маҳдудиятҳои худ мувофиқат кунад.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Ин қимат рақами дурусти байналмилалии мушаххаскунандаи коғазҳои қиматнок (ISIN) нест.</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Ин қимат бояд ифодаи дуруст бошад.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Ин қимат ранги дурусти CSS нест.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Ин қимат ба навишти CIDR мувофиқат намекунад.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Қимати маскаи шабака бояд байни {{ min }} ва {{ max }} бошад.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>Номи файл хеле дароз аст. Он бояд {{ filename_max_length }} аломат ё камтар дошта бошад.|Номи файл хеле дароз аст. Он бояд {{ filename_max_length }} аломат ё камтар дошта бошад.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>Мустаҳкамии парол хеле паст аст. Лутфан пароли мустаҳкамтарро истифода баред.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Ин қимат аломатҳоеро дар бар мегирад, ки дар сатҳи ҷории маҳдудият иҷозат дода намешаванд.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Истифодаи аломатҳои ноаён иҷозат дода намешавад.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Омехта кардани рақамҳо аз хатҳои гуногун иҷозат дода намешавад.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Истифодаи аломатҳои пинҳонии болопӯш иҷозат дода намешавад.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Пасванди файл нодуруст аст ({{ extension }}). Пасвандҳои иҷозатдодашуда: {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Рамзгузории муайяншудаи аломатҳо нодуруст аст ({{ detected }}). Рамзгузориҳои иҷозатдодашуда: {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target>Ин қимат суроғаи дурусти MAC нест.</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target>Дар ин URL домени сатҳи боло мавҷуд нест.</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
+                <target>Ин қимат хеле кӯтоҳ аст. Он бояд ҳадди ақал {{ min }} калима дошта бошад.|Ин қимат хеле кӯтоҳ аст. Он бояд ҳадди ақал {{ min }} калима дошта бошад.</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
+                <target>Ин қимат хеле дароз аст. Он бояд {{ max }} калима ё камтар дошта бошад.|Ин қимат хеле дароз аст. Он бояд {{ max }} калима ё камтар дошта бошад.</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>This value does not represent a valid week in the ISO 8601 format.</source>
+                <target>Ин қимат ҳафтаи дурустро дар формати ISO 8601 ифода намекунад.</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>This value is not a valid week.</source>
+                <target>Ин қимат ҳафтаи дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>This value should not be before week "{{ min }}".</source>
+                <target>Ин қимат набояд пеш аз ҳафтаи «{{ min }}» бошад.</target>
+            </trans-unit>
+            <trans-unit id="119">
+                <source>This value should not be after week "{{ max }}".</source>
+                <target>Ин қимат набояд баъд аз ҳафтаи «{{ max }}» бошад.</target>
+            </trans-unit>
+            <trans-unit id="121">
+                <source>This value is not a valid Twig template.</source>
+                <target>Ин қимат қолаби дурусти Twig нест.</target>
+            </trans-unit>
+            <trans-unit id="122">
+                <source>This file is not a valid video.</source>
+                <target>Ин файл видеои дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="123">
+                <source>The size of the video could not be detected.</source>
+                <target>Андозаи видеоро муайян кардан муяссар нашуд.</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>Бари видео хеле калон аст ({{ width }}px). Ҳадди аксари бари иҷозатдодашуда {{ max_width }}px аст.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>Бари видео хеле хурд аст ({{ width }}px). Ҳадди ақали бари интизоршаванда {{ min_width }}px аст.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>Баландии видео хеле калон аст ({{ height }}px). Ҳадди аксари баландии иҷозатдодашуда {{ max_height }}px аст.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>Баландии видео хеле хурд аст ({{ height }}px). Ҳадди ақали баландии интизоршаванда {{ min_height }}px аст.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target>Видео пикселҳои хеле кам дорад ({{ pixels }} пиксел). Ҳадди ақали миқдори интизоршаванда {{ min_pixels }} пиксел аст.</target>
+            </trans-unit>
+            <trans-unit id="129">
+                <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target>Видео пикселҳои хеле зиёд дорад ({{ pixels }} пиксел). Ҳадди аксари миқдори интизоршаванда {{ max_pixels }} пиксел аст.</target>
+            </trans-unit>
+            <trans-unit id="130">
+                <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>Таносуби тарафҳои видео хеле калон аст ({{ ratio }}). Ҳадди аксари таносуби иҷозатдодашуда {{ max_ratio }} аст.</target>
+            </trans-unit>
+            <trans-unit id="131">
+                <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>Таносуби тарафҳои видео хеле хурд аст ({{ ratio }}). Ҳадди ақали таносуби интизоршаванда {{ min_ratio }} аст.</target>
+            </trans-unit>
+            <trans-unit id="132">
+                <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
+                <target>Видео мураббаъ аст ({{ width }}x{{ height }}px). Видеоҳои мураббаъ иҷозат дода намешаванд.</target>
+            </trans-unit>
+            <trans-unit id="133">
+                <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
+                <target>Видео уфуқӣ аст ({{ width }}x{{ height }}px). Видеоҳои уфуқӣ иҷозат дода намешаванд.</target>
+            </trans-unit>
+            <trans-unit id="134">
+                <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
+                <target>Видео амудӣ аст ({{ width }}x{{ height }}px). Видеоҳои амудӣ иҷозат дода намешаванд.</target>
+            </trans-unit>
+            <trans-unit id="135">
+                <source>The video file is corrupted.</source>
+                <target>Файли видео вайрон шудааст.</target>
+            </trans-unit>
+            <trans-unit id="136">
+                <source>The video contains multiple streams. Only one stream is allowed.</source>
+                <target>Видео якчанд ҷараён дорад. Танҳо як ҷараён иҷозат дода мешавад.</target>
+            </trans-unit>
+            <trans-unit id="137">
+                <source>Unsupported video codec "{{ codec }}".</source>
+                <target>Кодеки видеоии «{{ codec }}» дастгирӣ намешавад.</target>
+            </trans-unit>
+            <trans-unit id="138">
+                <source>Unsupported video container "{{ container }}".</source>
+                <target>Контейнери видеоии «{{ container }}» дастгирӣ намешавад.</target>
+            </trans-unit>
+            <trans-unit id="139">
+                <source>The image file is corrupted.</source>
+                <target>Файли расм вайрон шудааст.</target>
+            </trans-unit>
+            <trans-unit id="140">
+                <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target>Расм пикселҳои хеле кам дорад ({{ pixels }} пиксел). Ҳадди ақали миқдори интизоршаванда {{ min_pixels }} пиксел аст.</target>
+            </trans-unit>
+            <trans-unit id="141">
+                <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target>Расм пикселҳои хеле зиёд дорад ({{ pixels }} пиксел). Ҳадди аксари миқдори интизоршаванда {{ max_pixels }} пиксел аст.</target>
+            </trans-unit>
+            <trans-unit id="142">
+                <source>This filename does not match the expected charset.</source>
+                <target>Ин номи файл ба рамзгузории интизоршаванда мувофиқат намекунад.</target>
+            </trans-unit>
+            <trans-unit id="143">
+                <source>This value is not valid XML.</source>
+                <target>Ин қимат XML-и дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="144">
+                <source>This value does not conform to the expected XSD schema.</source>
+                <target>Ин қимат ба схемаи интизоршавандаи XSD мувофиқат намекунад.</target>
+            </trans-unit>
+            <trans-unit id="145">
+                <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
+                <target>Ҳаҷми маълумоти XML хеле калон аст ({{ size }} байт): он аз ҳадди {{ limit }} байт зиёд аст.</target>
+            </trans-unit>
+            <trans-unit id="146">
+                <source>This value is not a valid cron expression.</source>
+                <target>Ин қимат ифодаи дурусти cron нест.</target>
+            </trans-unit>
+            <trans-unit id="147">
+                <source>The referenced entity does not exist.</source>
+                <target>Объекти истинодшуда мавҷуд нест.</target>
+            </trans-unit>
+            <trans-unit id="148" resname="This is not a valid ULID.">
+                <source>This value is not a valid ULID.</source>
+                <target>Ин ULID-и дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="149">
+                <source>This file is not a valid audio file.</source>
+                <target>Ин файл файли аудиоии дуруст нест.</target>
+            </trans-unit>
+            <trans-unit id="150">
+                <source>The audio is too short ({{ duration }} seconds). Minimum duration expected is {{ min_duration }} seconds.</source>
+                <target>Аудио хеле кӯтоҳ аст ({{ duration }} сония). Ҳадди ақали давомнокии интизоршаванда {{ min_duration }} сония аст.</target>
+            </trans-unit>
+            <trans-unit id="151">
+                <source>The audio is too long ({{ duration }} seconds). Allowed maximum duration is {{ max_duration }} seconds.</source>
+                <target>Аудио хеле дароз аст ({{ duration }} сония). Ҳадди аксари давомнокии иҷозатдодашуда {{ max_duration }} сония аст.</target>
+            </trans-unit>
+            <trans-unit id="152">
+                <source>The duration of the audio could not be detected.</source>
+                <target>Давомнокии аудиоро муайян кардан муяссар нашуд.</target>
+            </trans-unit>
+            <trans-unit id="153">
+                <source>The audio bitrate is too low ({{ bitrate }} bps). Minimum bitrate expected is {{ min_bitrate }} bps.</source>
+                <target>Битрейти аудио хеле паст аст ({{ bitrate }} бит/с). Ҳадди ақали битрейти интизоршаванда {{ min_bitrate }} бит/с аст.</target>
+            </trans-unit>
+            <trans-unit id="154">
+                <source>The audio bitrate is too high ({{ bitrate }} bps). Allowed maximum bitrate is {{ max_bitrate }} bps.</source>
+                <target>Битрейти аудио хеле баланд аст ({{ bitrate }} бит/с). Ҳадди аксари битрейти иҷозатдодашуда {{ max_bitrate }} бит/с аст.</target>
+            </trans-unit>
+            <trans-unit id="155">
+                <source>The bitrate of the audio could not be detected.</source>
+                <target>Битрейти аудиоро муайян кардан муяссар нашуд.</target>
+            </trans-unit>
+            <trans-unit id="156">
+                <source>Unsupported audio sample rate ({{ sample_rate }} Hz).</source>
+                <target>Басомади намунагирии аудио ({{ sample_rate }} Гс) дастгирӣ намешавад.</target>
+            </trans-unit>
+            <trans-unit id="157">
+                <source>The sample rate of the audio could not be detected.</source>
+                <target>Басомади намунагирии аудиоро муайян кардан муяссар нашуд.</target>
+            </trans-unit>
+            <trans-unit id="158">
+                <source>The audio has too few channels ({{ channels }}). Minimum amount expected is {{ min_channels }}.</source>
+                <target>Аудио каналҳои хеле кам дорад ({{ channels }}). Ҳадди ақали миқдори интизоршаванда {{ min_channels }} аст.</target>
+            </trans-unit>
+            <trans-unit id="159">
+                <source>The audio has too many channels ({{ channels }}). Maximum amount expected is {{ max_channels }}.</source>
+                <target>Аудио каналҳои хеле зиёд дорад ({{ channels }}). Ҳадди аксари миқдори интизоршаванда {{ max_channels }} аст.</target>
+            </trans-unit>
+            <trans-unit id="160">
+                <source>The number of audio channels could not be detected.</source>
+                <target>Миқдори каналҳои аудиоро муайян кардан муяссар нашуд.</target>
+            </trans-unit>
+            <trans-unit id="161">
+                <source>The audio file is corrupted.</source>
+                <target>Файли аудио вайрон шудааст.</target>
+            </trans-unit>
+            <trans-unit id="162">
+                <source>The audio contains multiple streams. Only one stream is allowed.</source>
+                <target>Аудио якчанд ҷараён дорад. Танҳо як ҷараён иҷозат дода мешавад.</target>
+            </trans-unit>
+            <trans-unit id="163">
+                <source>Unsupported audio codec "{{ codec }}".</source>
+                <target>Кодеки аудиоии «{{ codec }}» дастгирӣ намешавад.</target>
+            </trans-unit>
+            <trans-unit id="164">
+                <source>Unsupported audio container "{{ container }}".</source>
+                <target>Контейнери аудиоии «{{ container }}» дастгирӣ намешавад.</target>
+            </trans-unit>
+            <trans-unit id="165">
+                <source>The file does not contain any audio stream.</source>
+                <target>Файл ягон ҷараёни аудиоӣ надорад.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

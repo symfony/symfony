@@ -44,6 +44,8 @@ class ResetServicesListener implements EventSubscriberInterface
     {
         if (!$event->isWorkerIdle() && 0 === ++$this->count % $this->interval) {
             $this->resetPending = true;
+            // no new message is started: under a steady load the ones in flight would never be all handled
+            $event->getWorker()->pauseConsumption();
         }
 
         $this->resetIfNoMessageIsInFlight($event->getWorker());
@@ -65,6 +67,7 @@ class ResetServicesListener implements EventSubscriberInterface
         if ($this->resetPending && 0 === $worker->getInFlightMessageCount()) {
             $this->resetPending = false;
             $this->servicesResetter->reset();
+            $worker->resumeConsumption();
         }
     }
 

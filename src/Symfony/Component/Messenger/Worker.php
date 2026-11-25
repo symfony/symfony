@@ -60,6 +60,7 @@ use Symfony\Component\RateLimiter\LimiterInterface;
 class Worker
 {
     private bool $shouldStop = false;
+    private bool $consumptionPaused = false;
     private WorkerMetadata $metadata;
     private array $acks = [];
     private ?DeferredBatchMessageQueue $unacks = null;
@@ -146,7 +147,7 @@ class Worker
                     $envelopeHandledStart = $this->now();
                     $fetchSize = max(1, $options['fetch_size'] ?? 1);
 
-                    if ($this->messageExecutionStrategy->shouldPauseConsumption()
+                    if ($this->shouldPauseConsumption()
                         && $this->messageExecutionStrategy->wait($this->completionCallback)
                     ) {
                         $this->notifyMessagesCompleted();
@@ -212,7 +213,7 @@ class Worker
                             $this->handleMessage($envelope, $transportName, $receipt, $options['bus_name'] ?? null);
                             $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
 
-                            if ($this->messageExecutionStrategy->shouldPauseConsumption()) {
+                            if ($this->shouldPauseConsumption()) {
                                 $bufferedEnvelopes[$transportName] = $envelopes;
 
                                 break 2;
@@ -593,6 +594,26 @@ class Worker
     public function getInFlightMessageCount(): int
     {
         return $this->messageExecutionStrategy instanceof InFlightMessageCountAwareInterface ? $this->messageExecutionStrategy->getInFlightMessageCount() : 0;
+    }
+
+    /**
+     * Stops starting messages until resumeConsumption() is called: the strategy only completes the ones in flight.
+     *
+     * Lets a listener wait for the messages in flight without new ones keeping the worker busy forever.
+     */
+    public function pauseConsumption(): void
+    {
+        $this->consumptionPaused = true;
+    }
+
+    public function resumeConsumption(): void
+    {
+        $this->consumptionPaused = false;
+    }
+
+    private function shouldPauseConsumption(): bool
+    {
+        return $this->consumptionPaused || $this->messageExecutionStrategy->shouldPauseConsumption();
     }
 
     /**

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-25T17:50:11Z
+
+Thanks for the PR. I added `Uuid`, which also has a `normalizer` option and maps to `format: uuid`.

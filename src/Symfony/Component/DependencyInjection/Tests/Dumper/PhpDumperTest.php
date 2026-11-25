@@ -1942,6 +1942,24 @@ class PhpDumperTest extends TestCase
         $this->assertSame($dumpedContainer->get('a\\\\b'), $dumpedContainer->get('a\\\\b'));
     }
 
+    public function testCircularReferencesWithIntegerLikeIds()
+    {
+        $container = new ContainerBuilder();
+        $container->register('1', \stdClass::class)->setPublic(true)->setProperty('two', new Reference('2'))->setProperty('three', new Reference('3'));
+        $container->register('2', \stdClass::class)->setPublic(true)->setProperty('one', new Reference('1'));
+        $container->register('3', \stdClass::class)->setPublic(true)->setProperty('two', new Reference('2'));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => $class = 'Symfony_DI_PhpDumper_Test_Circular_Integer_Like_Ids']));
+
+        $dumpedContainer = new $class();
+        $one = $dumpedContainer->get('1');
+
+        $this->assertSame($one, $one->two->one);
+        $this->assertSame($one->two, $one->three->two);
+    }
+
     public function testCloningLazyGhostWithDependency()
     {
         $container = new ContainerBuilder();

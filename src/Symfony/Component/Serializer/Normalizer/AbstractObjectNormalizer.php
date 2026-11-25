@@ -447,8 +447,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             $type = $this->getType($resolvedClass, $attribute);
 
-            // the current value is used only to denormalize typed attributes
-            if (null !== $type && ($attributeContext[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false)) {
+            // normalizers without a type extractor may resolve types themselves and use the current value;
+            // ObjectNormalizer doesn't use it untyped, and reading it could call any method named after the attribute
+            if ((null !== $type || (null === $this->propertyTypeExtractor && !$this instanceof ObjectNormalizer)) && ($attributeContext[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false)) {
                 $discriminatorMapping = $this->classDiscriminatorResolver?->getMappingForMappedObject($object);
 
                 try {
@@ -953,8 +954,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         // asking PropertyInfo about attributes that the class doesn't have would fill its cache with each unknown key
-        if (null !== ($name = $this->getDeclaredAttributeName($currentClass, $attribute)) && null !== $type = $this->propertyTypeExtractor->getType($currentClass, $name)) {
-            return $this->typeCache[$key] = $type;
+        if (null !== $declared = $this->getDeclaredAttribute($currentClass, $attribute)) {
+            [$declaringClass, $name] = $declared;
+
+            if (null !== $type = $this->propertyTypeExtractor->getType($declaringClass, $name)) {
+                return $this->typeCache[$key] = $type;
+            }
         }
 
         if ($discriminatorMapping = $this->classDiscriminatorResolver?->getMappingForClass($currentClass)) {
@@ -963,8 +968,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             foreach ($discriminatorMapping->getTypesMapping() as $mappedClass) {
-                if (null !== ($name = $this->getDeclaredAttributeName($mappedClass, $attribute)) && null !== $type = $this->propertyTypeExtractor->getType($mappedClass, $name)) {
-                    return $this->typeCache[$key] = $type;
+                if (null !== $declared = $this->getDeclaredAttribute($mappedClass, $attribute)) {
+                    [$declaringClass, $name] = $declared;
+
+                    if (null !== $type = $this->propertyTypeExtractor->getType($declaringClass, $name)) {
+                        return $this->typeCache[$key] = $type;
+                    }
                 }
             }
         }
@@ -975,18 +984,20 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
-     * Returns the name of the property, getter, setter or constructor argument that the attribute refers to, as PropertyInfo lists it.
+     * Returns the class and name of the property, getter, setter or constructor argument that the attribute refers to, as PropertyInfo lists it.
+     *
+     * @return array{string, string}|null
      */
-    private function getDeclaredAttributeName(string $class, string $attribute): ?string
+    private function getDeclaredAttribute(string $class, string $attribute): ?array
     {
         if (property_exists($class, $attribute)) {
-            return $attribute;
+            return [$class, $attribute];
         }
 
         if (method_exists($class, '__construct')) {
             foreach ((new \ReflectionMethod($class, '__construct'))->getParameters() as $parameter) {
                 if ($attribute === $parameter->name) {
-                    return $attribute;
+                    return [$class, $attribute];
                 }
             }
         }
@@ -996,7 +1007,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 // method names are case-insensitive, so the name is read from the method, the way ReflectionExtractor::getProperties() does
                 $name = substr((new \ReflectionMethod($class, $prefix.$attribute))->name, 3);
 
-                return property_exists($class, lcfirst($name)) || (!property_exists($class, $name) && !preg_match('/^[A-Z]{2,}/', $name)) ? lcfirst($name) : $name;
+                return [$class, property_exists($class, lcfirst($name)) || (!property_exists($class, $name) && !preg_match('/^[A-Z]{2,}/', $name)) ? lcfirst($name) : $name];
+            }
+        }
+
+        // PropertyInfo doesn't resolve private properties of parent classes when asked about the child class
+        foreach (class_parents($class) ?: [] as $parent) {
+            if (property_exists($parent, $attribute)) {
+                return [$parent, $attribute];
             }
         }
 

@@ -166,6 +166,27 @@ class ResponseHeaderBagTest extends TestCase
         $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
     }
 
+    public function testReplaceClearsCookies()
+    {
+        $bag = new ResponseHeaderBag();
+        $bag->setCookie(Cookie::create('foo', 'bar'));
+
+        $bag->replace(['X-Test' => 'value']);
+
+        $this->assertSame([], $bag->getCookies());
+        $this->assertFalse($bag->has('Set-Cookie'));
+        $this->assertSame([], $bag->all('Set-Cookie'));
+        $this->assertArrayNotHasKey('set-cookie', $bag->all());
+        $this->assertArrayNotHasKey('set-cookie', $bag->allPreserveCaseWithoutCookies());
+
+        $bag->setCookie(Cookie::create('foo', 'bar'));
+        $bag->replace(['Set-Cookie' => 'baz=qux']);
+
+        $this->assertCount(1, $bag->getCookies());
+        $this->assertSame('baz', $bag->getCookies()[0]->getName());
+        $this->assertSame('qux', $bag->getCookies()[0]->getValue());
+    }
+
     public function testCookiesWithSameNames()
     {
         $bag = new ResponseHeaderBag();

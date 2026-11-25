@@ -1069,7 +1069,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
             if (isset($seen[$id])) {
                 $seen = array_values($seen);
-                $seen = \array_slice($seen, array_search($id, $seen));
+                $seen = \array_slice($seen, array_search($id, $seen, true));
                 $seen[] = $id;
 
                 throw new ServiceCircularReferenceException($id, $seen);

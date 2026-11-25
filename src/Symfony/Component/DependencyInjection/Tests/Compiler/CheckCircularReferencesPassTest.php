@@ -156,6 +156,29 @@ class CheckCircularReferencesPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testProcessWithNumericLookingIds()
+    {
+        $container = new ContainerBuilder();
+        $container->register('01')->addArgument(new Reference('001'));
+        $container->register('001');
+
+        $this->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessDetectsCircularReferenceWithIntegerLikeId()
+    {
+        $container = new ContainerBuilder();
+        $container->register('1')->addArgument(new Reference('01'));
+        $container->register('01')->addArgument(new Reference('1'));
+
+        $this->expectException(ServiceCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for service "1", path: "1 -> 01 -> 1".');
+
+        $this->process($container);
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $compiler = new Compiler();

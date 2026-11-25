@@ -77,7 +77,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             throw new RuntimeException(\sprintf('Parent definition "%s" does not exist.', $parent));
         }
 
-        $searchKey = array_search($parent, $this->currentPath);
+        $searchKey = array_search($parent, $this->currentPath, true);
         $this->currentPath[] = $parent;
 
         if (false !== $searchKey) {

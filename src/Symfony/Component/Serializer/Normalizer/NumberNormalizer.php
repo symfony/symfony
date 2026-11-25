@@ -47,6 +47,10 @@ final class NumberNormalizer implements NormalizerInterface, DenormalizerInterfa
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Number|\GMP
     {
+        if (!\in_array($type, [Number::class, \GMP::class], true)) {
+            throw new InvalidArgumentException(\sprintf('Only "%s" and "%s" types are supported.', Number::class, \GMP::class));
+        }
+
         if (!\is_string($data) && !\is_int($data)) {
             throw $this->createNotNormalizableValueException($type, $data, $context);
         }
@@ -55,7 +59,6 @@ final class NumberNormalizer implements NormalizerInterface, DenormalizerInterfa
             return match ($type) {
                 Number::class => new Number($data),
                 \GMP::class => new \GMP($data),
-                default => throw new InvalidArgumentException(\sprintf('Only "%s" and "%s" types are supported.', Number::class, \GMP::class)),
             };
         } catch (\ValueError $e) {
             throw $this->createNotNormalizableValueException($type, $data, $context, $e);

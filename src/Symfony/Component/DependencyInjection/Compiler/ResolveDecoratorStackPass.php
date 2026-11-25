@@ -101,7 +101,7 @@ class ResolveDecoratorStackPass implements CompilerPassInterface
                 continue;
             }
 
-            $resolved = $this->resolveStack($stacks, [$id]);
+            $resolved = $this->resolveStack($stacks, [(string) $id]);
 
             if ($decoratedService = $definition->getDecoratedService()) {
                 // Propagate decoration to the innermost definition in the stack,
@@ -138,7 +138,7 @@ class ResolveDecoratorStackPass implements CompilerPassInterface
             return [$id => new ChildDefinition($id)];
         }
 
-        if (key($path) !== $searchKey = array_search($id, $path)) {
+        if (key($path) !== $searchKey = array_search($id, $path, true)) {
             throw new ServiceCircularReferenceException($id, \array_slice($path, $searchKey));
         }
 

@@ -1396,6 +1396,20 @@ class ContainerBuilderTest extends TestCase
         $this->assertEquals($definition, $container->findDefinition('foobar'), '->findDefinition() returns a Definition');
     }
 
+    public function testFindDefinitionWithCircularAliasesAndNumericLookingIds()
+    {
+        $container = new ContainerBuilder();
+        $container->setAlias('entry', '01');
+        $container->setAlias('01', '001');
+        $container->setAlias('001', 'loop');
+        $container->setAlias('loop', '001');
+
+        $this->expectException(ServiceCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for service "001", path: "001 -> loop -> 001".');
+
+        $container->findDefinition('entry');
+    }
+
     public function testAddObjectResource()
     {
         $container = new ContainerBuilder();

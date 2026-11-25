@@ -54,7 +54,7 @@ class ConstantNode extends Node
             $array[] = 'false';
         } elseif (null === $value) {
             $array[] = 'null';
-        } elseif (is_numeric($value)) {
+        } elseif (\is_int($value) || \is_float($value)) {
             $array[] = $value;
         } elseif (!\is_array($value)) {
             $array[] = $this->dumpString($value);

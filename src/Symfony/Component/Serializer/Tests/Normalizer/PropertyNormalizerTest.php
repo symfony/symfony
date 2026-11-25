@@ -29,6 +29,7 @@ use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -550,6 +551,21 @@ class PropertyNormalizerTest extends TestCase
         $this->assertTrue($this->normalizer->supportsNormalization(new PropertyChildDummy()));
     }
 
+    public function testDenormalizeInheritedPrivatePropertyUsesItsType()
+    {
+        $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
+        $normalizer = new PropertyNormalizer(null, null, $extractor);
+        $serializer = new Serializer([
+            new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d H:i:s']),
+            $normalizer,
+        ]);
+
+        $object = $serializer->denormalize(['x' => 1, 'occurredOn' => '2020-01-02 03:04:05'], InheritedPrivatePropertyChild::class);
+
+        $this->assertInstanceOf(\DateTimeImmutable::class, $object->occurredOn());
+        $this->assertSame('2020-01-02 03:04:05', $object->occurredOn()->format('Y-m-d H:i:s'));
+    }
+
     public function testMultiDimensionObject()
     {
         $normalizer = $this->getDenormalizerForTypeEnforcement();
@@ -842,6 +858,29 @@ class PropertyParentDummy
 
 class PropertyChildDummy extends PropertyParentDummy
 {
+}
+
+abstract class InheritedPrivatePropertyParent
+{
+    private \DateTimeImmutable $occurredOn;
+
+    public function __construct()
+    {
+        $this->occurredOn = new \DateTimeImmutable();
+    }
+
+    public function occurredOn(): \DateTimeImmutable
+    {
+        return $this->occurredOn;
+    }
+}
+
+final class InheritedPrivatePropertyChild extends InheritedPrivatePropertyParent
+{
+    public function __construct(public readonly int $x)
+    {
+        parent::__construct();
+    }
 }
 
 class RootDummy

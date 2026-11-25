@@ -48,15 +48,16 @@ final class AckAwareDispatcher
 
     /**
      * @param \Closure(string, Envelope, ?\Throwable, ?\Closure): void $onAcknowledge Receives the acks that the batch handlers send: the transport name, the envelope, the error and the closure combining the acks of the message
-     * @param bool                                                       $acked         Set to whether the message got its outcome through the acks of its batch handlers.
-     *                                                                                  It MUST be the variable passed by reference to the $onHandled callable of the execution strategy:
-     *                                                                                  the batch handlers flip it later to signal a late ack, and passing a copy breaks the batch acking
+     * @param bool                                                     $acked         Set to whether the message got its outcome through the acks of its batch handlers.
+     *                                                                                It MUST be the variable passed by reference to the $onHandled callable of the execution strategy:
+     *                                                                                the batch handlers flip it later to signal a late ack, and passing a copy breaks the batch acking
      */
     public function dispatch(Envelope $envelope, string $transportName, \Closure $onAcknowledge, bool &$acked): DispatchResult
     {
         $acked = false;
         $acks = [];
-        $dispatching = true;
+        // the flag flips once the dispatch is done, while the ack closure below keeps living: it is read through a holder
+        $dispatching = new \ArrayObject(['on' => true]);
         $batch = null;
         $flushes = [];
         $combine = static function (array $acks) use (&$batch, &$acked): ?array {
@@ -67,8 +68,8 @@ final class AckAwareDispatcher
             return $ack;
         };
 
-        $ack = function (Envelope $handledEnvelope, ?\Throwable $handledError = null) use (&$acks, &$dispatching, $combine, $transportName, $onAcknowledge): void {
-            if ($dispatching) {
+        $ack = function (Envelope $handledEnvelope, ?\Throwable $handledError = null) use (&$acks, $dispatching, $combine, $transportName, $onAcknowledge): void {
+            if ($dispatching['on']) {
                 $acks[] = [$handledEnvelope, $handledError];
 
                 return;
@@ -98,13 +99,13 @@ final class AckAwareDispatcher
             }
 
             // when the bus throws, its exception wins over the acks sent during the dispatch
-            $dispatching = false;
+            $dispatching['on'] = false;
 
             return new DispatchResult($envelope, $e);
         }
 
         $this->releaseHeldAcks(false);
-        $dispatching = false;
+        $dispatching['on'] = false;
 
         if ($acks || $envelope->last(NoAutoAckStamp::class)) {
             $batch = [$envelope->withoutAll(AckStamp::class), []];

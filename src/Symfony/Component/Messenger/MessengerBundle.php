@@ -18,7 +18,6 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\ConsoleBundle;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -66,8 +65,7 @@ class MessengerBundle extends AbstractBundle
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new RemoveMissingDependenciesPass());
-        // runs last so that the passes adjusting the middleware of each bus, which other bundles own, have run already
-        $container->addCompilerPass(new MessengerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -16);
+        $container->addCompilerPass(new MessengerPass());
     }
 
     public function configure(DefinitionConfigurator $definition): void

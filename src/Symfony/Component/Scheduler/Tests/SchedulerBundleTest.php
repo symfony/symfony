@@ -26,6 +26,7 @@ use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\InMemoryStore;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
+use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -66,6 +67,18 @@ class SchedulerBundleTest extends TestCase
         $this->assertInstanceOf(SchedulerTransport::class, $container->get('test.default_transport'));
         $this->assertInstanceOf(DebugCommand::class, $container->get('test.debug_command'));
         $this->assertInstanceOf(ArrayAdapter::class, $container->get('test.cache'));
+    }
+
+    public function testScheduledTransportsAreRegisteredWhenMessengerBundleComesFirst()
+    {
+        $kernel = new TestSchedulerWithMessengerBundleKernel('test', true, $this->varDir);
+        $kernel->boot();
+        $receivers = $kernel->getContainer()->get('test.receiver_locator');
+
+        $this->assertTrue($receivers->has('scheduler_default'));
+        $this->assertInstanceOf(SchedulerTransport::class, $receivers->get('scheduler_default'));
+        $this->assertTrue($receivers->has('scheduler_attributes'));
+        $this->assertInstanceOf(SchedulerTransport::class, $receivers->get('scheduler_attributes'));
     }
 
     public function testSchedulesAreStatelessByDefault()
@@ -309,5 +322,35 @@ class TestSchedulerWithoutMessengerKernel extends AbstractKernel
                 ->set(AttributeScheduleProvider::class)->autoconfigure()
             ;
         }
+    }
+}
+
+class TestSchedulerWithMessengerBundleKernel extends AbstractKernel
+{
+    use KernelTrait;
+
+    public function __construct(string $env, bool $debug, private string $dir)
+    {
+        parent::__construct($env, $debug);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new MessengerBundle();
+        yield new SchedulerBundle();
+    }
+
+    private function configureContainer(ContainerConfigurator $container): void
+    {
+        $container->services()
+            ->set(AttributeScheduleProvider::class)->autoconfigure()
+            ->set(AttributeTask::class)->autoconfigure()
+            ->alias('test.receiver_locator', 'messenger.receiver_locator')->public()
+        ;
     }
 }

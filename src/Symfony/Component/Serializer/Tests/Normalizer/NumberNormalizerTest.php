@@ -199,4 +199,21 @@ class NumberNormalizerTest extends TestCase
 
         $this->normalizer->denormalize('1.23', \stdClass::class);
     }
+
+    #[DataProvider('denormalizeUnsupportedTypeProvider')]
+    public function testDenormalizeUnsupportedTypeThrows(mixed $data)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Only "BcMath\Number" and "GMP" types are supported.');
+
+        $this->normalizer->denormalize($data, \stdClass::class);
+    }
+
+    public static function denormalizeUnsupportedTypeProvider(): iterable
+    {
+        yield 'null' => [null];
+        yield 'array' => [[]];
+        yield 'boolean' => [true];
+        yield 'float' => [1.23];
+    }
 }

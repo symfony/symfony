@@ -446,6 +446,15 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
             }
 
             if ($chunk->isLast()) {
+                if ($context->getInfo('canceled')) {
+                    // the body was not fully received: drop what was stored for this attempt
+                    $this->cache->invalidateTags([$attemptTag]);
+
+                    yield $chunk;
+
+                    return;
+                }
+
                 $this->cache->get($chunkKey, static function (ItemInterface $item) use ($expiresAt, $fullUrlTag, $metadataKey, $chunk, $attemptTag): array {
                     $item->tag([$fullUrlTag, $metadataKey, $attemptTag])->expiresAt($expiresAt);
 

@@ -29,6 +29,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\TraceableHttpClient;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 #[CoversClass(CachingHttpClient::class)]
@@ -2492,6 +2493,36 @@ class CachingHttpClientTest extends TestCase
         $response = $client->request('GET', 'http://example.com/vary-asterisk');
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('bar', $response->getContent());
+    }
+
+    #[DataProvider('provideDiscardedResponses')]
+    public function testDiscardedResponseIsNotCached(\Closure $discard)
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse(['foo', 'bar'], ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse(['foo', 'bar'], ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $response = $client->request('GET', 'http://example.com/discarded');
+        $this->assertSame(200, $response->getStatusCode());
+        $discard($response);
+        unset($response);
+
+        $response = $client->request('GET', 'http://example.com/discarded');
+        $this->assertSame('foobar', $response->getContent());
+        $this->assertSame(2, $mockClient->getRequestsCount());
+
+        $response = $client->request('GET', 'http://example.com/discarded');
+        $this->assertSame('foobar', $response->getContent());
+        $this->assertSame(2, $mockClient->getRequestsCount());
+    }
+
+    public static function provideDiscardedResponses(): iterable
+    {
+        yield 'canceled' => [static fn (ResponseInterface $response) => $response->cancel()];
+        yield 'destructed' => [static fn (ResponseInterface $response) => null];
     }
 
     public function testExcludedHeadersAreNotCached()

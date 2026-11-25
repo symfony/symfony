@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="tg" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="28">
+                <source>This form should not contain extra fields.</source>
+                <target>Ин шакл набояд майдонҳои иловагӣ дошта бошад.</target>
+            </trans-unit>
+            <trans-unit id="29">
+                <source>The uploaded file was too large. Please try to upload a smaller file.</source>
+                <target>Файли боргузоришуда хеле калон аст. Лутфан файли хурдтарро боргузорӣ кунед.</target>
+            </trans-unit>
+            <trans-unit id="30">
+                <source>The CSRF token is invalid. Please try to resubmit the form.</source>
+                <target>Токени CSRF нодуруст аст. Лутфан шаклро дубора фиристед.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid HTML5 color.</source>
+                <target>Ин қимат ранги дурусти HTML5 нест.</target>
+            </trans-unit>
+            <trans-unit id="100" resname="Please enter a valid birthdate.">
+                <source>This value is not a valid birthdate.</source>
+                <target>Лутфан санаи таваллуди дурустро ворид кунед.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>The selected choice is invalid.</source>
+                <target>Варианти интихобшуда нодуруст аст.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>The collection is invalid.</source>
+                <target>Маҷмӯа нодуруст аст.</target>
+            </trans-unit>
+            <trans-unit id="103" resname="Please select a valid color.">
+                <source>This value is not a valid color.</source>
+                <target>Лутфан ранги дурустро интихоб кунед.</target>
+            </trans-unit>
+            <trans-unit id="104" resname="Please select a valid country.">
+                <source>This value is not a valid country.</source>
+                <target>Лутфан кишвари дурустро интихоб кунед.</target>
+            </trans-unit>
+            <trans-unit id="105" resname="Please select a valid currency.">
+                <source>This value is not a valid currency.</source>
+                <target>Лутфан асъори дурустро интихоб кунед.</target>
+            </trans-unit>
+            <trans-unit id="106" resname="Please choose a valid date interval.">
+                <source>This value is not a valid date interval.</source>
+                <target>Лутфан фосилаи санаҳои дурустро интихоб кунед.</target>
+            </trans-unit>
+            <trans-unit id="107" resname="Please enter a valid date and time.">
+                <source>This value is not a valid date and time.</source>
+                <target>Лутфан сана ва вақти дурустро ворид кунед.</target>
+            </trans-unit>
+            <trans-unit id="108" resname="Please enter a valid date.">
+                <source>This value is not a valid date.</source>
+                <target>Лутфан санаи дурустро ворид кунед.</target>
+            </trans-unit>
+            <trans-unit id="109" resname="Please select a valid file.">
+                <source>This value is not a valid file.</source>
+                <target>Лутфан файли дурустро интихоб кунед.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The hidden field is invalid.</source>
+                <target>Майдони пинҳон нодуруст аст.</target>
+            </trans-unit>
+            <trans-unit id="111" resname="Please enter an integer.">
+                <source>This value is not a valid integer.</source>
+                <target>Лутфан адади бутун ворид кунед.</target>
+            </trans-unit>
+            <trans-unit id="112" resname="Please select a valid language.">
+                <source>This value is not a valid language.</source>
+                <target>Лутфан забони дурустро интихоб кунед.</target>
+            </trans-unit>
+            <trans-unit id="113" resname="Please select a valid locale.">
+                <source>This value is not a valid locale.</source>
+                <target>Лутфан локали дурустро интихоб кунед.</target>
+            </trans-unit>
+            <trans-unit id="114" resname="Please enter a valid money amount.">
+                <source>This value is not a valid money amount.</source>
+                <target>Лутфан маблағи дурусти пулиро ворид кунед.</target>
+            </trans-unit>
+            <trans-unit id="115" resname="Please enter a number.">
+                <source>This value is not a valid number.</source>
+                <target>Лутфан адад ворид кунед.</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>The password is invalid.</source>
+                <target>Парол нодуруст аст.</target>
+            </trans-unit>
+            <trans-unit id="117" resname="Please enter a percentage value.">
+                <source>This value is not a valid percentage.</source>
+                <target>Лутфан қимати фоизиро ворид кунед.</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>The values do not match.</source>
+                <target>Қиматҳо мувофиқат намекунанд.</target>
+            </trans-unit>
+            <trans-unit id="119" resname="Please enter a valid time.">
+                <source>This value is not a valid time.</source>
+                <target>Лутфан вақти дурустро ворид кунед.</target>
+            </trans-unit>
+            <trans-unit id="120" resname="Please select a valid timezone.">
+                <source>This value is not a valid timezone.</source>
+                <target>Лутфан минтақаи вақти дурустро интихоб кунед.</target>
+            </trans-unit>
+            <trans-unit id="121" resname="Please enter a valid URL.">
+                <source>This value is not a valid URL.</source>
+                <target>Лутфан URL-и дурустро ворид кунед.</target>
+            </trans-unit>
+            <trans-unit id="122" resname="Please enter a valid search term.">
+                <source>This value is not a valid search term.</source>
+                <target>Лутфан калимаи ҷустуҷӯи дурустро ворид кунед.</target>
+            </trans-unit>
+            <trans-unit id="123" resname="Please provide a valid phone number.">
+                <source>This value is not a valid phone number.</source>
+                <target>Лутфан рақами телефони дурустро ворид кунед.</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The checkbox has an invalid value.</source>
+                <target>Қуттии қайд қимати нодуруст дорад.</target>
+            </trans-unit>
+            <trans-unit id="125" resname="Please enter a valid email address.">
+                <source>This value is not a valid email address.</source>
+                <target>Лутфан суроғаи электронии дурустро ворид кунед.</target>
+            </trans-unit>
+            <trans-unit id="126" resname="Please select a valid option.">
+                <source>This value is not a valid option.</source>
+                <target>Лутфан варианти дурустро интихоб кунед.</target>
+            </trans-unit>
+            <trans-unit id="127" resname="Please select a valid range.">
+                <source>This value is not a valid range.</source>
+                <target>Лутфан диапазони дурустро интихоб кунед.</target>
+            </trans-unit>
+            <trans-unit id="128" resname="Please enter a valid week.">
+                <source>This value is not a valid week.</source>
+                <target>Лутфан ҳафтаи дурустро ворид кунед.</target>
+            </trans-unit>
+            <trans-unit id="129" resname="Please enter a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target>Лутфан UUID-и дурустро ворид кунед.</target>
+            </trans-unit>
+            <trans-unit id="130">
+                <source>The lower bound must not be greater than the upper bound.</source>
+                <target>Ҳудуди поёнӣ набояд аз ҳудуди болоӣ зиёд бошад.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

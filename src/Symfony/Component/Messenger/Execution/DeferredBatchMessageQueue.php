@@ -28,7 +28,7 @@ final class DeferredBatchMessageQueue
      * A strategy running messages concurrently may report them out of order, e.g. the message that flushed
      * the batch after the ones that came next: the batch handler is then flushed with a message still pending.
      *
-     * @var \SplObjectStorage<object, list<DeferredBatchMessage>>|null
+     * @var \SplObjectStorage<object, non-empty-list<DeferredBatchMessage>>|null
      */
     private ?\SplObjectStorage $messages = null;
 
@@ -39,7 +39,7 @@ final class DeferredBatchMessageQueue
 
     public function add(object $batchHandler, mixed $context, Envelope $envelope, bool &$acked, float $queuedAt): void
     {
-        /** @var \SplObjectStorage<object, list<DeferredBatchMessage>> $messages */
+        /** @var \SplObjectStorage<object, non-empty-list<DeferredBatchMessage>> $messages */
         $messages = $this->messages ??= new \SplObjectStorage();
 
         // forget the messages that got their outcome meanwhile
@@ -70,7 +70,7 @@ final class DeferredBatchMessageQueue
             return $flushable;
         }
 
-        /** @var \SplObjectStorage<object, list<DeferredBatchMessage>> $remaining */
+        /** @var \SplObjectStorage<object, non-empty-list<DeferredBatchMessage>> $remaining */
         $remaining = new \SplObjectStorage();
 
         foreach ($this->messages as $handler) {

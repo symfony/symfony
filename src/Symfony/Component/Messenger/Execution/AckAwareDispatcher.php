@@ -57,6 +57,7 @@ final class AckAwareDispatcher
         $acked = false;
         $acks = [];
         // the flag flips once the dispatch is done, while the ack closure below keeps living: it is read through a holder
+        /** @var \ArrayObject<string, bool> $dispatching */
         $dispatching = new \ArrayObject(['on' => true]);
         $batch = null;
         $flushes = [];

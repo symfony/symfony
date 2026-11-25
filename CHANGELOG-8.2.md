@@ -7,6 +7,359 @@ in 8.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v8.2.0...v8.2.1
 
+## 8.2.0-RC1 (2026-11-25)
+
+### Asset
+
+ * bug #68401 [Asset] Preserve zero-valued paths in asset URLs (shuvroroy)
+
+### AssetMapper
+
+ * bug #68281 [AssetMapper] Fix detecting imports in JavaScript files (nicolas-grekas)
+ * bug #68204 [AssetMapper][Messenger][Translation][TwigBridge] Escape values in text output and write JSON raw in commands (prateekbhujel)
+
+### Cache
+
+ * bug #68361 [Cache] Add support for relay 0.62 (nicolas-grekas)
+ * minor #68253 [Cache] Use findOne and unordered bulk writes in the MongoDB adapters (GromNaN)
+ * minor #68223 [Cache] Fix dead phpredis and predis links in comments (farisbasha)
+
+### Config
+
+ * bug #68300 [Config] Reject empty lists for nonempty maps in generated schemas (shuvroroy)
+ * minor #68317 [Config] Fix ResourceCheckerConfigCacheTest::testAnUnchangedGeneratedFileNeedsOnlyOneCorrectiveBuild on slow runners (clfer)
+
+### Console
+
+ * bug #68398 [Console] Allow zero as table padding character (malekkadri)
+ * bug #68382 [Console] Fix handling of zero option shortcuts (malekkadri)
+ * bug #68376 [Console] Restore formatter decoration state on exceptions (malekkadri)
+ * bug #68381 [Console] Retry alarms that interrupt an autoload instead of wrapping the autoloader (nicolas-grekas)
+ * bug #68314 [Console] Fix "Class not found" when a signal handler needs a class being autoloaded (Inf1mum)
+ * bug #68332 [Console] Fix how date arguments and options are resolved (nicolas-grekas)
+ * bug #68284 [Console] Fix `#[AskChoice]` on `#[MapInput]` properties (nicolas-grekas)
+ * bug #68283 [Console] Fix `#[Ask]` on `#[MapInput]` properties and out-of-range `bool|int` options (nicolas-grekas)
+ * bug #68282 [Console] Fix validation of int-backed enums and numeric union options in invokable commands (prateekbhujel)
+ * bug #68265 [Console] Fix the symfony/polyfill-php85 requirement and add tests for CombinedOutput (pawell67)
+ * bug #68258 [Console] Fix default values of promoted properties in `#[MapInput]` DTOs (pawell67)
+ * bug #68234 [Console] Stop rendering `PHP_BINARY` in `%command.invocation%` (nicolas-grekas)
+ * bug #68237 [Console] Fix hydrating readonly properties of `#[MapInput]` DTOs (nicolas-grekas)
+ * bug #68216 [Console] Fix `InputFile` with `file://` URIs that contain `%5C` or a host name (nicolas-grekas)
+ * bug #68188 [Console][Translation][TwigBridge][Yaml] Escape file names and messages in the output of the lint commands (nicolas-grekas)
+ * bug #68189 [Console][HttpKernel] Escape the output of `lint:expressions` and write the GitLab report raw (nicolas-grekas)
+ * bug #68179 [Console] Fix file:// URI handling in InputFile (Tong-bit-art)
+ * minor #68342 [Console] Fix the `tty` group of `TerminalInputHelperTest` (nicolas-grekas)
+
+### DebugBundle
+
+ * bug #68344 [DebugBundle] Register the VAR_DUMPER_SERVER default before resolving dump_destination (lazerg)
+
+### DependencyInjection
+
+ * bug #68399 [DependencyInjection] Handle invalid integer-backed enum env values (malekkadri)
+ * bug #68392 [DependencyInjection] Preserve falsy query strings in env processor (malekkadri)
+ * bug #68380 [DependencyInjection] Reset non-empty parameter metadata when clearing ParameterBag (malekkadri)
+ * bug #68379 [DependencyInjection] Preserve trailing newlines when resolving parameters (malekkadri)
+ * bug #68277 [DependencyInjection] Fix checking the type of env placeholders coming from extension configs (pawell67)
+ * bug #68236 [DependencyInjection] Make `ResolveNoPreloadPass` iterative (nikophil)
+ * bug #68212 [DependencyInjection] Don't keep the container in `AttributeAutoconfigurationPass` after processing (nicolas-grekas)
+ * minor #68213 [DependencyInjection] Clear the service reference graph built by `InlineServiceDefinitionsPass` (nicolas-grekas)
+ * minor #68209 [DependencyInjection] Release the container builder before loading the compiled container (vencakrecl)
+
+### DoctrineBridge
+
+ * security #cve-2026-133759 [DoctrineBridge] Refuse the copies of previous remember-me tokens as series, and delete them with their token (nicolas-grekas)
+ * bug #68295 [DoctrineBridge] Filter invalid GUID values only on platforms with a native GUID type (prateekbhujel)
+ * bug #68233 [DoctrineBridge] Undeprecate `DoctrinePingConnectionMiddleware`, it resets closed entity managers (nicolas-grekas)
+
+### ExpressionLanguage
+
+ * security #cve-2026-134791 [ExpressionLanguage] Lex comments in linear time (nicolas-grekas)
+ * security #cve-2026-133760 [ExpressionLanguage] Check the nesting level of short ternaries in linear time (nicolas-grekas)
+
+### Filesystem
+
+ * bug #68394 [Filesystem] Handle scheme-only paths in Path::getRoot() (malekkadri)
+ * bug #68374 [Filesystem] Fix Path::changeExtension() for zero extensions (malekkadri)
+
+### Finder
+
+ * bug #68385 [Finder] Fix case-insensitive date comparison operators (malekkadri)
+
+### Form
+
+ * bug #68405 [Form] Preserve four-digit years when transforming ISO weeks (shuvroroy)
+ * bug #68404 [Form] Reject zero-valued date fields in DateTimeToArrayTransformer (malekkadri)
+ * bug #68372 [Form][Security] Fix inaccurate Arabic translations (malekkadri)
+ * bug #68347 [Form] Skip write-only virtual promoted properties in ConstructorMapper (prateekbhujel)
+ * bug #68288 [Form] Fix losing digits when rounding big numbers (nicolas-grekas)
+ * bug #68286 [Form] Accept integer limits in localized number transformers (ahbaqdadi)
+ * bug #68276 [Form][HttpKernel][Intl][JsonStreamer][Serializer] Fix ValueError on date and timezone strings that contain a null byte (nicolas-grekas)
+ * bug #68231 [Form][FrameworkBundle][Messenger] Escape user data and write raw dumps in console commands (prateekbhujel)
+ * bug #68218 [Form] Don't submit a form with an empty name when the request contains none of its fields (nicolas-grekas)
+ * bug #68215 [Form] Resolve the false value of missing checkboxes in Form::submit() (alexandre-castelain)
+ * minor #68412 [Form][Security][Validator] Add Tajik (tg) translations (ismoil77)
+ * minor #68407 [Form] Update Tagalog (tl) validator translations (edmer664)
+ * minor #68329 [Form][Security][Translation][Validator] Move the mixed-alphabet check to translation-status.php (nicolas-grekas)
+ * minor #68296 [Form][Security][Validator] Fix letters from another alphabet in el, mn and uk translations (bardrop, nicolas-grekas)
+ * minor #68319 [Form][Validator] Refine Czech validation messages (hrabosh)
+ * minor #68289 [Form][Validator] Review Hebrew (he) translations (oriko9)
+ * minor #68269 [Form][Security][Validator] Review Basque (eu) translations (ikerib)
+ * minor #68222 [Form][Security][Validator] Review Portuguese (pt) translations (TiagoCruz1224)
+ * minor #68151 [Form][Validator] Review Uzbek (uz) translations (turgunovabb)
+ * minor #68186 [Form][HttpFoundation][Messenger] Improve static types (HypeMC)
+
+### FrameworkBundle
+
+ * security #cve-2026-133762 [FrameworkBundle] Use the CLI error renderer only in debug mode (nicolas-grekas)
+ * security #cve-2026-133747 [FrameworkBundle] Keep the options of scoped HTTP clients in their scope when caching is enabled (nicolas-grekas)
+ * security #cve-2026-133745 [FrameworkBundle][Routing] Don't let router redirects send paths that start with // to another host (nicolas-grekas)
+ * bug #68310 [FrameworkBundle] Fix `debug:config` when booting the kernel copy rebuilds the container (haraldpdl)
+ * bug #68243 [FrameworkBundle][TwigBridge] Fix the JSON and YAML output of `debug:config <name> <path>` and escape values in `debug:twig` (nicolas-grekas)
+ * bug #68162 [FrameworkBundle] Use the share directory for file sessions (nicolas-grekas)
+
+### GHA
+
+ * minor #68270 [GHA] Disable opcache in the CLI of the Windows all-extensions job (nicolas-grekas)
+
+### HtmlSanitizer
+
+ * security #cve-2026-133756 [HtmlSanitizer] Strip the whitespace that browsers skip before the time of a meta refresh (nicolas-grekas)
+
+### HttpClient
+
+ * security #cve-2026-133750 [HttpClient] Take the options set with withOptions() into account in CachingHttpClient (nicolas-grekas)
+ * security #cve-2026-134792 [HttpClient] Read HTTP_PROXY from the environment, not from $_SERVER, on the CLI (nicolas-grekas)
+ * security #cve-2026-133758 [HttpClient] Let the client decorated by NoPrivateNetworkHttpClient apply its own default options (nicolas-grekas)
+ * security #cve-2026-133757 [HttpClient] Don't let decorated clients add their default credentials to cross-origin redirects of NoPrivateNetworkHttpClient (nicolas-grekas)
+ * bug #68413 [HttpClient] Register HttpClientPass at default priority (nicolas-grekas)
+ * bug #68406 [HttpClient] Set redirect_url on mocked redirect responses (nicolas-grekas)
+ * bug #68356 [HttpClient] Fix CachingHttpClient letting cached chunks expire before their metadata (nicolas-grekas)
+ * bug #68354 [HttpClient] Treat incomplete cached responses as cache misses (andreybolonin)
+ * bug #68248 [HttpClient] Don't send the fragment of URLs to proxies with NativeHttpClient (nicolas-grekas)
+ * bug #68198 [HttpClient] Fix memory leak in AmpHttpClient when responses are canceled (nicolas-grekas)
+ * minor #68318 [HttpClient] Mark the pause-during-body test of AmpHttpClient as transient on Windows (clfer)
+ * minor #68316 [HttpClient] Skip CurlHttpClientTest::testTimeoutOnDestruct on Windows (clfer)
+ * minor #68245 [HttpClient] Fix a max_duration test that fails on slow machines (nicolas-grekas)
+ * minor #68202 [HttpClient] Pause the max-duration test well past its limit, so that a slow machine is not taken for a wait on the pause (phcorp)
+ * minor #68159 [HttpClient] Let the test suite run on another port so that several runs can work in parallel (nicolas-grekas)
+
+### HttpFoundation
+
+ * security #cve-2026-133748 [HttpFoundation] Match IPv4-mapped addresses against IPv4 subnets in IpUtils::checkIp() (nicolas-grekas)
+ * security #cve-2026-133743 [HttpFoundation][HttpKernel] Trust 127.0.0.1 only for the requests built by SubRequestHandler (nicolas-grekas)
+ * bug #68388 [HttpFoundation] Reset cache-control directives when replacing headers (malekkadri)
+ * bug #68373 [HttpFoundation] Fix AcceptHeaderItem parsing of empty input (malekkadri)
+ * bug #68371 [HttpFoundation] Fix Request::getRequestUri() for an absolute URL without a path (lazerg)
+ * bug #68290 [HttpFoundation] Anonymize bracketed scoped IPv6 addresses (ahbaqdadi)
+ * bug #68287 [HttpFoundation] Fix UriSigner dropping the "@" when the user is "0" (nicolas-grekas)
+ * bug #68285 [HttpFoundation] Preserve network-path URLs when signing URIs (ahbaqdadi)
+ * minor #68227 [HttpFoundation] Fix the dead OWASP cheat sheet link in JsonResponse (farisbasha)
+
+### HttpKernel
+
+ * bug #68262 [HttpKernel] Fix `#[MapQueryParameter]` throwing on an invalid Uid (anthonyhacart)
+ * bug #68165 [HttpKernel] Limit IPv6 clients by their /64 network in the default #[RateLimit] key (jack-worman)
+ * bug #68161 [HttpKernel] Accept JSON and XML media type variants in `#[MapRequestPayload]` (nicolas-grekas)
+ * minor #68321 [HttpKernel] Fix transient failure of InlineFragmentRendererTest (clfer)
+ * minor #68249 [HttpKernel] Fix transient failures in ResponseCacheStrategyTest (nicolas-grekas)
+ * minor #68244 [HttpKernel][SecurityBundle] Make time-dependent tests independent of second boundaries (nicolas-grekas)
+
+### JsonPath
+
+ * security #cve-2026-133744 [JsonPath] Bound the work and the length of queries (nicolas-grekas)
+ * bug #68268 [JsonPath] Fix comparisons and function arguments to follow RFC 9535 (nicolas-grekas)
+ * bug #68267 [JsonPath] Fix comparing absolute queries that select objects in filters (pawell67)
+ * bug #68266 [JsonPath] Don't consider null and absent values as equal to 0 (pawell67)
+
+### JsonSchema
+
+ * bug #68327 [JsonSchema] Align the keywords of Length, Regex, NotBlank and repeated constraints with the validator (nicolas-grekas)
+ * bug #68301 [JsonSchema] Emit length bounds only for code point counts (shuvroroy)
+ * bug #68328 [JsonSchema] Handle Valid and nested composites inside Sequentially and Compound constraints (prateekbhujel)
+ * bug #68297 [JsonSchema] Do not allow null for NotBlank and NotNull (Tong-bit-art)
+
+### JsonStreamer
+
+ * bug #68352 [JsonStreamer][PropertyAccess] Fix reading and writing virtual hooked properties (nicolas-grekas)
+ * bug #68343 [JsonStreamer] Write dicts of scalars as JSON objects (nicolas-grekas)
+ * bug #68336 [JsonStreamer] Do not use json_encode() for non-array iterables (prateekbhujel)
+ * bug #68335 [JsonStreamer] Fix encoding numeric string keys in dict collections (prateekbhujel)
+
+### KeyManagement
+
+ * bug #68337 [KeyManagement] Return string from EncryptedType::convertToDatabaseValue() (prateekbhujel)
+ * bug #68302 [KeyManagement] Reuse factories supplied by a generator (shuvroroy)
+ * minor #68246 [KeyManagement] Mention self-hosted production in the SodiumKms docblock (nikophil)
+ * minor #66273 [KeyManagement] Register encrypted DBAL types on the connection, not the static registry (GromNaN, nicolas-grekas)
+
+### Lock
+
+ * bug #68333 [Lock] Wrap store exceptions thrown by `exists()` in `Lock::release()` (dmitryuk)
+ * bug #68197 [Lock] Fix the Oracle clock of DoctrineDbalStore and PdoStore counting the time of day twice (nicolas-grekas)
+ * bug #68174 [Lock] Fix the MySQL clock of DoctrineDbalStore and PdoStore jumping an hour when DST ends (jack-worman)
+
+### Mailer
+
+ * security #cve-2026-133755 [Mailer] Refuse to start TLS when the server sends data before the handshake (nicolas-grekas)
+ * security #cve-2026-133751 [Mailer] Make `require_tls` resist a man in the middle (nicolas-grekas)
+ * minor #68203 [Mailer] Give gpg more time to start in the test of PgpMimeEncryptedMessageListener on Windows CI (phcorp)
+
+### Messenger
+
+ * bug #68411 [Messenger][Scheduler] Register MessengerPass at default priority (prateekbhujel)
+ * bug #68393 [Messenger] Preserve millisecond precision in DelayStamp::delayFor() and delayUntil() (malekkadri)
+ * bug #68313 [Messenger] Fix --concurrency pausing consumption while probing a message key (Inf1mum)
+ * bug #68224 [Messenger] Reset Redis receiver state when closing (dalerazimov)
+ * bug #68205 [Messenger] Keep plus signs in the vhost of AMQP DSNs (nicolas-grekas)
+ * bug #68200 [Messenger] Make `messenger:stop-workers` fail when the stop signal can't be saved (javiereguiluz)
+ * minor #68320 [Messenger] Skip transient AmpSql transport tests on Windows (clfer)
+
+### Mime
+
+ * bug #68403 [Mime] Preserve zero-valued names when building MIME messages (malekkadri)
+ * bug #68384 [Mime] Preserve zero-valued stream bodies in TextPart (malekkadri)
+ * bug #68206 [Mime] Throw a Mime exception when gpg times out (nicolas-grekas)
+ * minor #68325 [Mime] Fix AddressTest with egulias/email-validator 4.0.5 (phcorp)
+
+### Notifier
+
+ * bug #68345 [Notifier][SmsProxima] Fix the "default" host in DSN (SMS-Proxima)
+ * bug #68326 [Notifier][Bluesky] Fix overlapping facets and mentions detected inside email addresses (nicolas-grekas)
+ * bug #68324 [Notifier][Bluesky] Fix mentions and links at the start of the text not being detected (thejesh23)
+ * minor #68220 [Notifier] Update dead Engagespot and Plivo documentation links (farisbasha)
+
+### ObjectMapper
+
+ * bug #68341 [ObjectMapper] Fix mapping write-only virtual properties and nested targets that extend internal classes (nicolas-grekas)
+ * bug #68338 [ObjectMapper] Fix reading virtual hooked properties and properties of ArrayObject subclasses (prateekbhujel)
+
+### PhpUnitBridge
+
+ * minor #68211 [PhpUnitBridge] Limit how many suites run at once on the Windows CI (nicolas-grekas)
+
+### Process
+
+ * bug #68306 [Process] Never generate an all-digit env var name on Windows (linzch3)
+
+### PropertyAccess
+
+ * bug #68340 [PropertyAccess][PropertyInfo] Handle write-only virtual hooked properties (prateekbhujel)
+ * bug #68278 [PropertyAccess] Fix double periods in the messages of exceptions about non-writable properties (pawell67)
+ * bug #68264 [PropertyAccess] Throw NoSuchPropertyException when writing a property that is not publicly writable (pawell67)
+
+### PropertyInfo
+
+ * bug #68353 [PropertyInfo] Fix `PhpDocExtractor` reading `iterable<K, V>` and pseudo types as class names (nicolas-grekas)
+ * bug #68294 [PropertyInfo] Limit the caches that grow with the input (nicolas-grekas)
+ * bug #68261 [PropertyInfo] Fix getWriteInfo() returning the adder/remover for a singular property (cestercian)
+ * bug #68272 [PropertyInfo] Fix `getReadInfo()` for non-public properties of classes that define `__get()` (nicolas-grekas)
+ * bug #68271 [PropertyInfo] Fix `getWriteInfo()` for non-public properties of classes that define `__set()` (nicolas-grekas)
+ * minor #68207 [PropertyInfo] Use a PHPDoc type that TypeInfo can't resolve in the test of inherited types (nicolas-grekas)
+
+### PsrHttpMessageBridge
+
+ * bug #68364 [PsrHttpMessageBridge] Don't read the stream of an uploaded file that has an upload error (vasikmansuri)
+
+### Routing
+
+ * security #cve-2026-133754 [Routing] Reject host parameters that contain forbidden characters (nicolas-grekas)
+ * security #cve-2026-133746 [Routing] Don't let generated URLs point to another host (nicolas-grekas)
+ * bug #68396 [Routing] Compare alias names strictly when detecting circular references (malekkadri)
+ * bug #68383 [Routing] Preserve explicit ports for case-insensitive URI schemes (malekkadri)
+
+### Scheduler
+
+ * bug #68323 [Scheduler] Fix the "nth weekday" cron syntax being treated as a hashed expression (thejesh23)
+
+### Security
+
+ * security #cve-2026-134790 [Security] Parse the host of redirect targets like browsers do (nicolas-grekas)
+ * security #cve-2026-133753 [Security] Require every attribute to be granted with the unanimous strategy (nicolas-grekas)
+ * security #cve-2026-133749 [Security] Run the checkPostAuth() method of user checkers in GuardAuthenticatorHandler::authenticateUserAndHandleSuccess() (nicolas-grekas)
+ * bug #68359 [Security][Validator] Review Brazilian Portuguese (pt_BR) translations (andretorresdg)
+ * bug #68187 [Security] Fix login throttling of requests that have no client IP (nicolas-grekas)
+
+### SecurityBundle
+
+ * bug #68369 [SecurityBundle] Fix the Token tab of the profiler being disabled after a deauthentication (javiereguiluz)
+ * bug #68303 [SecurityBundle] Show shared roles under each parent in the debug tree (shuvroroy)
+
+### Serializer
+
+ * security #cve-2026-133761 [Serializer] Limit the nesting depth of CSV headers (jack-worman)
+ * security #cve-2026-133752 [Serializer] Compute the allowed attributes for the class being denormalized (nicolas-grekas)
+ * bug #68389 [Serializer] Handle invalid input types in DateTimeZoneNormalizer (malekkadri)
+ * bug #68391 [Serializer] Fix empty CSV line endings (malekkadri)
+ * bug #68351 [Serializer] Handle mixed/template array keys and DNF/template types in denormalization (prateekbhujel)
+ * bug #68346 [Serializer] Fix XmlEncoder::FORCE_COLLECTION and match repeated element names (prateekbhujel)
+ * bug #68349 [Serializer] Fix PropertyNormalizer with virtual hooked properties and inherited private(set) (prateekbhujel)
+ * bug #68348 [Serializer] Respect COLLECT_DENORMALIZATION_ERRORS => false in Serializer::denormalize() (prateekbhujel)
+ * bug #68293 [Serializer] Limit the caches that grow with each nesting path (nicolas-grekas)
+ * bug #68292 [Serializer] Don't ask PropertyInfo about each case variant of an attribute name (nicolas-grekas)
+ * minor #68180 [Serializer] Reset the attributes cache of object normalizers (soyuka)
+ * minor #68196 [Serializer] Resolve the type of each constructor parameter once (christian-kolb)
+ * minor #68195 [Serializer] Create the property accessors used for serialized paths once per normalizer (christian-kolb)
+
+### Stopwatch
+
+ * bug #68378 [Stopwatch] Fix incorrect start time for nested event periods (malekkadri)
+
+### String
+
+ * bug #68395 [String] Fix source encoding detection in toByteString() (malekkadri)
+ * bug #68375 [String] Fix negative offsets when searching for multiple needles (malekkadri)
+
+### Translation
+
+ * bug #68402 [Translation] Keep "0" message IDs and translations in gettext loaders (malekkadri)
+ * bug #68397 [Translation] Handle malformed INI translation resources (malekkadri)
+ * bug #68390 [Translation] Handle invalid JSON translation resource types (malekkadri)
+ * bug #68387 [Translation] Fix handling of zero catalogue metadata keys and domains (malekkadri)
+ * minor #68304 [Translation] Check XLIFF path selection through the updated files (shuvroroy)
+
+### Tui
+
+ * bug #68256 [Tui] Don't cut a select list label that fits (phcorp)
+ * bug #68254 [Tui] Show the minimum lines of an editor past its content (phcorp)
+ * bug #68255 [Tui] Name the argument of EditorWidget::expandVertically() like its interface (phcorp)
+ * bug #68247 [Tui] Turn the background off at the end of a wrapped line (phcorp)
+ * bug #68242 [Tui] Turn strikethrough and inverse off at the end of a wrapped line (phcorp)
+ * bug #68241 [Tui] Hide HTML comments in Markdown (phcorp)
+ * bug #68240 [Tui] Recognize unmodified F1, F2 and F4 sent as CSI P, Q and S (phcorp)
+ * bug #68239 [Tui] Restore the terminal when the process exits without stop() (phcorp)
+ * bug #68185 [Tui] Let a TUI dropped without being stopped be garbage collected (phcorp)
+
+### TwigBundle
+
+ * feature #67135 [TwigBundle] Register subclasses of AttributeExtension as runtimes (GromNaN)
+
+### TypeInfo
+
+ * bug #68199 [TypeInfo] Resolve conditional PHPDoc return types (drewmt)
+
+### Validator
+
+ * bug #68386 [Validator] Fix the error of Count when its max is zero (nicolas-grekas)
+ * bug #68377 [Validator] Fix incorrect validation error for zero maximum length (malekkadri)
+ * bug #68360 [Validator] Fix the Portuguese (pt) translation of the Currency constraint message (andretorresdg)
+ * bug #68350 [Validator] Skip write-only virtual properties in Cascade and PropertyInfoLoader (prateekbhujel)
+ * bug #68274 [Validator] Fix DateTime constraint throwing ValueError on values containing a null byte (pcbeingused333)
+ * minor #68226 [Validator] Fix the dead Have I Been Pwned API link (farisbasha)
+
+### Yaml
+
+ * bug #68280 [Yaml] Fix how `lint:yaml` reads the `$schema` header and follows `$ref` (nicolas-grekas)
+ * bug #68279 [Yaml] Decode percent-encoded schema header paths (Tong-bit-art)
+ * bug #68210 [Yaml] Escape the schema path in the text output of lint:yaml (nicolas-grekas)
+
+### Other
+
+ * minor #68250 Limit how many suites run at once on the Windows CI of 5.4 (nicolas-grekas)
+ * minor #68238 Download CI binaries from symfony-tools/binary-utils (nicolas-grekas)
+ * minor #68229 Remove the security-triage skill (nicolas-grekas)
+ * minor #68164 Declare bundle options that resolve at compile time (nicolas-grekas)
+
 ## 8.2.0-BETA2 (2026-11-13)
 
 ### AssetMapper

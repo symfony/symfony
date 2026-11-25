@@ -148,10 +148,13 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
      */
     private function apply(Constraint $constraint, array $schema, Dialect $dialect, ?Type $type): array
     {
+        if (self::hasNormalizer($constraint)) {
+            return $schema;
+        }
+
         [$values, $minCount, $maxCount] = \in_array('object', (array) ($schema['type'] ?? []), true) ? ['additionalProperties', 'minProperties', 'maxProperties'] : ['items', 'minItems', 'maxItems'];
 
         return match (true) {
-            ($constraint instanceof Length || $constraint instanceof Regex) && null !== $constraint->normalizer => $schema,
             $constraint instanceof NotBlank => match (true) {
                 (bool) $type?->isIdentifiedBy(TypeIdentifier::STRING) => [...$schema, 'minLength' => 1],
                 (bool) $type?->isIdentifiedBy(TypeIdentifier::ARRAY, TypeIdentifier::ITERABLE) => [...$schema, $minCount => 1],
@@ -187,6 +190,22 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
             },
             $constraint instanceof Time => [...$schema, 'pattern' => $constraint->withSeconds ? '^\\d{2}:\\d{2}:\\d{2}$' : '^\\d{2}:\\d{2}$'],
             default => $schema,
+        };
+    }
+
+    /**
+     * Tells whether the constraint validates a value transformed by its normalizer.
+     */
+    private static function hasNormalizer(Constraint $constraint): bool
+    {
+        return match (true) {
+            $constraint instanceof Length,
+            $constraint instanceof Regex,
+            $constraint instanceof Email,
+            $constraint instanceof Url,
+            $constraint instanceof Ip,
+            $constraint instanceof Uuid => null !== $constraint->normalizer,
+            default => false,
         };
     }
 

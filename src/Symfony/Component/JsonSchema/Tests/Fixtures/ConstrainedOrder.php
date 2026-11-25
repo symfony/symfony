@@ -52,6 +52,22 @@ class ConstrainedOrder
     #[Assert\Regex(pattern: '/^[A-Z]{2}$/', normalizer: 'trim')]
     public string $countryCode = '';
 
+    #[Assert\Email(normalizer: 'trim')]
+    public string $email = '';
+
+    #[Assert\Url(normalizer: 'trim')]
+    public string $website = '';
+
+    #[Assert\Ip(normalizer: 'trim')]
+    public string $ip = '';
+
+    #[Assert\Uuid(normalizer: 'trim')]
+    public string $uuid = '';
+
+    /** @var list<string> */
+    #[Assert\Unique(normalizer: 'trim')]
+    public array $tags = [];
+
     #[Assert\NotBlank]
     public bool $termsAccepted;
 

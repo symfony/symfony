@@ -80,6 +80,30 @@
                     "type": "string",
                     "default": ""
                 },
+                "email": {
+                    "type": "string",
+                    "default": ""
+                },
+                "website": {
+                    "type": "string",
+                    "default": ""
+                },
+                "ip": {
+                    "type": "string",
+                    "default": ""
+                },
+                "uuid": {
+                    "type": "string",
+                    "default": ""
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "uniqueItems": true
+                },
                 "termsAccepted": {
                     "type": "boolean",
                     "not": {

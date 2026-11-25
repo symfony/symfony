@@ -545,6 +545,35 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertEquals('bar', $stringCollection->children[1]);
     }
 
+    public function testDenormalizeDeepObjectToPopulateWithoutPropertyTypeExtractorPassesTheCurrentValue()
+    {
+        $normalizer = new ObjectToPopulateRecordingNormalizer();
+        $object = new Dummy();
+        $object->foo = $inner = new \stdClass();
+
+        $normalizer->denormalize(['foo' => ['bar' => 'baz']], Dummy::class, null, [
+            AbstractNormalizer::OBJECT_TO_POPULATE => $object,
+            AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
+        ]);
+
+        $this->assertSame($inner, $normalizer->objectsToPopulate['foo']);
+    }
+
+    public function testDenormalizeDeepObjectToPopulateWithPropertyTypeExtractorSkipsTheCurrentValueOfUntypedAttributes()
+    {
+        $normalizer = new ObjectToPopulateRecordingNormalizer(null, null, new ReflectionExtractor());
+        $object = new Dummy();
+        $object->foo = new \stdClass();
+
+        $normalizer->denormalize(['foo' => ['bar' => 'baz']], Dummy::class, null, [
+            AbstractNormalizer::OBJECT_TO_POPULATE => $object,
+            AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
+        ]);
+
+        $this->assertArrayHasKey('foo', $normalizer->objectsToPopulate);
+        $this->assertNull($normalizer->objectsToPopulate['foo']);
+    }
+
     public function testDenormalizeNotSerializableObjectToPopulate()
     {
         $normalizer = new AbstractObjectNormalizerDummy();
@@ -2469,6 +2498,21 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
     public function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, ?string $format = null): object
     {
         return parent::instantiateObject($data, $class, $context, $reflectionClass, $allowedAttributes, $format);
+    }
+}
+
+class ObjectToPopulateRecordingNormalizer extends AbstractObjectNormalizerDummy
+{
+    public $objectsToPopulate = [];
+
+    protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
+    {
+        return $object->$attribute;
+    }
+
+    protected function setAttributeValue(object $object, string $attribute, $value, ?string $format = null, array $context = []): void
+    {
+        $this->objectsToPopulate[$attribute] = $context[self::OBJECT_TO_POPULATE] ?? null;
     }
 }
 

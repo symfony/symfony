@@ -597,6 +597,8 @@ abstract class AbstractWidget
      * The returned lines represent the widget's visual content, one array
      * element per terminal row. The Renderer calls this method with a
      * context whose dimensions already exclude chrome (padding, border).
+     * A {@see SelfRenderingInterface} widget instead receives the entire allocated
+     * box and its resolved style, and applies its own layout and chrome.
      *
      * ## Contract
      *

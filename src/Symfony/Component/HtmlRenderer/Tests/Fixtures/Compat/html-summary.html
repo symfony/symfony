@@ -1,0 +1,16 @@
+<!-- covers: html.elements.summary -->
+<style>
+  .faq summary { color: #60a5fa }
+  .faq summary::marker { content: "+ " }
+  .faq details[open] > summary::marker { content: "− " }
+  .plain summary { list-style: none; text-decoration: underline }
+</style>
+<div class="faq">
+  <details><summary>A question with a + marker</summary><p>Its answer.</p></details>
+  <details open><summary>An open one, with a − marker</summary><p>Shown.</p></details>
+</div>
+<div class="plain"><details><summary>No marker at all</summary><p>Hidden.</p></details></div>
+<style>.toggle > summary::after { content: "Collapse"; overflow: hidden; width: 0; height: 0; position: absolute } .rightside { float: right }</style>
+<details class="toggle" open><summary><span class="rightside">1.0.0 · Source</span>pub fn new(), like rustdoc: its source at the end of the line, no hidden ::after</summary><p>Constructs a new value.</p></details>
+<details class="bare" open><summary>Not drawn</summary><p>An open disclosure whose summary is display: none: its content alone, like the descriptions of rustdoc without scripts.</p></details>
+<style>.bare > summary { display: none }</style>

@@ -49,8 +49,8 @@ starts; its `FrameWriterInterface` writes the frames to the terminal, and implem
 decides which widgets take the focus and in what order. Widgets keep working with any backend: a renderer keeps what it
 knows of each widget with `AbstractWidget::getExtensionState()`, matches custom states set with
 `AbstractWidget::setState()`, and listens to `RendererChangeEvent` when another renderer is selected.
-The TuiHtml component (`symfony/tui-html`) is such a backend, drawing HTML and CSS; applications using the native
-widgets need neither it nor anything it depends on.
+The TuiHtml bridge (`symfony/tui-html-bridge`) integrates the standalone HtmlRenderer component with Tui; applications
+using native widgets need neither package.
 
 The lifecycle of a renderer:
 

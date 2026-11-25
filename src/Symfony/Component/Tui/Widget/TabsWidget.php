@@ -384,17 +384,19 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
      */
     public function render(RenderContext $context): array
     {
-        $columns = $context->getColumns();
-        $rows = $context->getRows();
+        return $this->renderUsing($context);
+    }
 
-        if ($columns <= 0 || $rows <= 0 || !$this->tabs) {
-            return [];
-        }
-
-        return match ($this->position) {
-            TabPosition::Top, TabPosition::Bottom => $this->renderHorizontal($columns, $rows, $context),
-            TabPosition::Left, TabPosition::Right => $this->renderVertical($columns, $rows, $context),
-        };
+    /**
+     * Composes native tab chrome with content rendered by an embedding application.
+     *
+     * @param \Closure(AbstractWidget, RenderContext, int, int): array $renderContent The active content, allocated context and local row/column origin
+     *
+     * @internal
+     */
+    public function renderWithContent(RenderContext $context, \Closure $renderContent): array
+    {
+        return $this->renderUsing($context, $renderContent);
     }
 
     /**
@@ -428,10 +430,25 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
         $this->activeFocusableContent = null;
     }
 
+    private function renderUsing(RenderContext $context, ?\Closure $renderContent = null): array
+    {
+        $columns = $context->getColumns();
+        $rows = $context->getRows();
+
+        if ($columns <= 0 || $rows <= 0 || !$this->tabs) {
+            return [];
+        }
+
+        return match ($this->position) {
+            TabPosition::Top, TabPosition::Bottom => $this->renderHorizontal($columns, $rows, $context, $renderContent),
+            TabPosition::Left, TabPosition::Right => $this->renderVertical($columns, $rows, $context, $renderContent),
+        };
+    }
+
     /**
      * @return string[]
      */
-    private function renderHorizontal(int $columns, int $rows, RenderContext $context): array
+    private function renderHorizontal(int $columns, int $rows, RenderContext $context, ?\Closure $renderContent = null): array
     {
         $segments = [];
         foreach ($this->tabs as $i => $tab) {
@@ -481,7 +498,7 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
         }
 
         $contentRows = max(0, $rows - 3);
-        $contentLines = $contentRows > 0 ? $this->renderActiveContent($context->withRows($contentRows)) : [];
+        $contentLines = $contentRows > 0 ? $this->renderActiveContent($context->withRows($contentRows), $renderContent, TabPosition::Top === $this->position ? 3 : 0, 0) : [];
 
         $headerLines = [$top, $middle, $bottom];
         $contentLines = array_map(
@@ -499,7 +516,7 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
     /**
      * @return string[]
      */
-    private function renderVertical(int $columns, int $rows, RenderContext $context): array
+    private function renderVertical(int $columns, int $rows, RenderContext $context, ?\Closure $renderContent = null): array
     {
         $headerAtRight = TabPosition::Right === $this->position;
         $chars = self::VERTICAL_BORDER_CHARS[$this->position->value];
@@ -540,7 +557,7 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
 
         // Reserve 2 rows for first/last full-width separators
         $innerRows = max(0, $rows - 2);
-        $contentLines = $contentColumns > 0 && $innerRows > 0 ? $this->renderActiveContent($context->withSize($contentColumns, $innerRows)) : [];
+        $contentLines = $contentColumns > 0 && $innerRows > 0 ? $this->renderActiveContent($context->withSize($contentColumns, $innerRows), $renderContent, 1, $headerAtRight ? 0 : $headerWidth) : [];
 
         if ($headerAtRight) {
             $firstLine = $this->padLineWithLeftFill($firstHeaderLine, $columns, '─');
@@ -629,11 +646,11 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
     /**
      * @return string[]
      */
-    private function renderActiveContent(RenderContext $context): array
+    private function renderActiveContent(RenderContext $context, ?\Closure $renderContent = null, int $row = 0, int $column = 0): array
     {
         $content = $this->tabs[$this->activeIndex]->getContent();
 
-        return $this->getContext()?->renderWidget($content, $context) ?? [];
+        return null === $renderContent ? ($this->getContext()?->renderWidget($content, $context) ?? []) : $renderContent($content, $context, $row, $column);
     }
 
     /**

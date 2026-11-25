@@ -1,0 +1,42 @@
+{
+    "name": "symfony/html-renderer",
+    "type": "library",
+    "description": "A standalone HTML and CSS rendering engine",
+    "keywords": [
+        "html",
+        "css",
+        "rendering",
+        "layout"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "ext-dom": "*",
+        "psr/log": "^1|^2|^3",
+        "symfony/polyfill-ctype": "^1.8",
+        "symfony/polyfill-mbstring": "^1.31"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "^8.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\HtmlRenderer\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

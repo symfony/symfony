@@ -1,0 +1,26 @@
+<!-- covers: html.elements.form html.elements.fieldset html.elements.legend html.elements.label html.elements.input html.elements.textarea html.elements.select html.elements.progress html.elements.details html.global_attributes.aria-label html.global_attributes.aria-labelledby html.global_attributes.aria-describedby html.global_attributes.title html.global_attributes.tabindex html.global_attributes.accesskey html.global_attributes.role html.global_attributes.aria-live html.global_attributes.data-density css.selectors.condensed -->
+<!-- variant: focus-select focus=#lang -->
+<style>
+  form { padding: 0 1ch }
+  :condensed > legend { display: none }
+</style>
+<form>
+  <fieldset data-density="condensed">
+    <legend>Profile (hidden when condensed)</legend>
+    <label for="name">Name</label>
+    <input id="name" value="Ada" tabindex="2">
+    <label>Email <input id="email" type="email" value="ada@example.com" tabindex="1"></label>
+  </fieldset>
+  <span id="bio-label">Bio</span>
+  <textarea id="bio" aria-labelledby="bio-label" rows="2">Analytical engines</textarea>
+  <select id="lang" title="Language" size="3" accesskey="l">
+    <option value="php" title="Hypertext Preprocessor" selected>PHP</option>
+    <option value="rust">Rust</option>
+    <option value="go" disabled>Go</option>
+  </select>
+  <select aria-label="Tags" multiple><option selected>a</option><option>b</option></select>
+  <progress value="3" max="4"></progress>
+  <details open aria-describedby="details-help"><summary>More</summary><p>Details content</p></details>
+  <p id="details-help">Help for the details</p>
+  <p role="status" aria-live="polite">Saved</p>
+</form>

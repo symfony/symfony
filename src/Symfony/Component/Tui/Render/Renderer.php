@@ -22,6 +22,7 @@ use Symfony\Component\Tui\Terminal\TerminalInterface;
 use Symfony\Component\Tui\Widget\AbstractWidget;
 use Symfony\Component\Tui\Widget\ContainerWidget;
 use Symfony\Component\Tui\Widget\Figlet\FontRegistry;
+use Symfony\Component\Tui\Widget\SelfRenderingInterface;
 
 /**
  * Renders the widget tree with style resolution, layout, and chrome.
@@ -32,8 +33,9 @@ use Symfony\Component\Tui\Widget\Figlet\FontRegistry;
  * 3. Calls widget->render() with enriched context
  * 4. Applies chrome (padding, border, background) around widget content
  *
- * All widget types are rendered through the Renderer: containers via
- * renderContainer(), and leaf widgets by delegating to widget->render().
+ * Containers normally use renderContainer(), and leaf widgets delegate to
+ * widget->render(). SelfRenderingInterface widgets own their complete box,
+ * so their render() method also handles layout and chrome.
  *
  * @experimental
  *
@@ -170,7 +172,9 @@ final class Renderer implements WidgetRendererInterface, RendererInterface
 
         $styledContext = $context->withStyle($resolvedStyle);
 
-        if ($widget instanceof ContainerWidget) {
+        if ($widget instanceof SelfRenderingInterface) {
+            $lines = new ArrayLineBuffer($widget->render($styledContext));
+        } elseif ($widget instanceof ContainerWidget) {
             $lines = $this->renderContainer($widget, $styledContext, $resolvedStyle);
         } else {
             $innerContext = $this->chromeApplier->computeInnerContext($styledContext, $resolvedStyle);
@@ -206,6 +210,22 @@ final class Renderer implements WidgetRendererInterface, RendererInterface
 
     public function measureIntrinsicWidth(AbstractWidget $widget, int $maxColumns, int $rows): int
     {
+        if ($widget instanceof SelfRenderingInterface) {
+            $savedStack = $this->positionTracker->suppressStack();
+            try {
+                $lines = $this->renderWidgetLines($widget, new RenderContext($maxColumns, $rows, null, $this->fontRegistry));
+                $width = 0;
+                foreach ($lines as $line) {
+                    $width = max($width, AnsiUtils::visibleWidth($line));
+                }
+
+                return min(max(1, $width), $maxColumns);
+            } finally {
+                $widget->clearRenderCache();
+                $this->positionTracker->restoreStack($savedStack);
+            }
+        }
+
         $resolvedStyle = $this->resolveStyle($widget);
 
         // Apply maxColumns from the widget's own style

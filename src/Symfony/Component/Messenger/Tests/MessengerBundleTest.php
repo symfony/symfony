@@ -482,6 +482,14 @@ class MessengerBundleTest extends TestCase
         $this->assertSame(1, $transport->closeCount);
     }
 
+    public function testHandlersLocatorIsAvailableInDefaultPriorityCompilerPass()
+    {
+        $kernel = new TestHandlersLocatorCompilerPassKernel('test', true, $this->varDir);
+        $kernel->boot();
+
+        $this->assertContains(DummyCommand::class, $kernel->handledMessages);
+    }
+
     private static function hideTheUidComponent(): void
     {
         ClassExistsMock::register(ContainerBuilder::class);
@@ -1143,5 +1151,63 @@ class CloseableTransport implements TransportInterface, CloseableTransportInterf
     {
         $this->connected = false;
         ++$this->closeCount;
+    }
+}
+
+class TestHandlersLocatorCompilerPassKernel extends AbstractKernel
+{
+    use KernelTrait;
+
+    /** @var list<string> */
+    public array $handledMessages = [];
+
+    public function __construct(string $env, bool $debug, private string $dir)
+    {
+        parent::__construct($env, $debug);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new MessengerBundle();
+    }
+
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new class($this) implements CompilerPassInterface {
+            public function __construct(private TestHandlersLocatorCompilerPassKernel $kernel)
+            {
+            }
+
+            public function process(ContainerBuilder $container): void
+            {
+                $this->kernel->handledMessages = array_keys($container->getDefinition('command.bus.messenger.handlers_locator')->getArgument(0));
+            }
+        });
+    }
+
+    private function configureContainer(ContainerConfigurator $container): void
+    {
+        $container->extension('messenger', [
+            'default_bus' => 'command.bus',
+            'buses' => [
+                'command.bus' => [],
+            ],
+        ]);
+        $container->services()
+            ->set(HandlersLocatorTestHandler::class)->autoconfigure()
+        ;
+    }
+}
+
+class HandlersLocatorTestHandler
+{
+    #[AsMessageHandler(bus: 'command.bus')]
+    public function __invoke(DummyCommand $command): void
+    {
     }
 }

@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleBundle;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
@@ -41,7 +42,8 @@ class SchedulerBundle extends AbstractBundle
 
     public function build(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new AddScheduleMessengerPass());
+        // before MessengerPass, which collects the "messenger.receiver" and "messenger.message_handler" tags
+        $container->addCompilerPass(new AddScheduleMessengerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 8);
     }
 
     public function configure(DefinitionConfigurator $definition): void

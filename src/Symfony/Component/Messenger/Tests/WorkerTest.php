@@ -98,7 +98,6 @@ use Symfony\Component\Messenger\Worker;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Reservation;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
-use Symfony\Contracts\Service\ResetInterface;
 
 #[Group('time-sensitive')]
 class WorkerTest extends TestCase
@@ -522,44 +521,6 @@ class WorkerTest extends TestCase
         $worker->run(['fetch_size' => 2]);
 
         $this->assertSame(4, $receiver->getAcknowledgeCount());
-    }
-
-    public function testWorkerStopsStartingMessagesWhileTheServicesResetWaitsForTheMessagesInFlight()
-    {
-        $batches = [];
-        for ($i = 1; $i <= 10; ++$i) {
-            $batches[] = [new Envelope(new DummyMessage('message '.$i))];
-        }
-        $batches[] = [];
-        $receiver = new DummyReceiver($batches);
-
-        $strategy = new ConcurrentExecutionStrategy(3);
-
-        // a steady load: with 3 messages at once and one finishing as the next one starts, none of the moments is quiet
-        $resets = [];
-        $resetter = new class($resets, $strategy) implements ResetInterface {
-            public function __construct(private array &$resets, private ConcurrentExecutionStrategy $strategy)
-            {
-            }
-
-            public function reset(): void
-            {
-                $this->resets[] = [\count($this->strategy->executed), $this->strategy->getInFlightMessageCount()];
-            }
-        };
-
-        $listener = new ResetServicesListener($resetter);
-        $listener->setInterval(4);
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber($listener);
-        $dispatcher->addSubscriber(new StopWorkerOnIdleListener());
-
-        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, new MockClock(), $strategy);
-        $worker->run();
-
-        $this->assertSame(10, $receiver->getAcknowledgeCount());
-        // reset in a quiet moment, at the interval, and not only when the worker stops
-        $this->assertSame([[4, 0], [8, 0], [10, 0]], \array_slice($resets, 0, 3));
     }
 
     public function testWorkerReportsTheMessagesInFlightAndWhenTheyCompleteToItsListeners()
@@ -4036,38 +3997,6 @@ class InFlightCountingExecutionStrategy extends PausingExecutionStrategy impleme
     public function getInFlightMessageCount(): int
     {
         return \count($this->inFlight);
-    }
-}
-
-class ConcurrentExecutionStrategy extends InFlightCountingExecutionStrategy
-{
-    public function __construct(private readonly int $concurrency)
-    {
-    }
-
-    public function flush(callable $onHandled, bool|float $force = false): bool
-    {
-        // the messages in flight are finished by wait(), the worker has to stop for them
-        return true === $force && parent::flush($onHandled, true);
-    }
-
-    public function shouldPauseConsumption(): bool
-    {
-        return \count($this->inFlight) >= $this->concurrency;
-    }
-
-    public function wait(callable $onHandled, ?float $timeout = null): bool
-    {
-        if (!$this->inFlight) {
-            return false;
-        }
-
-        // one message finishes at a time
-        [$envelope, $transportName] = array_shift($this->inFlight);
-        $acked = false;
-        $onHandled($envelope, $transportName, $acked, null);
-
-        return true;
     }
 }
 

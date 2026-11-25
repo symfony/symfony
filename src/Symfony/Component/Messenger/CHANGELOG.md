@@ -25,7 +25,7 @@ CHANGELOG
  * Add a `$clock` argument to `FailedMessagesRetryCommand`, `FailedMessagesShowCommand` and `FailedMessagesRemoveCommand`
  * Make `RedispatchMessage` dispatch to the senders configured for the message when `$transportNames` is empty, instead of to no sender at all
  * Add `MessageExecutionStrategyFactoryInterface` and the `messenger.execution_strategy_factory` option to make the `messenger:consume` command run its messages with a custom `MessageExecutionStrategyInterface`
- * Add `InFlightMessageCountAwareInterface` and `Worker::getInFlightMessageCount()`, make `ResetServicesListener` pause the consumption (`Worker::pauseConsumption()` and `resumeConsumption()`) until no message is in flight to reset the services, and add `WorkerMessagesCompletedEvent`, dispatched when such a strategy completes messages started earlier
+ * Add `InFlightMessageCountAwareInterface` and `Worker::getInFlightMessageCount()`, make `ResetServicesListener` wait until no message is in flight to reset the services, and add `WorkerMessagesCompletedEvent`, dispatched when such a strategy completes messages started earlier
  * Add `AckAwareDispatcher` to let the execution strategies dispatch a message and handle the acks of its batch handlers like the sync strategy does, including when messages are dispatched concurrently in different fibers
  * Add a `--concurrency` option to the `messenger:consume` command to process messages in parallel
  * Add a `--redispatch` option to the `messenger:failed:retry` command to send messages back to their transport instead of handling them in the command

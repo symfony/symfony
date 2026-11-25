@@ -47,7 +47,7 @@ class ImpersonateUrlGeneratorTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push(new Request([], [], [], [], [], ['HTTP_HOST' => 'localhost', 'REQUEST_URI' => $requestUri]));
 
-        $firewallMap = $this->createMock(FirewallMap::class);
+        $firewallMap = $this->createStub(FirewallMap::class);
         $firewallMap->method('getFirewallConfig')->willReturn(new FirewallConfig('main', 'security.user_checker', null, true, false, null, null, null, null, null, [], ['parameter' => '_switch_user']));
 
         $originalToken = new UsernamePasswordToken(new InMemoryUser('admin', ''), 'main');

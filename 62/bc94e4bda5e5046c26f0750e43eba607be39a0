@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-25T12:34:53Z
+
+Thanks for the PR. The reproducer fails in the same way with the 6.4.50 and 8.1.11 code, because PropertyInfo never described the private properties of a parent class. So this is not a regression, and I moved the PR to 7.4 since 6.4 is close to its end of life. I also kept the `@return mixed` docblocks: removing them makes the merge-up conflict.

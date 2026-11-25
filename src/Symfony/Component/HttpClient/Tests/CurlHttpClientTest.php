@@ -225,6 +225,10 @@ class CurlHttpClientTest extends HttpClientTestCase
 
     public function testProxyFromProcessEnvIsNotUsed()
     {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('http_proxy and HTTP_PROXY are the same environment variable on Windows.');
+        }
+
         $client = $this->getHttpClient(__FUNCTION__);
 
         // Only curl reads the process environment, and it must not do so behind our back

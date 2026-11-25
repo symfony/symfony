@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-25T07:55:20Z
+
+PR updated: years with more than four digits are now accepted, as the HTML week format allows, and years below 1 are rejected, since `-005-W01` could not be read back.

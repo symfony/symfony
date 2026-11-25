@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveDecoratorStackPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Reference;
 
 class ResolveDecoratorStackPassTest extends TestCase
@@ -280,6 +281,30 @@ class ResolveDecoratorStackPassTest extends TestCase
 
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('cannot have both "decorates" and "decorates_tag"');
+        (new ResolveDecoratorStackPass())->process($container);
+    }
+
+    public function testProcessWithNumericLookingIds()
+    {
+        $container = new ContainerBuilder();
+        $container->setDefinition('01', (new ChildDefinition(''))->addTag('container.stack')->setArguments([new Reference('001')]));
+        $container->setDefinition('001', (new ChildDefinition(''))->addTag('container.stack')->setArguments([new Definition(\stdClass::class)]));
+
+        (new ResolveDecoratorStackPass())->process($container);
+
+        $this->assertTrue($container->hasAlias('01'));
+        $this->assertTrue($container->hasAlias('001'));
+    }
+
+    public function testProcessDetectsCircularStackWithIntegerLikeId()
+    {
+        $container = new ContainerBuilder();
+        $container->setDefinition('1', (new ChildDefinition(''))->addTag('container.stack')->setArguments([new Reference('01')]));
+        $container->setDefinition('01', (new ChildDefinition(''))->addTag('container.stack')->setArguments([new Reference('1')]));
+
+        $this->expectException(ServiceCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for service "1", path: "1 -> 01 -> 1".');
+
         (new ResolveDecoratorStackPass())->process($container);
     }
 

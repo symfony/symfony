@@ -80,6 +80,8 @@ class ResponseHeaderBag extends HeaderBag
     public function replace(array $headers = []): void
     {
         $this->headerNames = [];
+        $this->cookies = [];
+        $this->computedCacheControl = [];
 
         parent::replace($headers);
 

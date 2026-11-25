@@ -332,6 +332,13 @@ class ParameterBagTest extends TestCase
         $this->assertSame(99, $result['second']);
     }
 
+    public function testFilterWithZeroFlags()
+    {
+        $bag = new ParameterBag(['foo' => '42']);
+
+        $this->assertSame(42, $bag->filter('foo', null, \FILTER_VALIDATE_INT, 0));
+    }
+
     public function testFilterCallback()
     {
         $this->expectException(\InvalidArgumentException::class);

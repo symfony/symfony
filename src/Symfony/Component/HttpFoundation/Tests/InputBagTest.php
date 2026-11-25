@@ -92,6 +92,23 @@ class InputBagTest extends TestCase
         $this->assertNull($bag->get('foo[bar]'));
     }
 
+    public function testFilterWithZeroFlags()
+    {
+        $bag = new InputBag(['foo' => '42']);
+
+        $this->assertSame(42, $bag->filter('foo', null, \FILTER_VALIDATE_INT, 0));
+    }
+
+    public function testFilterWithZeroFlagsAndInvalidValue()
+    {
+        $bag = new InputBag(['foo' => 'invalid']);
+
+        $this->expectException(BadRequestException::class);
+        $this->expectExceptionMessage('Input value "foo" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.');
+
+        $bag->filter('foo', null, \FILTER_VALIDATE_INT, 0);
+    }
+
     public function testFilterArray()
     {
         $bag = new InputBag([

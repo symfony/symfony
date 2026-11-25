@@ -222,7 +222,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
         $value = $this->get($key, $default);
 
         // Always turn $options into an array - this allows filter_var option shortcuts.
-        if (!\is_array($options) && $options) {
+        if (!\is_array($options)) {
             $options = ['flags' => $options];
         }
 

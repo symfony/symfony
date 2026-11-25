@@ -167,7 +167,7 @@ class SecurityDataCollectorTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('hhamon', 'P4$$w0rD', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN']), 'provider', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $adminToken));
 
-        $firewallMap = $this->createMock(FirewallMap::class);
+        $firewallMap = $this->createStub(FirewallMap::class);
         $firewallMap->method('getFirewallConfig')->willReturn(new FirewallConfig('dummy', 'security.user_checker.dummy', null, true, false, null, null, null, null, null, [], ['parameter' => '_switch_user']));
 
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, $firewallMap, null, true);

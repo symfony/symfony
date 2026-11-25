@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-25T07:45:43Z
+
+PR updated: I used priority 8 for `AddScheduleMessengerPass` instead of 1, to leave room on both sides.

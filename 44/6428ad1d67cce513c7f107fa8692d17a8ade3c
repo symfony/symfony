@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-25T12:16:15Z
+
+PR updated: I applied the same fix to `ParameterBag::filter()`, which had the same check.

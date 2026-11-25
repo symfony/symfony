@@ -446,8 +446,10 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
             }
 
             if ($chunk->isLast()) {
-                if ($context->getInfo('canceled')) {
-                    // the body was not fully received: drop what was stored for this attempt
+                // The last chunk comes before the full body when the response is canceled or destructed, or when the decorated client cancels it, unless there is no body
+                $canceled = $context->getInfo('canceled') || $context->getResponse()->getInfo('canceled');
+
+                if ($canceled && 'HEAD' !== $method && 204 !== $context->getStatusCode() && '0' !== ($headers['content-length'][0] ?? null)) {
                     $this->cache->invalidateTags([$attemptTag]);
 
                     yield $chunk;

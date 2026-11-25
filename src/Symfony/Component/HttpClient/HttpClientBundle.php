@@ -17,7 +17,6 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -51,8 +50,7 @@ class HttpClientBundle extends AbstractBundle
 
     public function build(ContainerBuilder $container): void
     {
-        // the container can drop the data collector this pass looks for, so run after it
-        $container->addCompilerPass(new HttpClientPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -16);
+        $container->addCompilerPass(new HttpClientPass());
     }
 
     public function configure(DefinitionConfigurator $definition): void

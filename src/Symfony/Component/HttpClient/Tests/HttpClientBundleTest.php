@@ -20,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Target;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass;
@@ -93,6 +94,14 @@ class HttpClientBundleTest extends TestCase
 
         $this->assertSame(1, $collector->getRequestCount());
         $this->assertSame(['http_client', 'scoped_client', 'cached_client'], array_keys($collector->getClients()));
+    }
+
+    public function testTracedClientsAreAvailableInDefaultPriorityCompilerPass()
+    {
+        $kernel = new TestTracedClientsCompilerPassKernel('test', true, $this->varDir);
+        $kernel->boot();
+
+        $this->assertSame(['http_client'], $kernel->tracedClients);
     }
 
     #[RequiresPhpExtension('curl')]
@@ -351,6 +360,50 @@ class TestHttpClientKernel extends AbstractKernel
             $services->set('profiler', \stdClass::class);
             $services->alias('test.data_collector', 'data_collector.http_client')->public();
         }
+    }
+}
+
+class TestTracedClientsCompilerPassKernel extends AbstractKernel
+{
+    use KernelTrait;
+
+    /** @var list<string> */
+    public array $tracedClients = [];
+
+    public function __construct(string $env, bool $debug, private string $dir)
+    {
+        parent::__construct($env, $debug);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new HttpClientBundle();
+    }
+
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new class($this) implements CompilerPassInterface {
+            public function __construct(private TestTracedClientsCompilerPassKernel $kernel)
+            {
+            }
+
+            public function process(ContainerBuilder $container): void
+            {
+                foreach ($container->getDefinition('data_collector.http_client')->getMethodCalls() as [, [$name]]) {
+                    $this->kernel->tracedClients[] = $name;
+                }
+            }
+        });
+    }
+
+    private function configureContainer(ContainerConfigurator $container): void
+    {
+        $container->services()->set('profiler', \stdClass::class);
     }
 }
 

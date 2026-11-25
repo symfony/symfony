@@ -131,6 +131,19 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->process($container);
     }
 
+    public function testProcessThrowsOnNonSharedLoopsWithNumericLookingIds()
+    {
+        $container = new ContainerBuilder();
+        $container->register('entry')->setPublic(true)->addArgument(new Reference('01'));
+        $container->register('01')->setShared(false)->addArgument(new Reference('1'));
+        $container->register('1')->setShared(false)->addArgument(new Reference('1'));
+
+        $this->expectException(ServiceCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for service "1", path: "1 -> 1".');
+
+        $this->process($container);
+    }
+
     public function testProcessNestedNonSharedServices()
     {
         $container = new ContainerBuilder();

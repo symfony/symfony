@@ -438,4 +438,16 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $def = $container->getDefinition('child');
         $this->assertTrue($def->isSynthetic());
     }
+
+    public function testProcessWithNumericLookingParentIds()
+    {
+        $container = new ContainerBuilder();
+        $container->setDefinition('child', new ChildDefinition('01'));
+        $container->setDefinition('01', new ChildDefinition('001'));
+        $container->register('001', \stdClass::class);
+
+        $this->process($container);
+
+        $this->assertSame(\stdClass::class, $container->getDefinition('child')->getClass());
+    }
 }

@@ -152,10 +152,10 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
         }
 
         if (isset($this->cloningIds[$id])) {
-            $ids = array_keys($this->cloningIds);
+            $ids = array_map('strval', array_keys($this->cloningIds));
             $ids[] = $id;
 
-            throw new ServiceCircularReferenceException($id, \array_slice($ids, array_search($id, $ids)));
+            throw new ServiceCircularReferenceException($id, \array_slice($ids, array_search($id, $ids, true)));
         }
 
         $this->cloningIds[$id] = true;

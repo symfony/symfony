@@ -54,7 +54,7 @@ class ResolveDecoratorStackPass implements CompilerPassInterface
                 continue;
             }
 
-            foreach (array_reverse($this->resolveStack($stacks, [$id]), true) as $k => $v) {
+            foreach (array_reverse($this->resolveStack($stacks, [(string) $id]), true) as $k => $v) {
                 $resolvedDefinitions[$k] = $v;
             }
 
@@ -82,7 +82,7 @@ class ResolveDecoratorStackPass implements CompilerPassInterface
             return [$id => new ChildDefinition($id)];
         }
 
-        if (key($path) !== $searchKey = array_search($id, $path)) {
+        if (key($path) !== $searchKey = array_search($id, $path, true)) {
             throw new ServiceCircularReferenceException($id, \array_slice($path, $searchKey));
         }
 

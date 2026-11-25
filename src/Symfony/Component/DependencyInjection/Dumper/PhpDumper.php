@@ -463,7 +463,7 @@ class PhpDumper extends Dumper
                         $pathInLoop[1][$k] = $pathByConstructor;
                         $loops[$k][] = &$pathInLoop;
                         $loopByConstructor = $loopByConstructor && $pathByConstructor;
-                    } elseif ($k === $id) {
+                    } elseif ((string) $k === $id) {
                         $loop = [];
                     }
                 }
@@ -482,7 +482,7 @@ class PhpDumper extends Dumper
                     foreach ($loopPath as $k => $pathByConstructor) {
                         if (null !== $fillPath) {
                             $fillPath[$k] = $pathByConstructor;
-                        } elseif ($k === $id) {
+                        } elseif ((string) $k === $id) {
                             $fillPath = $path;
                             $fillPath[$k] = $pathByConstructor;
                         }
@@ -495,7 +495,7 @@ class PhpDumper extends Dumper
                         if (null !== $loop) {
                             $loop[] = $k;
                             $loopByConstructor = $loopByConstructor && $pathByConstructor;
-                        } elseif ($k === $first) {
+                        } elseif ((string) $k === $first) {
                             $loop = [];
                         }
                     }

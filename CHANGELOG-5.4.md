@@ -7,6 +7,117 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+## 5.4.57 (2026-11-25)
+
+### BrowserKit
+
+ * bug #68061 [BrowserKit][HttpClient] Don't send credentials to other origins on redirects (nicolas-grekas)
+
+### Cache
+
+ * bug #68123 [Cache] Check cache keys even when assertions are disabled (nicolas-grekas)
+
+### DoctrineBridge
+
+ * security #cve-2026-133759 [DoctrineBridge] Refuse the copies of previous remember-me tokens as series, and delete them with their token (nicolas-grekas)
+
+### ExpressionLanguage
+
+ * security #cve-2026-133760 [ExpressionLanguage] Check the nesting level of short ternaries in linear time (nicolas-grekas)
+
+### FrameworkBundle
+
+ * security #cve-2026-133745 [FrameworkBundle][Routing] Don't let router redirects send paths that start with // to another host (nicolas-grekas)
+ * bug #68065 [FrameworkBundle][HttpClient] Match scopes against the URL without its userinfo (nicolas-grekas)
+
+### HttpClient
+
+ * security #cve-2026-134792 [HttpClient] Read HTTP_PROXY from the environment, not from $_SERVER, on the CLI (nicolas-grekas)
+ * security #cve-2026-133758 [HttpClient] Let the client decorated by NoPrivateNetworkHttpClient apply its own default options (nicolas-grekas)
+ * security #cve-2026-133757 [HttpClient] Don't let decorated clients add their default credentials to cross-origin redirects of NoPrivateNetworkHttpClient (nicolas-grekas)
+ * bug #68248 [HttpClient] Don't send the fragment of URLs to proxies with NativeHttpClient (nicolas-grekas)
+ * bug #67859 [HttpClient] Reject `CURLOPT_COOKIE` and `CURLOPT_UNRESTRICTED_AUTH` in `extra.curl` (nicolas-grekas)
+ * bug #67842 [HttpClient][Validator] Add the deprecated IPv6 site-local range to the private subnets (nicolas-grekas)
+ * bug #67849 [HttpClient] Fix a typo in NoPrivateNetworkHttpClient (Jontsa)
+ * bug #67858 [HttpClient] Use the first `Location` header in CurlHttpClient, like curl does (nicolas-grekas)
+ * minor #68102 [HttpClient] Document that the proxy must block private destinations behind NoPrivateNetworkHttpClient (nicolas-grekas)
+ * minor #68119 [HttpClient] Fix testing redirects with user info on libcurl < 8.23 (nicolas-grekas)
+
+### HttpFoundation
+
+ * security #cve-2026-133748 [HttpFoundation] Match IPv4-mapped addresses against IPv4 subnets in IpUtils::checkIp() (nicolas-grekas)
+ * security #cve-2026-133743 [HttpFoundation][HttpKernel] Trust 127.0.0.1 only for the requests built by SubRequestHandler (nicolas-grekas)
+ * bug #67874 [HttpFoundation] Cap the size of the cache of IpUtils (nicolas-grekas)
+
+### HttpKernel
+
+ * minor #68321 [HttpKernel] Fix transient failure of InlineFragmentRendererTest (clfer)
+ * minor #68249 [HttpKernel] Fix transient failures in ResponseCacheStrategyTest (nicolas-grekas)
+ * minor #68244 [HttpKernel][SecurityBundle] Make time-dependent tests independent of second boundaries (nicolas-grekas)
+
+### Mime
+
+ * minor #68325 [Mime] Fix AddressTest with egulias/email-validator 4.0.5 (phcorp)
+
+### PropertyAccess
+
+ * bug #67902 [PropertyAccess] Limit the caches that grow with the input (nicolas-grekas)
+
+### PropertyInfo
+
+ * bug #68294 [PropertyInfo] Limit the caches that grow with the input (nicolas-grekas)
+
+### Routing
+
+ * security #cve-2026-133754 [Routing] Reject host parameters that contain forbidden characters (nicolas-grekas)
+ * security #cve-2026-133746 [Routing] Don't let generated URLs point to another host (nicolas-grekas)
+ * bug #68003 [Routing] Use the host value of variables that are both in the host and the path in compiled matchers (nicolas-grekas)
+ * bug #68014 [Routing] Fix the order of routes with host variables in compiled matchers (nicolas-grekas)
+ * bug #68002 [Routing] Make named groups in requirements non-capturing, like unnamed ones (nicolas-grekas)
+ * bug #67929 [Routing] Prevent `{_route}` host placeholders from matching the path in compiled matchers (nicolas-grekas)
+
+### Security
+
+ * security #cve-2026-134790 [Security] Parse the host of redirect targets like browsers do (nicolas-grekas)
+ * security #cve-2026-133753 [Security] Require every attribute to be granted with the unanimous strategy (nicolas-grekas)
+ * security #cve-2026-133749 [Security] Run the checkPostAuth() method of user checkers in GuardAuthenticatorHandler::authenticateUserAndHandleSuccess() (nicolas-grekas)
+ * bug #68010 [Security] Limit login attempts of IPv6 clients by their /64 network (nicolas-grekas)
+ * bug #68007 [Security] Keep the IP limit of login throttling on successful logins (nicolas-grekas)
+ * bug #67991 [Security] Remove accents and invisible characters from login throttling keys (nicolas-grekas)
+ * bug #67875 [Security] Reject X509 DNs whose identifier attribute appears more than once (nicolas-grekas)
+
+### Serializer
+
+ * security #cve-2026-133761 [Serializer] Limit the nesting depth of CSV headers (jack-worman)
+ * security #cve-2026-133752 [Serializer] Compute the allowed attributes for the class being denormalized (nicolas-grekas)
+ * bug #68293 [Serializer] Limit the caches that grow with each nesting path (nicolas-grekas)
+ * bug #68292 [Serializer] Don't ask PropertyInfo about each case variant of an attribute name (nicolas-grekas)
+ * bug #67883 [Serializer] Don't read untyped attributes with deep_object_to_populate (nicolas-grekas)
+ * bug #67878 [Serializer] Don't call methods named after the attributes being denormalized (nicolas-grekas)
+ * bug #67887 [Serializer][Templating] Limit more caches that grow with the input (nicolas-grekas)
+ * bug #67884 [Serializer][Templating] Limit the caches that grow with each input value (nicolas-grekas)
+ * bug #67882 [Serializer] Apply ignored attributes to setter and adder aliases (nicolas-grekas)
+ * bug #67877 [Serializer] Ignore undeclared property paths with brackets (nicolas-grekas)
+
+### VarDumper
+
+ * bug #68060 [VarDumper] Don't turn object property names into dump attributes and link only to http(s) URLs (nicolas-grekas)
+ * bug #68058 [VarDumper] Escape the content type of images in HtmlDumper (nicolas-grekas)
+
+### WebProfilerBundle
+
+ * bug #68059 [WebProfilerBundle] Ignore debug headers of cross-origin responses and only link to http(s) URLs (nicolas-grekas)
+
+### Yaml
+
+ * bug #67881 [Yaml] Don't copy long nested blocks at each nesting level (nicolas-grekas)
+ * bug #67880 [Yaml] Bound the number of nodes that collection aliases expand to (nicolas-grekas)
+
+### Other
+
+ * minor #68250 Limit how many suites run at once on the Windows CI of 5.4 (nicolas-grekas)
+ * minor #68238 Download CI binaries from symfony-tools/binary-utils (nicolas-grekas)
+
 ## 5.4.56 (2026-11-04)
 
 ### Config

@@ -14,7 +14,17 @@ where:
  - `USERLOGIN` is your Octopush email
  - `APIKEY` is your Octopush token
  - `FROM` is your sender
- - `TYPE` is Octopush sms type (`XXX` = SMS LowCost; `FR` = SMS Premium; `WWW` = SMS World)
+ - `TYPE` is Octopush sms type:
+   - with the legacy API: `XXX` = SMS LowCost; `FR` = SMS Premium; `WWW` = SMS World
+   - with the API v1: `sms_low_cost` or `sms_premium`
+
+The API v1 is used as soon as one of its types is given, and also accepts a `purpose`:
+
+```
+OCTOPUSH_DSN=octopush://USERLOGIN:APIKEY@default?from=FROM&type=sms_premium&purpose=alert
+```
+
+where `PURPOSE` is `alert` (transactional SMS, the default) or `wholesale` (marketing SMS).
 
 Sponsor
 -------

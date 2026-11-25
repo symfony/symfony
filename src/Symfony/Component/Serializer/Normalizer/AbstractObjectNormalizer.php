@@ -440,8 +440,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             $types = $this->getTypes($resolvedClass, $attribute);
 
-            // the current value is used only to denormalize typed attributes
-            if (null !== $types && ($attributeContext[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false)) {
+            // normalizers without a type extractor may resolve types themselves and use the current value;
+            // ObjectNormalizer doesn't use it untyped, and reading it could call any method named after the attribute
+            if ((null !== $types || (null === $this->propertyTypeExtractor && !$this instanceof ObjectNormalizer)) && ($attributeContext[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false)) {
                 $discriminatorProperty = null;
                 if (null !== $this->classDiscriminatorResolver && null !== $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($object)) {
                     $discriminatorProperty = $mapping->getTypeProperty();

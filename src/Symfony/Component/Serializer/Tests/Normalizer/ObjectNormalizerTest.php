@@ -738,12 +738,14 @@ class ObjectNormalizerTest extends TestCase
             }
         };
 
-        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
-        new Serializer([$normalizer]);
-        $normalizer->denormalize(['logout' => ['foo' => 'bar']], \get_class($object), null, [
-            'object_to_populate' => $object,
-            'deep_object_to_populate' => true,
-        ]);
+        foreach ([null, new ReflectionExtractor()] as $propertyTypeExtractor) {
+            $normalizer = new ObjectNormalizer(null, null, null, $propertyTypeExtractor);
+            new Serializer([$normalizer]);
+            $normalizer->denormalize(['logout' => ['foo' => 'bar']], \get_class($object), null, [
+                'object_to_populate' => $object,
+                'deep_object_to_populate' => true,
+            ]);
+        }
 
         $this->assertFalse($object->loggedOut);
         $this->assertSame(['logout' => ['foo' => 'bar']], $object->data);

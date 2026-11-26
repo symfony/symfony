@@ -13,6 +13,7 @@ namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
+use Symfony\Component\ExpressionLanguage\Node\NameNode;
 
 class ArrayNodeTest extends AbstractNodeTestCase
 {
@@ -55,6 +56,30 @@ class ArrayNodeTest extends AbstractNodeTestCase
         $array->addElement(new ConstantNode('c'));
         $array->addElement(new ConstantNode('d'));
         yield ['["c", "d"]', $array];
+
+        $array = static::createArrayNode();
+        $array->addElement(new ConstantNode('first'), new NameNode('key'));
+        $array->addElement(new ConstantNode('second'), new NameNode('other'));
+        yield ['{(key): "first", (other): "second"}', $array];
+
+        $array = static::createArrayNode();
+        $array->addElement(new ConstantNode('first'), new ConstantNode('key'));
+        $array->addElement(new ConstantNode('second'), new ConstantNode('key'));
+        yield ['{"key": "first", "key": "second"}', $array];
+
+        $array = static::createArrayNode();
+        $array->addElement(new ConstantNode('value'), new ConstantNode(true));
+        yield ['{(true): "value"}', $array];
+
+        $array = static::createArrayNode();
+        $array->addElement(new ConstantNode('value'), new ConstantNode(-1));
+        yield ['{(-1): "value"}', $array];
+
+        $array = static::createArrayNode();
+        $array->addElement(new ConstantNode('value'), new ConstantNode('-1'));
+        yield ['{"-1": "value"}', $array];
+
+        yield ['[]', static::createArrayNode()];
     }
 
     protected static function getArrayNode(): ArrayNode

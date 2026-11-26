@@ -2,7 +2,7 @@
     "name": "symfony/bluesky-notifier",
     "type": "symfony-notifier-bridge",
     "description": "Symfony Bluesky Notifier Bridge",
-    "keywords": ["bluesky", "bluesky", "notifier"],
+    "keywords": ["bluesky", "notifier"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

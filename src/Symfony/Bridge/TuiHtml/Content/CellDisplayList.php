@@ -15,6 +15,7 @@ use Symfony\Bridge\TuiHtml\Internal\TextMarkers;
 use Symfony\Bridge\TuiHtml\Render\CellBuffer;
 use Symfony\Bridge\TuiHtml\Render\TerminalTextMeasurer;
 use Symfony\Bridge\TuiHtml\Style\Color;
+use Symfony\Bridge\TuiHtml\Widget\RichTextWidget;
 use Symfony\Component\HtmlRenderer\Paint\DisplayList;
 
 /** @internal */
@@ -56,7 +57,14 @@ final class CellDisplayList
             }
             $text = ['type' => 'text', ...$geometry, 'text' => $cell['text'], 'color' => $fg->toHex(), 'font-size' => 16.0, 'font-weight' => $attributes & CellBuffer::ATTR_BOLD ? 700 : 400, 'font-style' => $attributes & CellBuffer::ATTR_ITALIC ? 'italic' : 'normal', 'text-decoration-line' => implode(' ', array_unique($decorations)) ?: 'none'];
             if ('' !== $cell['link']) {
-                $text['href'] = explode(';', $cell['link'], 2)[1];
+                [$parameters, $href] = explode(';', $cell['link'], 2);
+                $text['href'] = str_starts_with($parameters, RichTextWidget::FRAGMENT_LINK.':') && !str_starts_with($href, '#') ? '#'.$href : $href;
+                foreach (explode(':', $parameters) as $parameter) {
+                    if (str_starts_with($parameter, 'id=') && '' !== substr($parameter, 3)) {
+                        $text['link-id'] = substr($parameter, 3);
+                        break;
+                    }
+                }
             }
             $underline = $cell['underline'];
             $text['text-decoration-style'] = match (true) {

@@ -38,6 +38,12 @@ final class BoxBuilder
     private int $remainingPositionAlternatives = 100000;
     private ?array $namedAnchors = null;
 
+    /**
+     * @param \SplObjectStorage<\Dom\Element, array<string, string>>   $styles
+     * @param \SplObjectStorage<\Dom\Element, array<array-key, mixed>> $states
+     * @param \SplObjectStorage<\Dom\Node, list<mixed>>|null           $anonymousGroups Native children and presentation descriptors, validated while building
+     * @param \SplObjectStorage<\Dom\Node, array<string, array>>|null  $usedStyles      Presentation styles by visual role, validated when read
+     */
     public function __construct(private readonly \SplObjectStorage $styles, private readonly StyleResolver $resolver, private readonly ResourceCollection $resources, private readonly \SplObjectStorage $states, private readonly ?\Closure $replacedContentResolver = null, private readonly ?\SplObjectStorage $anonymousGroups = null, private readonly ?\SplObjectStorage $usedStyles = null)
     {
         $this->content = new ContentResolver($resolver->getCounterStyles());
@@ -161,7 +167,7 @@ final class BoxBuilder
             if ('img' === $node->localName && !$projectedContent) {
                 $image = $this->resources->image($node->getAttribute('src') ?? '');
                 $text = null === $image ? ($node->getAttribute('alt') ?? '') : null;
-            } elseif ('svg' === $node->localName) {
+            } elseif ('svg' === $node->localName && !$projectedContent) {
                 $image = $this->resources->svg($node, fn (\Dom\Element $element): array => $this->styles[$element] ?? []);
             }
             if (null !== $image) {
@@ -818,6 +824,7 @@ final class BoxBuilder
         }
     }
 
+    /** @param \SplObjectStorage<\Dom\Element, array<string, string>> $styles */
     private static function inlineNeighbor(\Dom\Node $node, \SplObjectStorage $styles, bool $after): bool
     {
         $sibling = $after ? $node->nextSibling : $node->previousSibling;

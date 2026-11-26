@@ -1610,7 +1610,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
             $inline[$widget] = $this->inlineMirrors[$widget][1] ?? [];
         }
 
-        return ['document' => $this->document, 'nodes' => $nodes, 'anonymous' => $anonymous, 'spaced' => $spaced, 'descriptions' => $descriptions, 'computed' => $computed, 'inline' => $inline, 'stylesheet' => new ParsedStylesheet($this->rules, $this->registered, $this->keyframes, $this->counterDefinitions, $this->functions, $this->positionTries)];
+        return ['document' => $this->document, 'nodes' => $nodes, 'anonymous' => $anonymous, 'spaced' => $spaced, 'descriptions' => $descriptions, 'computed' => $computed, 'inline' => $inline, 'inline-computed' => $this->nativeInlineDeclarations, 'stylesheet' => new ParsedStylesheet($this->rules, $this->registered, $this->keyframes, $this->counterDefinitions, $this->functions, $this->positionTries)];
     }
 
     /** @internal */

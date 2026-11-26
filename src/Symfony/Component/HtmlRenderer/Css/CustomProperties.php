@@ -113,9 +113,12 @@ final class CustomProperties
                 unset($properties[$property]);
             }
         }
+        $invalid = [];
+        if (!$graph) {
+            return $properties;
+        }
         $done = [];
         $path = [];
-        $invalid = [];
         $visit = static function (string $name) use (&$visit, &$done, &$path, &$invalid, $graph): void {
             if (isset($path[$name])) {
                 foreach (\array_slice(array_keys($path), $path[$name]) as $cyclic) {

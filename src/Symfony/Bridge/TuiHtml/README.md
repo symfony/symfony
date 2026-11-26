@@ -131,6 +131,8 @@ The decorator delegates native widget rendering and focus policy and reuses the 
 
 A terminal has fixed font metrics and whole cells. The adapter draws styled Unicode text, backgrounds, per-side borders, gradients, images/SVG, directional clips and translated drawing operations. It reuses Tui's Unicode and bidirectional algorithms, preserves visual caret positions, reuses the retained Unicode superscript/subscript approximation and schedules active animations through Tui's existing runtime. Opacity groups dim terminal text and omit zero-opacity content; full color-layer compositing and scale/rotation are not reproduced; mixed-style bidirectional paragraphs, disjoint bidirectional selections and popup controls still have limitations. Partial gradient transparency adapts background cells rather than compositing every glyph. Border-image sources color the existing border glyphs; slicing, repeat modes and outsets are not reproduced. Resolved gradient colors can differ slightly from the retained renderer's percentage-based color rounding. Color functions use CSS color operands before terminal adaptation. For example, the retained terminal palette uses yellow `[205, 205, 0]`, blue `[0, 0, 238]` and white `[229, 229, 229]`; CSS functions resolve those names to `[255, 255, 0]`, `[0, 0, 255]` and `[255, 255, 255]`. Direct named colors still use the terminal palette, while resolved function results use numeric colors. Consequently `light-dark()` and color mixes can differ visibly from the retained renderer even when their text and geometry match. The retained widget renderer continues to support its existing terminal approximations; these paths must converge before the standalone refactor is complete.
 
+The opt-in `HtmlBuilder::useHtmlRenderer()` path projects registered inline raster and SVG images through the existing native image drawing code. Private image markers are consumed in the bridge before layout and display-list generation. Image rows retain native colors and distinct hyperlink identities. Each projected image currently remains one replaced box: when it wraps over several terminal rows, following text cannot use the unused cells of its final row. Generated `content: url()` sizing also differs from the retained path. These are remaining convergence gaps.
+
 Twig templates
 --------------
 
@@ -224,7 +226,7 @@ use Symfony\Bridge\TuiHtml\Css\CssStyleSheet;
 use Symfony\Bridge\TuiHtml\Html\HtmlBuilder;
 use Symfony\Bridge\TuiHtml\Hyphenation\HeiglHyphenator;
 
-$builder = new HtmlBuilder(new CssStyleSheet(hyphenator: new HeiglHyphenator()));
+$builder = new HtmlBuilder(new CssStyleSheet(null, null, false, null, new HeiglHyphenator()));
 $view = $builder->build('<p lang="en" style="hyphens: auto; width: 12ch">Hyphenation breaks extraordinarily long words.</p>');
 ```
 
@@ -245,6 +247,8 @@ Scripts never run, nothing is fetched by itself, lengths are rounded to cells, a
 
 Performance
 -----------
+
+The following widget-cache behavior and memory figures describe the retained rendering path. The independent facade still performs a complete Core cascade and compatibility projection on changed state; measured dirty-style costs remain materially higher. Cached frames avoid that work. Terminal parity and these regressions must be resolved before retiring the retained path.
 
 Building a view parses the document and its style sheets once; building takes about 65 MB of memory for each MB of
 HTML, so views are best kept to the size of a screen or a few, not to that of a long web page. Each frame then draws

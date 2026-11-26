@@ -273,7 +273,7 @@ final class LayoutEngine
             }
             $hasRun = null !== $box->selection || null === $box->pseudoElement && $box->node instanceof \Dom\Element && ('textarea' === $box->node->localName || 'input' === $box->node->localName && !\in_array(strtolower($box->node->getAttribute('type') ?? 'text'), ['checkbox', 'radio', 'range', 'color', 'file', 'hidden', 'button', 'submit', 'reset', 'image'], true));
             $sourceLines = $hasRun && ($prepared !== $text || str_contains($text, "\u{00AD}")) ? [] : null;
-            $lines = $this->lines($prepared, $innerWidth, $font, $style['white-space'] ?? 'normal', $lineWidth, $style['word-break'] ?? 'normal', $this->hyphenCharacter($style), $sourceLines, 'anywhere' === ($style['overflow-wrap'] ?? ''));
+            $lines = $this->lines($prepared, $innerWidth, $font, $style['white-space'] ?? 'normal', $lineWidth, $style['word-break'] ?? 'normal', $this->hyphenCharacter($style), $sourceLines, \in_array($style['overflow-wrap'] ?? '', ['anywhere', 'break-word'], true));
             $sourceGraphemes = null;
             $mappedCursor = 0;
             $sourceByte = $sourceOffset = 0;
@@ -479,7 +479,7 @@ final class LayoutEngine
                 $intrinsic = $inline ? $this->inlineOuterWidth($child, $innerWidth, $inlineFont) : 0.0;
                 $lineStart = 0.0;
                 $lineEnd = $innerWidth;
-                $handlesFloatLine = $inline && $activeFloats && ($inlineGroup || $intrinsic <= $innerWidth || 'anywhere' === ($child->style['overflow-wrap'] ?? ''));
+                $handlesFloatLine = $inline && $activeFloats && ($inlineGroup || $intrinsic <= $innerWidth || \in_array($child->style['overflow-wrap'] ?? '', ['anywhere', 'break-word'], true));
                 if ($handlesFloatLine) {
                     while (true) {
                         [$left, $flowLineWidth] = FlowGeometry::interval($activeFloats, $innerX, $innerY + $contentHeight, $innerWidth, max($font->lineHeight, $inlineFont->lineHeight, $inlineGroup && null !== $floatLineMetrics ? $this->lineBoxHeight($floatLineMetrics) : 0.0));
@@ -497,7 +497,7 @@ final class LayoutEngine
                 } elseif ($inline) {
                     $flowLineWidth = $innerWidth;
                 }
-                if ($inline && ('anywhere' === ($child->style['overflow-wrap'] ?? '') && $intrinsic > $lineEnd - $lineStart || $handlesFloatLine && $intrinsic <= $innerWidth && $intrinsic > $lineEnd - $inlineX || ($inlineX > $lineStart || '1' === ($child->style['-renderer-highlight'] ?? null)) && $intrinsic > $lineEnd - $inlineX || isset($boxes[$childIndex + 1]) && InlineFormatting::joins($child, $boxes[$childIndex + 1]) && $intrinsic + $this->inlineOuterWidth($boxes[$childIndex + 1], $innerWidth, $this->font($boxes[$childIndex + 1]->style, $style)) > $lineEnd - $inlineX) && null !== $parts = InlineFormatting::split($child)) {
+                if ($inline && (\in_array($child->style['overflow-wrap'] ?? '', ['anywhere', 'break-word'], true) && $intrinsic > $lineEnd - $lineStart || $handlesFloatLine && $intrinsic <= $innerWidth && $intrinsic > $lineEnd - $inlineX || ($inlineX > $lineStart || '1' === ($child->style['-renderer-highlight'] ?? null)) && $intrinsic > $lineEnd - $inlineX || isset($boxes[$childIndex + 1]) && InlineFormatting::joins($child, $boxes[$childIndex + 1]) && $intrinsic + $this->inlineOuterWidth($boxes[$childIndex + 1], $innerWidth, $this->font($boxes[$childIndex + 1]->style, $style)) > $lineEnd - $inlineX) && null !== $parts = InlineFormatting::split($child)) {
                     if (\count($parts) > 1) {
                         foreach ($parts as $part) {
                             $inlineParts[$part] = true;
@@ -509,7 +509,7 @@ final class LayoutEngine
                 }
                 $fragmentedInline = isset($inlineParts[$child]);
                 if ($fragmentedInline) {
-                    $trimmed = $this->trimBoundary($child, true);
+                    $trimmed = $this->trimBoundary($child, true, $style['white-space'] ?? 'normal');
                     $trimmedWidth = $this->inlineOuterWidth($trimmed, $innerWidth, $inlineFont);
                     if ($intrinsic > $lineEnd - $inlineX && $trimmedWidth <= $lineEnd - $inlineX) {
                         $child = $trimmed;
@@ -532,10 +532,44 @@ final class LayoutEngine
                             }
                         }
                         $runEnd = $nextIndex + 1;
-                        $runWidth += $this->inlineOuterWidth($this->trimBoundary($nextBox, true), $innerWidth, $this->font($nextBox->style, $style));
+                        $runWidth += $this->inlineOuterWidth($this->trimBoundary($nextBox, true, $style['white-space'] ?? 'normal'), $innerWidth, $this->font($nextBox->style, $style));
                     }
                 }
-                if ($inline && !$joinedPrevious && 'anywhere' === ($child->style['overflow-wrap'] ?? '') && $runWidth > $lineEnd - $lineStart) {
+                if ($handlesFloatLine && !$inlineGroup && !\in_array($child->style['overflow-wrap'] ?? '', ['anywhere', 'break-word'], true) && $runWidth > $flowLineWidth) {
+                    while (null !== $next = FlowGeometry::nextEnd($activeFloats, $innerY + $contentHeight, max($font->lineHeight, $inlineFont->lineHeight))) {
+                        $contentHeight = $next - $innerY;
+                        [$left, $flowLineWidth] = FlowGeometry::interval($activeFloats, $innerX, $next, $innerWidth, max($font->lineHeight, $inlineFont->lineHeight));
+                        $lineStart = $left - $innerX;
+                        $lineEnd = $lineStart + $flowLineWidth;
+                        $inlineX = $lineStart;
+                        if ($runWidth <= $flowLineWidth) {
+                            break;
+                        }
+                    }
+                }
+                $atLineStart = !$inlineGroup && ($contentHeight > 0 || $box === $this->rootBox || !\in_array($box->display, ['inline', 'ruby'], true));
+                if ($inline && ($atLineStart || $inlineGroup && 'nowrap' !== ($child->style['white-space'] ?? $style['white-space'] ?? 'normal') && !$joinedPrevious && $runWidth > $lineEnd - $inlineX) && InlineFormatting::collapsibleWhitespace($child, $style['white-space'] ?? 'normal')) {
+                    continue;
+                }
+                if ($inlineGroup && (!$inline || !$joinedPrevious && $runWidth > $lineEnd - $inlineX)) {
+                    $atLineStart = true;
+                    $this->alignLine($children, $inlineGroup, $flowLineWidth, $style, $lineHeight, $innerY + $contentHeight, true, !$inline, $inlineOffsets, $floatLineShift);
+                    $contentHeight += $lineHeight;
+                    $inlineX = $lineHeight = 0.0;
+                    if ($handlesFloatLine) {
+                        [$left, $flowLineWidth] = FlowGeometry::interval($activeFloats, $innerX, $innerY + $contentHeight, $innerWidth, max($font->lineHeight, $inlineFont->lineHeight, $inlineGroup && null !== $floatLineMetrics ? $this->lineBoxHeight($floatLineMetrics) : 0.0));
+                        $lineStart = $left - $innerX;
+                        $lineEnd = $lineStart + $flowLineWidth;
+                        $inlineX = $lineStart;
+                    }
+                    if (isset($style['-renderer-line-context'])) {
+                        $style['-renderer-line-context'] = '1';
+                    }
+                }
+                if (!$inlineGroup && ($fragmentedInline || $inline && $atLineStart && InlineFormatting::hasCollapsibleLeadingSpace($child, $style['white-space'] ?? 'normal'))) {
+                    $child = $this->trimBoundary($child, false, $style['white-space'] ?? 'normal');
+                }
+                if ($inline && !$joinedPrevious && \in_array($child->style['overflow-wrap'] ?? '', ['anywhere', 'break-word'], true) && $runWidth > $lineEnd - $lineStart) {
                     $emergencyParts = [];
                     for ($index = $childIndex; $index < $runEnd; ++$index) {
                         array_push($emergencyParts, ...(InlineFormatting::split($boxes[$index], true) ?? [$boxes[$index]]));
@@ -550,35 +584,6 @@ final class LayoutEngine
                         $intrinsic = $runWidth = $this->inlineOuterWidth($child, $innerWidth, $inlineFont);
                         $fragmentedInline = true;
                     }
-                }
-                if ($handlesFloatLine && !$inlineGroup && 'anywhere' !== ($child->style['overflow-wrap'] ?? '') && $runWidth > $flowLineWidth) {
-                    while (null !== $next = FlowGeometry::nextEnd($activeFloats, $innerY + $contentHeight, max($font->lineHeight, $inlineFont->lineHeight))) {
-                        $contentHeight = $next - $innerY;
-                        [$left, $flowLineWidth] = FlowGeometry::interval($activeFloats, $innerX, $next, $innerWidth, max($font->lineHeight, $inlineFont->lineHeight));
-                        $lineStart = $left - $innerX;
-                        $lineEnd = $lineStart + $flowLineWidth;
-                        $inlineX = $lineStart;
-                        if ($runWidth <= $flowLineWidth) {
-                            break;
-                        }
-                    }
-                }
-                if ($inlineGroup && (!$inline || !$joinedPrevious && $runWidth > $lineEnd - $inlineX)) {
-                    $this->alignLine($children, $inlineGroup, $flowLineWidth, $style, $lineHeight, $innerY + $contentHeight, true, !$inline, $inlineOffsets, $floatLineShift);
-                    $contentHeight += $lineHeight;
-                    $inlineX = $lineHeight = 0.0;
-                    if ($handlesFloatLine) {
-                        [$left, $flowLineWidth] = FlowGeometry::interval($activeFloats, $innerX, $innerY + $contentHeight, $innerWidth, max($font->lineHeight, $inlineFont->lineHeight, $inlineGroup && null !== $floatLineMetrics ? $this->lineBoxHeight($floatLineMetrics) : 0.0));
-                        $lineStart = $left - $innerX;
-                        $lineEnd = $lineStart + $flowLineWidth;
-                        $inlineX = $lineStart;
-                    }
-                    if (isset($style['-renderer-line-context'])) {
-                        $style['-renderer-line-context'] = '1';
-                    }
-                }
-                if ($fragmentedInline && !$inlineGroup) {
-                    $child = $this->trimBoundary($child, false);
                 }
                 $childX = $innerX + $inlineX;
                 $childY = $innerY + $contentHeight;
@@ -3393,9 +3398,9 @@ final class LayoutEngine
         return max(0.0, $this->constrain($outer, $style, 'width', $this->viewportWidth, $font, $chrome) - $chrome);
     }
 
-    private function trimBoundary(Box $box, bool $end): Box
+    private function trimBoundary(Box $box, bool $end, string $whiteSpace = 'normal'): Box
     {
-        $copy = InlineFormatting::trimBoundary($box, $end);
+        $copy = InlineFormatting::trimBoundary($box, $end, $whiteSpace);
         if (null !== $this->layoutMetrics) {
             $remember = function (Box $source, Box $copy) use (&$remember): void {
                 $this->copiedBox($source, $copy);

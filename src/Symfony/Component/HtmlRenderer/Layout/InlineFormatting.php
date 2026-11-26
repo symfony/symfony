@@ -30,7 +30,7 @@ final class InlineFormatting
         if (!self::undecorated($box)) {
             return null;
         }
-        if ($emergency && 'anywhere' === ($box->style['overflow-wrap'] ?? '')) {
+        if ($emergency && \in_array($box->style['overflow-wrap'] ?? '', ['anywhere', 'break-word'], true)) {
             $style = $box->style;
             $style['-renderer-emergency-break'] = '1';
         } else {
@@ -198,15 +198,61 @@ final class InlineFormatting
         return array_map(static fn (Box $box): Box => $visit($box, $whiteSpace), $boxes);
     }
 
-    public static function trimBoundary(Box $box, bool $end): Box
+    public static function collapsibleWhitespace(Box $box, string $whiteSpace = 'normal'): bool
     {
+        $whiteSpace = $box->style['white-space'] ?? $whiteSpace;
+        if ('inline' !== $box->display || null !== $box->image || null !== $box->replacedContent || null !== $box->selection || !self::undecorated($box) || !\in_array($whiteSpace, ['normal', 'nowrap', 'pre-line'], true)) {
+            return false;
+        }
+        $text = $box->text ?? ($box->node instanceof \Dom\Text ? $box->node->textContent : null);
+        if (null !== $text) {
+            $characters = 'pre-line' === $whiteSpace ? " \t\f" : " \t\r\n\f";
+
+            return '' !== $text && strspn($text, $characters) === \strlen($text);
+        }
+        if (!$box->children) {
+            return false;
+        }
+        foreach ($box->children as $child) {
+            if (!self::collapsibleWhitespace($child, $whiteSpace)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static function hasCollapsibleLeadingSpace(Box $box, string $whiteSpace = 'normal'): bool
+    {
+        $whiteSpace = $box->style['white-space'] ?? $whiteSpace;
+        if ('inline' !== $box->display || null !== $box->image || null !== $box->replacedContent || null !== $box->selection || !self::undecorated($box) || null !== $box->topLayer || 'static' !== ($box->style['position'] ?? 'static') || !\in_array($whiteSpace, ['normal', 'nowrap', 'pre-line'], true)) {
+            return false;
+        }
+        $text = $box->text ?? ($box->node instanceof \Dom\Text ? $box->node->textContent : null);
+        if (null !== $text) {
+            $characters = 'pre-line' === $whiteSpace ? " \t\f" : " \t\r\n\f";
+
+            return strspn($text, $characters) > 0;
+        }
+        $first = $box->children[0] ?? null;
+
+        return null !== $first && self::hasCollapsibleLeadingSpace($first, $whiteSpace);
+    }
+
+    public static function trimBoundary(Box $box, bool $end, string $whiteSpace = 'normal'): Box
+    {
+        $whiteSpace = $box->style['white-space'] ?? $whiteSpace;
+        if (!\in_array($whiteSpace, ['normal', 'nowrap', 'pre-line'], true)) {
+            return $box;
+        }
+        $characters = 'pre-line' === $whiteSpace ? " \t\f" : " \t\r\n\f";
         $text = $box->text ?? ($box->node instanceof \Dom\Text ? $box->node->textContent : null);
         $children = $box->children;
         if (null !== $text) {
-            $text = $end ? rtrim($text, ' ') : ltrim($text, ' ');
+            $text = $end ? rtrim($text, $characters) : ltrim($text, $characters);
         } elseif ($children) {
             $index = $end ? array_key_last($children) : array_key_first($children);
-            $children[$index] = self::trimBoundary($children[$index], $end);
+            $children[$index] = self::trimBoundary($children[$index], $end, $whiteSpace);
         }
 
         return new Box($box->node, $box->display, $box->style, $children, $text, $box->image, $box->selection, $box->pseudoElement, $box->topLayer, $box->borderImage, $box->anchor, $box->replacedContent, $box->anchorReferences, $box->positionTries);

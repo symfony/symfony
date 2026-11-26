@@ -741,10 +741,10 @@ final class StyleResolver
                     $scheme = ColorScheme::forced($values['color-scheme'] ?? '') ?? $scheme;
                     $values = $this->colors($values, $inherited, $scheme);
                 }
-                // Reuse only fully resolved, undeclared owner inputs within this computation.
+                // Reuse fully resolved normalization inputs within this computation.
                 // User callbacks and per-element Timeline effects have already run.
-                $normalizationInput = empty($winners[$element] ?? []) ? [$values, $inherited, $result[$document->documentElement] ?? null, null, null !== $parent ? ($lineHeightMultipliers[$parent] ?? null) : null] : null;
-                if (null !== $normalizationInput && null !== $lastPrincipalNormalization && $lastPrincipalNormalization[0] === $normalizationInput) {
+                $normalizationInput = [$values, $inherited, $result[$document->documentElement] ?? null, ($winners[$element] ?? [])['line-height'][0] ?? null, null !== $parent ? ($lineHeightMultipliers[$parent] ?? null) : null];
+                if (null !== $lastPrincipalNormalization && $lastPrincipalNormalization[0] === $normalizationInput) {
                     [$values, $fontSize, $rootSize, $normalLineHeight, $line, $multiplier] = $lastPrincipalNormalization[1];
                     if (null !== $multiplier) {
                         $lineHeightMultipliers[$element] = $multiplier;
@@ -775,9 +775,7 @@ final class StyleResolver
                     }
                     $values = $this->textSpacing($values, $inherited, $result[$document->documentElement] ?? $values, $width, $height);
                     $values = $this->decorationThickness($values, $result[$document->documentElement] ?? [], $width, $height);
-                    if (null !== $normalizationInput) {
-                        $lastPrincipalNormalization = [$normalizationInput, [$values, $fontSize, $rootSize, $normalLineHeight, $line, $lineHeightMultipliers[$element] ?? null]];
-                    }
+                    $lastPrincipalNormalization = [$normalizationInput, [$values, $fontSize, $rootSize, $normalLineHeight, $line, $lineHeightMultipliers[$element] ?? null]];
                 }
                 $specified = array_fill_keys(array_keys($inheritedOverrides), true);
                 foreach ($winners[$element] ?? [] as $property => [$declaration]) {
@@ -866,7 +864,7 @@ final class StyleResolver
                     }
                     $pseudoSemantic = $pseudo;
                     $inactiveTargetInput = null;
-                    if ('target-text' === $name && !\in_array($name, ($elementStates[$element] ?? [])['active-pseudo-elements'] ?? [], true) && empty($record['animated']) && empty($winners[$element] ?? [])
+                    if ('target-text' === $name && !\in_array($name, ($elementStates[$element] ?? [])['active-pseudo-elements'] ?? [], true) && empty($record['animated'])
                         && !array_diff(array_keys($pseudoMap[$element]), ['color', 'background-color'])
                         && !array_any($pseudoMap[$element], static fn (array $winner): bool => $winner[4] ?? false)) {
                         $inactiveTargetInput = [$pseudo, $resolvedPseudo, $pseudoInherited, $values, $pseudoMap[$element], $fontSize, $rootSize, $normalLineHeight, $lineHeightMultipliers[$element] ?? null];
@@ -1261,7 +1259,7 @@ final class StyleResolver
      * Winning declarations retain their source property and order independently of used-value normalization.
      * Absence from declarations means that a computed value comes from inheritance or an initial value.
      *
-     * @return array{computed: array<string, string>, resolved: array<string, string>, cascaded: array<string, string>, specified: array<string, true>, declarations: array<string, array{value: string, source: string, source-value: string, priority: list<int|string>, order: array{int, int}, important: bool, origin: string, valid: bool, initial: bool}>, matched-rules?: list<int>, animated?: array<string, true>, pseudos?: array<string, array>, starting-style?: array, starting-rules?: list<int>, scroll-driven?: bool}
+     * @return array{computed: array<string, string>, resolved: array<string, string>, cascaded: array<string, string>, specified: array<string, true>, declarations: array<string, array{value: string, source: string, source-value: string, expansion: list<string>, implicit: bool, explicit-candidate: array{0: string, ...}|null, priority: list<int|string>, order: array{int, int}, important: bool, origin: string, valid: bool, initial: bool}>, matched-rules?: list<int>, animated?: array<string, true>, pseudos?: array<string, array>, starting-style?: array, starting-rules?: list<int>, scroll-driven?: bool}
      */
     public function getCascadeRecord(\Dom\Element $element, ?string $pseudoElement = null): array
     {

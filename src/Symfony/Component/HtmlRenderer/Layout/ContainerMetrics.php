@@ -14,6 +14,10 @@ namespace Symfony\Component\HtmlRenderer\Layout;
 /** @internal Per-element principal dimensions and the actual scrolling viewport. */
 final class ContainerMetrics
 {
+    /**
+     * @param \SplObjectStorage<\Dom\Element, array<string, string>>   $styles
+     * @param \SplObjectStorage<\Dom\Element, array<array-key, mixed>> $states
+     */
     public static function collect(\SplObjectStorage $styles, Fragment $root, \SplObjectStorage $states): \SplObjectStorage
     {
         $containers = new \SplObjectStorage();
@@ -94,6 +98,9 @@ final class ContainerMetrics
         return $containers;
     }
 
+    /**
+     * @param \SplObjectStorage<\Dom\Element, array<array-key, mixed>> $states
+     */
     private static function scrollState(Fragment $fragment, \SplObjectStorage $states): array
     {
         $element = $fragment->node;

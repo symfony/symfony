@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HtmlRenderer\Tests\Css;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HtmlRenderer\Animation\Timeline;
 use Symfony\Component\HtmlRenderer\Css\StyleResolver;
@@ -20,9 +21,10 @@ use Symfony\Component\HtmlRenderer\Resource\ResourceLoader;
 
 final class ResolvedStyleSemanticsTest extends TestCase
 {
-    public function testRepeatedInactivePseudoStylesStillEvaluateEveryValueCallback()
+    #[DataProvider('provideOwnerDeclarations')]
+    public function testRepeatedInactivePseudoStylesStillEvaluateEveryValueCallback(string $ownerDeclarations)
     {
-        $document = \Dom\HTMLDocument::createFromString('<!doctype html><style>::target-text{color:--dynamic();background-color:MarkText}</style>'.str_repeat('<p>Target</p>', 30));
+        $document = \Dom\HTMLDocument::createFromString('<!doctype html><style>'.$ownerDeclarations.'::target-text{color:--dynamic();background-color:MarkText}</style>'.str_repeat('<p>Target</p>', 30));
         $source = $document->saveHtml();
         $calls = 0;
         $color = 'red';
@@ -45,6 +47,31 @@ final class ResolvedStyleSemanticsTest extends TestCase
         }
         self::assertSame(102, $calls);
         self::assertSame($source, $document->saveHtml());
+    }
+
+    public static function provideOwnerDeclarations(): iterable
+    {
+        yield 'undeclared owners' => [''];
+        yield 'authored owners' => ['p{font-size:18px;line-height:1.5}'];
+    }
+
+    public function testAuthoredOwnersKeepExplicitAndInheritedLineHeightOriginsDistinct()
+    {
+        foreach ([false, true] as $reverse) {
+            $explicit = '<div id="explicit" style="font-size:20px;line-height:20px">Explicit</div>';
+            $inherited = '<div id="inherited" style="font-size:20px">Inherited</div>';
+            $document = \Dom\HTMLDocument::createFromString('<!doctype html><section style="font-size:10px;line-height:2">'.($reverse ? $inherited.$explicit : $explicit.$inherited).'</section>');
+            $resolver = new StyleResolver();
+            $styles = $resolver->resolve($document, 400, 200);
+            $explicitOwner = $document->getElementById('explicit');
+            $inheritedOwner = $document->getElementById('inherited');
+            self::assertSame('20px', $styles[$explicitOwner]['font-size']);
+            self::assertSame('20px', $styles[$inheritedOwner]['font-size']);
+            self::assertSame('20px', $styles[$explicitOwner]['line-height']);
+            self::assertSame('40px', $styles[$inheritedOwner]['line-height']);
+            self::assertSame('20px', $resolver->getCascadeRecord($explicitOwner)['declarations']['line-height']['value']);
+            self::assertArrayNotHasKey('line-height', $resolver->getCascadeRecord($inheritedOwner)['declarations']);
+        }
     }
 
     public function testInheritedFontRootUnitsLineHeightAndCustomColorsRemainDistinct()

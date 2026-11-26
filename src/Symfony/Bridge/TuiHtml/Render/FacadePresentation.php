@@ -30,6 +30,7 @@ use Symfony\Bridge\TuiHtml\Widget\CollapsibleWidget;
 use Symfony\Bridge\TuiHtml\Widget\ContainerWidget;
 use Symfony\Bridge\TuiHtml\Widget\FrameWidget;
 use Symfony\Bridge\TuiHtml\Widget\HtmlRootWidget;
+use Symfony\Bridge\TuiHtml\Widget\RichTextWidget;
 use Symfony\Bridge\TuiHtml\Widget\Text\InlineContentInterface;
 use Symfony\Component\HtmlRenderer\Html\BoxBuilder;
 use Symfony\Component\HtmlRenderer\Layout\Fragment;
@@ -61,6 +62,8 @@ final class FacadePresentation
     private array $viewport = [0, 0];
     private ?array $key = null;
     private \WeakMap $providers;
+    private \WeakMap $inlineImageProviders;
+    private \SplObjectStorage $preparedInlineImages;
     private \WeakMap $implicitAnchors;
     private string $defaultForeground = 'default';
     private ?\Closure $nativeStyleResolver = null;
@@ -76,6 +79,8 @@ final class FacadePresentation
         $this->resources = new ResourceCollection(new ResourceLoader($sheet->getImageSourceData(...)));
         $this->rects = new \SplObjectStorage();
         $this->providers = new \WeakMap();
+        $this->inlineImageProviders = new \WeakMap();
+        $this->preparedInlineImages = new \SplObjectStorage();
         $this->implicitAnchors = new \WeakMap();
         $this->usedStyles = new \SplObjectStorage();
         $this->nativeProperties = new \SplObjectStorage();
@@ -136,7 +141,7 @@ final class FacadePresentation
         }
         $this->prepareWidgets($root, true);
         $snapshot = $this->sheet->prepareProjection($root, $media, function (array $snapshot) use ($root): void {
-            $this->projector->project($snapshot, $root);
+            $this->preparedInlineImages = $this->projector->project($snapshot, $root)['inline-images'];
         }, $defaultColor, $this->nativePolicies);
         $key = [$root->getRenderRevision(), $media->getKey(), $snapshot['styles'], $context->getFontRegistry()];
         if ($key === $this->key) {
@@ -147,7 +152,7 @@ final class FacadePresentation
         if (null !== $this->result) {
             $previousLayouts[] = $this->result;
         }
-        $build = function () use (&$snapshot, $seedUsedStyles, $previousLayouts, $root, $context, $media, $constraints, $cell, $columns, $rows): array {
+        $build = function () use (&$snapshot, $seedUsedStyles, $previousLayouts, $root, $context, $media, $constraints, $cell, $columns, $rows, $defaultColor): array {
             $this->usedStyles = clone $seedUsedStyles;
             foreach ($this->tabAdapters as $adapter) {
                 $adapter->dispose();
@@ -214,6 +219,7 @@ final class FacadePresentation
             }
             $styles = $snapshot['styles'];
             $providers = new \SplObjectStorage();
+            /** @var \SplObjectStorage<\Dom\Element, array<array-key, mixed>> $states */
             $states = new \SplObjectStorage();
             foreach ($projection['owners'] as $element) {
                 if (!$element instanceof \Dom\Element || !$projection['owners'][$element] instanceof InlineContentInterface) {
@@ -235,6 +241,29 @@ final class FacadePresentation
                 }
                 $styleNode = $widget instanceof CollapsibleWidget ? $snapshot['nodes'][$widget] : $element;
                 $style = array_replace($styles[$styleNode] ?? [], ($this->usedStyles[$styleNode] ?? [])[''] ?? []);
+                if ($widget instanceof RichTextWidget && isset($projection['inline-images'][$element])) {
+                    $image = $projection['inline-images'][$element];
+                    $tokens = $image['tokens'];
+                    $nativeColor = $snapshot['inline-computed'][spl_object_id($widget)][$image['inline-index']]['color'] ?? ($snapshot['computed'][$widget]['color'] ?? null);
+                    if ('default' === $defaultColor && (null === $nativeColor || \in_array(strtolower(trim($nativeColor)), ['default', 'initial'], true))) {
+                        $style['color'] = 'default';
+                    }
+                    $link = null === $image['href'] ? null : RichTextWidget::linkOpening($image['href'], RichTextWidget::linkId($widget, $image['link-index'] ?? 0));
+                    $key = [$widget->getRenderRevision(), $tokens, $style, $media->getKey(), $link, $context->getFontRegistry()];
+                    $cached = $this->inlineImageProviders[$element] ?? null;
+                    $providers[$element] = null !== $cached && $cached[0] === $key ? $cached[1] : new NativeContentAdapter(\WeakReference::create($widget), $widget->getRenderRevision(), $style, $this->metrics, $context->getFontRegistry(), $media, static function (RichTextWidget $source, $inner) use ($tokens, $media, $link): array {
+                        $prefix = ($link ?? '').$inner->getStyle()->getAnsiRestore();
+                        $lines = array_map(static fn (string $part): string => $prefix.$part, mb_str_split($tokens, max(1, $inner->getColumns())));
+                        $lines = $source->renderInlineImages($lines, $media->colorScheme);
+                        if (null !== $link) {
+                            $lines = array_map(static fn (string $line): string => $line."\x1b]8;;\x07", $lines);
+                        }
+
+                        return $lines;
+                    }, $this->metrics->cellWidth);
+                    $this->inlineImageProviders[$element] = [$key, $providers[$element]];
+                    continue;
+                }
                 if ($widget instanceof TabsWidget) {
                     $providers[$element] = $this->tabAdapters[] = new TabsContentAdapter($widget, $style, $this->metrics, $context->getFontRegistry(), $media, function (AbstractWidget $body, $inner) use ($snapshot, $projection, $providers, &$states, $constraints, $media, $cell, $rows): array {
                         $node = $snapshot['nodes'][$body];
@@ -360,6 +389,8 @@ final class FacadePresentation
         $this->lines = [];
         $this->rects = new \SplObjectStorage();
         $this->providers = new \WeakMap();
+        $this->inlineImageProviders = new \WeakMap();
+        $this->preparedInlineImages = new \SplObjectStorage();
         $this->usedStyles = new \SplObjectStorage();
         $this->nativeProperties = new \SplObjectStorage();
         $this->detachedContents = new \WeakMap();
@@ -465,13 +496,22 @@ final class FacadePresentation
 
     public function getLinkAt(int $row, int $column): ?string
     {
-        $element = $this->linkElementAt($row, $column);
+        $hit = $this->hitWitness($row, $column);
+        $element = $this->linkElementAt($row, $column, $hit);
+        $image = $hit['element'] ?? null;
+        if (null === ($hit['axis'] ?? null) && null === ($hit['control'] ?? null) && null !== $image && isset($this->projection['inline-images'][$image])) {
+            $descriptor = $this->projection['inline-images'][$image];
+            $owner = $this->projection['owners'][$image];
+            if (null !== $descriptor['href'] && null !== $descriptor['link-index']) {
+                return RichTextWidget::linkId($owner, $descriptor['link-index']);
+            }
+        }
         for (; null !== $element; $element = $element->parentElement) {
             if ('a' !== $element->localName || '' === trim($element->getAttribute('href') ?? '')) {
                 continue;
             }
             $widget = $this->projection['owners'][$element] ?? null;
-            if (!$widget instanceof \Symfony\Bridge\TuiHtml\Widget\RichTextWidget) {
+            if (!$widget instanceof RichTextWidget) {
                 return null;
             }
             $index = 0;
@@ -535,9 +575,9 @@ final class FacadePresentation
         return null === $element ? null : \Symfony\Bridge\TuiHtml\Internal\FragmentLink::target($element->getAttribute('href') ?? '');
     }
 
-    private function linkElementAt(int $row, int $column): ?\Dom\Element
+    private function linkElementAt(int $row, int $column, ?array $hit = null): ?\Dom\Element
     {
-        $hit = $this->hitWitness($row, $column);
+        $hit ??= $this->hitWitness($row, $column);
         if (null !== ($hit['axis'] ?? null) || null !== ($hit['control'] ?? null)) {
             return null;
         }
@@ -568,6 +608,10 @@ final class FacadePresentation
         return $hit;
     }
 
+    /**
+     * @param \SplObjectStorage<\Dom\Element, array<string, string>>   $styles
+     * @param \SplObjectStorage<\Dom\Element, array<array-key, mixed>> $states
+     */
     private function metricsForLayout(\SplObjectStorage $styles, Fragment $fragment, \SplObjectStorage $states): \SplObjectStorage
     {
         $metrics = \Symfony\Component\HtmlRenderer\Layout\ContainerMetrics::collect($styles, $fragment, $states);
@@ -651,12 +695,18 @@ final class FacadePresentation
             }
         }
 
+        foreach ($this->preparedInlineImages as $element) {
+            $policy = $colors[$element] ?? [];
+            $policy['']['max-width'] = '100%';
+            $colors[$element] = $policy;
+        }
+
         return $colors;
     }
 
     private function colorToken(Color $color): string
     {
-        return $color->toForegroundCode() === Color::named('default')->toForegroundCode() ? ('default' === $this->defaultForeground ? Color::named('default')->toHex() : $this->defaultForeground) : $color->toHex();
+        return $color->toForegroundCode() === Color::named('default')->toForegroundCode() ? ('default' === $this->defaultForeground ? 'default' : $this->defaultForeground) : $color->toHex();
     }
 
     private function supportsOwnStyle(AbstractWidget $widget): bool

@@ -72,6 +72,30 @@ class AnonymousProjectionTest extends TestCase
         self::assertSame($option, $select->firstElementChild);
     }
 
+    public function testExplicitSvgContentReplacesItsImageWithoutChangingTheDocument()
+    {
+        $document = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><svg aria-label="logo"></svg>');
+        $svg = $document->querySelector('svg');
+        $text = $document->createTextNode('[logo]');
+        $svg->appendChild($text);
+        $before = $document->saveHtml();
+        $resolver = new StyleResolver();
+        $styles = $resolver->resolve($document, 400, 200);
+        $resources = new ResourceCollection(new ResourceLoader());
+        $normal = new BoxBuilder($styles, $resolver, $resources, new \SplObjectStorage())->build($svg);
+        self::assertNotNull($normal->image);
+        $groups = new \SplObjectStorage();
+        $groups[$svg] = [$text];
+        $projected = new BoxBuilder($styles, $resolver, $resources, new \SplObjectStorage(), null, $groups)->build($svg);
+        self::assertNull($projected->image);
+        self::assertCount(1, $projected->children);
+        self::assertSame($text, $projected->children[0]->node);
+        self::assertSame('[logo]', $projected->children[0]->text);
+        self::assertSame($before, $document->saveHtml());
+        self::assertSame($svg, $text->parentNode);
+        self::assertNotNull(new BoxBuilder($styles, $resolver, $resources, new \SplObjectStorage())->build($svg)->image);
+    }
+
     public function testDuplicateSemanticReferencesAreRejected()
     {
         $document = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><div><span>A</span></div>');

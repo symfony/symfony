@@ -20,6 +20,7 @@ use Symfony\Bridge\TuiHtml\Render\Compositor;
 use Symfony\Bridge\TuiHtml\Render\Layer;
 use Symfony\Bridge\TuiHtml\Render\RenderContext;
 use Symfony\Bridge\TuiHtml\Style\Color;
+use Symfony\Bridge\TuiHtml\Style\ColorScheme;
 use Symfony\Bridge\TuiHtml\Style\RasterImage;
 use Symfony\Bridge\TuiHtml\Style\Style;
 use Symfony\Bridge\TuiHtml\Style\TextAlign;
@@ -357,7 +358,7 @@ class RichTextWidget extends TextWidget implements InlineContentInterface
         $context = ContextBridge::computed($context);
         $lines = $this->renderShadowed($context);
 
-        return $this->inlineImages || $this->generatedImages ? $this->images()->draw($lines, StyleBridge::media($this->getContext())?->colorScheme) : $lines;
+        return $this->renderInlineImages($lines, StyleBridge::media($this->getContext())?->colorScheme);
     }
 
     /**
@@ -705,6 +706,18 @@ class RichTextWidget extends TextWidget implements InlineContentInterface
         return null;
     }
 
+    /**
+     * @param list<string> $lines
+     *
+     * @return list<string>
+     *
+     * @internal draws only registered image cells; text layout remains the caller's responsibility
+     */
+    public function renderInlineImages(array $lines, ?ColorScheme $scheme = null): array
+    {
+        return $this->inlineImages || $this->generatedImages ? $this->images()->draw($lines, $scheme) : $lines;
+    }
+
     private function images(): InlineImages
     {
         return $this->drawnImages ??= new InlineImages($this->inlineImages, $this->generatedImages);
@@ -738,7 +751,7 @@ class RichTextWidget extends TextWidget implements InlineContentInterface
         // Its images not in the shadows, but in the text over them
         $plain = array_map(static fn (string $line) => InlineImages::blank(AnsiUtils::stripAnsiCodes($line)), $lines);
         if ($this->inlineImages || $this->generatedImages) {
-            $lines = $this->images()->draw($lines, StyleBridge::media($this->getContext())?->colorScheme);
+            $lines = $this->renderInlineImages($lines, StyleBridge::media($this->getContext())?->colorScheme);
         }
         // The cursor of a focused link, which the layers do not keep: put back at its column
         $markers = [];

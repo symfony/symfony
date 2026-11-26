@@ -15,6 +15,7 @@ use Symfony\Bridge\TuiHtml\Css\CssStyleSheet;
 use Symfony\Bridge\TuiHtml\Internal\ContainerState;
 use Symfony\Bridge\TuiHtml\Widget\CollapsibleWidget;
 use Symfony\Bridge\TuiHtml\Widget\ContainerWidget;
+use Symfony\Bridge\TuiHtml\Widget\RichTextWidget;
 use Symfony\Bridge\TuiHtml\Widget\Text\InlineContentInterface;
 use Symfony\Bridge\TuiHtml\Widget\Text\InlineNode;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
@@ -31,6 +32,7 @@ final class MirrorPresentation
     private \SplObjectStorage $groups;
     private \SplObjectStorage $owners;
     private \SplObjectStorage $replacements;
+    private \SplObjectStorage $inlineImages;
     private \SplObjectStorage $usedTexts;
     private ?\SplObjectStorage $usedStyles = null;
 
@@ -46,6 +48,7 @@ final class MirrorPresentation
         $this->groups = new \SplObjectStorage();
         $this->owners = new \SplObjectStorage();
         $this->replacements = new \SplObjectStorage();
+        $this->inlineImages = new \SplObjectStorage();
         $this->usedTexts = new \SplObjectStorage();
         $node = $snapshot['nodes'][$root] ?? null;
         if (!$node instanceof \Dom\Element) {
@@ -57,7 +60,7 @@ final class MirrorPresentation
             $this->texts[$owner] = array_intersect_key($slots, $this->usedTexts[$owner] ?? []);
         }
 
-        return ['document' => $snapshot['document'], 'root' => $node, 'groups' => $this->groups, 'owners' => $this->owners, 'replacements' => $this->replacements];
+        return ['document' => $snapshot['document'], 'root' => $node, 'groups' => $this->groups, 'owners' => $this->owners, 'replacements' => $this->replacements, 'inline-images' => $this->inlineImages];
     }
 
     private function widget(AbstractWidget $widget, \Dom\Element $parent, bool $inInlineFlow = false): array
@@ -89,7 +92,10 @@ final class MirrorPresentation
             };
             $collect($this->snapshot['inline'][$widget] ?? []);
             $counter = 0;
-            $children = $this->inline($widget->getInlineNodes(), $owner, $widget, $index, $counter, '');
+            $links = $widget instanceof RichTextWidget ? $widget->getLinks() : [];
+            $linkCounter = 0;
+            $blockLink = $widget instanceof RichTextWidget && (null !== $widget->getLink() || 'a' === $owner->localName && '' !== trim($owner->getAttribute('href') ?? '')) ? 0 : null;
+            $children = $this->inline($widget->getInlineNodes(), $owner, $widget, $index, $counter, '', $links, $linkCounter, $blockLink);
             if (!$anonymous) {
                 $this->populate($owner, $children);
 
@@ -156,7 +162,7 @@ final class MirrorPresentation
         return [['style' => $style, 'children' => $children]];
     }
 
-    private function inline(array $nodes, \Dom\Element $owner, AbstractWidget $widget, array $elements, int &$counter, string $path): array
+    private function inline(array $nodes, \Dom\Element $owner, AbstractWidget $widget, array $elements, int &$counter, string $path, array $links, int &$linkCounter, ?int $activeLink): array
     {
         $children = [];
         foreach ($nodes as $offset => $node) {
@@ -178,9 +184,23 @@ final class MirrorPresentation
                 throw new \LogicException('The inline element is absent from the prepared mirror.');
             }
             $this->owners[$element] = $widget;
-            $contents = $this->inline($node->children, $element, $widget, $elements, $counter, $path.$offset.'.');
+            $link = $activeLink;
+            if ('a' === $node->tagName && '' !== trim($node->attributes['href'] ?? '')) {
+                $link = $linkCounter++;
+            }
+            if ($widget instanceof RichTextWidget && \in_array($element->localName, ['img', 'svg'], true) && 1 === \count($node->children) && null !== $tokens = $node->children[0]->text) {
+                if (preg_match('/^[\x{100000}-\x{101FFF}]+$/u', $tokens)) {
+                    $this->inlineImages[$element] = ['inline-index' => $counter - 1, 'tokens' => $tokens, 'href' => null === $link ? null : ($links[$link] ?? null), 'link-index' => $link];
+                    $this->replacements[$element] = $widget;
+                    $this->populate($element, []);
+                    $this->groups[$element] = [];
+                    $children[] = $element;
+                    continue;
+                }
+            }
+            $contents = $this->inline($node->children, $element, $widget, $elements, $counter, $path.$offset.'.', $links, $linkCounter, $link);
             $this->populate($element, $contents);
-            if ('img' === $element->localName) {
+            if (\in_array($element->localName, ['img', 'svg'], true)) {
                 $this->groups[$element] = $contents;
                 if (null !== $this->usedStyles) {
                     $used = $this->usedStyles[$element] ?? [];

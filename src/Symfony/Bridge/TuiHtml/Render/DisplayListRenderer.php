@@ -27,6 +27,7 @@ use Symfony\Bridge\TuiHtml\Style\Style;
 use Symfony\Bridge\TuiHtml\Style\UnderlineStyle;
 use Symfony\Bridge\TuiHtml\Style\VectorImage;
 use Symfony\Bridge\TuiHtml\Widget\ImageWidget;
+use Symfony\Bridge\TuiHtml\Widget\RichTextWidget;
 use Symfony\Component\HtmlRenderer\Paint\DisplayList;
 use Symfony\Component\HtmlRenderer\Paint\Filter;
 use Symfony\Component\HtmlRenderer\Paint\GradientGeometry;
@@ -302,8 +303,11 @@ final class DisplayListRenderer
         }
         $prefix = \in_array('blink', $decorations, true) ? "\x1b[5m" : '';
         $href = $operation['href'] ?? null;
-        if (\is_string($href) && !preg_match('/[\x00-\x20\x7f]/', $href) && preg_match('/^(?:https?|mailto|file|ftp|sftp|ssh):/i', $href)) {
-            $prefix .= "\x1b]8;;".$href."\x07";
+        $linkId = $operation['link-id'] ?? null;
+        $linkId = \is_string($linkId) && !preg_match('/[\x00-\x20\x7f:;]/', $linkId) ? $linkId : '';
+        $opening = \is_string($href) && !preg_match('/[\x00-\x20\x7f]/', $href) ? RichTextWidget::linkOpening($href, $linkId) : null;
+        if (null !== $opening) {
+            $prefix .= '' === $linkId && !str_starts_with($href, '#') ? "\x1b]8;;".$href."\x07" : $opening;
         } else {
             $href = null;
         }

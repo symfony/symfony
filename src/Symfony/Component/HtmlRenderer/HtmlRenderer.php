@@ -79,6 +79,7 @@ final class HtmlRenderer
         $timeline?->setActiveElements($view['mirrors'] ?? null);
         $modal = null;
         $modalOrder = -1;
+        /** @var \SplObjectStorage<\Dom\Element, array<array-key, mixed>> $stateMap */
         $stateMap = new \SplObjectStorage();
         foreach ($states as [$element, $state]) {
             $stateMap[$element] = $state;
@@ -125,6 +126,9 @@ final class HtmlRenderer
         return new RenderingResult($document, $styles, $fragment, (new Painter($context->textMeasurer, $embedded, $context->layoutMetrics))->paint($fragment), $context->textMeasurer, $modal, $context->layoutMetrics, $view['parents'] ?? null);
     }
 
+    /**
+     * @param \SplObjectStorage<\Dom\Element, array<array-key, mixed>> $stateMap
+     */
     private static function frame(\Dom\HTMLDocument $document, RenderingContext $context, array $states, ?Timeline $timeline, float $time, ResourceCollection $resources, StyleResolver $resolver, \SplObjectStorage $stateMap, ?\SplObjectStorage $containers = null, ?array $view = null): array
     {
         $styles = $resolver->resolve($document, $context->width, $context->height, $states, $timeline, $time, $containers, null, $view['owners'] ?? null, $view['depths'] ?? []);

@@ -97,6 +97,7 @@ final class CascadeResolver
             $raw = $parent;
             foreach (array_intersect_key($record['cascaded'], array_flip(self::PROPERTIES)) as $property => $value) {
                 $raw[$property] = match (true) {
+                    'color' === $property && 'default' === ($record['resolved']['color'] ?? null) => 'default',
                     \in_array($value, ['inherit', 'unset'], true) => $parent[$property] ?? 'initial',
                     'font-weight' === $property && \in_array(strtolower(trim($value)), ['bolder', 'lighter'], true) => $styles[$element][$property],
                     default => $value,
@@ -157,8 +158,8 @@ final class CascadeResolver
                 $values[$property] = 'default';
             }
         }
-        if ('initial' === ($raw['color'] ?? null)) {
-            $values['color'] = 'initial';
+        if (\in_array($raw['color'] ?? null, ['initial', 'default'], true)) {
+            $values['color'] = $raw['color'];
         }
 
         return $values;
@@ -353,7 +354,8 @@ final class CascadeResolver
                     continue;
                 }
                 $record = $resolver->getCascadeRecord($element);
-                $rowInput = !isset($record['starting-style']) && !$record['declarations'] ? [$record, $raw[$element], $coverage[$element], $managed[$element], $origins[$element] ?? 0, $lineOrigins[$element] ?? null] : null;
+                // Capture may update animated used values without changing the resolver's records.
+                $rowInput = !isset($record['starting-style']) && !$record['declarations'] ? [$record, $raw[$element], $coverage[$element], $managed[$element], $origins[$element] ?? 0, $lineOrigins[$element] ?? null, $styles[$element]] : null;
                 if (null !== $rowInput && null !== $lastProjectedRow && $lastProjectedRow[0] === $rowInput) {
                     $projected[$element] = $lastProjectedRow[1];
                     continue;
@@ -405,7 +407,10 @@ final class CascadeResolver
     }
 
     /**
-     * @param \SplObjectStorage<\Dom\Element, array<string, string>> $styles
+     * @param array{computed: array<string, string>, resolved: array<string, string>, cascaded: array<string, string>, specified: array<string, true>, declarations: array<string, array{value: string, source: string, source-value: string, expansion: list<string>, priority: array, order: array{int, int}, valid: bool, initial: bool, implicit: bool, explicit-candidate: array{0: string, ...}|null, ...}>, animated?: array<string, true>, ...} $record
+     * @param \SplObjectStorage<\Dom\Element, array<string, string>>                                                                                                                                                                                                                                                                                                                                                                                    $styles
+     * @param \SplObjectStorage<\Dom\Element, int>                                                                                                                                                                                                                                                                                                                                                                                                      $origins
+     * @param \WeakMap<\Dom\Element, string>                                                                                                                                                                                                                                                                                                                                                                                                            $lineOrigins
      *
      * @return array{computed: array<string, string>, own: array<string, string>}
      */
@@ -435,7 +440,10 @@ final class CascadeResolver
     }
 
     /**
-     * @param \SplObjectStorage<\Dom\Element, array<string, string>> $styles
+     * @param array{computed: array<string, string>, resolved: array<string, string>, cascaded: array<string, string>, specified: array<string, true>, declarations: array<string, array{value: string, source: string, source-value: string, expansion: list<string>, priority: array, order: array{int, int}, valid: bool, initial: bool, implicit: bool, explicit-candidate: array{0: string, ...}|null, ...}>, animated?: array<string, true>, ...} $record
+     * @param \SplObjectStorage<\Dom\Element, array<string, string>>                                                                                                                                                                                                                                                                                                                                                                                    $styles
+     * @param \SplObjectStorage<\Dom\Element, int>                                                                                                                                                                                                                                                                                                                                                                                                      $origins
+     * @param \WeakMap<\Dom\Element, string>                                                                                                                                                                                                                                                                                                                                                                                                            $lineOrigins
      *
      * @return array<string, string>
      */

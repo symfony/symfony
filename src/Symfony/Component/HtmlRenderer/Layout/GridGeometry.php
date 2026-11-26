@@ -158,33 +158,43 @@ final class GridGeometry
      */
     public static function place(array $styles, int $columns, bool $dense = false, bool $columnFlow = false, int $explicitRows = 1, ?int &$columnLead = null, ?int &$rowLead = null, bool $subgridColumns = false, bool $subgridRows = false): array
     {
-        $columnLead = $rowLead = 0;
-        if ($columnFlow) {
-            $transposed = array_map(static function (array $style): array {
-                $result = [];
-                foreach (['grid-row' => 'grid-column', 'grid-column' => 'grid-row', 'grid-row-start' => 'grid-column-start', 'grid-row-end' => 'grid-column-end', 'grid-column-start' => 'grid-row-start', 'grid-column-end' => 'grid-row-end'] as $from => $to) {
-                    if (isset($style[$from])) {
-                        $result[$to] = $style[$from];
-                    }
-                }
-
-                return $result;
-            }, $styles);
-
-            return array_map(static fn (array $item): array => [$item[1], $item[0], $item[3], $item[2]], self::place($transposed, max(1, $explicitRows), $dense, false, $columns, $rowLead, $columnLead, $subgridRows, $subgridColumns));
-        }
         $items = [];
-        foreach ($styles as $index => $style) {
+        foreach ($styles as $style) {
             [$column, $columnSpan] = self::axis($style, 'grid-column', $columns);
             [$row, $rowSpan] = self::axis($style, 'grid-row', $explicitRows);
+            $items[] = [$row, $column, $rowSpan, $columnSpan];
+        }
+
+        return self::placeResolved($items, $columns, $dense, $columnFlow, $explicitRows, $columnLead, $rowLead, $subgridColumns, $subgridRows);
+    }
+
+    /**
+     * @param list<array{?int, ?int, int, int}> $items Resolved row, column and spans, before leading implicit tracks
+     *
+     * @param-out int $columnLead
+     * @param-out int $rowLead
+     *
+     * @return list<array{int, int, int, int}>
+     *
+     * @internal
+     */
+    public static function placeResolved(array $items, int $columns, bool $dense = false, bool $columnFlow = false, int $explicitRows = 1, ?int &$columnLead = null, ?int &$rowLead = null, bool $subgridColumns = false, bool $subgridRows = false): array
+    {
+        $columnLead = $rowLead = 0;
+        if ($columnFlow) {
+            $transposed = array_map(static fn (array $item): array => [$item[1], $item[0], $item[3], $item[2]], $items);
+
+            return array_map(static fn (array $item): array => [$item[1], $item[0], $item[3], $item[2]], self::placeResolved($transposed, max(1, $explicitRows), $dense, false, $columns, $rowLead, $columnLead, $subgridRows, $subgridColumns));
+        }
+        foreach ($items as &$item) {
             if ($subgridColumns) {
-                [$column, $columnSpan] = self::clampPlacement($column, $columnSpan, $columns);
+                [$item[1], $item[3]] = self::clampPlacement($item[1], $item[3], $columns);
             }
             if ($subgridRows) {
-                [$row, $rowSpan] = self::clampPlacement($row, $rowSpan, $explicitRows);
+                [$item[0], $item[2]] = self::clampPlacement($item[0], $item[2], $explicitRows);
             }
-            $items[$index] = [$row, $column, $rowSpan, $columnSpan];
         }
+        unset($item);
         if ($items) {
             $columnLead = max(0, -min(0, ...array_map(static fn (array $item): int => $item[1] ?? 0, $items)));
             $rowLead = max(0, -min(0, ...array_map(static fn (array $item): int => $item[0] ?? 0, $items)));

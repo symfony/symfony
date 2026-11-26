@@ -2964,28 +2964,7 @@ final class LayoutEngine
         $lead = 0;
         $rowLead = 0;
         $explicitRows = max(\count($template->rows), ...array_values(array_map(static fn (array $area) => $area[2] + 1, $template->areas ?: [[0, 0, 0, 0]])));
-        // Column after column, the items fill the explicit rows, or a single row without any
-        $flowRows = max(1, $explicitRows);
         $resolve = \Symfony\Component\HtmlRenderer\Layout\GridGeometry::resolveLines(...);
-        $taken = [];
-        $occupy = static function (int $row, int $column, int $rowSpan, int $columnSpan) use (&$taken): void {
-            for ($r = $row; $r < $row + $rowSpan; ++$r) {
-                for ($c = $column; $c < $column + $columnSpan; ++$c) {
-                    $taken[$r][$c] = true;
-                }
-            }
-        };
-        $free = static function (int $row, int $column, int $rowSpan, int $columnSpan) use (&$taken): bool {
-            for ($r = $row; $r < $row + $rowSpan; ++$r) {
-                for ($c = $column; $c < $column + $columnSpan; ++$c) {
-                    if (isset($taken[$r][$c])) {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        };
         $items = [];
         foreach ($children as $order => $child) {
             $style = StyleBridge::resolve($this->widgetRenderer, $child);
@@ -3032,158 +3011,20 @@ final class LayoutEngine
             [$rowFrom, $rowTo] = $lines($placement->rowStart, $placement->rowStartName, true, false, $placement->rowEndName, $placement->rowEnd, $explicitRows);
             [$column, $columnSpan] = $resolve($columnFrom, $columnTo, $placement->columnSpan, $count);
             [$row, $rowSpan] = $resolve($rowFrom, $rowTo, $placement->rowSpan, $explicitRows);
-            if ($template->columnFlow) {
-                // Column after column, the columns are added as needed: the explicit rows bound the spans instead
-                $columnSpan = min(self::MAX_GRID_ROW_SPAN, $columnSpan);
-                $column = null === $column ? null : min(1000, max(0, $column));
-                $rowSpan = min($flowRows, $rowSpan);
-            } else {
-                if ($subgrid) {
-                    [$column, $columnSpan] = \Symfony\Component\HtmlRenderer\Layout\GridGeometry::clampPlacement($column, $columnSpan, $count);
-                } else {
-                    $columnSpan = min(self::MAX_GRID_ROW_SPAN, $columnSpan);
-                    if (null !== $column) {
-                        // A line before the first one adds columns before the explicit grid.
-                        $column = min(max(-self::MAX_GRID_ROW_SPAN, $column), 1000);
-                    }
-                }
-            }
-            $items[$order] = [$child, null === $row ? null : min(1000, max(-self::MAX_GRID_ROW_SPAN, $row)), $column, min(self::MAX_GRID_ROW_SPAN, $rowSpan), $columnSpan];
+            $items[$order] = [$child, $row, $column, $rowSpan, $columnSpan];
         }
-        // The rows added before the explicit ones, from a line before the first one, like grid-row: -5 / -1 in a grid of
-        // three rows: every row moves past them
-        if (!$subgrid && !$template->subgridRows && $items && 0 < $rowLead = max(0, -min(0, ...array_map(static fn (array $item): int => $item[1] ?? 0, $items)))) {
-            foreach ($items as $order => $item) {
-                if (null !== $item[1]) {
-                    $items[$order][1] += $rowLead;
-                }
-            }
-            $flowRows += $rowLead;
-        }
-        if (!$template->columnFlow && !$subgrid && $items) {
-            // The columns added before the explicit ones: every column moves past them
-            if (0 < $lead = max(0, -min(0, ...array_map(static fn (array $item): int => $item[2] ?? 0, $items)))) {
-                foreach ($items as $order => $item) {
-                    if (null !== $item[2]) {
-                        $items[$order][2] += $lead;
-                    }
-                }
-                $count += $lead;
-            }
-            $count = max($count, ...array_map(static fn (array $item): int => ($item[2] ?? 0) + $item[4], $items));
-        }
-        // Fixed first: areas and items with both lines; then the ones with a row (a column, column after column); then the others, in order
-        $placed = [];
-        if ($template->columnFlow) {
-            foreach ([true, false] as $both) {
-                foreach ($items as $order => [$child, $row, $column, $rowSpan, $columnSpan]) {
-                    if (null === $column || isset($placed[$order]) || $both && null === $row) {
-                        continue;
-                    }
-                    if (null === $row) {
-                        for ($row = 0; !$free($row, $column, $rowSpan, $columnSpan); ++$row) {
-                        }
-                    }
-                    $occupy(max(0, $row), $column, $rowSpan, $columnSpan);
-                    $placed[$order] = [$child, max(0, $row), $column, $rowSpan, $columnSpan];
-                }
-            }
-        }
-        // The items of a row and no column: past those placed in their row before them, unless dense, in the columns
-        // added past the explicit ones when there is no room left, like CSS
-        $rowEnds = [];
-        foreach ($template->columnFlow ? [] : [true, false] as $both) {
-            foreach ($items as $order => [$child, $row, $column, $rowSpan, $columnSpan]) {
-                if (null === $row || isset($placed[$order]) || $both && null === $column) {
-                    continue;
-                }
-                $row = max(0, $row);
-                if (null === $column) {
-                    for ($column = $template->dense ? 0 : $rowEnds[$row] ?? 0; $column < 1000 && !$free($row, $column, $rowSpan, $columnSpan); ++$column) {
-                    }
-                    $rowEnds[$row] = $column + $columnSpan;
-                    if (!$subgrid) {
-                        $count = max($count, $column + $columnSpan);
-                    }
-                    $column = min($column, $count - $columnSpan);
-                }
-                $occupy($row, $column, $rowSpan, $columnSpan);
-                $placed[$order] = [$child, $row, $column, $rowSpan, $columnSpan];
-            }
-        }
-        $cursorRow = 0;
-        $cursorColumn = 0;
-        foreach ($items as $order => [$child, $row, $column, $rowSpan, $columnSpan]) {
-            if (isset($placed[$order])) {
-                continue;
-            }
-            if ($template->columnFlow) {
-                // Dense: from the first cell again; the next free cells from the cursor, column after column, a fixed row keeping its row
-                if ($template->dense) {
-                    $cursorRow = 0;
-                    $cursorColumn = 0;
-                }
-                if (null !== $row && $row < $cursorRow) {
-                    ++$cursorColumn;
-                }
-                for ($guard = 0; $guard < 100000; ++$guard) {
-                    $tryRow = $row ?? $cursorRow;
-                    if (null === $row && $tryRow + $rowSpan > $flowRows) {
-                        ++$cursorColumn;
-                        $cursorRow = 0;
-                        continue;
-                    }
-                    if ($free($tryRow, $cursorColumn, $rowSpan, $columnSpan)) {
-                        break;
-                    }
-                    if (null === $row) {
-                        ++$cursorRow;
-                    } else {
-                        ++$cursorColumn;
-                    }
-                }
-                $at = $row ?? $cursorRow;
-                $occupy($at, $cursorColumn, $rowSpan, $columnSpan);
-                $placed[$order] = [$child, $at, $cursorColumn, $rowSpan, $columnSpan];
-                // Past it, a fixed row too: the items after it do not go back to the cells left free before it, like CSS
-                $cursorRow = $at + $rowSpan;
-                continue;
-            }
-            // Dense: from the first cell again, filling what the items before left free
-            if ($template->dense) {
-                $cursorRow = 0;
-                $cursorColumn = 0;
-            }
-            // The next free cells from the cursor, row after row; a fixed column keeps its column
-            if (null !== $column && $column < $cursorColumn) {
-                ++$cursorRow;
-            }
-            for ($guard = 0; $guard < 100000; ++$guard) {
-                $tryColumn = $column ?? $cursorColumn;
-                if (null === $column && $tryColumn + $columnSpan > $count) {
-                    ++$cursorRow;
-                    $cursorColumn = 0;
-                    continue;
-                }
-                if ($free($cursorRow, $tryColumn, $rowSpan, $columnSpan)) {
-                    break;
-                }
-                if (null === $column) {
-                    ++$cursorColumn;
-                } else {
-                    ++$cursorRow;
-                }
-            }
-            $at = $column ?? $cursorColumn;
-            $occupy($cursorRow, $at, $rowSpan, $columnSpan);
-            $placed[$order] = [$child, $cursorRow, $at, $rowSpan, $columnSpan];
-            // Past it, a fixed column too: the items after it do not go back to the cells left free before it, like CSS
-            $cursorColumn = $at + $columnSpan;
-        }
-        ksort($placed);
+        $resolved = array_map(static fn (array $item): array => [
+            null === $item[1] ? null : min(1000, max(-self::MAX_GRID_ROW_SPAN, $item[1])),
+            null === $item[2] ? null : min(1000, max(-self::MAX_GRID_ROW_SPAN, $item[2])),
+            max(1, min(self::MAX_GRID_ROW_SPAN, $item[3])),
+            max(1, min(self::MAX_GRID_ROW_SPAN, $item[4])),
+        ], array_values($items));
+        // Native coordinates stay bounded; the shared engine rejects an extent beyond 1000 tracks,
+        // including a clamped start whose span would cross that limit.
+        $placed = \Symfony\Component\HtmlRenderer\Layout\GridGeometry::placeResolved($resolved, $count, $template->dense, $template->columnFlow, max(1, $explicitRows), $lead, $rowLead, $subgrid, $template->subgridRows);
+        $children = array_values($children);
 
-        // [child, row, column, rows, columns]
-        return array_values($placed);
+        return array_map(static fn (array $item, int $index): array => [$children[$index], ...$item], $placed, array_keys($placed));
     }
 
     /**

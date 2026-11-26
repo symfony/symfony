@@ -133,6 +133,8 @@ A terminal has fixed font metrics and whole cells. The adapter draws styled Unic
 
 The opt-in `HtmlBuilder::useHtmlRenderer()` path projects registered inline raster and SVG images through the existing native image drawing code. Private image markers are consumed in the bridge before layout and display-list generation. Image rows retain native colors and distinct hyperlink identities. Each projected image currently remains one replaced box: when it wraps over several terminal rows, following text cannot use the unused cells of its final row. Generated `content: url()` sizing also differs from the retained path. These are remaining convergence gaps.
 
+Grid auto-placement is shared with HtmlRenderer, including sparse and dense column flow and leading implicit tracks. Native spans remain limited to 100 tracks. Placement that would generate more than 1,000 tracks along either axis raises `\LengthException`; oversized native positions previously used endpoint clamping. Nonpositive native spans normalize to one, matching the existing placement setters.
+
 Twig templates
 --------------
 

@@ -148,6 +148,24 @@ final class GridGeometryTest extends TestCase
         self::assertSame([[0, 3, 1, 1], [0, 0, 1, 1], [0, 1, 1, 1], [0, 4, 1, 2], [0, 2, 1, 1]], GridGeometry::place($styles, 4, true));
     }
 
+    public function testResolvedPlacementPreservesLeadingTracksAndSourceOrder()
+    {
+        $columnLead = $rowLead = 0;
+        $placed = GridGeometry::placeResolved([[0, -1, 1, 1], [null, null, 1, 1], [0, null, 1, 2]], 3, false, true, 3, $columnLead, $rowLead);
+
+        self::assertSame([[0, 0, 1, 1], [1, 0, 1, 1], [0, 1, 1, 2]], $placed);
+        self::assertSame([1, 0], [$columnLead, $rowLead]);
+    }
+
+    public function testResolvedPlacementClampsOnlySubgridAxes()
+    {
+        $columnLead = $rowLead = 0;
+        $placed = GridGeometry::placeResolved([[-1, -1, 4, 5]], 3, false, false, 2, $columnLead, $rowLead, true, true);
+
+        self::assertSame([[0, 0, 2, 3]], $placed);
+        self::assertSame([0, 0], [$columnLead, $rowLead]);
+    }
+
     public function testUntrustedGridPlacementCannotAllocateUnboundedImplicitTracks()
     {
         $this->expectException(\LengthException::class);

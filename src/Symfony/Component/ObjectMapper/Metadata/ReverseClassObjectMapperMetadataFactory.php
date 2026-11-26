@@ -47,7 +47,7 @@ final class ReverseClassObjectMapperMetadataFactory implements ObjectMapperMetad
         }
 
         $mappings = $this->objectMapperMetadataFactory->create($object, $property, $context);
-        $targetClasses = (array) ($this->classMap[$class] ?? []);
+        $targetClasses = $property ? (array) ($this->classMap[$class] ?? []) : $this->getClosestTargetClasses($class);
 
         if (!$targetClasses) {
             return $mappings;
@@ -103,5 +103,23 @@ final class ReverseClassObjectMapperMetadataFactory implements ObjectMapperMetad
         }
 
         return $this->attributesCache[$key] = $mappings;
+    }
+
+    /**
+     * Returns the targets of the source class, or of its closest parent class listed in the class map.
+     *
+     * @param class-string $class
+     *
+     * @return list<class-string>
+     */
+    private function getClosestTargetClasses(string $class): array
+    {
+        foreach ([$class, ...class_parents($class)] as $source) {
+            if (isset($this->classMap[$source])) {
+                return (array) $this->classMap[$source];
+            }
+        }
+
+        return [];
     }
 }

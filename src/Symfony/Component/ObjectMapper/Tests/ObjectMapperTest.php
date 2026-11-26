@@ -32,6 +32,20 @@ use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFact
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\A;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\AbstractTarget\AmbiguousVehicleSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\AbstractTarget\Car;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\AbstractTarget\CarFromRecord;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\AbstractTarget\Drivable;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\AbstractTarget\ElectricTruckRecord;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\AbstractTarget\LorryFromRecord;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\AbstractTarget\NamedTruckFromRecord;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\AbstractTarget\Truck;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\AbstractTarget\TruckFromRecord;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\AbstractTarget\TruckRecord;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\AbstractTarget\UnmappedVehicleSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\AbstractTarget\Vehicle;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\AbstractTarget\VehicleRecord;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\AbstractTarget\VehicleSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\B;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Bundle\NestedEntity;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Bundle\NestedEntityResource;
@@ -1337,6 +1351,130 @@ final class ObjectMapperTest extends TestCase
 
         $this->assertInstanceOf(BasePaymentView::class, $view);
         $this->assertSame(500, $view->amountCents);
+    }
+
+    #[DataProvider('sourceDeclaredSubclassOfAbstractTargetProvider')]
+    public function testMapToAbstractTargetResolvesSubclassDeclaredBySource(object $source, string $target, string $expected)
+    {
+        $mapped = (new ObjectMapper())->map($source, $target);
+
+        $this->assertInstanceOf($expected, $mapped);
+        $this->assertSame($source->name, $mapped->name);
+    }
+
+    public static function sourceDeclaredSubclassOfAbstractTargetProvider(): iterable
+    {
+        yield 'abstract class' => [new VehicleSource('Clio', 4), Vehicle::class, Car::class];
+        yield 'interface' => [new VehicleSource('Clio', 4), Drivable::class, Car::class];
+        yield 'condition' => [new VehicleSource('Actros', 18), Vehicle::class, Truck::class];
+    }
+
+    #[DataProvider('reverseSubclassOfAbstractTargetProvider')]
+    public function testMapToAbstractTargetResolvesSubclassMappedFromClosestSourceAncestor(VehicleRecord $source, string $expected)
+    {
+        $classMap = [
+            VehicleRecord::class => [CarFromRecord::class],
+            TruckRecord::class => [TruckFromRecord::class],
+        ];
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), $classMap));
+
+        $mapped = $mapper->map($source, Vehicle::class);
+
+        $this->assertInstanceOf($expected, $mapped);
+        $this->assertSame($source->name, $mapped->name);
+    }
+
+    public static function reverseSubclassOfAbstractTargetProvider(): iterable
+    {
+        yield 'declared source' => [new VehicleRecord('Clio'), CarFromRecord::class];
+        yield 'declared subclass source' => [new TruckRecord('Actros'), TruckFromRecord::class];
+        yield 'closest ancestor' => [new ElectricTruckRecord('eActros'), TruckFromRecord::class];
+    }
+
+    #[DataProvider('conditionalReverseSubclassOfAbstractTargetProvider')]
+    public function testMapToAbstractTargetSkipsReverseSubclassExcludedByCondition(VehicleRecord $source, string $expected)
+    {
+        $classMap = [
+            VehicleRecord::class => [CarFromRecord::class],
+            TruckRecord::class => [NamedTruckFromRecord::class],
+        ];
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), $classMap));
+
+        $this->assertInstanceOf($expected, $mapper->map($source, Vehicle::class));
+    }
+
+    public static function conditionalReverseSubclassOfAbstractTargetProvider(): iterable
+    {
+        yield 'condition met' => [new ElectricTruckRecord('eActros'), NamedTruckFromRecord::class];
+    }
+
+    public function testMapToAbstractTargetIgnoresFartherSourceAncestorWhenClosestOneIsExcludedByCondition()
+    {
+        $classMap = [
+            VehicleRecord::class => [CarFromRecord::class],
+            TruckRecord::class => [NamedTruckFromRecord::class],
+        ];
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), $classMap));
+
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot map "%1$s" to "%2$s": no subclass of "%2$s" maps from it.', ElectricTruckRecord::class, Vehicle::class));
+
+        $mapper->map(new ElectricTruckRecord(), Vehicle::class);
+    }
+
+    public function testMapResolvesReverseTargetDeclaredForClosestSourceAncestor()
+    {
+        $classMap = [
+            VehicleRecord::class => [CarFromRecord::class],
+            TruckRecord::class => [TruckFromRecord::class],
+        ];
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), $classMap));
+
+        $mapped = $mapper->map(new ElectricTruckRecord('eActros'));
+
+        $this->assertInstanceOf(TruckFromRecord::class, $mapped);
+        $this->assertSame('eActros', $mapped->name);
+    }
+
+    #[DataProvider('ambiguousSubclassOfAbstractTargetProvider')]
+    public function testMapToAbstractTargetThrowsWhenSeveralSubclassesMatch(ObjectMapper $mapper, object $source, string $message)
+    {
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage($message);
+
+        $mapper->map($source, Vehicle::class);
+    }
+
+    public static function ambiguousSubclassOfAbstractTargetProvider(): iterable
+    {
+        yield 'source-declared' => [
+            new ObjectMapper(),
+            new AmbiguousVehicleSource(),
+            \sprintf('Ambiguous mapping for "%s" to "%s": "%s", "%s" match.', AmbiguousVehicleSource::class, Vehicle::class, Car::class, Truck::class),
+        ];
+
+        $classMap = [TruckRecord::class => [TruckFromRecord::class, LorryFromRecord::class]];
+
+        yield 'reverse' => [
+            new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), $classMap)),
+            new ElectricTruckRecord(),
+            \sprintf('Ambiguous mapping for "%s" to "%s": "%s", "%s" match.', ElectricTruckRecord::class, Vehicle::class, TruckFromRecord::class, LorryFromRecord::class),
+        ];
+    }
+
+    #[DataProvider('unmappedAbstractTargetProvider')]
+    public function testMapToAbstractTargetThrowsWhenNoSubclassMapsFromSource(string $target)
+    {
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot map "%1$s" to "%2$s": no subclass of "%2$s" maps from it.', UnmappedVehicleSource::class, $target));
+
+        (new ObjectMapper())->map(new UnmappedVehicleSource(), $target);
+    }
+
+    public static function unmappedAbstractTargetProvider(): iterable
+    {
+        yield 'abstract class' => [Vehicle::class];
+        yield 'interface' => [Drivable::class];
     }
 
     public function testClassMapKeepsEveryConditionalClassLevelMapDeclaredOnTarget()

@@ -165,14 +165,9 @@ class Inline
                     setlocale(\LC_NUMERIC, 'C');
                 }
                 if (\is_float($value)) {
-                    $repr = (string) $value;
+                    $repr = var_export($value, true);
                     if (is_infinite($value)) {
                         $repr = str_ireplace('INF', '.Inf', $repr);
-                    } elseif (floor($value) == $value && $repr == $value) {
-                        // Preserve float data type since storing a whole number will result in integer value.
-                        if (!str_contains($repr, 'E')) {
-                            $repr .= '.0';
-                        }
                     }
                 } else {
                     $repr = \is_string($value) ? "'$value'" : (string) $value;

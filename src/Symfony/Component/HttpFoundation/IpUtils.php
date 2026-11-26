@@ -139,9 +139,11 @@ class IpUtils
                 return self::setCacheResult($cacheKey, false !== filter_var($address, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4));
             }
 
-            if ($netmask < 0 || $netmask > 32) {
+            if (!ctype_digit($netmask) || 32 < (int) $netmask) {
                 return self::setCacheResult($cacheKey, false);
             }
+
+            $netmask = (int) $netmask;
         } else {
             $address = $ip;
             $netmask = 32;
@@ -190,12 +192,14 @@ class IpUtils
             }
 
             if ('0' === $netmask) {
-                return (bool) unpack('n*', @inet_pton($address));
+                return self::setCacheResult($cacheKey, (bool) unpack('n*', @inet_pton($address)));
             }
 
-            if ($netmask < 1 || $netmask > 128) {
+            if (!ctype_digit($netmask) || 1 > (int) $netmask || 128 < (int) $netmask) {
                 return self::setCacheResult($cacheKey, false);
             }
+
+            $netmask = (int) $netmask;
         } else {
             if (!filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
                 return self::setCacheResult($cacheKey, false);

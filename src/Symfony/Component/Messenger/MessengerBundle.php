@@ -403,10 +403,7 @@ class MessengerBundle extends AbstractBundle
         }
 
         $configurator->import('Resources/config/messenger.php');
-
-        if ($container->getParameter('kernel.debug')) {
-            $configurator->import('Resources/config/messenger_debug.php');
-        }
+        $configurator->import('Resources/config/messenger_debug.php');
 
         if ($hasConsole = class_exists(Application::class)) {
             $configurator->import('Resources/config/console.php');

@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Mailer\Tests;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
@@ -321,10 +323,18 @@ class MailerBundleTest extends TestCase
         ], $pool->getTags());
     }
 
-    public function testTheDataCollectorIsRegisteredInDebugModeOnly()
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testTheDataCollectorGoesWithTheProfiler(bool $debug)
     {
-        $this->assertFalse($this->load([])->hasDefinition('mailer.data_collector'));
-        $this->assertTrue($this->load([], true)->hasDefinition('mailer.data_collector'));
+        $container = $this->load([], $debug);
+        new ContainerRemoveMissingDependenciesPass()->process($container);
+        $this->assertFalse($container->hasDefinition('mailer.data_collector'));
+
+        $container = $this->load([], $debug);
+        $container->register('profiler', \stdClass::class);
+        new ContainerRemoveMissingDependenciesPass()->process($container);
+        $this->assertTrue($container->hasDefinition('mailer.data_collector'));
     }
 
     public function testNothingIsRegisteredWhenDisabled()

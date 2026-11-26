@@ -197,8 +197,6 @@ FrameworkBundle
  * `CacheBundle` and `RouterBundle` are registered whether or not their configuration is set, `symfony/cache`
    and `symfony/routing` being hard requirements of this bundle; `cache` has no `enabled` flag, and the router
    stays off until it is configured, as before
- * Every traceable decorator and data collector the moved sections own is registered in debug mode and dropped
-   when the profiler is disabled, where some of them used to follow the profiler alone
  * The component bundles drop at compile time the services whose dependencies are missing, for instance their cache pools when no `cache.system` pool is registered
  * `ValidationBundle` no longer enables the validator when forms are enabled
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated

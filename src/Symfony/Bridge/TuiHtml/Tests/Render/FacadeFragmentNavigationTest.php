@@ -20,7 +20,7 @@ use Symfony\Component\Tui\Tui;
 
 class FacadeFragmentNavigationTest extends TestCase
 {
-    public function testPhysicalClickNavigatesTheActualNativeViewFragment(): void
+    public function testPhysicalClickNavigatesTheActualNativeViewFragment()
     {
         foreach (['<p id="link" style="margin:0"><a href="#target">Jump</a></p><p id="target">Target</p>', '<tui-tabs><section title="First"><p id="link" style="margin:0"><a href="#target">Jump</a></p><p id="target">Target</p></section></tui-tabs>'] as $html) {
             $view = new HtmlBuilder()->useHtmlRenderer()->build($html);

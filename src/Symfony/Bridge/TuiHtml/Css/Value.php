@@ -15,6 +15,8 @@ use Symfony\Bridge\TuiHtml\Style\Color;
 use Symfony\Bridge\TuiHtml\Style\ColorScheme;
 use Symfony\Bridge\TuiHtml\Style\MediaContext;
 use Symfony\Bridge\TuiHtml\Style\TailwindStylesheet;
+use Symfony\Component\HtmlRenderer\Css\ColorSpace;
+use Symfony\Component\HtmlRenderer\Css\Selector;
 use Symfony\Component\HtmlRenderer\Exception\InvalidArgumentException;
 
 /**

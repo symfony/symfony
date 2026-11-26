@@ -24,7 +24,6 @@ use Symfony\Bridge\TuiHtml\Internal\TextMarkers;
 use Symfony\Bridge\TuiHtml\Style\Align;
 use Symfony\Bridge\TuiHtml\Style\AutoMargin;
 use Symfony\Bridge\TuiHtml\Style\BackgroundLayout;
-use Symfony\Bridge\TuiHtml\Style\BlendMode;
 use Symfony\Bridge\TuiHtml\Style\Border;
 use Symfony\Bridge\TuiHtml\Style\BorderPattern;
 use Symfony\Bridge\TuiHtml\Style\Color;
@@ -65,6 +64,7 @@ use Symfony\Bridge\TuiHtml\Widget\Text\InlineImages;
 use Symfony\Bridge\TuiHtml\Widget\Text\InlineNode;
 use Symfony\Bridge\TuiHtml\Widget\TextWidget;
 use Symfony\Component\HtmlRenderer\Exception\InvalidArgumentException;
+use Symfony\Component\HtmlRenderer\Paint\BlendMode;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Ansi\TextWrapper;
 use Symfony\Component\Tui\Focus\FocusPolicyInterface;
@@ -4806,17 +4806,18 @@ final class Renderer implements FocusPolicyInterface, WidgetRendererInterface, R
         $last = \count($rows) - 1;
         $resolvedRowSides = [];
         foreach ($rows as $row => $_) {
-            $sides = [];
-            for ($side = 0; $side < 4; ++$side) {
-                $sides[] = $rowSides[$row][$side] || $groupSides[$row][0][$side] && match ($side) {
-                    0 => $groupSides[$row][1],
-                    2 => $groupSides[$row][2],
-                    default => true,
-                };
-            }
-            $resolvedRowSides[] = $sides;
+            $resolvedRowSides[] = [
+                $rowSides[$row][0] || $groupSides[$row][0][0] && $groupSides[$row][1],
+                $rowSides[$row][1] || $groupSides[$row][0][1],
+                $rowSides[$row][2] || $groupSides[$row][0][2] && $groupSides[$row][2],
+                $rowSides[$row][3] || $groupSides[$row][0][3],
+            ];
         }
-        $grid = new \Symfony\Component\HtmlRenderer\Layout\CollapsedBorderGrid($owners, array_map(static fn (array $cell): array => \array_slice($cell, 1), $cells), $cellSides, $resolvedRowSides, $tableSides, $count);
+        $cellBoxes = [];
+        foreach ($cells as [, $row, $column, $rowSpan, $columnSpan]) {
+            $cellBoxes[] = [$row, $column, $rowSpan, $columnSpan];
+        }
+        $grid = new \Symfony\Component\HtmlRenderer\Layout\CollapsedBorderGrid($owners, $cellBoxes, $cellSides, $resolvedRowSides, $tableSides, $count);
         $vertical = $grid->vertical(...);
         $horizontal = $grid->horizontal(...);
         // The rows and columns of lines: around the table where a line is on that side, between rows where one is

@@ -19,9 +19,9 @@ use Symfony\Component\HtmlRenderer\Font\TextMetrics;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Ansi\Bidi;
 
-final readonly class TerminalTextMeasurer implements TextMeasurerInterface
+final class TerminalTextMeasurer implements TextMeasurerInterface
 {
-    public function __construct(public float $cellWidth = 8.0, public float $cellHeight = 16.0, public bool $textSizing = false)
+    public function __construct(public readonly float $cellWidth = 8.0, public readonly float $cellHeight = 16.0, public readonly bool $textSizing = false)
     {
         if (!is_finite($cellWidth) || !is_finite($cellHeight) || $cellWidth <= 0 || $cellHeight <= 0) {
             throw new \InvalidArgumentException('Cell dimensions must be finite and positive.');

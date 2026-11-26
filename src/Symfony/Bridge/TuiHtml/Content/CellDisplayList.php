@@ -18,9 +18,9 @@ use Symfony\Bridge\TuiHtml\Style\Color;
 use Symfony\Component\HtmlRenderer\Paint\DisplayList;
 
 /** @internal */
-final readonly class CellDisplayList
+final class CellDisplayList
 {
-    public function __construct(private TerminalTextMeasurer $metrics = new TerminalTextMeasurer())
+    public function __construct(private readonly TerminalTextMeasurer $metrics = new TerminalTextMeasurer())
     {
     }
 

@@ -17,7 +17,7 @@ use Symfony\Component\HtmlRenderer\RenderingContext;
 
 class IntrinsicChildConstraintTest extends TestCase
 {
-    public function testChildContributionsRespectMaximumMinimumAndBoxSizing(): void
+    public function testChildContributionsRespectMaximumMinimumAndBoxSizing()
     {
         foreach (['width:100px;max-width:40px' => 40.0, 'width:100px;max-width:40px;min-width:60px' => 60.0, 'width:100px;max-width:40px;padding:5px;border:2px solid' => 54.0, 'width:100px;max-width:40px;padding:5px;border:2px solid;box-sizing:border-box' => 40.0] as $style => $expected) {
             foreach (['', 'width:min-content'] as $width) {
@@ -27,7 +27,7 @@ class IntrinsicChildConstraintTest extends TestCase
         }
     }
 
-    public function testPercentageConstraintsDoNotAcquireAnInventedIntrinsicContainingWidth(): void
+    public function testPercentageConstraintsDoNotAcquireAnInventedIntrinsicContainingWidth()
     {
         foreach (['' => [300.0, 150.0], 'width:200px' => [200.0, 100.0]] as $width => [$outer, $child]) {
             $session = new HtmlRenderer()->createSession('<span id="outer" style="display:inline-block;'.$width.'"><div id="child" style="width:300px;max-width:50%;height:10px">X</div></span>', new RenderingContext(400, 200));

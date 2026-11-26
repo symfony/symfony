@@ -26,7 +26,7 @@ use Symfony\Component\Tui\Widget\Figlet\FontRegistry;
 
 class NativeHeaderContentTest extends TestCase
 {
-    public function testHeaderRenderingDoesNotRenderOrDetachTheRealBody(): void
+    public function testHeaderRenderingDoesNotRenderOrDetachTheRealBody()
     {
         $body = new class extends AbstractWidget {
             public int $renders = 0;
@@ -54,7 +54,7 @@ class NativeHeaderContentTest extends TestCase
         }
     }
 
-    public function testProjectionKeepsClosedSemanticBodyWithoutChangingDefaultMirrorOrLifecycle(): void
+    public function testProjectionKeepsClosedSemanticBodyWithoutChangingDefaultMirrorOrLifecycle()
     {
         $view = new HtmlBuilder()->build('<details id="details"><summary>Summary</summary><p id="body-text">Body</p></details>');
         $details = $view->getById('details');
@@ -82,7 +82,7 @@ class NativeHeaderContentTest extends TestCase
         self::assertSame($body, $details->getContent()->all()[0]);
     }
 
-    public function testPreparedHeaderUsesTheActualWidgetAndExportsPortableContentOnly(): void
+    public function testPreparedHeaderUsesTheActualWidgetAndExportsPortableContentOnly()
     {
         $widget = new CollapsibleWidget("S\x1b[31mummary\x1b[0m", new class extends AbstractWidget {
             public function render(NativeContext $context): array
@@ -105,7 +105,7 @@ class NativeHeaderContentTest extends TestCase
         self::assertStringNotContainsString('BODY', $text);
     }
 
-    public function testPreparedPartDoesNotRetainItsNativeWidget(): void
+    public function testPreparedPartDoesNotRetainItsNativeWidget()
     {
         $widget = new CollapsibleWidget('Summary', new class extends AbstractWidget {
             public function render(NativeContext $context): array

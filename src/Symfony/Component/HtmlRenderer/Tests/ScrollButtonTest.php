@@ -17,7 +17,7 @@ use Symfony\Component\HtmlRenderer\RenderingContext;
 
 class ScrollButtonTest extends TestCase
 {
-    public function testGeneratedButtonsReserveTheirMeasuredHeightInsideTheScrollContainer(): void
+    public function testGeneratedButtonsReserveTheirMeasuredHeightInsideTheScrollContainer()
     {
         $session = new HtmlRenderer()->createSession('<style>div{width:160px;height:64px;line-height:16px;overflow:auto}div::scroll-button(up){content:"Up"}div::scroll-button(down){content:"Down"}</style><div id="s">one<br>two<br>three<br>four<br>five<br>six</div>', new RenderingContext(320, 240));
         $node = $session->getDocument()->getElementById('s');
@@ -29,7 +29,7 @@ class ScrollButtonTest extends TestCase
         self::assertSame('block', $result->getComputedStyle($node)['display']);
     }
 
-    public function testAutoHeightAndAuthoredChromeRetainTheirOuterDimensions(): void
+    public function testAutoHeightAndAuthoredChromeRetainTheirOuterDimensions()
     {
         foreach (['' => [128.0, 96.0], 'height:96px;border:2px solid;padding:4px' => [108.0, 64.0], 'display:inline-block;height:64px' => [64.0, 32.0]] as $style => [$outer, $port]) {
             [$result, $node] = $this->render($style, 'one<br>two<br>three<br>four<br>five<br>six');
@@ -38,7 +38,7 @@ class ScrollButtonTest extends TestCase
         }
     }
 
-    public function testTheContentKeepsAuthoredFlexGridAndPercentageContainingBlocks(): void
+    public function testTheContentKeepsAuthoredFlexGridAndPercentageContainingBlocks()
     {
         foreach (['display:flex;flex-direction:row;column-gap:8px', 'display:grid;grid-template-columns:1fr 1fr;column-gap:8px'] as $style) {
             [$result, $node] = $this->render('height:64px;'.$style, '<span id="first" style="width:50%;height:100%">A</span><span id="second">B</span>');
@@ -51,7 +51,7 @@ class ScrollButtonTest extends TestCase
         }
     }
 
-    public function testDirectionalDisabledStateUsesTheActualPortWithoutDisablingTheOrigin(): void
+    public function testDirectionalDisabledStateUsesTheActualPortWithoutDisablingTheOrigin()
     {
         $session = new HtmlRenderer()->createSession('<style>#s{width:160px;height:64px;line-height:16px;overflow:auto}#s::scroll-button(*){content:"Go"}#s::scroll-button(*):disabled{color:red}#s::scroll-button(*):enabled{color:green}</style><div id="s">one<br>two<br>three<br>four<br>five<br>six</div>', new RenderingContext(320, 240));
         $node = $session->getDocument()->getElementById('s');
@@ -72,7 +72,7 @@ class ScrollButtonTest extends TestCase
         self::assertStringNotContainsString('scroll-button-', $session->getDocument()->saveHtml());
     }
 
-    public function testPointerButtonsScrollAnExplicitFloatingPointPageAndDoNotActivateTheOwner(): void
+    public function testPointerButtonsScrollAnExplicitFloatingPointPageAndDoNotActivateTheOwner()
     {
         $session = new HtmlRenderer()->createSession('<style>#s{display:block;width:160px;height:64px;line-height:16px;overflow:auto}#s::scroll-button(up){content:"Up"}#s::scroll-button(down){content:"Down"}</style><a id="s" href="#target">one<br>two<br>three<br>four<br>five<br>six</a><p id="target">Target</p>', new RenderingContext(320, 240));
         $node = $session->getDocument()->getElementById('s');
@@ -90,7 +90,7 @@ class ScrollButtonTest extends TestCase
         self::assertEqualsWithDelta(54.4, $session->render()->getScrollGeometry($node)->offsetY, .0001);
     }
 
-    public function testCanceledAndRemovedControlOriginsNeverApplyTheDefaultScroll(): void
+    public function testCanceledAndRemovedControlOriginsNeverApplyTheDefaultScroll()
     {
         foreach ([false, true] as $remove) {
             $session = new HtmlRenderer()->createSession('<style>#s{width:160px;height:64px;line-height:16px;overflow:auto}#s::scroll-button(down){content:"Down"}</style><div id="s">one<br>two<br>three<br>four<br>five<br>six</div>', new RenderingContext(320, 240));
@@ -111,7 +111,7 @@ class ScrollButtonTest extends TestCase
         }
     }
 
-    public function testNonBoxAndNonReplacedInlineOriginsGenerateNoScrollControls(): void
+    public function testNonBoxAndNonReplacedInlineOriginsGenerateNoScrollControls()
     {
         foreach (['inline', 'contents'] as $display) {
             [$result, $node] = $this->render('display:'.$display, 'Text');

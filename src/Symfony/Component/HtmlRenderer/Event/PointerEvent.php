@@ -12,9 +12,9 @@
 namespace Symfony\Component\HtmlRenderer\Event;
 
 /** @experimental */
-final readonly class PointerEvent
+final class PointerEvent
 {
-    public function __construct(public string $type, public float $x, public float $y, public int $button = 0, public bool $shift = false)
+    public function __construct(public readonly string $type, public readonly float $x, public readonly float $y, public readonly int $button = 0, public readonly bool $shift = false)
     {
         if (!\in_array($type, ['down', 'move', 'up'], true) || !is_finite($x) || !is_finite($y) || $button < 0) {
             throw new \InvalidArgumentException('Pointer input requires a down, move or up type, finite document coordinates and a non-negative button.');

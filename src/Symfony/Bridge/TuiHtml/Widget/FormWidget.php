@@ -35,9 +35,9 @@ class FormWidget extends ContainerWidget
     }
 
     /**
-     * @param array<string, string|list<string>> $values
-     * @param string                             $action Where the values go, like the action of a form or the formaction of its button
-     * @param 'get'|'post'|'dialog'              $method How, like the method of a form or the formmethod of its button: dialog closes the dialog the form is in
+     * @param array<int|string, string|list<string>> $values
+     * @param string                                 $action Where the values go, like the action of a form or the formaction of its button
+     * @param 'get'|'post'|'dialog'                  $method How, like the method of a form or the formmethod of its button: dialog closes the dialog the form is in
      */
     public function submit(array $values, ?AbstractWidget $submitter = null, string $action = '', string $method = 'get'): void
     {

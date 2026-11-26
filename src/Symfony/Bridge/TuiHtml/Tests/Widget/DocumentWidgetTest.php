@@ -735,6 +735,9 @@ final class DocumentWidgetTest extends TestCase
     {
         $html = '<style>:condensed > legend{display:none}:condensed{color:red}:regular{color:blue}p{margin:0}</style><fieldset id="outer" data-density="condensed"><legend id="legend">Hidden</legend><p id="compact">Compact</p><section data-density="regular"><p id="regular">Regular</p></section></fieldset><p id="host">Host</p>';
         $session = (new HtmlRenderer())->createSession($html, new RenderingContext(480, 320));
+        $standalone = $session->render();
+        $this->assertNotSame('none', $standalone->getComputedStyle($session->getDocument()->getElementById('legend'))['display'] ?? null);
+        $this->assertNotSame('red', $standalone->getComputedStyle($session->getDocument()->getElementById('compact'))['color'] ?? null);
         $widget = new DocumentWidget($session);
         $widget->render(new RenderContext(60, 20));
         $result = $session->render();

@@ -13,9 +13,9 @@ namespace Symfony\Bridge\TuiHtml\Tests\Html;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\TuiHtml\Css\Selector;
 use Symfony\Bridge\TuiHtml\Html\HtmlBuilder;
 use Symfony\Bridge\TuiHtml\Tests\Fixtures\HtmlTui as Tui;
+use Symfony\Component\HtmlRenderer\Css\Selector;
 use Symfony\Component\Tui\Terminal\ScreenBuffer;
 use Symfony\Component\Tui\Terminal\VirtualTerminal;
 

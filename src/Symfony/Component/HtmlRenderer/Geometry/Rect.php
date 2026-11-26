@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\HtmlRenderer\Geometry;
 
-final readonly class Rect
+final class Rect
 {
-    public function __construct(public float $x, public float $y, public float $width, public float $height)
+    public function __construct(public readonly float $x, public readonly float $y, public readonly float $width, public readonly float $height)
     {
         if (!is_finite($x) || !is_finite($y) || !is_finite($width) || !is_finite($height) || $width < 0 || $height < 0) {
             throw new \InvalidArgumentException('A rectangle requires finite coordinates and non-negative dimensions.');

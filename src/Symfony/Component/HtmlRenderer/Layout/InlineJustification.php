@@ -119,7 +119,7 @@ final class InlineJustification
             }
             $bounds = new Rect($fragment->bounds->x + $dx, $fragment->bounds->y, $fragment->bounds->width + $growth, $fragment->bounds->height);
 
-            return new Fragment($fragment->node, $bounds, $fragment->style, null, $children, $fragment->image, null === $fragment->transform ? null : Transform::moved($fragment->transform, $dx, 0), $fragment->backgrounds, null, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll?->moved($dx, 0), $fragment->borderImage, $fragment->anchor, $fragment->content);
+            return new Fragment($fragment->node, $bounds, $fragment->style, null, $children, $fragment->image, null === $fragment->transform ? null : Transform::moved($fragment->transform, $dx, 0), $fragment->backgrounds, null, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll?->moved($dx, 0), $fragment->borderImage, $fragment->anchor, $fragment->content, $fragment->surfaceBackground, $fragment->outline);
         };
 
         return array_map($replace, $fragments);

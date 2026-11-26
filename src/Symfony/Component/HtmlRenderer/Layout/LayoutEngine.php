@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HtmlRenderer\Layout;
 
+use Symfony\Component\HtmlRenderer\Content\ReplacedContentInterface;
 use Symfony\Component\HtmlRenderer\Css\ColorScheme;
 use Symfony\Component\HtmlRenderer\Css\ColorValue;
 use Symfony\Component\HtmlRenderer\Css\GradientParser;
@@ -24,7 +25,9 @@ use Symfony\Component\HtmlRenderer\Hyphenation\HyphenatorInterface;
 use Symfony\Component\HtmlRenderer\Hyphenation\LanguageHyphenator;
 use Symfony\Component\HtmlRenderer\Paint\BorderImageSource;
 use Symfony\Component\HtmlRenderer\Paint\GradientGeometry;
+use Symfony\Component\HtmlRenderer\Paint\OutlineGeometry;
 use Symfony\Component\HtmlRenderer\Paint\Transform;
+use Symfony\Component\HtmlRenderer\Resource\ImageResource;
 use Symfony\Component\HtmlRenderer\Text\CaretGeometry;
 use Symfony\Component\HtmlRenderer\Text\Hyphenation;
 use Symfony\Component\HtmlRenderer\Text\LineBreaks;
@@ -179,9 +182,9 @@ final class LayoutEngine
         $vertical = $boxVertical + $reserved[0] + $reserved[2];
         $naturalWidth = null;
         if (null !== $box->replacedContent && 'auto' === strtolower(trim($style['width'] ?? 'auto')) && null === $forcedWidth) {
-            $naturalWidth = null !== $box->replacedContent->getIntrinsicSize()->aspectRatio ? $this->imageIntrinsicWidth($box, $font, $availableWidth, $availableHeight) : $box->replacedContent->getIntrinsicSize()->preferredWidth;
+            $naturalWidth = null !== $box->replacedContent->getIntrinsicSize()->aspectRatio ? $this->imageIntrinsicWidth($box, $font, $box->replacedContent, $availableWidth, $availableHeight) : $box->replacedContent->getIntrinsicSize()->preferredWidth;
         } elseif (null !== $box->image && 'auto' === strtolower(trim($style['width'] ?? 'auto')) && null === $forcedWidth) {
-            $naturalWidth = $this->imageIntrinsicWidth($box, $font, $availableWidth, $availableHeight) + ('border-box' === ($style['box-sizing'] ?? '') ? $boxHorizontal : 0.0);
+            $naturalWidth = $this->imageIntrinsicWidth($box, $font, $box->image, $availableWidth, $availableHeight) + ('border-box' === ($style['box-sizing'] ?? '') ? $boxHorizontal : 0.0);
         } elseif (\in_array($box->display, ['inline', 'inline-block', 'inline-flex', 'inline-grid', 'inline-table', 'ruby', 'ruby-pair'], true) && !isset($style['width']) && null === $forcedWidth) {
             $availableWidth = max($this->minimumWidth($box, $font) + $horizontal + $margin[1] + $margin[3], min($availableWidth, $this->intrinsicWidth($box, $font) + $horizontal + $margin[1] + $margin[3]));
         }
@@ -210,6 +213,7 @@ final class LayoutEngine
         $children = [];
         $contentHeight = 0.0;
         $contentLayout = null;
+        $surfaceBackground = null;
         $replacementIndex = null;
         $ratioContent = null !== $box->replacedContent?->getIntrinsicSize()->aspectRatio;
         if (null !== $box->image || $ratioContent) {
@@ -241,6 +245,10 @@ final class LayoutEngine
                 $children[] = new Fragment($box->node, new Rect($innerX, $innerY, $innerWidth, $contentHeight));
             } else {
                 $contentLayout = $box->replacedContent->layout($innerWidth, $contentRoom);
+                $surfaceBackground = $contentLayout->background;
+                if (null !== $surfaceBackground) {
+                    $contentLayout = new \Symfony\Component\HtmlRenderer\Content\ContentLayout($contentLayout->height, $contentLayout->displayList, $contentLayout->clipToBounds);
+                }
                 $contentHeight = $contentLayout->height;
                 $children[] = new Fragment($box->node, new Rect($innerX, $innerY, $innerWidth, $contentHeight), array_intersect_key($style, array_flip(['color', 'visibility', 'pointer-events'])), null, [], null, null, [], null, null, null, null, null, null, $contentLayout);
             }
@@ -385,10 +393,16 @@ final class LayoutEngine
         } else {
             $inlineX = 0.0;
             $lineHeight = 0.0;
+            $flowLineWidth = $innerWidth;
             $activeFloats = $floats;
             $ownFloatBottom = $innerY;
             $lastFloatTop = $innerY;
             $inlineGroup = [];
+            $inlineStart = $innerX;
+            $inlineOffsets = [];
+            $floatLineShift = 0.0;
+            $floatLineMetrics = null;
+            $floatLineFont = $floatLineStrut = null;
             $markerHeight = 0.0;
             $inlineParts = new \SplObjectStorage();
             $pendingMargin = null;
@@ -405,8 +419,9 @@ final class LayoutEngine
                 }
                 if ('line-break' === $child->display) {
                     $style['-renderer-line-crossed'] = '1';
-                    $this->alignLine($children, $inlineGroup, $innerWidth, $style, $lineHeight, $innerY + $contentHeight, true, true);
+                    $this->alignLine($children, $inlineGroup, $flowLineWidth, $style, $lineHeight, $innerY + $contentHeight, true, true, $inlineOffsets, $floatLineShift);
                     $contentHeight += max($font->lineHeight, $lineHeight);
+                    $contentHeight = FlowGeometry::clear($activeFloats, $innerY + $contentHeight, $child->style['clear'] ?? 'none') - $innerY;
                     $pendingMargin = null;
                     $marginBase = $contentHeight;
                     $inlineX = $lineHeight = 0.0;
@@ -418,7 +433,7 @@ final class LayoutEngine
                 $clear = FlowGeometry::clear($activeFloats, $innerY + $contentHeight, $child->style['clear'] ?? 'none');
                 if ($clear > $innerY + $contentHeight) {
                     $hadLine = [] !== $inlineGroup;
-                    $this->alignLine($children, $inlineGroup, $innerWidth, $style, $lineHeight, $innerY + $contentHeight);
+                    $this->alignLine($children, $inlineGroup, $flowLineWidth, $style, $lineHeight, $innerY + $contentHeight, true, false, $inlineOffsets, $floatLineShift);
                     $contentHeight = $clear - $innerY;
                     $pendingMargin = null;
                     $marginBase = $contentHeight;
@@ -451,7 +466,9 @@ final class LayoutEngine
                     $fragment = $this->translate($fragment, $left, $top);
                     $children[] = $fragment;
                     $outer = new Rect($fragment->bounds->x - $margin[3], $fragment->bounds->y - $margin[0], $outerWidth, max(0.0, $fragment->bounds->height + $margin[0] + $margin[2]));
-                    $activeFloats[] = ['side' => $float, 'bounds' => $outer];
+                    $gap = max(0.0, $this->layoutMetrics?->constrainLength(0.0, 'float-exclusion-gap', false, $floatFont) ?? 0.0);
+                    $exclusion = $gap > 0 ? new Rect($outer->x - ('right' === $float ? $gap : 0.0), $outer->y, $outer->width + $gap, $outer->height) : $outer;
+                    $activeFloats[] = ['side' => $float, 'bounds' => $exclusion];
                     $lastFloatTop = $top;
                     $ownFloatBottom = max($ownFloatBottom, $outer->y + $outer->height);
                     continue;
@@ -460,7 +477,27 @@ final class LayoutEngine
                 $inlineFont = $this->font($child->style, $style);
                 $inlineMargin = $inline ? $this->edges($child->style, 'margin', $innerWidth, $inlineFont) : [0.0, 0.0, 0.0, 0.0];
                 $intrinsic = $inline ? $this->inlineOuterWidth($child, $innerWidth, $inlineFont) : 0.0;
-                if ($inline && ('anywhere' === ($child->style['overflow-wrap'] ?? '') && $intrinsic > $innerWidth || ($inlineX > 0 || '1' === ($child->style['-renderer-highlight'] ?? null)) && $intrinsic > $innerWidth - $inlineX || isset($boxes[$childIndex + 1]) && InlineFormatting::joins($child, $boxes[$childIndex + 1]) && $intrinsic + $this->inlineOuterWidth($boxes[$childIndex + 1], $innerWidth, $this->font($boxes[$childIndex + 1]->style, $style)) > $innerWidth - $inlineX) && null !== $parts = InlineFormatting::split($child)) {
+                $lineStart = 0.0;
+                $lineEnd = $innerWidth;
+                $handlesFloatLine = $inline && $activeFloats && ($inlineGroup || $intrinsic <= $innerWidth || 'anywhere' === ($child->style['overflow-wrap'] ?? ''));
+                if ($handlesFloatLine) {
+                    while (true) {
+                        [$left, $flowLineWidth] = FlowGeometry::interval($activeFloats, $innerX, $innerY + $contentHeight, $innerWidth, max($font->lineHeight, $inlineFont->lineHeight, $inlineGroup && null !== $floatLineMetrics ? $this->lineBoxHeight($floatLineMetrics) : 0.0));
+                        $lineStart = $left - $innerX;
+                        $lineEnd = $lineStart + $flowLineWidth;
+                        $next = FlowGeometry::nextEnd($activeFloats, $innerY + $contentHeight, max($font->lineHeight, $inlineFont->lineHeight));
+                        if ($inlineGroup || $flowLineWidth > 0 || null === $next) {
+                            break;
+                        }
+                        $contentHeight = $next - $innerY;
+                    }
+                    if (!$inlineGroup) {
+                        $inlineX = $lineStart;
+                    }
+                } elseif ($inline) {
+                    $flowLineWidth = $innerWidth;
+                }
+                if ($inline && ('anywhere' === ($child->style['overflow-wrap'] ?? '') && $intrinsic > $lineEnd - $lineStart || $handlesFloatLine && $intrinsic <= $innerWidth && $intrinsic > $lineEnd - $inlineX || ($inlineX > $lineStart || '1' === ($child->style['-renderer-highlight'] ?? null)) && $intrinsic > $lineEnd - $inlineX || isset($boxes[$childIndex + 1]) && InlineFormatting::joins($child, $boxes[$childIndex + 1]) && $intrinsic + $this->inlineOuterWidth($boxes[$childIndex + 1], $innerWidth, $this->font($boxes[$childIndex + 1]->style, $style)) > $lineEnd - $inlineX) && null !== $parts = InlineFormatting::split($child)) {
                     if (\count($parts) > 1) {
                         foreach ($parts as $part) {
                             $inlineParts[$part] = true;
@@ -474,7 +511,7 @@ final class LayoutEngine
                 if ($fragmentedInline) {
                     $trimmed = $this->trimBoundary($child, true);
                     $trimmedWidth = $this->inlineOuterWidth($trimmed, $innerWidth, $inlineFont);
-                    if ($intrinsic > $innerWidth - $inlineX && $trimmedWidth <= $innerWidth - $inlineX) {
+                    if ($intrinsic > $lineEnd - $inlineX && $trimmedWidth <= $lineEnd - $inlineX) {
                         $child = $trimmed;
                         $intrinsic = $trimmedWidth;
                     }
@@ -498,7 +535,7 @@ final class LayoutEngine
                         $runWidth += $this->inlineOuterWidth($this->trimBoundary($nextBox, true), $innerWidth, $this->font($nextBox->style, $style));
                     }
                 }
-                if ($inline && !$joinedPrevious && 'anywhere' === ($child->style['overflow-wrap'] ?? '') && $runWidth > $innerWidth) {
+                if ($inline && !$joinedPrevious && 'anywhere' === ($child->style['overflow-wrap'] ?? '') && $runWidth > $lineEnd - $lineStart) {
                     $emergencyParts = [];
                     for ($index = $childIndex; $index < $runEnd; ++$index) {
                         array_push($emergencyParts, ...(InlineFormatting::split($boxes[$index], true) ?? [$boxes[$index]]));
@@ -514,15 +551,33 @@ final class LayoutEngine
                         $fragmentedInline = true;
                     }
                 }
-                if ($inlineX > 0 && (!$inline || !$joinedPrevious && $runWidth > $innerWidth - $inlineX)) {
-                    $this->alignLine($children, $inlineGroup, $innerWidth, $style, $lineHeight, $innerY + $contentHeight, true, !$inline);
+                if ($handlesFloatLine && !$inlineGroup && 'anywhere' !== ($child->style['overflow-wrap'] ?? '') && $runWidth > $flowLineWidth) {
+                    while (null !== $next = FlowGeometry::nextEnd($activeFloats, $innerY + $contentHeight, max($font->lineHeight, $inlineFont->lineHeight))) {
+                        $contentHeight = $next - $innerY;
+                        [$left, $flowLineWidth] = FlowGeometry::interval($activeFloats, $innerX, $next, $innerWidth, max($font->lineHeight, $inlineFont->lineHeight));
+                        $lineStart = $left - $innerX;
+                        $lineEnd = $lineStart + $flowLineWidth;
+                        $inlineX = $lineStart;
+                        if ($runWidth <= $flowLineWidth) {
+                            break;
+                        }
+                    }
+                }
+                if ($inlineGroup && (!$inline || !$joinedPrevious && $runWidth > $lineEnd - $inlineX)) {
+                    $this->alignLine($children, $inlineGroup, $flowLineWidth, $style, $lineHeight, $innerY + $contentHeight, true, !$inline, $inlineOffsets, $floatLineShift);
                     $contentHeight += $lineHeight;
                     $inlineX = $lineHeight = 0.0;
+                    if ($handlesFloatLine) {
+                        [$left, $flowLineWidth] = FlowGeometry::interval($activeFloats, $innerX, $innerY + $contentHeight, $innerWidth, max($font->lineHeight, $inlineFont->lineHeight, $inlineGroup && null !== $floatLineMetrics ? $this->lineBoxHeight($floatLineMetrics) : 0.0));
+                        $lineStart = $left - $innerX;
+                        $lineEnd = $lineStart + $flowLineWidth;
+                        $inlineX = $lineStart;
+                    }
                     if (isset($style['-renderer-line-context'])) {
                         $style['-renderer-line-context'] = '1';
                     }
                 }
-                if ($fragmentedInline && 0.0 === $inlineX) {
+                if ($fragmentedInline && !$inlineGroup) {
                     $child = $this->trimBoundary($child, false);
                 }
                 $childX = $innerX + $inlineX;
@@ -544,8 +599,8 @@ final class LayoutEngine
                 } else {
                     $pendingMargin = null;
                 }
-                $childWidth = max(0.0, $innerWidth - $inlineX);
-                $childFloats = $activeFloats;
+                $childWidth = max(0.0, $lineEnd - $inlineX);
+                $childFloats = $handlesFloatLine ? [] : $activeFloats;
                 if (Containment::layout($child->style) || \in_array($child->display, ['flow-root', 'inline-block', 'flex', 'inline-flex', 'grid', 'inline-grid', 'table', 'inline-table'], true) || \in_array($child->style['overflow-x'] ?? $child->style['overflow'] ?? 'visible', ['hidden', 'auto', 'scroll'], true) || \in_array($child->style['overflow-y'] ?? $child->style['overflow'] ?? 'visible', ['hidden', 'auto', 'scroll'], true)) {
                     $least = $this->length($child->style['width'] ?? 'auto', $childWidth, $this->font($child->style, $style));
                     while (true) {
@@ -561,7 +616,71 @@ final class LayoutEngine
                     $childFloats = [];
                 }
                 $fragment = $this->place($child, $childX, $childY, $childWidth, $childAvailableHeight, $style, null, $childFloats, null, $innerWidth);
+                $prospectiveLine = null;
+                $atomic = null !== $child->image || null !== $child->replacedContent || \in_array($child->display, ['inline-block', 'inline-flex', 'inline-grid', 'inline-table', 'ruby-pair'], true);
+                if ($inline && $activeFloats && ($handlesFloatLine || $atomic)) {
+                    $floatLineFont ??= $this->font($style, []);
+                    $floatLineStrut ??= $this->lineStrut($floatLineFont);
+                    $baseMetrics = [$floatLineStrut[0], $floatLineStrut[1], 0.0];
+                    $previousLine = $inlineGroup ? $floatLineMetrics : $baseMetrics;
+                    if (null === $previousLine) {
+                        // Floats can enter an already started line. Accumulate its earlier runs once.
+                        $previousLine = $baseMetrics;
+                        foreach ($inlineGroup as $index) {
+                            $previousLine = self::extendLineMetrics($previousLine, $this->inlineVerticalMetrics($children[$index], $floatLineFont, $floatLineStrut[2], $style));
+                        }
+                    }
+                    $item = $this->inlineVerticalMetrics($fragment, $floatLineFont, $floatLineStrut[2], $style);
+                    $prospectiveLine = self::extendLineMetrics($previousLine, $item);
+                    $outerWidth = $fragment->bounds->width + $inlineMargin[1] + $inlineMargin[3];
+                    $outerHeight = max($this->lineBoxHeight($prospectiveLine), $atomic ? $fragment->bounds->height + $inlineMargin[0] + $inlineMargin[2] : 0.0);
+                    $normalLeft = $inlineGroup ? $inlineStart : $childX;
+                    $normalRight = max($innerX + $inlineX, $childX + $outerWidth);
+                    [$left, $room] = FlowGeometry::interval($activeFloats, $innerX, $innerY + $contentHeight, $innerWidth, $outerHeight);
+                    if ($normalLeft < $left || $normalRight > $left + $room) {
+                        if ($normalRight - $normalLeft <= $room) {
+                            // Keep a fitting line together. Older runs receive this origin change only at finalization.
+                            $dx = $left - $normalLeft;
+                            $floatLineShift += $dx;
+                            $inlineX += $dx;
+                            $childX += $dx;
+                            $fragment = $this->translate($fragment, $dx, 0.0);
+                            $inlineStart = $left;
+                        } else {
+                            if ($inlineGroup) {
+                                $this->alignLine($children, $inlineGroup, $flowLineWidth, $style, $lineHeight, $innerY + $contentHeight, true, false, $inlineOffsets, $floatLineShift);
+                                $contentHeight += $lineHeight;
+                                $lineHeight = 0.0;
+                            }
+                            $prospectiveLine = self::extendLineMetrics($baseMetrics, $item);
+                            $outerHeight = max($this->lineBoxHeight($prospectiveLine), $atomic ? $fragment->bounds->height + $inlineMargin[0] + $inlineMargin[2] : 0.0);
+                            $top = $innerY + $contentHeight;
+                            while (true) {
+                                [$left, $room] = FlowGeometry::interval($activeFloats, $innerX, $top, $innerWidth, $outerHeight);
+                                $next = FlowGeometry::nextEnd($activeFloats, $top, $outerHeight);
+                                if ($outerWidth <= $room || null === $next) {
+                                    break;
+                                }
+                                $top = $next;
+                            }
+                            $fragment = $this->translate($fragment, $left - $childX, $top - $childY);
+                            $childX = $left;
+                            $childY = $top;
+                            $contentHeight = $top - $innerY;
+                            $inlineX = $left - $innerX;
+                        }
+                        $flowLineWidth = $room;
+                        $lineEnd = $left - $innerX + $room;
+                    }
+                }
                 if ($inline) {
+                    if (!$inlineGroup) {
+                        $inlineStart = $childX;
+                    }
+                    if ($activeFloats) {
+                        $inlineOffsets[\count($children)] = $floatLineShift;
+                        $floatLineMetrics = $prospectiveLine;
+                    }
                     if ('1' === ($fragment->style['-renderer-line-crossed'] ?? null)) {
                         $style['-renderer-line-context'] = '1';
                         $style['-renderer-line-crossed'] = '1';
@@ -578,8 +697,8 @@ final class LayoutEngine
                 if ($inline) {
                     $inlineX += $fragment->bounds->width + $inlineMargin[1] + $inlineMargin[3];
                     $lineHeight = max($lineHeight, $bottom - $contentHeight);
-                    if ($inlineX >= $innerWidth && (!isset($boxes[$childIndex + 1]) || !InlineFormatting::joins($child, $boxes[$childIndex + 1]))) {
-                        $this->alignLine($children, $inlineGroup, $innerWidth, $style, $lineHeight, $innerY + $contentHeight, isset($boxes[$childIndex + 1]) || !\in_array($box->display, ['inline', 'ruby'], true) || $box === $this->rootBox);
+                    if ($inlineX >= $lineEnd && (!isset($boxes[$childIndex + 1]) || !InlineFormatting::joins($child, $boxes[$childIndex + 1]))) {
+                        $this->alignLine($children, $inlineGroup, $flowLineWidth, $style, $lineHeight, $innerY + $contentHeight, isset($boxes[$childIndex + 1]) || !\in_array($box->display, ['inline', 'ruby'], true) || $box === $this->rootBox, false, $inlineOffsets, $floatLineShift);
                         $contentHeight += $lineHeight;
                         $inlineX = $lineHeight = 0.0;
                         if (isset($style['-renderer-line-context'])) {
@@ -609,7 +728,7 @@ final class LayoutEngine
                 }
             }
             // Inline descendants defer their final whitespace boundary to the containing line.
-            $this->alignLine($children, $inlineGroup, $innerWidth, $style, $lineHeight, $innerY + $contentHeight, !\in_array($box->display, ['inline', 'ruby'], true) || $box === $this->rootBox, true);
+            $this->alignLine($children, $inlineGroup, $flowLineWidth, $style, $lineHeight, $innerY + $contentHeight, !\in_array($box->display, ['inline', 'ruby'], true) || $box === $this->rootBox, true, $inlineOffsets, $floatLineShift);
             $contentHeight = max($markerHeight, $contentHeight + $lineHeight);
             if ('flow-root' === $box->display || Containment::layout($style) || \in_array($style['overflow-x'] ?? $style['overflow'] ?? 'visible', ['hidden', 'auto', 'scroll'], true) || \in_array($style['overflow-y'] ?? $style['overflow'] ?? 'visible', ['hidden', 'auto', 'scroll'], true)) {
                 $contentHeight = max($contentHeight, $ownFloatBottom - $innerY);
@@ -645,6 +764,10 @@ final class LayoutEngine
             $drawY = $target->y + ($this->layoutMetrics?->constrainLength($drawY - $target->y, 'object-position', true) ?? $drawY - $target->y);
             if (null !== $box->replacedContent) {
                 $contentLayout = $drawWidth > 0 && $drawHeight > 0 ? $box->replacedContent->layout($drawWidth, $drawHeight) : new \Symfony\Component\HtmlRenderer\Content\ContentLayout(0.0, new \Symfony\Component\HtmlRenderer\Paint\DisplayList());
+                $surfaceBackground = $contentLayout->background;
+                if (null !== $surfaceBackground) {
+                    $contentLayout = new \Symfony\Component\HtmlRenderer\Content\ContentLayout($contentLayout->height, $contentLayout->displayList, $contentLayout->clipToBounds);
+                }
                 $drawHeight = $contentLayout->height;
             }
             $draw = new Fragment($box->node, new Rect($drawX, $drawY, $drawWidth, $drawHeight), array_intersect_key($style, array_flip(['color', 'visibility', 'pointer-events', 'image-rendering', 'image-orientation'])), null, [], $box->image, null, [], null, null, null, null, null, null, $contentLayout);
@@ -675,7 +798,7 @@ final class LayoutEngine
             $scroll = new ScrollGeometry($port, $content, 0.0, 0.0, true, true, $reserved, $policy['x'], $policy['y'], $policy['lock-x'] || $policy['lock-y']);
         }
 
-        return new Fragment($box->node, new Rect($x, $y, $width, $height), $style, null, $children, null, null, [], null, $box->pseudoElement, $box->topLayer, $scroll, null === $box->borderImage ? null : new BorderImageSource($box->borderImage), $box->anchor);
+        return new Fragment($box->node, new Rect($x, $y, $width, $height), $style, null, $children, null, null, [], null, $box->pseudoElement, $box->topLayer, $scroll, null === $box->borderImage ? null : new BorderImageSource($box->borderImage), $box->anchor, null, $surfaceBackground);
     }
 
     private function colorAlias(string $value, string $scheme): array|false|null
@@ -878,13 +1001,81 @@ final class LayoutEngine
         }
         $bounds = new Rect($fragment->bounds->x, $fragment->bounds->y, $width, $fragment->bounds->height);
 
-        return [new Fragment($fragment->node, $bounds, $style, $text, $children, $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content), $empty && 0.0 === $width];
+        return [new Fragment($fragment->node, $bounds, $style, $text, $children, $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content, $fragment->surfaceBackground, $fragment->outline), $empty && 0.0 === $width];
     }
 
-    private function alignLine(array &$children, array &$indices, float $width, array $style, float &$lineHeight, float $lineTop, bool $trimEnd = true, bool $lastLine = false): void
+    /** @return array{float, float, TextMetrics} */
+    private function lineStrut(FontStyle $font): array
+    {
+        $metrics = $this->measureText('', $font);
+        $ascent = ($font->lineHeight - $metrics->ascent - $metrics->descent) / 2 + $metrics->ascent;
+
+        return [$ascent, $font->lineHeight - $ascent, $metrics];
+    }
+
+    /** @return array{float, float, float, string, float} */
+    private function inlineVerticalMetrics(Fragment $fragment, FontStyle $font, TextMetrics $metrics, array $style): array
+    {
+        $align = $fragment->style['vertical-align'] ?? 'baseline';
+        $baseline = $this->inlineBaseline($fragment) - $fragment->bounds->y;
+        $height = $fragment->bounds->height;
+        $childFont = $this->font($fragment->style, $style);
+        $shift = match ($align) {
+            'super' => $font->size * .5,
+            'sub' => -$font->size * .25,
+            'middle' => $height / 2 + $font->size / 4 - $baseline,
+            'text-top' => $metrics->ascent - $baseline,
+            'text-bottom' => $height - $metrics->descent - $baseline,
+            default => $this->length($align, $childFont->lineHeight, $childFont, 'vertical-align', true, false) ?? 0.0,
+        };
+        $applied = $this->layoutMetrics?->constrainLength($shift, 'vertical-align-'.$align, true) ?? $shift;
+
+        return [$baseline, $shift, $applied, $align, $height];
+    }
+
+    /**
+     * @param array{float, float, float}                $state
+     * @param array{float, float, float, string, float} $item
+     *
+     * @return array{float, float, float}
+     */
+    private static function extendLineMetrics(array $state, array $item): array
+    {
+        if (\in_array($item[3], ['top', 'bottom'], true)) {
+            $state[2] = max($state[2], $item[4]);
+        } else {
+            $state[0] = max($state[0], $item[0] + $item[2]);
+            $state[1] = max($state[1], $item[4] - $item[0] - $item[2]);
+        }
+
+        return $state;
+    }
+
+    /** @param array{float, float, float} $state */
+    private function lineBoxHeight(array $state): float
+    {
+        $required = max(0.0, $state[0] + $state[1], $state[2]);
+
+        return $this->layoutMetrics?->constrainLength($required, 'line-box-height', true) ?? $required;
+    }
+
+    private function alignLine(array &$children, array &$indices, float $width, array $style, float &$lineHeight, float $lineTop, bool $trimEnd = true, bool $lastLine = false, array &$inlineOffsets = [], float &$floatLineShift = 0.0): void
     {
         if (!$indices) {
+            $inlineOffsets = [];
+            $floatLineShift = 0.0;
+
             return;
+        }
+        if ($inlineOffsets || 0.0 !== $floatLineShift) {
+            foreach ($indices as $index) {
+                $dx = $floatLineShift - ($inlineOffsets[$index] ?? 0.0);
+                if (0.0 !== $dx) {
+                    $children[$index] = $this->translate($children[$index], $dx, 0.0);
+                }
+            }
+            $inlineOffsets = [];
+            $floatLineShift = 0.0;
         }
         $alignment = $indices;
         if ($trimEnd) {
@@ -898,38 +1089,15 @@ final class LayoutEngine
             }
         }
         $font = $this->font($style, []);
-        $metrics = $this->measureText('', $font);
-        $ascent = ($font->lineHeight - $metrics->ascent - $metrics->descent) / 2 + $metrics->ascent;
-        $descent = $font->lineHeight - $ascent;
+        [$ascent, $descent, $metrics] = $this->lineStrut($font);
+        $state = [$ascent, $descent, 0.0];
         $items = [];
         foreach ($indices as $index) {
-            $fragment = $children[$index];
-            $align = $fragment->style['vertical-align'] ?? 'baseline';
-            $baseline = $this->inlineBaseline($fragment) - $fragment->bounds->y;
-            $height = $fragment->bounds->height;
-            $childFont = $this->font($fragment->style, $style);
-            $shift = match ($align) {
-                'super' => $font->size * .5,
-                'sub' => -$font->size * .25,
-                'middle' => $height / 2 + $font->size / 4 - $baseline,
-                'text-top' => $metrics->ascent - $baseline,
-                'text-bottom' => $height - $metrics->descent - $baseline,
-                default => $this->length($align, $childFont->lineHeight, $childFont, 'vertical-align', true, false) ?? 0.0,
-            };
-            $applied = $this->layoutMetrics?->constrainLength($shift, 'vertical-align-'.$align, true) ?? $shift;
-            if (!\in_array($align, ['top', 'bottom'], true)) {
-                $ascent = max($ascent, $baseline + $applied);
-                $descent = max($descent, $height - $baseline - $applied);
-            }
-            $items[$index] = [$baseline, $shift, $applied, $align];
+            $items[$index] = $this->inlineVerticalMetrics($children[$index], $font, $metrics, $style);
+            $state = self::extendLineMetrics($state, $items[$index]);
         }
-        $required = max(0.0, $ascent + $descent);
-        foreach ($indices as $index) {
-            if (\in_array($items[$index][3], ['top', 'bottom'], true)) {
-                $required = max($required, $children[$index]->bounds->height);
-            }
-        }
-        $lineHeight = $this->layoutMetrics?->constrainLength($required, 'line-box-height', true) ?? $required;
+        $ascent = $state[0];
+        $lineHeight = $this->lineBoxHeight($state);
         $left = $alignment ? min(array_map(static fn (int $index): float => $children[$index]->bounds->x, $alignment)) : $children[$indices[0]]->bounds->x;
         $right = $alignment ? max(array_map(static fn (int $index): float => $children[$index]->bounds->x + $children[$index]->bounds->width, $alignment)) : $left;
         $align = $style['text-align'] ?? 'start';
@@ -967,7 +1135,7 @@ final class LayoutEngine
                 $fragment = $this->translate($fragment, $offset, $dy);
             }
             if (0.0 !== $shift) {
-                $fragment = new Fragment($fragment->node, $fragment->bounds, array_replace($fragment->style, ['-renderer-baseline-shift' => (string) $shift]), $fragment->text, $fragment->children, $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content);
+                $fragment = new Fragment($fragment->node, $fragment->bounds, array_replace($fragment->style, ['-renderer-baseline-shift' => (string) $shift]), $fragment->text, $fragment->children, $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content, $fragment->surfaceBackground, $fragment->outline);
             }
             $children[$index] = $fragment;
         }
@@ -1106,17 +1274,17 @@ final class LayoutEngine
         }
 
         $style = $fragment->style;
+        $outline = null;
         if (!\in_array($style['outline-style'] ?? 'none', ['none', 'hidden'], true)) {
             $value = $style['outline-width'] ?? 'medium';
             $value = match (strtolower(trim($value))) {
-                'thin' => '1px', 'medium' => '3px', 'thick' => '5px', default => $value
+                'thin' => '1px', 'medium' => '3px', 'thick' => '5px', default => $value,
             };
-            foreach ([false, true] as $vertical) {
-                $axis = $vertical ? 'y' : 'x';
-                $base = $vertical ? $fragment->bounds->height : $fragment->bounds->width;
-                $style['-renderer-outline-width-'.$axis] = max(0.0, $this->length($value, $base, $font, 'outline-width', $vertical) ?? 0.0);
-                $style['-renderer-outline-offset-'.$axis] = $this->length($style['outline-offset'] ?? '0', $base, $font, 'outline-offset', $vertical) ?? 0.0;
-            }
+            $widthX = max(0.0, $this->length($value, $fragment->bounds->width, $font, 'outline-width', false) ?? 0.0);
+            $offsetX = $this->length($style['outline-offset'] ?? '0', $fragment->bounds->width, $font, 'outline-offset', false) ?? 0.0;
+            $widthY = max(0.0, $this->length($value, $fragment->bounds->height, $font, 'outline-width', true) ?? 0.0);
+            $offsetY = $this->length($style['outline-offset'] ?? '0', $fragment->bounds->height, $font, 'outline-offset', true) ?? 0.0;
+            $outline = new OutlineGeometry($widthX, $widthY, $offsetX, $offsetY);
         }
         if (isset($style['border-radius']) || isset($style['border-top-left-radius']) || isset($style['border-top-right-radius']) || isset($style['border-bottom-right-radius']) || isset($style['border-bottom-left-radius'])) {
             $radii = [];
@@ -1137,7 +1305,7 @@ final class LayoutEngine
             }
         }
 
-        $result = new Fragment($fragment->node, $fragment->bounds, $style, $fragment->text, $children, $fragment->image, $transform, $this->backgrounds($fragment->style, $fragment->bounds, $font, $fragment), $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $scroll, $borderImage, $fragment->anchor, $fragment->content);
+        $result = new Fragment($fragment->node, $fragment->bounds, $style, $fragment->text, $children, $fragment->image, $transform, $this->backgrounds($fragment->style, $fragment->bounds, $font, $fragment), $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $scroll, $borderImage, $fragment->anchor, $fragment->content, $fragment->surfaceBackground, $outline);
         if (null !== $anchorSource) {
             $this->anchorSources[$result] = $anchorSource;
         }
@@ -1199,7 +1367,7 @@ final class LayoutEngine
             $children = $fragment->children;
             $children[$index] = $replace($children[$index], $path, $replacement);
 
-            $result = new Fragment($fragment->node, $fragment->bounds, $fragment->style, $fragment->text, $children, $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content);
+            $result = new Fragment($fragment->node, $fragment->bounds, $fragment->style, $fragment->text, $children, $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content, $fragment->surfaceBackground, $fragment->outline);
             if (isset($sources[$fragment])) {
                 $sources[$result] = $sources[$fragment];
             }
@@ -1504,7 +1672,7 @@ final class LayoutEngine
                 continue;
             }
             $selection = new TextSelection($selection->anchor, $selection->focus, false, $selection->foreground, $selection->background);
-            $fragments[$index] = new Fragment($fragment->node, $fragment->bounds, $fragment->style, $fragment->text, $fragment->children, $fragment->image, $fragment->transform, $fragment->backgrounds, new TextRun($run->start, $run->end, $selection, $run->sourceOffsets, $run->caretPositions), $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content);
+            $fragments[$index] = new Fragment($fragment->node, $fragment->bounds, $fragment->style, $fragment->text, $fragment->children, $fragment->image, $fragment->transform, $fragment->backgrounds, new TextRun($run->start, $run->end, $selection, $run->sourceOffsets, $run->caretPositions), $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content, $fragment->surfaceBackground, $fragment->outline);
         }
 
         return $fragments;
@@ -1541,7 +1709,7 @@ final class LayoutEngine
         }
         $bounds = $fragment->bounds;
 
-        $result = new Fragment($fragment->node, new Rect($bounds->x + $x, $bounds->y + $y, $bounds->width, $bounds->height), $fragment->style, $fragment->text, array_map(fn (Fragment $child): Fragment => $this->scrollTranslate($child, $x, $y, $localFixed || Containment::fixed($fragment->style)), $fragment->children), $fragment->image, null === $fragment->transform ? null : Transform::moved($fragment->transform, $x, $y), $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll?->moved($x, $y), $fragment->borderImage, $fragment->anchor, $fragment->content);
+        $result = new Fragment($fragment->node, new Rect($bounds->x + $x, $bounds->y + $y, $bounds->width, $bounds->height), $fragment->style, $fragment->text, array_map(fn (Fragment $child): Fragment => $this->scrollTranslate($child, $x, $y, $localFixed || Containment::fixed($fragment->style)), $fragment->children), $fragment->image, null === $fragment->transform ? null : Transform::moved($fragment->transform, $x, $y), $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll?->moved($x, $y), $fragment->borderImage, $fragment->anchor, $fragment->content, $fragment->surfaceBackground, $fragment->outline);
         if (isset($this->anchorSources[$fragment])) {
             $this->anchorSources[$result] = $this->anchorSources[$fragment];
         }
@@ -1880,7 +2048,7 @@ final class LayoutEngine
             $style['border-bottom-width'] = '0';
         }
 
-        return new Fragment($fragment->node, new Rect($bounds->x, $top, $bounds->width, $bottom - $top), $style, $fragment->text, $children, $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content);
+        return new Fragment($fragment->node, new Rect($bounds->x, $top, $bounds->width, $bottom - $top), $style, $fragment->text, $children, $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content, $fragment->surfaceBackground, $fragment->outline);
     }
 
     private function grid(Box $owner, array $boxes, float $x, float $y, float $width, float $height, array $style, FontStyle $font, float $verticalChrome, float $gutterBlock = 0.0, ?float $usedContentHeight = null): array
@@ -2093,7 +2261,7 @@ final class LayoutEngine
                 default => 0.0,
             };
             if (\in_array($align, ['normal', 'stretch'], true) && 'auto' === ($boxes[$index]->style['height'] ?? 'auto')) {
-                $fragment = new Fragment($fragment->node, new Rect($fragment->bounds->x, $fragment->bounds->y, $fragment->bounds->width, max(0.0, $areaHeight - $margin[0] - $margin[2])), $fragment->style, $fragment->text, $fragment->children, $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content);
+                $fragment = new Fragment($fragment->node, new Rect($fragment->bounds->x, $fragment->bounds->y, $fragment->bounds->width, max(0.0, $areaHeight - $margin[0] - $margin[2])), $fragment->style, $fragment->text, $fragment->children, $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content, $fragment->surfaceBackground, $fragment->outline);
             }
             $children[] = $this->translate($fragment, $x + $columnOffsets[$column] + $dx, $y + $rowOffsets[$row] + $dy);
         }
@@ -2263,7 +2431,7 @@ final class LayoutEngine
                 $crossAround = $column ? $margin[1] + $margin[3] : $margin[0] + $margin[2];
                 $slack = max(0.0, $lineCross - $crossDimension - $crossAround);
                 if (\in_array($alignment, ['normal', 'stretch'], true) && 'auto' === ($boxes[$index]->style[$column ? 'width' : 'height'] ?? 'auto')) {
-                    $fragment = new Fragment($fragment->node, new Rect(0.0, 0.0, $column ? max(0.0, $lineCross - $crossAround) : $fragment->bounds->width, $column ? $fragment->bounds->height : max(0.0, $lineCross - $crossAround)), $fragment->style, $fragment->text, $fragment->children, $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content);
+                    $fragment = new Fragment($fragment->node, new Rect(0.0, 0.0, $column ? max(0.0, $lineCross - $crossAround) : $fragment->bounds->width, $column ? $fragment->bounds->height : max(0.0, $lineCross - $crossAround)), $fragment->style, $fragment->text, $fragment->children, $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content, $fragment->surfaceBackground, $fragment->outline);
                     $slack = 0.0;
                 }
                 $crossShift = match ($alignment) {
@@ -2530,7 +2698,8 @@ final class LayoutEngine
         foreach ($structure['cells'] as $index => $cell) {
             $register($cell['box'], 5, $cell['row'], $cell['column']);
             $bounds[] = [$cell['row'], $cell['column'], $cell['rowSpan'], $cell['span']];
-            $sides[] = array_map(static fn (array $edge): bool => $edge['width'] > 0, $candidates[$cell['box']]);
+            [$top, $right, $bottom, $left] = $candidates[$cell['box']];
+            $sides[] = [$top['width'] > 0, $right['width'] > 0, $bottom['width'] > 0, $left['width'] > 0];
             for ($row = $cell['row']; $row < $cell['row'] + $cell['rowSpan']; ++$row) {
                 for ($column = $cell['column']; $column < $cell['column'] + $cell['span']; ++$column) {
                     $owners[$row][$column] = $index;
@@ -2670,6 +2839,7 @@ final class LayoutEngine
         return $this->collapsedTables[$source] = ['horizontal' => $horizontal, 'vertical' => $vertical];
     }
 
+    /** @return array{groups: list<array{box: Box|null, rows: list<Box>}>, rows: list<Box>, cells: list<array{box: Box, column: int, span: int, row: int, rowSpan: int}>, columns: int} */
     private function tableStructure(Box $table): array
     {
         if (isset($this->tableStructures[$table])) {
@@ -2792,6 +2962,7 @@ final class LayoutEngine
             }
         }
         $columns = max($columns, \count($columnWidths));
+        $constraints = [];
         foreach ($cells as &$entry) {
             $cell = $entry['box'];
             $column = $entry['column'];
@@ -2817,6 +2988,7 @@ final class LayoutEngine
             $natural = $fixed ? 0.0 : max($this->intrinsicWidth($cell, $cellFont), $declared ?? 0.0) + $decoration;
             $entry['width'] = $natural;
             $entry['minimum'] = $fixed ? 0.0 : $this->minimumWidth($cell, $cellFont) + $decoration;
+            $constraints[] = ['column' => $column, 'span' => $span, 'width' => $natural, 'minimum' => $entry['minimum']];
         }
         unset($entry);
         if (0 === $columns) {
@@ -2825,7 +2997,6 @@ final class LayoutEngine
         if ($fixed) {
             $widths = TableGeometry::fixedColumns($columns, max(0.0, $width - $gapX * ($columns - 1)), $given);
         } else {
-            $constraints = $cells;
             foreach ($given as $column => $size) {
                 $constraints[] = ['column' => $column, 'span' => 1, 'width' => $size, 'minimum' => $size];
             }
@@ -2861,7 +3032,7 @@ final class LayoutEngine
             $extra = max(0.0, $cellHeight - $fragment->bounds->height);
             $align = $cell['box']->style['vertical-align'] ?? 'middle';
             $shift = 'bottom' === $align ? $extra : ('middle' === $align ? $extra / 2 : 0.0);
-            $rowChildren[$cell['row']][] = new Fragment($fragment->node, new Rect($fragment->bounds->x, $fragment->bounds->y, $fragment->bounds->width, $cellHeight), $fragment->style, null, array_map(fn (Fragment $child): Fragment => $this->translate($child, 0.0, $shift), $fragment->children), $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content);
+            $rowChildren[$cell['row']][] = new Fragment($fragment->node, new Rect($fragment->bounds->x, $fragment->bounds->y, $fragment->bounds->width, $cellHeight), $fragment->style, null, array_map(fn (Fragment $child): Fragment => $this->translate($child, 0.0, $shift), $fragment->children), $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, $fragment->anchor, $fragment->content, $fragment->surfaceBackground, $fragment->outline);
         }
         $rowFragments = [];
         foreach ($rows as $index => $row) {
@@ -2897,10 +3068,10 @@ final class LayoutEngine
             return $contained;
         }
         if (null !== $box->replacedContent) {
-            return null !== $box->replacedContent->getIntrinsicSize()->aspectRatio ? min($box->replacedContent->getIntrinsicSize()->minimumWidth, $this->imageIntrinsicWidth($box, $font)) : $box->replacedContent->getIntrinsicSize()->minimumWidth;
+            return null !== $box->replacedContent->getIntrinsicSize()->aspectRatio ? min($box->replacedContent->getIntrinsicSize()->minimumWidth, $this->imageIntrinsicWidth($box, $font, $box->replacedContent)) : $box->replacedContent->getIntrinsicSize()->minimumWidth;
         }
         if (null !== $box->image) {
-            return $this->imageIntrinsicWidth($box, $font);
+            return $this->imageIntrinsicWidth($box, $font, $box->image);
         }
         $text = $box->text ?? ($box->node instanceof \Dom\Text ? $box->node->textContent : null);
         if (null !== $text) {
@@ -2935,7 +3106,7 @@ final class LayoutEngine
     private function translate(Fragment $fragment, float $x, float $y): Fragment
     {
         $bounds = $fragment->bounds;
-        $translated = new Fragment($fragment->node, new Rect($bounds->x + $x, $bounds->y + $y, $bounds->width, $bounds->height), $fragment->style, $fragment->text, array_map(fn (Fragment $child): Fragment => $this->translate($child, $x, $y), $fragment->children), $fragment->image, null === $fragment->transform ? null : Transform::moved($fragment->transform, $x, $y), $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll?->moved($x, $y), $fragment->borderImage, $fragment->anchor, $fragment->content);
+        $translated = new Fragment($fragment->node, new Rect($bounds->x + $x, $bounds->y + $y, $bounds->width, $bounds->height), $fragment->style, $fragment->text, array_map(fn (Fragment $child): Fragment => $this->translate($child, $x, $y), $fragment->children), $fragment->image, null === $fragment->transform ? null : Transform::moved($fragment->transform, $x, $y), $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll?->moved($x, $y), $fragment->borderImage, $fragment->anchor, $fragment->content, $fragment->surfaceBackground, $fragment->outline);
         if (isset($this->positionedBoxes[$fragment])) {
             $this->positionedBoxes[$translated] = $this->positionedBoxes[$fragment];
         }
@@ -3068,12 +3239,18 @@ final class LayoutEngine
     }
 
     /** Intrinsic contributions are content-box sizes; percentages need a definite containing axis. */
-    private function imageIntrinsicWidth(Box $box, FontStyle $font, ?float $baseWidth = null, ?float $baseHeight = null): float
+    private function imageIntrinsicWidth(Box $box, FontStyle $font, ImageResource|ReplacedContentInterface $content, ?float $baseWidth = null, ?float $baseHeight = null): float
     {
         $style = $box->style;
-        $intrinsic = $box->replacedContent?->getIntrinsicSize();
-        $naturalWidth = $box->image->width ?? $intrinsic->preferredWidth;
-        $naturalRatio = null !== $box->image ? $box->image->width / $box->image->height : $intrinsic->aspectRatio;
+        $intrinsic = null;
+        if ($content instanceof ImageResource) {
+            $naturalWidth = $content->width;
+            $naturalRatio = $content->width / $content->height;
+        } else {
+            $intrinsic = $content->getIntrinsicSize();
+            $naturalWidth = $intrinsic->preferredWidth;
+            $naturalRatio = $intrinsic->aspectRatio;
+        }
         $padding = $this->padding($box, $style, $baseWidth ?? $this->viewportWidth, $font);
         $border = $this->borders($style, $baseWidth ?? $this->viewportWidth, $font);
         $horizontal = $padding[1] + $padding[3] + $border[1] + $border[3];
@@ -3126,10 +3303,10 @@ final class LayoutEngine
             return $contained;
         }
         if (null !== $box->replacedContent) {
-            return null !== $box->replacedContent->getIntrinsicSize()->aspectRatio ? $this->imageIntrinsicWidth($box, $font) : $box->replacedContent->getIntrinsicSize()->preferredWidth;
+            return null !== $box->replacedContent->getIntrinsicSize()->aspectRatio ? $this->imageIntrinsicWidth($box, $font, $box->replacedContent) : $box->replacedContent->getIntrinsicSize()->preferredWidth;
         }
         if (null !== $box->image) {
-            return $this->imageIntrinsicWidth($box, $font);
+            return $this->imageIntrinsicWidth($box, $font, $box->image);
         }
         $text = $box->text ?? ($box->node instanceof \Dom\Text ? $box->node->textContent : null);
         if (null !== $text) {

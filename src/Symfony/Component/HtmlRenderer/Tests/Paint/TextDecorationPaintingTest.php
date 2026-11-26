@@ -40,6 +40,6 @@ final class TextDecorationPaintingTest extends TestCase
         self::assertSame('blue', $operations[1]['color']);
         self::assertSame('red', $operations[1]['text-decoration-color']);
         self::assertSame('from-font', $operations[1]['text-decoration-thickness']);
-        self::assertSame('#ff0000',$operations[2]['color']);
+        self::assertSame('#ff0000', $operations[2]['color']);
     }
 }

@@ -16,7 +16,7 @@ use Symfony\Component\HtmlRenderer\Layout\ScrollSnapGeometry;
 
 class ScrollSnapGeometryTest extends TestCase
 {
-    public function testPositionsUseTheBorderBoxAndResolvedScrollPaddingAndMargins(): void
+    public function testPositionsUseTheBorderBoxAndResolvedScrollPaddingAndMargins()
     {
         self::assertSame(15.25, ScrollSnapGeometry::position('start', 20.5, 10.25, 2.0, 3.0, 3.25, 4.0, 12.0, 80.0));
         self::assertSame(25.75, ScrollSnapGeometry::position('end', 20.5, 10.25, 2.0, 3.0, 3.25, 4.0, 12.0, 80.0));
@@ -25,7 +25,7 @@ class ScrollSnapGeometryTest extends TestCase
         self::assertSame(80.0, ScrollSnapGeometry::position('end', 100.0, 10.0, 0.0, 0.0, 0.0, 0.0, 12.0, 80.0));
     }
 
-    public function testSelectionPreservesDirectionStopsProximityAndFractionalCoordinates(): void
+    public function testSelectionPreservesDirectionStopsProximityAndFractionalCoordinates()
     {
         $points = [[0.0, false], [30.25, false], [60.5, false], [90.75, false]];
         self::assertSame(1.0, ScrollSnapGeometry::select([], 1.0, null));
@@ -38,7 +38,7 @@ class ScrollSnapGeometryTest extends TestCase
         self::assertSame(30.25, ScrollSnapGeometry::select([[0.0, false], [30.25, true], [60.5, false]], 0.0, 60.5));
     }
 
-    public function testModesAndAlignmentRetainTheExistingBlockAndInlineAxisContract(): void
+    public function testModesAndAlignmentRetainTheExistingBlockAndInlineAxisContract()
     {
         self::assertSame('mandatory', ScrollSnapGeometry::mode('y mandatory', true));
         self::assertSame('', ScrollSnapGeometry::mode('y mandatory', false));

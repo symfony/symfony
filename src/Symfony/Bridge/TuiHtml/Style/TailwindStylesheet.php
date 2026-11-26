@@ -183,7 +183,9 @@ class TailwindStylesheet extends StyleSheet
         foreach (array_keys(self::TAILWIND_COLORS) as $family) {
             foreach (array_keys(self::SHADE_SCALE) as $shade) {
                 $name = $family.'-'.$shade;
-                $colors[$name] = self::getPaletteColor($name);
+                if (null !== $color = self::getPaletteColor($name)) {
+                    $colors[$name] = $color;
+                }
             }
         }
 

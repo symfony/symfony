@@ -64,6 +64,6 @@ class FirstLetterTest extends TestCase
         $text = array_values(array_filter($result->getDisplayList()->getOperations(), static fn (array $operation) => 'text' === $operation['type']));
         self::assertSame(['B', 'efore ', 'After'], array_column($text, 'text'));
         self::assertSame('red', $text[0]['color']);
-        self::assertSame('#000000',$text[2]['color']);
+        self::assertSame('#000000', $text[2]['color']);
     }
 }

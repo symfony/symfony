@@ -15,9 +15,9 @@ namespace Symfony\Component\HtmlRenderer\Font;
  * Deterministic metrics for headless layout tests, without font shaping.
  * Letter spacing skips Arabic-script graphemes as a bounded cursive-text approximation.
  */
-final readonly class MonospaceTextMeasurer implements TextMeasurerInterface
+final class MonospaceTextMeasurer implements TextMeasurerInterface
 {
-    public function __construct(private float $advanceRatio = 0.5, private float $ascentRatio = 0.8)
+    public function __construct(private readonly float $advanceRatio = 0.5, private readonly float $ascentRatio = 0.8)
     {
         if (!is_finite($advanceRatio) || $advanceRatio < 0 || !is_finite($ascentRatio) || $ascentRatio < 0 || $ascentRatio > 1) {
             throw new \InvalidArgumentException('Invalid font metric ratios.');

@@ -20,7 +20,7 @@ use Symfony\Component\Tui\Widget\ContainerWidget;
 
 class FacadeFrameTest extends TestCase
 {
-    public function testTerminalFrameFitIsUserAgentPolicyBelowAuthoredWidthConstraints(): void
+    public function testTerminalFrameFitIsUserAgentPolicyBelowAuthoredWidthConstraints()
     {
         foreach ([1, 2] as $density) {
             foreach (['' => 35, 'max-width:none' => 38, 'min-width:40ch' => 40] as $declaration => $expected) {
@@ -36,7 +36,7 @@ class FacadeFrameTest extends TestCase
         }
     }
 
-    public function testNestedScopesKeepRealWidgetRectsAndExposeContentExtent(): void
+    public function testNestedScopesKeepRealWidgetRectsAndExposeContentExtent()
     {
         $html = '<p style="margin:0">'.str_repeat('Line<br>', 12).'</p><input id="deep">';
         for ($depth = 0; $depth < 3; ++$depth) {
@@ -66,7 +66,7 @@ class FacadeFrameTest extends TestCase
         self::assertTrue($rect->contains($rect->row, $rect->col), var_export([$rect, $renderer->getWidgetRect($view->getRoot()), $renderer->getWidgetRect($view->getFrames()[0]->getRoot()), $renderer->getWidgetRect($parent->getRoot()), $frame->getScrollTop()], true));
     }
 
-    public function testNestedFieldsKeepNativeFocusEventsAndRemount(): void
+    public function testNestedFieldsKeepNativeFocusEventsAndRemount()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<input id="outer"><iframe style="width:20ch;height:5lh" srcdoc="&lt;input id=inner accesskey=k&gt;"></iframe>');
         $child = $view->getFrames()[0];
@@ -96,7 +96,7 @@ class FacadeFrameTest extends TestCase
         }
     }
 
-    public function testNestedDocumentUsesIndependentCoreProjectionAndAllocatedViewport(): void
+    public function testNestedDocumentUsesIndependentCoreProjectionAndAllocatedViewport()
     {
         $html = '<style>p{color:red}</style><iframe id="frame" style="width:20ch;height:5lh" srcdoc="'.htmlspecialchars('<style>p{margin:0;color:blue}@media(width < 15ch){p{color:green}}</style><p id="inner">Child</p>').'"></iframe><p id="after">After</p>';
         $view = new HtmlBuilder()->useHtmlRenderer()->build($html);

@@ -57,7 +57,7 @@ final class TextSpacingLayoutTest extends TestCase
                 preg_match_all('/\\X/u', $text, $matches);
                 foreach ($matches[0] as $grapheme) {
                     $width += match ($grapheme) {
-                        'W' => 12, 'i' => 4, ' ' => 3, default => 5
+                        'W' => 12, 'i' => 4, ' ' => 3, default => 5,
                     } + $font->letterSpacing + (' ' === $grapheme ? $font->wordSpacing : 0.0);
                     $positions[] = $width;
                 }

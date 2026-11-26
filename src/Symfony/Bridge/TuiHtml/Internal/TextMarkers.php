@@ -59,7 +59,7 @@ final class TextMarkers
 
     public static function unscaledPayload(string $payload): string
     {
-        return preg_replace('/\\x1b\\]66;s=[1-4];([^\\x07]*)\\x07/', '$1', $payload);
+        return preg_replace('/\\x1b\\]66;s=[1-4];([^\\x07]*)\\x07/', '$1', $payload) ?? $payload;
     }
 
     public static function cursor(CursorShape $shape = CursorShape::Block, ?Color $color = null): string

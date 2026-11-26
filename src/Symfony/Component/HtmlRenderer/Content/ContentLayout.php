@@ -19,15 +19,18 @@ use Symfony\Component\HtmlRenderer\Paint\DisplayList;
  *
  * @experimental
  */
-final readonly class ContentLayout
+final class ContentLayout
 {
-    public DisplayList $displayList;
+    public readonly DisplayList $displayList;
+    /** The background surface behind local drawing, covering the host padding box. */
+    public readonly string|array|null $background;
 
-    public function __construct(public float $height, DisplayList $displayList, public bool $clipToBounds = true)
+    public function __construct(public readonly float $height, DisplayList $displayList, public readonly bool $clipToBounds = true, string|array|null $background = null)
     {
         if (!is_finite($height) || $height < 0) {
             throw new InvalidArgumentException('Content height must be finite and non-negative.');
         }
+        $this->background = self::copyValues($background);
         $states = ['clip' => 0, 'transform' => 0, 'opacity' => 0, 'filter' => 0];
         $operations = [];
         foreach ($displayList as $key => $operation) {

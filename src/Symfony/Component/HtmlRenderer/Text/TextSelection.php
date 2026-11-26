@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\HtmlRenderer\Text;
 
-final readonly class TextSelection
+final class TextSelection
 {
-    public function __construct(public int $anchor, public int $focus, public bool $caretVisible = true, public string $foreground = 'HighlightText', public string $background = 'Highlight')
+    public function __construct(public readonly int $anchor, public readonly int $focus, public readonly bool $caretVisible = true, public readonly string $foreground = 'HighlightText', public readonly string $background = 'Highlight')
     {
         if ($anchor < 0 || $focus < 0) {
             throw new \InvalidArgumentException('Selection offsets must be non-negative grapheme indexes.');

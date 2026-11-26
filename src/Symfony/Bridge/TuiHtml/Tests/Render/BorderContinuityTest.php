@@ -18,36 +18,36 @@ use Symfony\Component\Tui\Ansi\AnsiUtils;
 
 class BorderContinuityTest extends TestCase
 {
-    public function testAdjacentBorderRowsReuseTheLegacyGlyphContinuity(): void
+    public function testAdjacentBorderRowsReuseTheLegacyGlyphContinuity()
     {
         self::assertSame(['┌─┐', '│ │'], $this->paint([$this->border(0, ['top']), $this->border(16, ['left', 'right'])]));
     }
 
-    public function testContainedBorderRowsDoNotAcquireSiblingJunctions(): void
+    public function testContainedBorderRowsDoNotAcquireSiblingJunctions()
     {
         $parent = $this->border(0, ['top']);
         $parent['height'] = 32.0;
         self::assertSame(['───', '│ │'], $this->paint([$parent, $this->border(16, ['left', 'right'])]));
     }
 
-    public function testOrdinaryAndOpaqueNativeTextGlyphsDoNotAcquireBorderOwnership(): void
+    public function testOrdinaryAndOpaqueNativeTextGlyphsDoNotAcquireBorderOwnership()
     {
         self::assertSame(['───', '│ │'], $this->paint([$this->text(0, '───'), $this->border(16, ['left', 'right'])]));
         self::assertSame(['───', '│ │'], $this->paint([$this->border(0, ['top']), $this->text(16, '│ │')]));
     }
 
-    public function testLaterPaintOccludesBorderOwnershipEvenWhenItUsesTheSameGlyph(): void
+    public function testLaterPaintOccludesBorderOwnershipEvenWhenItUsesTheSameGlyph()
     {
         self::assertSame(['───', '│ │'], $this->paint([$this->border(0, ['top']), $this->border(16, ['left', 'right']), $this->text(0, '───')]));
         self::assertSame(['   ', '│ │'], $this->paint([$this->border(0, ['top']), $this->border(16, ['left', 'right']), ['type' => 'rectangle', 'x' => 0.0, 'y' => 0.0, 'width' => 24.0, 'height' => 16.0, 'color' => 'blue']]));
     }
 
-    public function testClippedBorderEdgesDoNotJoinHiddenCells(): void
+    public function testClippedBorderEdgesDoNotJoinHiddenCells()
     {
         self::assertSame(['──┐', '  │'], $this->paint([$this->border(0, ['top']), ['type' => 'push-clip', 'x' => 8.0, 'y' => 16.0, 'width' => 16.0, 'height' => 16.0], $this->border(16, ['left', 'right']), ['type' => 'pop-clip']]));
     }
 
-    public function testFilteredLayersPreserveOnlyActualBorderOwnership(): void
+    public function testFilteredLayersPreserveOnlyActualBorderOwnership()
     {
         $start = ['type' => 'push-filter', 'functions' => [['brightness', 0.5]]];
         $end = ['type' => 'pop-filter'];

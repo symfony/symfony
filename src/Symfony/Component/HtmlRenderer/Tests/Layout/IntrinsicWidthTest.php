@@ -48,8 +48,8 @@ final class IntrinsicWidthTest extends TestCase
         $box = new Box(null, 'block', ['position' => 'fixed', 'left' => '0', 'right' => '0', 'top' => '0', 'bottom' => '0', 'margin' => 'auto', 'border-width' => '1px'], [], 'Centered');
         $layout = (new LayoutEngine(new MonospaceTextMeasurer()))->layout(new Box(null, 'block', [], [$box]), 100.5, 80.25);
         self::assertSame(100.5, $layout->children[0]->bounds->width);
-        self::assertSame(80.25,$layout->children[0]->bounds->height);
-        self::assertSame(0.0,$layout->children[0]->bounds->x);
-        self::assertSame(0.0,$layout->children[0]->bounds->y);
+        self::assertSame(80.25, $layout->children[0]->bounds->height);
+        self::assertSame(0.0, $layout->children[0]->bounds->x);
+        self::assertSame(0.0, $layout->children[0]->bounds->y);
     }
 }

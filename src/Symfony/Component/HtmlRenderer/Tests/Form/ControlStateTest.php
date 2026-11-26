@@ -16,7 +16,7 @@ use Symfony\Component\HtmlRenderer\Form\ControlState;
 
 class ControlStateTest extends TestCase
 {
-    public function testLeafNodesHaveNoDescendantRadioGroups(): void
+    public function testLeafNodesHaveNoDescendantRadioGroups()
     {
         $document = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><input type="radio" required>');
         foreach ([$document->createTextNode('text'), $document->createComment('comment'), $document->doctype] as $node) {

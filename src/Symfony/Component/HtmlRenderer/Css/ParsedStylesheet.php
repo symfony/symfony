@@ -12,23 +12,23 @@
 namespace Symfony\Component\HtmlRenderer\Css;
 
 /** @internal */
-final readonly class ParsedStylesheet
+final class ParsedStylesheet
 {
     /**
-     * @param array<int, CssRule>                 $rules
-     * @param array<string, array>                $registered
-     * @param array<string, array>                $keyframes
-     * @param array<string, array<string, mixed>> $counterStyles
-     * @param array<string, array>                $functions
-     * @param array<string, array>                $positionTries
+     * @param array<int, CssRule>                                                                                                                                                                                                                                                                                                                       $rules
+     * @param array<string, array>                                                                                                                                                                                                                                                                                                                      $registered
+     * @param array<string, array>                                                                                                                                                                                                                                                                                                                      $keyframes
+     * @param array<string, array{system: string, first?: int, symbols?: list<string>, additive?: list<array{int, string}>, negative?: array{string, string}, prefix?: string, suffix?: string, range?: list<array{int|null, int|null}>|null, pad?: array{int, string}|null, fallback?: string, extends?: string, units?: list<string>, formal?: bool}> $counterStyles
+     * @param array<string, array>                                                                                                                                                                                                                                                                                                                      $functions
+     * @param array<string, array>                                                                                                                                                                                                                                                                                                                      $positionTries
      */
     public function __construct(
-        public array $rules = [],
-        public array $registered = [],
-        public array $keyframes = [],
-        public array $counterStyles = [],
-        public array $functions = [],
-        public array $positionTries = [],
+        public readonly array $rules = [],
+        public readonly array $registered = [],
+        public readonly array $keyframes = [],
+        public readonly array $counterStyles = [],
+        public readonly array $functions = [],
+        public readonly array $positionTries = [],
     ) {
     }
 }

@@ -25,7 +25,7 @@ use Symfony\Component\Tui\Widget\TextWidget;
 
 class FacadeRendererTest extends TestCase
 {
-    public function testDefaultBuilderIsUnchangedAndOptInPreservesNativeBodyIdentity(): void
+    public function testDefaultBuilderIsUnchangedAndOptInPreservesNativeBodyIdentity()
     {
         self::assertNotInstanceOf(HtmlRootWidget::class, new HtmlBuilder()->build('<p>Hello</p>')->getRoot());
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<p>Hello</p>');
@@ -34,7 +34,7 @@ class FacadeRendererTest extends TestCase
         self::assertNotSame($view->getBody(), $view->getRoot());
     }
 
-    public function testOnlyHtmlRootUsesCoreAndNativeSiblingKeepsItsNaturalRow(): void
+    public function testOnlyHtmlRootUsesCoreAndNativeSiblingKeepsItsNaturalRow()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<p id="p" style="margin:0">Hello</p>');
         $paragraph = $view->getById('p');
@@ -56,7 +56,7 @@ class FacadeRendererTest extends TestCase
         self::assertSame($paragraph, $view->getById('p'));
     }
 
-    public function testMountedFacadeKeepsRealNativeFocusInputAndMutationCallbacks(): void
+    public function testMountedFacadeKeepsRealNativeFocusInputAndMutationCallbacks()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<style>p{margin:0}input{width:10ch}</style><input id="field"><p id="message">initial</p>');
         $field = $view->getById('field');
@@ -98,7 +98,7 @@ class FacadeRendererTest extends TestCase
         }
     }
 
-    public function testPreparedSelectRetainsNativeFieldListAndSelectionWithoutDuplicateChrome(): void
+    public function testPreparedSelectRetainsNativeFieldListAndSelectionWithoutDuplicateChrome()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<style>select::picker-icon{content:"@"}</style><select id="choice"><option>A</option><option>B</option></select>');
         $select = $view->getById('choice');
@@ -134,7 +134,7 @@ class FacadeRendererTest extends TestCase
         }
     }
 
-    public function testUnmountReleasesCapturedRootAndCanRemountSameFacade(): void
+    public function testUnmountReleasesCapturedRootAndCanRemountSameFacade()
     {
         $builder = new HtmlBuilder()->useHtmlRenderer();
         $view = $builder->build('<p style="margin:0">Hello</p>');

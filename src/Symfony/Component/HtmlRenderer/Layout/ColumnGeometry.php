@@ -94,7 +94,21 @@ final class ColumnGeometry
             return $parts;
         }
         $high = max($total, $low);
-        $parts = $place($high);
+        // At the full content height, only forced breaks can divide the upper bound.
+        $parts = [];
+        $from = 0.0;
+        foreach ($forced as $at) {
+            if ($from >= $total - 1e-9 || (!$overflow && \count($parts) >= $count - 1)) {
+                break;
+            }
+            if ($at > $from + 1e-9 && $at < $total) {
+                $parts[] = [$from, $at];
+                $from = $at;
+            }
+        }
+        if ($from < $total - 1e-9) {
+            $parts[] = [$from, $total];
+        }
         for ($step = 0; $step < 48; ++$step) {
             $middle = ($low + $high) / 2;
             if (null !== $candidate = $place($middle)) {

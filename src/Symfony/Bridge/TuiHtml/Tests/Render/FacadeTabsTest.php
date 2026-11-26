@@ -24,7 +24,7 @@ use Symfony\Component\Tui\Tui;
 
 class FacadeTabsTest extends TestCase
 {
-    public function testNativeTabChromeKeepsCoreHtmlBodyLayoutInAllPositions(): void
+    public function testNativeTabChromeKeepsCoreHtmlBodyLayoutInAllPositions()
     {
         foreach (['top', 'bottom', 'left', 'right'] as $position) {
             $html = '<style>p{margin:0;color:green}</style><tui-tabs position="'.$position.'"><section title="First"><p>First <b>body</b></p></section><section title="Second">Second body</section></tui-tabs>';
@@ -32,7 +32,7 @@ class FacadeTabsTest extends TestCase
         }
     }
 
-    public function testBodyLinksAndNestedFramesUseTheChromeContentOrigin(): void
+    public function testBodyLinksAndNestedFramesUseTheChromeContentOrigin()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<tui-tabs position="left"><section title="First"><p id="link" style="margin:0"><a href="/target">Link</a></p><iframe style="width:15ch;height:4lh" srcdoc="&lt;input id=inner&gt;"></iframe></section></tui-tabs>');
         $outer = new \Symfony\Component\Tui\Widget\ContainerWidget();
@@ -50,7 +50,7 @@ class FacadeTabsTest extends TestCase
         self::assertGreaterThan($rect->col, $fieldRect->col);
     }
 
-    public function testActiveBodyUsesTheActualNativeFocusEventsAndLifecycle(): void
+    public function testActiveBodyUsesTheActualNativeFocusEventsAndLifecycle()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<tui-tabs id="tabs"><section title="First"><input id="first"></section><section title="Second"><input id="second"></section></tui-tabs>');
         $tabs = $view->getById('tabs');

@@ -14,10 +14,10 @@ namespace Symfony\Component\HtmlRenderer\Paint;
 use Symfony\Component\HtmlRenderer\Resource\ImageResource;
 
 /** @internal */
-final readonly class BorderImageSource
+final class BorderImageSource
 {
     /** @param ImageResource|array<string, mixed> $source Image bytes or resolved gradient geometry */
-    public function __construct(public ImageResource|array $source)
+    public function __construct(public readonly ImageResource|array $source)
     {
     }
 }

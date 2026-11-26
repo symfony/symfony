@@ -24,7 +24,7 @@ use Symfony\Component\HtmlRenderer\Paint\DisplayList;
 
 class CellDisplayListTest extends TestCase
 {
-    public function testCoverageWideGraphemesColorsAndHiddenCells(): void
+    public function testCoverageWideGraphemesColorsAndHiddenCells()
     {
         $list = new CellDisplayList()->convert(["A\u{0301}界\x1b[7m \x1b[0;44;8msecret"], 20, 1, Color::hex('#eeeeee'), Color::hex('#111111'));
         $operations = $list->getOperations();
@@ -39,7 +39,7 @@ class CellDisplayListTest extends TestCase
         self::assertStringNotContainsString("\x1b", json_encode($operations, \JSON_UNESCAPED_UNICODE));
     }
 
-    public function testUnderlineHyperlinkBlinkAndCaretRemainSemantic(): void
+    public function testUnderlineHyperlinkBlinkAndCaretRemainSemantic()
     {
         $list = new CellDisplayList()->convert(["\x1b]8;;https://example.org\x07\x1b[4:3;58;2;255;0;0;5mX\x1b_pi:c1\x07"], 4, 1, Color::hex('#eeeeee'), Color::hex('#111111'));
         $text = $list->getOperations()[0];
@@ -53,7 +53,7 @@ class CellDisplayListTest extends TestCase
         self::assertStringContainsString(';5', $lines[0]);
     }
 
-    public function testReverseKeepsTheActualParentBackdropAndDimIsOpacity(): void
+    public function testReverseKeepsTheActualParentBackdropAndDimIsOpacity()
     {
         $native = new CellDisplayList()->convert(["\x1b[7mX\x1b[0;2mY"], 4, 1, Color::hex('#eeeeee'), Color::hex('#000000'));
         self::assertSame('push-opacity', $native->getOperations()[1]['type']);
@@ -69,7 +69,7 @@ class CellDisplayListTest extends TestCase
         self::assertSame(CellBuffer::ATTR_DIM, $cells[1]['attributes'] & CellBuffer::ATTR_DIM);
     }
 
-    public function testKnownScaledMarkerBecomesPortableTextAndReservedGeometry(): void
+    public function testKnownScaledMarkerBecomesPortableTextAndReservedGeometry()
     {
         $marker = TextMarkers::scaled('Hi', 2);
         $list = new CellDisplayList()->convert([$marker.'    ', '    '], 4, 2, Color::hex('#eeeeee'), Color::hex('#000000'));
@@ -83,7 +83,7 @@ class CellDisplayListTest extends TestCase
         self::assertCount(2, $lines);
     }
 
-    public function testUnknownVisualProtocolFailsExplicitly(): void
+    public function testUnknownVisualProtocolFailsExplicitly()
     {
         $this->expectException(\InvalidArgumentException::class);
         new CellDisplayList()->convert(["\x1bPqopaque-sixel\x1b\\"], 4, 1, Color::hex('#eeeeee'), Color::hex('#000000'));

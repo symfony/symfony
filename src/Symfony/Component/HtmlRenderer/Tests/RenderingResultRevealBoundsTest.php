@@ -20,7 +20,7 @@ use Symfony\Component\HtmlRenderer\RenderingResult;
 
 class RenderingResultRevealBoundsTest extends TestCase
 {
-    public function testBoundsUseCurrentScrollTranslatedCoordinatesAndRetainFractionalClamps(): void
+    public function testBoundsUseCurrentScrollTranslatedCoordinatesAndRetainFractionalClamps()
     {
         $document = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><div></div>');
         $element = $document->querySelector('div');
@@ -36,7 +36,7 @@ class RenderingResultRevealBoundsTest extends TestCase
         self::assertNull($result->getScrollOffsetToRevealBounds(new Rect(0, 0, 1, 1), $document->documentElement));
     }
 
-    public function testPhysicalAxesKeepNearestHorizontalAndStartVerticalThroughNestedTransforms(): void
+    public function testPhysicalAxesKeepNearestHorizontalAndStartVerticalThroughNestedTransforms()
     {
         $session = new \Symfony\Component\HtmlRenderer\HtmlRenderer()->createSession('<style>#outer{width:200px;height:150px;overflow:auto;transform:translate(11.5px,7.25px)}#inner{width:60.5px;height:40.25px;overflow:auto;transform:translate(5px,3px)}#target{margin-left:100.25px;margin-top:50.75px;width:10.5px;height:8.25px}#tail{height:100.5px}</style><div id="outer"><div id="inner"><div id="target"></div><div id="tail"></div></div></div>', new \Symfony\Component\HtmlRenderer\RenderingContext(320, 240));
         $result = $session->render();

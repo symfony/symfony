@@ -14,7 +14,7 @@ namespace Symfony\Component\HtmlRenderer\Css;
 use Symfony\Component\HtmlRenderer\Exception\InvalidArgumentException;
 
 /** @internal */
-final readonly class FunctionEvaluator
+final class FunctionEvaluator
 {
     private const MAX_RESULT_BYTES = 65536;
 
@@ -23,7 +23,7 @@ final readonly class FunctionEvaluator
      * @param \Closure(string, string): bool  $matches
      * @param \Closure(array): \Closure       $conditions
      */
-    public function __construct(private array $functions, private \Closure $substitute, private \Closure $matches, private \Closure $conditions)
+    public function __construct(private readonly array $functions, private readonly \Closure $substitute, private readonly \Closure $matches, private readonly \Closure $conditions)
     {
     }
 

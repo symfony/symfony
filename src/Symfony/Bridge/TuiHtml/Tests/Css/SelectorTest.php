@@ -13,7 +13,7 @@ namespace Symfony\Bridge\TuiHtml\Tests\Css;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\TuiHtml\Css\Selector;
+use Symfony\Component\HtmlRenderer\Css\Selector;
 use Symfony\Component\HtmlRenderer\Exception\InvalidArgumentException;
 
 final class SelectorTest extends TestCase

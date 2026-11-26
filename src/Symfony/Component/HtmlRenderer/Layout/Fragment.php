@@ -14,19 +14,20 @@ namespace Symfony\Component\HtmlRenderer\Layout;
 use Symfony\Component\HtmlRenderer\Content\ContentLayout;
 use Symfony\Component\HtmlRenderer\Geometry\Rect;
 use Symfony\Component\HtmlRenderer\Paint\BorderImageSource;
+use Symfony\Component\HtmlRenderer\Paint\OutlineGeometry;
 use Symfony\Component\HtmlRenderer\Resource\ImageResource;
 use Symfony\Component\HtmlRenderer\Text\TextRun;
 
 /**
  * @internal
  */
-final readonly class Fragment
+final class Fragment
 {
     /**
      * @param array<string, string> $style
      * @param list<self>            $children
      */
-    public function __construct(public ?\Dom\Node $node, public Rect $bounds, public array $style = [], public ?string $text = null, public array $children = [], public ?ImageResource $image = null, public ?array $transform = null, public array $backgrounds = [], public ?TextRun $run = null, public ?string $pseudoElement = null, public ?int $topLayer = null, public ?ScrollGeometry $scroll = null, public ?BorderImageSource $borderImage = null, public ?\Dom\Element $anchor = null, public ?ContentLayout $content = null)
+    public function __construct(public readonly ?\Dom\Node $node, public readonly Rect $bounds, public readonly array $style = [], public readonly ?string $text = null, public readonly array $children = [], public readonly ?ImageResource $image = null, public readonly ?array $transform = null, public readonly array $backgrounds = [], public readonly ?TextRun $run = null, public readonly ?string $pseudoElement = null, public readonly ?int $topLayer = null, public readonly ?ScrollGeometry $scroll = null, public readonly ?BorderImageSource $borderImage = null, public readonly ?\Dom\Element $anchor = null, public readonly ?ContentLayout $content = null, public readonly string|array|null $surfaceBackground = null, public readonly ?OutlineGeometry $outline = null)
     {
     }
 

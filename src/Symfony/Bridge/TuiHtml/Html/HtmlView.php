@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\TuiHtml\Html;
 
 use Symfony\Bridge\TuiHtml\Css\CssStyleSheet;
-use Symfony\Bridge\TuiHtml\Css\Selector;
 use Symfony\Bridge\TuiHtml\Event\BeforeToggleEvent;
 use Symfony\Bridge\TuiHtml\Event\CloseEvent;
 use Symfony\Bridge\TuiHtml\Event\CommandEvent;
@@ -38,6 +37,7 @@ use Symfony\Bridge\TuiHtml\Widget\LinksInterface;
 use Symfony\Bridge\TuiHtml\Widget\RichTextWidget;
 use Symfony\Bridge\TuiHtml\Widget\SelectListWidget;
 use Symfony\Bridge\TuiHtml\Widget\SliderWidget;
+use Symfony\Component\HtmlRenderer\Css\Selector;
 use Symfony\Component\HtmlRenderer\Exception\InvalidArgumentException;
 use Symfony\Component\Tui\Event\CancelEvent;
 use Symfony\Component\Tui\Event\FocusEvent;

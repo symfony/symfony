@@ -86,7 +86,7 @@ final class TableCaptionTest extends TestCase
         $html = '<main style="display:table;border:1px solid"><div id="cap" style="display:table-caption">Generic</div><div style="display:table-row"><div style="display:table-cell">Cell</div></div></main>';
         $result = (new HtmlRenderer())->render($html, new RenderingContext(200, 100));
         $caption = $result->getBounds($result->getDocument()->querySelector('#cap'))[0];
-        $grid = $result->getBounds($result->getDocument()->querySelector('main'),'table-grid')[0];
-        self::assertSame($caption->y + $caption->height,$grid->y);
+        $grid = $result->getBounds($result->getDocument()->querySelector('main'), 'table-grid')[0];
+        self::assertSame($caption->y + $caption->height, $grid->y);
     }
 }

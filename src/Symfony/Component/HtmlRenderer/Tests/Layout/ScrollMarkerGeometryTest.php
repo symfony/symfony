@@ -16,7 +16,7 @@ use Symfony\Component\HtmlRenderer\Layout\ScrollMarkerGeometry;
 
 class ScrollMarkerGeometryTest extends TestCase
 {
-    public function testCurrentMarkerUsesStartsAndTheLastVisibleMarkerAtTheEnd(): void
+    public function testCurrentMarkerUsesStartsAndTheLastVisibleMarkerAtTheEnd()
     {
         self::assertNull(ScrollMarkerGeometry::current([], 0, 100, 25));
         self::assertSame(0, ScrollMarkerGeometry::current([null, null], 0, 100, 25));

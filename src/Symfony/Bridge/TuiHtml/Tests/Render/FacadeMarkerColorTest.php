@@ -22,7 +22,7 @@ use Symfony\Component\Tui\Widget\ContainerWidget;
 
 class FacadeMarkerColorTest extends TestCase
 {
-    public function testGroupColorIsOnlyANativeFallbackForMarkersWithoutTheirOwnColor(): void
+    public function testGroupColorIsOnlyANativeFallbackForMarkersWithoutTheirOwnColor()
     {
         $sheet = new CssStyleSheet();
         $sheet->setAnimationHandlers(static function (): void {}, static fn (): float => .5);

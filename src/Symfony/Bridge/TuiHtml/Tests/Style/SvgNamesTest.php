@@ -14,7 +14,7 @@ namespace Symfony\Bridge\TuiHtml\Tests\Style;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\TuiHtml\Css\CssStyleSheet;
-use Symfony\Bridge\TuiHtml\Style\SvgNames;
+use Symfony\Component\HtmlRenderer\Vector\SvgNames;
 
 #[RequiresPhpExtension('dom')]
 final class SvgNamesTest extends TestCase

@@ -20,7 +20,7 @@ use Symfony\Component\HtmlRenderer\RenderingContext;
 
 final class ShadowRenderingTest extends TestCase
 {
-    public function testAnAnchorMappingMustPreserveItsSourceElementIdentity(): void
+    public function testAnAnchorMappingMustPreserveItsSourceElementIdentity()
     {
         $document = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><p></p><i></i>');
         $element = $document->querySelector('p');

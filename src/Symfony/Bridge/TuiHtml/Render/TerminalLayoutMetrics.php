@@ -16,9 +16,9 @@ use Symfony\Component\HtmlRenderer\Font\FontStyle;
 use Symfony\Component\HtmlRenderer\Layout\LayoutMetricsInterface;
 use Symfony\Component\HtmlRenderer\Layout\RemainderAllocation;
 
-final readonly class TerminalLayoutMetrics implements LayoutMetricsInterface
+final class TerminalLayoutMetrics implements LayoutMetricsInterface
 {
-    public function __construct(private TerminalTextMeasurer $metrics = new TerminalTextMeasurer(), private bool $reserveOutsideMarkers = true)
+    public function __construct(private readonly TerminalTextMeasurer $metrics = new TerminalTextMeasurer(), private readonly bool $reserveOutsideMarkers = true)
     {
     }
 
@@ -46,6 +46,9 @@ final readonly class TerminalLayoutMetrics implements LayoutMetricsInterface
 
     public function constrainLength(float $length, string $property, bool $vertical, ?FontStyle $font = null): float
     {
+        if ('float-exclusion-gap' === $property) {
+            return $this->metrics->cellWidth;
+        }
         if ('computed-font-advance' === $property) {
             return $length / $this->resolveUnit(1, 'px', false, 1);
         }

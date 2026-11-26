@@ -13,11 +13,11 @@ namespace Symfony\Bridge\TuiHtml\Tests\Compatibility;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\TuiHtml\Compatibility\CompatibilityReport;
-use Symfony\Bridge\TuiHtml\Compatibility\Support;
-use Symfony\Bridge\TuiHtml\Compatibility\SupportLevel;
 use Symfony\Bridge\TuiHtml\Compatibility\SupportProviderInterface;
 use Symfony\Bridge\TuiHtml\Html\ElementRegistry;
 use Symfony\Bridge\TuiHtml\Widget\TextWidget;
+use Symfony\Component\HtmlRenderer\Compatibility\Support;
+use Symfony\Component\HtmlRenderer\Compatibility\SupportLevel;
 
 final class CompatibilityReportTest extends TestCase
 {

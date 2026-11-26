@@ -12,9 +12,9 @@
 namespace Symfony\Component\HtmlRenderer\Event;
 
 /** @experimental */
-final readonly class KeyboardEvent
+final class KeyboardEvent
 {
-    public function __construct(public string $key, public ?string $text = null, public bool $shift = false, public bool $control = false, public bool $alt = false, public bool $meta = false)
+    public function __construct(public readonly string $key, public readonly ?string $text = null, public readonly bool $shift = false, public readonly bool $control = false, public readonly bool $alt = false, public readonly bool $meta = false)
     {
     }
 }

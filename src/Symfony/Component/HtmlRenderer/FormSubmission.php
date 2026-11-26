@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\HtmlRenderer;
 
-final readonly class FormSubmission
+final class FormSubmission
 {
-    public function __construct(public \Dom\Element $form, public string $action, public string $method, public array $values)
+    public function __construct(public readonly \Dom\Element $form, public readonly string $action, public readonly string $method, public readonly array $values)
     {
     }
 }

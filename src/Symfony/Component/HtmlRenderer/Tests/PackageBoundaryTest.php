@@ -20,7 +20,7 @@ final class PackageBoundaryTest extends TestCase
         $violations = [];
         $root = \dirname(__DIR__);
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS)) as $file) {
-            $relative = substr($file->getPathname(), \strlen($root) + 1);
+            $relative = str_replace('\\', '/', substr($file->getPathname(), \strlen($root) + 1));
             if ('php' !== $file->getExtension() || preg_match('~^(Tests|vendor)/~', $relative)) {
                 continue;
             }

@@ -36,12 +36,12 @@ use Symfony\Component\Tui\Ansi\Bidi;
 use Symfony\Component\Tui\Render\RenderContext;
 use Symfony\Component\Tui\Widget\Util\StringUtils;
 
-final readonly class DisplayListRenderer
+final class DisplayListRenderer
 {
-    private \Symfony\Bridge\TuiHtml\Internal\BackgroundImageCache $backgroundImages;
-    private ?ColorDepth $colorDepth;
+    private readonly \Symfony\Bridge\TuiHtml\Internal\BackgroundImageCache $backgroundImages;
+    private readonly ?ColorDepth $colorDepth;
 
-    public function __construct(private TerminalTextMeasurer $metrics = new TerminalTextMeasurer(), private MediaContext $media = new MediaContext(), ?\Symfony\Bridge\TuiHtml\Internal\BackgroundImageCache $backgroundImages = null)
+    public function __construct(private readonly TerminalTextMeasurer $metrics = new TerminalTextMeasurer(), private readonly MediaContext $media = new MediaContext(), ?\Symfony\Bridge\TuiHtml\Internal\BackgroundImageCache $backgroundImages = null)
     {
         $this->backgroundImages = $backgroundImages ?? new \Symfony\Bridge\TuiHtml\Internal\BackgroundImageCache();
         $this->colorDepth = $media->colors < MediaContext::TRUE_COLORS ? new ColorDepth($media->colors) : null;
@@ -202,7 +202,8 @@ final readonly class DisplayListRenderer
                 $imageRows = max(1, min(1000, (int) ceil($operation['height'] / $this->metrics->cellHeight)));
                 $data = $operation['data'];
                 if ('svg' === $operation['type']) {
-                    $data = VectorImage::fromString($data)?->toPng((int) ceil($imageColumns * $this->metrics->cellWidth), (int) ceil($imageRows * $this->metrics->cellHeight), array_values($color->toRgb()));
+                    $rgb = $color->toRgb();
+                    $data = VectorImage::fromString($data)?->toPng((int) ceil($imageColumns * $this->metrics->cellWidth), (int) ceil($imageRows * $this->metrics->cellHeight), [$rgb['r'], $rgb['g'], $rgb['b']]);
                 }
                 if (null === $data) {
                     continue;
@@ -749,7 +750,7 @@ final readonly class DisplayListRenderer
         $widths[3] = min($columns, $widths[3]);
         $widths[1] = min(max(0, $columns - $widths[3]), $widths[1]);
         $corners = array_map(static fn (array $radius): ?string => $radius[0] > 0 && $radius[1] > 0 ? 'round' : null, $operation['radii'] ?? array_fill(0, 4, [0, 0]));
-        $border = new Border(...[...$widths, BorderPattern::NORMAL, $color, $colors, $patterns, $corners]);
+        $border = new Border($widths[0], $widths[1], $widths[2], $widths[3], BorderPattern::NORMAL, $color, $colors, $patterns, $corners);
         $innerColumns = max(0, $columns - $widths[1] - $widths[3]);
         $innerLines = array_fill(0, max(0, $rows - $widths[0] - $widths[2]), str_repeat(' ', $innerColumns));
 
@@ -780,7 +781,8 @@ final readonly class DisplayListRenderer
             $data = $source['data'];
             if ('svg' === $source['type']) {
                 $currentColor = Value::color($source['color'] ?? $operation['color'] ?? 'black', $media) ?: $color;
-                $data = VectorImage::fromString($data)?->toPng((int) ceil($bounds['width']), (int) ceil($bounds['height']), array_values($currentColor->toRgb()));
+                $rgb = $currentColor->toRgb();
+                $data = VectorImage::fromString($data)?->toPng((int) ceil($bounds['width']), (int) ceil($bounds['height']), [$rgb['r'], $rgb['g'], $rgb['b']]);
             }
             if (null === $data) {
                 return $lines;

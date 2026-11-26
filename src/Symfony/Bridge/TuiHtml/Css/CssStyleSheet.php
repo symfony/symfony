@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\TuiHtml\Css;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\TuiHtml\Compatibility\Support;
 use Symfony\Bridge\TuiHtml\Compatibility\SupportProviderInterface;
 use Symfony\Bridge\TuiHtml\Hyphenation\HyphenatorInterface;
 use Symfony\Bridge\TuiHtml\Internal\ContainerState;
@@ -58,11 +57,15 @@ use Symfony\Bridge\TuiHtml\Widget\Text\LanguageHyphenator;
 use Symfony\Bridge\TuiHtml\Widget\TextWidget;
 use Symfony\Bridge\TuiHtml\Widget\Util\UrlResolver;
 use Symfony\Component\HtmlRenderer\Animation\ScrollTimeline;
+use Symfony\Component\HtmlRenderer\Compatibility\Support;
+use Symfony\Component\HtmlRenderer\Css\Conditional;
 use Symfony\Component\HtmlRenderer\Css\ContainerQuery as NativeContainerQuery;
 use Symfony\Component\HtmlRenderer\Css\CounterStyles;
 use Symfony\Component\HtmlRenderer\Css\CssRule;
+use Symfony\Component\HtmlRenderer\Css\Declaration;
 use Symfony\Component\HtmlRenderer\Css\MediaQuery as NativeMediaQuery;
 use Symfony\Component\HtmlRenderer\Css\ParsedStylesheet;
+use Symfony\Component\HtmlRenderer\Css\Selector;
 use Symfony\Component\HtmlRenderer\Css\SelectorRequirements;
 use Symfony\Component\HtmlRenderer\Css\SpecifiedCascade;
 use Symfony\Component\HtmlRenderer\Css\StyleResolver;
@@ -326,6 +329,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
     private \WeakMap $elementRules;
     /** @var array<string, list<array{float, array<string, string>}>> */
     private array $keyframes = [];
+    /** @var array<string, array{system: string, first?: int, symbols?: list<string>, additive?: list<array{int, string}>, negative?: array{string, string}, prefix?: string, suffix?: string, range?: list<array{int|null, int|null}>|null, pad?: array{int, string}|null, fallback?: string, extends?: string, units?: list<string>, formal?: bool}> */
     private array $counterDefinitions = [];
     /** @var array<string, array{bool, ?string, string}> The custom properties registered by @property, see CssParser::takeRegisteredProperties() */
     private array $registered = [];
@@ -1036,7 +1040,11 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
             $cascadeDocument = $document;
             if ($scope instanceof \Dom\Element) {
                 $cascadeDocument = \Dom\XMLDocument::createEmpty();
-                $cascadeDocument->appendChild($clone = $cascadeDocument->importNode($scope, true));
+                $clone = $cascadeDocument->importNode($scope, true);
+                if (!$clone instanceof \Dom\Element) {
+                    throw new \LogicException('An SVG element must import as an element.');
+                }
+                $cascadeDocument->appendChild($clone);
                 $sources = new \SplObjectStorage();
                 $pending = [[$scope, $clone]];
                 while ($pending) {
@@ -1514,6 +1522,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
         return $this->applyNativeRecords($records, $previousNativeFonts);
     }
 
+    /** @param \SplObjectStorage<\Dom\Element, array{computed: array<string, string>, raw: array<string, string>, pseudos: array<string, array{computed: array<string, string>, own: array<string, string>}>, matched-rules: list<int>, starting-style?: array<string, string>, scroll-driven?: true}> $records */
     private function applyNativeRecords(\SplObjectStorage $records, \WeakMap $previousNativeFonts): bool
     {
         foreach ($records as $element) {
@@ -1746,6 +1755,31 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
     public function getStyles(AbstractWidget $widget): array
     {
         return isset($this->styles[$widget]) ? [$this->styles[$widget]] : [];
+    }
+
+    /** @internal */
+    public function getBackdropColor(AbstractWidget $widget): ?Color
+    {
+        return null === $this->media ? null : self::backdropColor($this->declarations[$this->widgetDeclarations[$widget] ?? -1] ?? [], $this->media);
+    }
+
+    private static function backdropColor(array $custom, MediaContext $media): ?Color
+    {
+        $backdrop = null;
+        try {
+            $backdropValue = Value::substitute($custom[self::BACKDROP] ?? '', $custom);
+        } catch (InvalidArgumentException) {
+            // A background of an invalid var(): none behind
+            $backdropValue = '';
+        }
+        foreach (Value::split($backdropValue) as $part) {
+            if (($color = Value::color($part, $media)) instanceof Color) {
+                $backdrop = $color;
+                break;
+            }
+        }
+
+        return $backdrop;
     }
 
     public function getElementStyles(AbstractWidget $widget, string $element): array
@@ -5955,15 +5989,18 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
             } catch (\Throwable) {
             }
         }
-        $image = \is_string($data) && '' !== $data && \strlen($data) <= self::MAX_IMAGE_BYTES ? new RasterImage($data) : null;
+        if (!\is_string($data) || '' === $data || \strlen($data) > self::MAX_IMAGE_BYTES) {
+            return $this->images[$url] = null;
+        }
+        $image = new RasterImage($data);
         $source = null;
         // An SVG, like the cross of the close button of Bootstrap: drawn once at up to four pixels per CSS pixel
-        if (null !== $image && null === $image->peekSize() && null !== $svg = self::svgToPng($data, 4)) {
+        if (null === $image->peekSize() && null !== $svg = self::svgToPng($data, 4)) {
             $source = $data;
             $image = (new RasterImage($svg[0]))->withResolution($svg[1]);
         }
         // Its header read, the image decoded when it is first drawn: those of rules that never apply cost nothing
-        $image = null !== $image?->peekSize() ? $image : null;
+        $image = null !== $image->peekSize() ? $image : null;
         $bytes = \strlen($image->data ?? '') + (null !== $source ? \strlen($source) : 0);
         if ($bytes > self::MAX_IMAGES_BYTES - $this->imageBytes) {
             return $this->images[$url] = null;
@@ -6789,19 +6826,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
                 unset($declarations[$property]);
             }
         }
-        $backdrop = null;
-        try {
-            $backdropValue = Value::substitute($custom[self::BACKDROP] ?? '', $custom);
-        } catch (InvalidArgumentException) {
-            // A background of an invalid var(): none behind
-            $backdropValue = '';
-        }
-        foreach (Value::split($backdropValue) as $part) {
-            if (($color = Value::color($part, $media)) instanceof Color) {
-                $backdrop = $color;
-                break;
-            }
-        }
+        $backdrop = self::backdropColor($custom, $media);
         $style = $this->mapper->map($declarations, $media, $backdrop, isset($custom[self::IN_VERTICAL_GRID]))->withCssCascade();
         if (isset($custom[self::ISOLATED]) && null !== $style->getBlend()) {
             $style = $style->withBlend(null);

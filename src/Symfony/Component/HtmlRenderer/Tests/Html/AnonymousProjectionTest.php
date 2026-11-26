@@ -19,7 +19,7 @@ use Symfony\Component\HtmlRenderer\Resource\ResourceLoader;
 
 class AnonymousProjectionTest extends TestCase
 {
-    public function testAnonymousGroupsKeepSemanticTopologyAndNodeIdentity(): void
+    public function testAnonymousGroupsKeepSemanticTopologyAndNodeIdentity()
     {
         $document = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><div>A<span>B</span><input>C<strong>D</strong><p>block</p>E</div>');
         $parent = $document->querySelector('div');
@@ -46,7 +46,7 @@ class AnonymousProjectionTest extends TestCase
         self::assertCount(3, $builder->build($parent)->children);
     }
 
-    public function testExplicitControlChildrenReplaceBuiltInContentWithoutChangingSemanticDom(): void
+    public function testExplicitControlChildrenReplaceBuiltInContentWithoutChangingSemanticDom()
     {
         $document = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><style>select::before{content:"before"}</style><select><option selected>Choice</option></select>');
         $select = $document->querySelector('select');
@@ -72,7 +72,7 @@ class AnonymousProjectionTest extends TestCase
         self::assertSame($option, $select->firstElementChild);
     }
 
-    public function testDuplicateSemanticReferencesAreRejected(): void
+    public function testDuplicateSemanticReferencesAreRejected()
     {
         $document = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><div><span>A</span></div>');
         $parent = $document->querySelector('div');
@@ -84,7 +84,7 @@ class AnonymousProjectionTest extends TestCase
         new BoxBuilder($resolver->resolve($document, 400, 200), $resolver, new ResourceCollection(new ResourceLoader()), new \SplObjectStorage(), null, $groups)->build($parent);
     }
 
-    public function testCyclicDescriptorsAreBounded(): void
+    public function testCyclicDescriptorsAreBounded()
     {
         $document = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><div></div>');
         $parent = $document->querySelector('div');

@@ -16,9 +16,9 @@ namespace Symfony\Component\HtmlRenderer\Event;
  *
  * @experimental
  */
-final readonly class WheelEvent
+final class WheelEvent
 {
-    public function __construct(public float $x, public float $y, public float $deltaX, public float $deltaY)
+    public function __construct(public readonly float $x, public readonly float $y, public readonly float $deltaX, public readonly float $deltaY)
     {
         if (!is_finite($x) || !is_finite($y) || !is_finite($deltaX) || !is_finite($deltaY)) {
             throw new \InvalidArgumentException('Wheel coordinates and deltas must be finite.');

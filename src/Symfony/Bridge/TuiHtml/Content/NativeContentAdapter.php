@@ -35,7 +35,7 @@ final class NativeContentAdapter implements ReplacedContentInterface
     private array $renders = [];
     private ?IntrinsicSize $intrinsic = null;
 
-    public function __construct(private readonly \WeakReference $widget, private readonly int $revision, private readonly array $computedStyle, private readonly TerminalTextMeasurer $metrics, private readonly FontRegistry $fonts, private readonly MediaContext $media, private readonly ?\Closure $renderPart = null, private readonly ?float $minimumWidth = null)
+    public function __construct(private readonly \WeakReference $widget, private readonly int $revision, private readonly array $computedStyle, private readonly TerminalTextMeasurer $metrics, private readonly FontRegistry $fonts, private readonly MediaContext $media, private readonly ?\Closure $renderPart = null, private readonly ?float $minimumWidth = null, private readonly ?Color $surfaceBackground = null)
     {
     }
 
@@ -83,7 +83,7 @@ final class NativeContentAdapter implements ReplacedContentInterface
         $background = Value::color($this->computedStyle['background-color'] ?? '#000000', $this->media) ?: Color::hex('#000000');
         $height = \count($lines) * $this->metrics->cellHeight;
 
-        return new ContentLayout($height, new CellDisplayList($this->metrics)->convert($lines, $columns, max(1, \count($lines)), $foreground, $background));
+        return new ContentLayout($height, new CellDisplayList($this->metrics)->convert($lines, $columns, max(1, \count($lines)), $foreground, $this->surfaceBackground ?? $background), true, null === $this->surfaceBackground ? null : (Color::named('default')->toForegroundCode() === $this->surfaceBackground->toForegroundCode() ? 'default' : $this->surfaceBackground->toHex()));
     }
 
     private function render(int $columns, int $rows): array

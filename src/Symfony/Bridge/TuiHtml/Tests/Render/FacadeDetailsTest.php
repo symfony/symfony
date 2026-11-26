@@ -26,7 +26,7 @@ use Symfony\Component\Tui\Tui;
 
 class FacadeDetailsTest extends TestCase
 {
-    public function testNativeToggleFocusAndBodyInstancesSurviveSemanticHeaderProjection(): void
+    public function testNativeToggleFocusAndBodyInstancesSurviveSemanticHeaderProjection()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<details id="details" open><summary>Header</summary><p id="message" style="margin:0">Body unique</p><input id="field"></details>');
         $details = $view->getById('details');
@@ -72,7 +72,7 @@ class FacadeDetailsTest extends TestCase
         }
     }
 
-    public function testExplicitRenderDetectsNestedClosedBodyChangesAndForgetsRemovedOwners(): void
+    public function testExplicitRenderDetectsNestedClosedBodyChangesAndForgetsRemovedOwners()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<details id="outer" open><summary>Outer</summary><details id="inner" open><summary>Inner</summary><p id="leaf">Leaf</p></details></details>');
         $outer = $view->getById('outer');
@@ -108,7 +108,7 @@ class FacadeDetailsTest extends TestCase
         }
     }
 
-    public function testSummaryMarkersColorsAndRightAlignedContentMatchExistingNativePresentation(): void
+    public function testSummaryMarkersColorsAndRightAlignedContentMatchExistingNativePresentation()
     {
         $html = file_get_contents(\dirname(__DIR__).'/Fixtures/Compat/html-summary.html');
         foreach ([[], ['density' => 'condensed']] as $options) {

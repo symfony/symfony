@@ -92,10 +92,10 @@ final class Painter
     private function outline(Fragment $fragment, array &$operations): void
     {
         $style = $fragment->style;
-        $x = (float) ($style['-renderer-outline-width-x'] ?? 0);
-        $y = (float) ($style['-renderer-outline-width-y'] ?? 0);
-        $offsetX = (float) ($style['-renderer-outline-offset-x'] ?? 0);
-        $offsetY = (float) ($style['-renderer-outline-offset-y'] ?? 0);
+        $x = $fragment->outline->widthX;
+        $y = $fragment->outline->widthY;
+        $offsetX = $fragment->outline->offsetX;
+        $offsetY = $fragment->outline->offsetY;
         $bounds = OutlineGeometry::outer($fragment->bounds, $x, $y, $offsetX, $offsetY);
         if (null === $bounds) {
             return;
@@ -220,6 +220,10 @@ final class Painter
             $layers = array_splice($operations, $backgroundStart);
             $operations[] = ['type' => 'background-group', ...$geometry, 'layers' => $layers];
         }
+        if (null !== $fragment->surfaceBackground) {
+            $surface = $fragment->getPaddingBox();
+            $operations[] = ['type' => 'rectangle', 'x' => $surface->x, 'y' => $surface->y, 'width' => $surface->width, 'height' => $surface->height, 'color' => $fragment->surfaceBackground];
+        }
         $sides = [];
         foreach (['top', 'right', 'bottom', 'left'] as $edge) {
             $borderColor = $this->color($style['border-'.$edge.'-color'] ?? $style['border-color'] ?? $color, $color);
@@ -307,6 +311,10 @@ final class Painter
     private function content(Fragment $fragment, array &$operations, ?string $verticalAlign = null, float $baselineShift = 0.0): void
     {
         if (null !== $fragment->content) {
+            if (null === $fragment->surfaceBackground && null !== $fragment->content->background) {
+                $surface = $fragment->getPaddingBox();
+                $operations[] = ['type' => 'rectangle', 'x' => $surface->x, 'y' => $surface->y, 'width' => $surface->width, 'height' => $surface->height, 'color' => $fragment->content->background];
+            }
             array_push($operations, ...EmbeddedDocuments::place($fragment->content->displayList, $fragment->getContentBox(), $fragment->content->clipToBounds));
         }
         if (null === $fragment->pseudoElement && $fragment->node instanceof \Dom\Element && 'iframe' === strtolower($fragment->node->localName) && null !== $this->embedded && null !== $display = ($this->embedded)($fragment)) {

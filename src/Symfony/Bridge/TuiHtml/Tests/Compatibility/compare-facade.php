@@ -17,7 +17,12 @@ use Symfony\Component\Tui\Ansi\AnsiUtils;
 
 require dirname(__DIR__).'/bootstrap.php';
 
-$arguments = getopt('', ['output:', 'case:']);
+$arguments = getopt('', ['output:', 'case:', 'reference:']);
+$reference = $arguments['reference'] ?? 'fixtures';
+if (!in_array($reference, ['fixtures', 'runtime'], true)) {
+    fwrite(\STDERR, "The reference must be fixtures or runtime.\n");
+    exit(2);
+}
 $directory = __DIR__.'/../Fixtures/Compat';
 if (isset($arguments['output']) && str_starts_with((realpath(dirname($arguments['output'])) ?: '').'/', realpath($directory).'/')) {
     fwrite(\STDERR, "The comparison receipt must be outside the compliance fixture directory.\n");
@@ -65,7 +70,7 @@ foreach (glob($directory.'/*.html') as $file) {
             $snapshot = $bundled;
         }
         try {
-            $expected = file_get_contents($snapshot);
+            $expected = 'runtime' === $reference ? FacadeScenario::render($html, $options) : file_get_contents($snapshot);
             $actual = FacadeScenario::render($html, $options, true);
             $plainExpected = AnsiUtils::stripAnsiCodes(str_replace('⟨', "\x1b[", $expected));
             $plainActual = AnsiUtils::stripAnsiCodes(str_replace('⟨', "\x1b[", $actual));
@@ -110,7 +115,7 @@ foreach ($tooling as $file => $hash) {
     $toolingUnchanged = $toolingUnchanged && hash_file('sha256', $file) === $hash;
 }
 $summary = ['total' => count($results), 'plain_equal' => count(array_filter($results, static fn ($r) => $r['plain_equal'] ?? false)), 'cell_equal' => count(array_filter($results, static fn ($r) => $r['cell_equal'] ?? false)), 'styled_equal' => count(array_filter($results, static fn ($r) => $r['styled_equal'] ?? false)), 'unsupported' => count(array_filter($results, static fn ($r) => $r['unsupported'] ?? false)), 'errors' => count(array_filter($results, static fn ($r) => isset($r['error']) && !($r['unsupported'] ?? false))), 'unavailable' => count(array_filter($results, static fn ($r) => (bool) $r['missing_requirements'])), 'source_coherent' => $before === $after && $toolingUnchanged, 'fixtures_unchanged' => $fixturesUnchanged, 'seconds' => (hrtime(true) - $started) / 1e9, 'peak_bytes' => memory_get_peak_usage(true)];
-$receipt = ['metadata' => ['runtime' => ['php' => \PHP_VERSION, 'intl' => extension_loaded('intl'), 'gd' => extension_loaded('gd')], 'case_filter' => $arguments['case'] ?? null, 'scenario' => 'Exact shared original ConformanceTest native facade scenario; explicit core opt-in, all original variants retained.', 'terminal_profile' => ['foreground' => [229, 229, 229], 'background' => [0, 0, 0]], 'transport' => 'Text-sizing comparisons cover reserved cells/protocol bytes, not device glyph rasterization.', 'source_before' => $before, 'source_after' => $after], 'summary' => $summary, 'cases' => $results];
+$receipt = ['metadata' => ['runtime' => ['php' => \PHP_VERSION, 'intl' => extension_loaded('intl'), 'gd' => extension_loaded('gd')], 'case_filter' => $arguments['case'] ?? null, 'reference' => $reference, 'scenario' => 'Exact shared original ConformanceTest native facade scenario; explicit core opt-in, all original variants retained.', 'terminal_profile' => ['foreground' => [229, 229, 229], 'background' => [0, 0, 0]], 'transport' => 'Text-sizing comparisons cover reserved cells/protocol bytes, not device glyph rasterization.', 'source_before' => $before, 'source_after' => $after], 'summary' => $summary, 'cases' => $results];
 if (isset($arguments['output'])) {
     file_put_contents($arguments['output'], json_encode($receipt, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE | \JSON_INVALID_UTF8_SUBSTITUTE | \JSON_THROW_ON_ERROR)."\n");
 }

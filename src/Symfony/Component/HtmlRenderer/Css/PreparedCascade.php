@@ -15,24 +15,24 @@ namespace Symfony\Component\HtmlRenderer\Css;
  *
  * @internal
  */
-final readonly class PreparedCascade
+final class PreparedCascade
 {
     public function __construct(
-        public \Dom\Document $document,
-        public float $width,
-        public float $height,
-        public ParsedStylesheet $stylesheet,
-        public array $elements,
-        public \WeakMap $states,
-        public \WeakMap $winners,
-        public ?\WeakMap $startingWinners,
-        public \WeakMap $startingElements,
-        public \WeakMap $matchedRules,
-        public array $pseudoWinners,
-        public \WeakMap $userAgentWinners,
-        public \WeakMap $explicitWinners,
-        public ?\SplObjectStorage $identities,
-        public ?\SplObjectStorage $styleParents,
+        public readonly \Dom\Document $document,
+        public readonly float $width,
+        public readonly float $height,
+        public readonly ParsedStylesheet $stylesheet,
+        public readonly array $elements,
+        public readonly \WeakMap $states,
+        public readonly \WeakMap $winners,
+        public readonly ?\WeakMap $startingWinners,
+        public readonly \WeakMap $startingElements,
+        public readonly \WeakMap $matchedRules,
+        public readonly array $pseudoWinners,
+        public readonly \WeakMap $userAgentWinners,
+        public readonly \WeakMap $explicitWinners,
+        public readonly ?\SplObjectStorage $identities,
+        public readonly ?\SplObjectStorage $styleParents,
     ) {
     }
 }

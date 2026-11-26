@@ -13,9 +13,9 @@ namespace Symfony\Bridge\TuiHtml\Tests\Css;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\TuiHtml\Css\Conditional;
 use Symfony\Bridge\TuiHtml\Html\HtmlBuilder;
 use Symfony\Bridge\TuiHtml\Tests\Fixtures\HtmlTui as Tui;
+use Symfony\Component\HtmlRenderer\Css\Conditional;
 use Symfony\Component\HtmlRenderer\Exception\InvalidArgumentException;
 use Symfony\Component\Tui\Terminal\VirtualTerminal;
 

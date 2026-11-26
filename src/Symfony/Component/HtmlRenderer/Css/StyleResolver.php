@@ -386,8 +386,9 @@ final class StyleResolver
         if ($startingRules) {
             $startingWinners = clone $winners;
             foreach ([$this->userAgentWinners, $this->explicitWinners] as $metadata) {
-                if (isset($metadata[$winners])) {
-                    $metadata[$startingWinners] = clone $metadata[$winners];
+                $winnerMetadata = $metadata[$winners] ?? null;
+                if (null !== $winnerMetadata) {
+                    $metadata[$startingWinners] = clone $winnerMetadata;
                 }
             }
             foreach ($startingRules as [$rule, $selector, $elements]) {
@@ -479,6 +480,8 @@ final class StyleResolver
         $lineHeightMultipliers = new \SplObjectStorage();
         $renderedElements = new \SplObjectStorage();
         $siblingPositions = new \SplObjectStorage();
+        $lastInactiveTarget = null;
+        $lastPrincipalNormalization = null;
         foreach ($styleElements as $element) {
             $startingRecord = null;
             $isStarting = isset($startingElements[$element]);
@@ -738,31 +741,44 @@ final class StyleResolver
                     $scheme = ColorScheme::forced($values['color-scheme'] ?? '') ?? $scheme;
                     $values = $this->colors($values, $inherited, $scheme);
                 }
-                $values['display'] = str_contains($values['display'] ?? '', 'list-item') ? $values['display'] : CssParser::display($values['display'] ?? 'inline');
-                $parentSize = (float) ($inherited['font-size'] ?? $this->defaultFont->size);
-                $rootSize = isset($result[$document->documentElement]) ? (float) ($result[$document->documentElement]['font-size'] ?? $this->defaultFont->size) : $this->defaultFont->size;
-                $fontSize = self::fontLength($values['font-size'] ?? $this->defaultFont->size.'px', $parentSize, $rootSize, $width, $height) ?? $parentSize;
-                $values['font-size'] = $fontSize.'px';
-                $values['font-family'] ??= $this->defaultFont->family;
-                $values['font-style'] = strtolower(trim($values['font-style'] ?? $this->defaultFont->style));
-                $parentWeight = (float) ($inherited['font-weight'] ?? $this->defaultFont->weight);
-                $weight = strtolower($values['font-weight'] ?? (string) $this->defaultFont->weight);
-                $values['font-weight'] = (string) (\in_array($weight, ['bolder', 'lighter'], true) ? DeclarationExpander::relativeFontWeight($weight, $parentWeight) : DeclarationExpander::fontWeight($weight));
-                $normalLineHeight = $this->defaultFont->size > 0 ? $this->defaultFont->lineHeight / $this->defaultFont->size : 1.2;
-                $line = $values['line-height'] ?? 'normal';
-                $declaredLine = ($winners[$element] ?? [])['line-height'][0] ?? null;
-                $inheritsLine = \in_array($declaredLine, ['inherit', 'unset'], true) || null === $declaredLine && $line === ($inherited['line-height'] ?? 'normal');
-                if ($inheritsLine && null !== $parent && isset($lineHeightMultipliers[$parent])) {
-                    $line = $lineHeightMultipliers[$parent];
-                }
-                if ('normal' === $line || is_numeric($line)) {
-                    $lineHeightMultipliers[$element] = $line;
-                    $values['line-height'] = $fontSize * ('normal' === $line ? $normalLineHeight : max(0, (float) $line)).'px';
+                // Reuse only fully resolved, undeclared owner inputs within this computation.
+                // User callbacks and per-element Timeline effects have already run.
+                $normalizationInput = empty($winners[$element] ?? []) ? [$values, $inherited, $result[$document->documentElement] ?? null, null, null !== $parent ? ($lineHeightMultipliers[$parent] ?? null) : null] : null;
+                if (null !== $normalizationInput && null !== $lastPrincipalNormalization && $lastPrincipalNormalization[0] === $normalizationInput) {
+                    [$values, $fontSize, $rootSize, $normalLineHeight, $line, $multiplier] = $lastPrincipalNormalization[1];
+                    if (null !== $multiplier) {
+                        $lineHeightMultipliers[$element] = $multiplier;
+                    }
                 } else {
-                    $values['line-height'] = (self::fontLength($line, $fontSize, $rootSize, $width, $height) ?? $fontSize * $normalLineHeight).'px';
+                    $values['display'] = str_contains($values['display'] ?? '', 'list-item') ? $values['display'] : CssParser::display($values['display'] ?? 'inline');
+                    $parentSize = (float) ($inherited['font-size'] ?? $this->defaultFont->size);
+                    $rootSize = isset($result[$document->documentElement]) ? (float) ($result[$document->documentElement]['font-size'] ?? $this->defaultFont->size) : $this->defaultFont->size;
+                    $fontSize = self::fontLength($values['font-size'] ?? $this->defaultFont->size.'px', $parentSize, $rootSize, $width, $height) ?? $parentSize;
+                    $values['font-size'] = $fontSize.'px';
+                    $values['font-family'] ??= $this->defaultFont->family;
+                    $values['font-style'] = strtolower(trim($values['font-style'] ?? $this->defaultFont->style));
+                    $parentWeight = (float) ($inherited['font-weight'] ?? $this->defaultFont->weight);
+                    $weight = strtolower($values['font-weight'] ?? (string) $this->defaultFont->weight);
+                    $values['font-weight'] = (string) (\in_array($weight, ['bolder', 'lighter'], true) ? DeclarationExpander::relativeFontWeight($weight, $parentWeight) : DeclarationExpander::fontWeight($weight));
+                    $normalLineHeight = $this->defaultFont->size > 0 ? $this->defaultFont->lineHeight / $this->defaultFont->size : 1.2;
+                    $line = $values['line-height'] ?? 'normal';
+                    $declaredLine = ($winners[$element] ?? [])['line-height'][0] ?? null;
+                    $inheritsLine = \in_array($declaredLine, ['inherit', 'unset'], true) || null === $declaredLine && $line === ($inherited['line-height'] ?? 'normal');
+                    if ($inheritsLine && null !== $parent && isset($lineHeightMultipliers[$parent])) {
+                        $line = $lineHeightMultipliers[$parent];
+                    }
+                    if ('normal' === $line || is_numeric($line)) {
+                        $lineHeightMultipliers[$element] = $line;
+                        $values['line-height'] = $fontSize * ('normal' === $line ? $normalLineHeight : max(0, (float) $line)).'px';
+                    } else {
+                        $values['line-height'] = (self::fontLength($line, $fontSize, $rootSize, $width, $height) ?? $fontSize * $normalLineHeight).'px';
+                    }
+                    $values = $this->textSpacing($values, $inherited, $result[$document->documentElement] ?? $values, $width, $height);
+                    $values = $this->decorationThickness($values, $result[$document->documentElement] ?? [], $width, $height);
+                    if (null !== $normalizationInput) {
+                        $lastPrincipalNormalization = [$normalizationInput, [$values, $fontSize, $rootSize, $normalLineHeight, $line, $lineHeightMultipliers[$element] ?? null]];
+                    }
                 }
-                $values = $this->textSpacing($values, $inherited, $result[$document->documentElement] ?? $values, $width, $height);
-                $values = $this->decorationThickness($values, $result[$document->documentElement] ?? [], $width, $height);
                 $specified = array_fill_keys(array_keys($inheritedOverrides), true);
                 foreach ($winners[$element] ?? [] as $property => [$declaration]) {
                     if (null !== $declaration && !\in_array($declaration, ['inherit', 'unset'], true) && (isset($resolvedValues[$property]) || 'initial' === $declaration)) {
@@ -849,6 +865,19 @@ final class StyleResolver
                         $pseudo['white-space'] = WhiteSpace::resolve($used);
                     }
                     $pseudoSemantic = $pseudo;
+                    $inactiveTargetInput = null;
+                    if ('target-text' === $name && !\in_array($name, ($elementStates[$element] ?? [])['active-pseudo-elements'] ?? [], true) && empty($record['animated']) && empty($winners[$element] ?? [])
+                        && !array_diff(array_keys($pseudoMap[$element]), ['color', 'background-color'])
+                        && !array_any($pseudoMap[$element], static fn (array $winner): bool => $winner[4] ?? false)) {
+                        $inactiveTargetInput = [$pseudo, $resolvedPseudo, $pseudoInherited, $values, $pseudoMap[$element], $fontSize, $rootSize, $normalLineHeight, $lineHeightMultipliers[$element] ?? null];
+                        if (null !== $lastInactiveTarget && $lastInactiveTarget[0] === $inactiveTargetInput) {
+                            $pseudos[$name] = $lastInactiveTarget[1];
+                            $pseudoRecords[$name] = $lastInactiveTarget[2];
+                            $timeline?->forget($identities[$element] ?? $element, $name);
+                            continue;
+                        }
+                    }
+
                     $pseudoScheme = ColorScheme::forced($pseudo['color-scheme'] ?? '') ?? ('dark' === ($this->mediaFeatures['prefers-color-scheme'] ?? 'light') ? 'dark' : 'light');
                     $pseudo = $this->colors($pseudo, $values, $pseudoScheme);
                     if (null !== $timeline) {
@@ -908,6 +937,9 @@ final class StyleResolver
                     ];
                     if (null !== $timeline) {
                         $pseudoRecords[$name]['animated'] = $this->animatedProperties($timeline->getAppliedProperties($identities[$element] ?? $element, $name), $record['animated'] ?? [], $pseudoRecords[$name]['cascaded'], $pseudoRecords[$name]['declarations'], $pseudoInherited, $resolvedPseudo, 'normal' === $pseudoLine || is_numeric($pseudoLine));
+                    }
+                    if (null !== $inactiveTargetInput) {
+                        $lastInactiveTarget = [$inactiveTargetInput, $pseudo, $pseudoRecords[$name]];
                     }
                     if (str_starts_with($name, 'highlight(') || \in_array($name, ['first-letter', 'first-line', 'before', 'after', 'details-content'], true)) {
                         $properties = array_fill_keys(array_keys($pseudoMap[$element]), true);

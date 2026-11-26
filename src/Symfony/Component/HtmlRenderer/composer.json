@@ -28,7 +28,7 @@
         "symfony/polyfill-mbstring": "^1.31"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^8.3"
+        "symfony/phpunit-bridge": "^8.2"
     },
     "autoload": {
         "psr-4": {

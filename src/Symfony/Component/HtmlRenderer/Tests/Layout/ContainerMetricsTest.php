@@ -16,7 +16,7 @@ use Symfony\Component\HtmlRenderer\Layout\ContainerMetrics;
 
 class ContainerMetricsTest extends TestCase
 {
-    public function testFingerprintRetainsFractionalChangesRegardlessOfSerializePrecision(): void
+    public function testFingerprintRetainsFractionalChangesRegardlessOfSerializePrecision()
     {
         $document = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><div></div>');
         $node = $document->querySelector('div');

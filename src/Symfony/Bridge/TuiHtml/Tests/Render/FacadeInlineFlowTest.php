@@ -23,14 +23,14 @@ use Symfony\Component\Tui\Tui;
 
 class FacadeInlineFlowTest extends TestCase
 {
-    public function testGeneratedInlineRowsPreserveNativeGlueAndPunctuation(): void
+    public function testGeneratedInlineRowsPreserveNativeGlueAndPunctuation()
     {
         foreach (['Hello <button>world</button>!', '<button>A</button><button>B</button>', '<button>A</button> <button>B</button>', 'A <span style="color:red">red label</span> <button>go</button>!'] as $content) {
             $this->assertNativeEqual('<p style="margin:0">'.$content.'</p>', 40);
         }
     }
 
-    public function testGlueDropsWhenTheInlineControlMovesToTheNextLine(): void
+    public function testGlueDropsWhenTheInlineControlMovesToTheNextLine()
     {
         foreach (['Hello <button>world</button>!', '<button>A</button> <button>B</button>', 'A <button>B</button> C'] as $content) {
             foreach ([10, 12] as $columns) {
@@ -39,18 +39,18 @@ class FacadeInlineFlowTest extends TestCase
         }
     }
 
-    public function testExplicitFlexAndPreservedWhitespaceKeepTheirExistingPolicies(): void
+    public function testExplicitFlexAndPreservedWhitespaceKeepTheirExistingPolicies()
     {
         $this->assertNativeEqual('<p style="margin:0;display:flex;gap:1ch">Label <button>B</button></p>', 40);
         $this->assertNativeEqual('<p style="margin:0;white-space:pre">A <button>B</button> C</p>', 40);
     }
 
-    public function testTallNativeControlsKeepTheirGeneratedRowAlignment(): void
+    public function testTallNativeControlsKeepTheirGeneratedRowAlignment()
     {
         $this->assertNativeEqual('<p style="margin:0">Label <textarea rows="3" style="width:6ch">AB</textarea>!</p>', 40);
     }
 
-    public function testAuthoredVerticalAlignmentOverridesTheGeneratedRowDefault(): void
+    public function testAuthoredVerticalAlignmentOverridesTheGeneratedRowDefault()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<p style="margin:0">Label <textarea id="field" rows="3" style="width:6ch;vertical-align:top">AB</textarea></p>');
         $outer = new \Symfony\Component\Tui\Widget\ContainerWidget();
@@ -60,7 +60,7 @@ class FacadeInlineFlowTest extends TestCase
         self::assertSame('top', $view->getRoot()->getPresentation()->getResult()->getComputedStyle($node)['vertical-align']);
     }
 
-    public function testTrueInlineProjectionKeepsTheActualInputFocusAndSourceIdentity(): void
+    public function testTrueInlineProjectionKeepsTheActualInputFocusAndSourceIdentity()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<p style="margin:0">Label <input id="field" style="width:6ch"></p>');
         $field = $view->getById('field');

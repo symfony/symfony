@@ -95,8 +95,8 @@ final class MarginCollapseTest extends TestCase
 
     public function testForcedInlineBreakSeparatesBlockMarginStruts()
     {
-        $root = new Box(null, 'block', ['font-size' => '10px', 'line-height' => '10px'], [new Box(null,'block',['height' => '10px', 'margin-bottom' => '5px']), new Box(null,'line-break'), new Box(null,'block',['height' => '10px', 'margin-top' => '10px'])]);
-        $layout = (new LayoutEngine(new MonospaceTextMeasurer()))->layout($root,100,100);
-        self::assertSame(35.0,$layout->children[1]->bounds->y);
+        $root = new Box(null, 'block', ['font-size' => '10px', 'line-height' => '10px'], [new Box(null, 'block', ['height' => '10px', 'margin-bottom' => '5px']), new Box(null, 'line-break'), new Box(null, 'block', ['height' => '10px', 'margin-top' => '10px'])]);
+        $layout = (new LayoutEngine(new MonospaceTextMeasurer()))->layout($root, 100, 100);
+        self::assertSame(35.0, $layout->children[1]->bounds->y);
     }
 }

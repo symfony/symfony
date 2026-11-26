@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\TuiHtml\Compatibility;
 
+use Symfony\Component\HtmlRenderer\Compatibility\Support;
+
 /** @internal */
 final class SelectorSupport
 {

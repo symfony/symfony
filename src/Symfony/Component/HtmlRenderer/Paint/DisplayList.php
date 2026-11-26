@@ -14,12 +14,12 @@ namespace Symfony\Component\HtmlRenderer\Paint;
 /**
  * @implements \IteratorAggregate<int, array<string, mixed>>
  */
-final readonly class DisplayList implements \IteratorAggregate, \Countable
+final class DisplayList implements \IteratorAggregate, \Countable
 {
     /**
      * @param list<array<string, mixed>> $operations
      */
-    public function __construct(private array $operations = [])
+    public function __construct(private readonly array $operations = [])
     {
     }
 

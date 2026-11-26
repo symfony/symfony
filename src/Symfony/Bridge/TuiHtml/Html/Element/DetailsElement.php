@@ -11,11 +11,11 @@
 
 namespace Symfony\Bridge\TuiHtml\Html\Element;
 
-use Symfony\Bridge\TuiHtml\Css\Selector;
 use Symfony\Bridge\TuiHtml\Html\ElementFactoryInterface;
 use Symfony\Bridge\TuiHtml\Html\HtmlBuilder;
 use Symfony\Bridge\TuiHtml\Widget\CollapsibleWidget;
 use Symfony\Bridge\TuiHtml\Widget\ContainerWidget;
+use Symfony\Component\HtmlRenderer\Css\Selector;
 use Symfony\Component\Tui\Event\ExpandEvent;
 use Symfony\Component\Tui\Widget\AbstractWidget;
 

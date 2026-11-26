@@ -105,7 +105,7 @@ class CssParser
     private array $keyframes = [];
     /** @var array<string, array{bool, ?string, string}> The custom properties registered by @property: whether they inherit, their initial value, their syntax */
     private array $registered = [];
-    /** @var array<string, array<string, mixed>> The styles of the @counter-style rules, by name */
+    /** @var array<string, array{system: string, first?: int, symbols?: list<string>, additive?: list<array{int, string}>, negative?: array{string, string}, prefix?: string, suffix?: string, range?: list<array{int|null, int|null}>|null, pad?: array{int, string}|null, fallback?: string, extends?: string, units?: list<string>, formal?: bool}> The styles of the @counter-style rules, by name */
     private array $counterStyles = [];
     /** The root of a @scope without one, like the parent of the <style> it is in */
     private ?string $implicitScope = null;
@@ -204,7 +204,7 @@ class CssParser
     /**
      * The styles of the @counter-style rules parsed since the last call, by name: a later one replaces an earlier one.
      *
-     * @return array<string, array<string, mixed>>
+     * @return array<string, array{system: string, first?: int, symbols?: list<string>, additive?: list<array{int, string}>, negative?: array{string, string}, prefix?: string, suffix?: string, range?: list<array{int|null, int|null}>|null, pad?: array{int, string}|null, fallback?: string, extends?: string, units?: list<string>, formal?: bool}>
      */
     public function takeCounterStyles(): array
     {

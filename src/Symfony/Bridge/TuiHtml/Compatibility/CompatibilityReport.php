@@ -13,6 +13,7 @@ namespace Symfony\Bridge\TuiHtml\Compatibility;
 
 use Symfony\Bridge\TuiHtml\Css\CssStyleSheet;
 use Symfony\Bridge\TuiHtml\Html\ElementRegistry;
+use Symfony\Component\HtmlRenderer\Compatibility\Support;
 
 /**
  * Collects what the HTML and CSS registries support into one matrix.

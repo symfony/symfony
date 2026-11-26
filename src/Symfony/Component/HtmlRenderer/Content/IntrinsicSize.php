@@ -18,9 +18,9 @@ use Symfony\Component\HtmlRenderer\Exception\InvalidArgumentException;
  *
  * @experimental
  */
-final readonly class IntrinsicSize
+final class IntrinsicSize
 {
-    public function __construct(public float $minimumWidth, public float $preferredWidth, public float $height, public ?float $aspectRatio = null)
+    public function __construct(public readonly float $minimumWidth, public readonly float $preferredWidth, public readonly float $height, public readonly ?float $aspectRatio = null)
     {
         if (null !== $aspectRatio && (!is_finite($aspectRatio) || $aspectRatio <= 0)) {
             throw new InvalidArgumentException('An intrinsic aspect ratio must be finite and positive.');

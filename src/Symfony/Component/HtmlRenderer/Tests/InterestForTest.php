@@ -134,6 +134,6 @@ class InterestForTest extends TestCase
         self::assertSame([], $session->render()->getBounds($tip));
         self::assertSame(1, $calls);
         $document->getElementById('save')->remove();
-        self::assertSame([],$session->render()->getBounds($tip));
+        self::assertSame([], $session->render()->getBounds($tip));
     }
 }

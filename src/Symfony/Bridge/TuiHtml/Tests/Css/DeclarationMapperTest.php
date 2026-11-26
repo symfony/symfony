@@ -13,8 +13,6 @@ namespace Symfony\Bridge\TuiHtml\Tests\Css;
 
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\TuiHtml\Compatibility\Support;
-use Symfony\Bridge\TuiHtml\Compatibility\SupportLevel;
 use Symfony\Bridge\TuiHtml\Css\DeclarationMapper;
 use Symfony\Bridge\TuiHtml\Css\Value;
 use Symfony\Bridge\TuiHtml\Style\Align;
@@ -37,6 +35,8 @@ use Symfony\Bridge\TuiHtml\Style\TextAlign;
 use Symfony\Bridge\TuiHtml\Style\UnderlineStyle;
 use Symfony\Bridge\TuiHtml\Style\VerticalAlign;
 use Symfony\Bridge\TuiHtml\Tests\Fixtures\CollectingLogger;
+use Symfony\Component\HtmlRenderer\Compatibility\Support;
+use Symfony\Component\HtmlRenderer\Compatibility\SupportLevel;
 use Symfony\Component\HtmlRenderer\Exception\InvalidArgumentException;
 
 final class DeclarationMapperTest extends TestCase

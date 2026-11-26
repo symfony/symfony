@@ -63,7 +63,7 @@ final class OverflowWrappingTest extends TestCase
 
     public function testEmergencyBreaksPreserveTheLineWidthAcrossStyledRuns()
     {
-        $result = (new HtmlRenderer())->render('<style>p{width:16px;font-size:16px;line-height:16px;margin:0;overflow-wrap:anywhere}</style><p><span>Alph</span>aBeta</p>', new RenderingContext(100, 100));
+        $result = (new HtmlRenderer())->render('<style>p{width:16px;font-size:16px;line-height:16px;margin:0;overflow-wrap:anywhere}</style><p><span>Alph</span>aBeta</p>', new RenderingContext(100, 100)); // codespell:ignore alph
         $text = array_values(array_filter($result->getDisplayList()->getOperations(), static fn (array $op): bool => 'text' === $op['type']));
         $lines = [];
         foreach ($text as $operation) {

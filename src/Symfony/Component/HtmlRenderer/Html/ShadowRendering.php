@@ -18,7 +18,7 @@ final class ShadowRendering
 {
     public static function fragment(Fragment $fragment, \SplObjectStorage $owners): Fragment
     {
-        return new Fragment(self::owner($fragment->node, $owners), $fragment->bounds, $fragment->style, $fragment->text, array_map(static fn (Fragment $child): Fragment => self::fragment($child, $owners), $fragment->children), $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, self::anchor($fragment->anchor, $owners), $fragment->content);
+        return new Fragment(self::owner($fragment->node, $owners), $fragment->bounds, $fragment->style, $fragment->text, array_map(static fn (Fragment $child): Fragment => self::fragment($child, $owners), $fragment->children), $fragment->image, $fragment->transform, $fragment->backgrounds, $fragment->run, $fragment->pseudoElement, $fragment->topLayer, $fragment->scroll, $fragment->borderImage, self::anchor($fragment->anchor, $owners), $fragment->content, $fragment->surfaceBackground, $fragment->outline);
     }
 
     public static function styles(\SplObjectStorage $styles, \SplObjectStorage $owners): \SplObjectStorage

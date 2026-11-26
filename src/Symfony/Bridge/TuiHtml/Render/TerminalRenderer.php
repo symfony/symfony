@@ -29,9 +29,9 @@ use Symfony\Component\Tui\Widget\ContainerWidget;
  *
  * @experimental
  */
-final readonly class TerminalRenderer implements RendererDecoratorInterface, FocusPolicyInterface
+final class TerminalRenderer implements RendererDecoratorInterface, FocusPolicyInterface
 {
-    public function __construct(private RendererInterface $renderer)
+    public function __construct(private readonly RendererInterface $renderer)
     {
     }
 

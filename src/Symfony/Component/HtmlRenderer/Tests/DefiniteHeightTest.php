@@ -17,7 +17,7 @@ use Symfony\Component\HtmlRenderer\RenderingContext;
 
 class DefiniteHeightTest extends TestCase
 {
-    public function testPercentageChildrenUseTheUsedParentContentHeight(): void
+    public function testPercentageChildrenUseTheUsedParentContentHeight()
     {
         foreach (['block', 'flex', 'grid'] as $display) {
             foreach (['height:64px' => 64.0, 'height:64px;padding:4px;border:2px solid;box-sizing:border-box' => 52.0, 'height:64px;padding:4px;border:2px solid;box-sizing:content-box' => 64.0, 'height:64.5px' => 64.5] as $style => $expected) {
@@ -27,7 +27,7 @@ class DefiniteHeightTest extends TestCase
         }
     }
 
-    public function testAForcedColumnFlexItemSuppliesThePercentageBasisOfItsDescendants(): void
+    public function testAForcedColumnFlexItemSuppliesThePercentageBasisOfItsDescendants()
     {
         $session = new HtmlRenderer()->createSession('<div style="display:flex;flex-direction:column;height:64px"><div id="item" style="display:flex;flex:1;min-height:0"><span id="child" style="height:100%">A</span></div></div>', new RenderingContext(320, 240));
         $result = $session->render();

@@ -23,7 +23,7 @@ use Symfony\Component\Tui\Widget\ContainerWidget;
 
 class FacadeProviderLifecycleTest extends TestCase
 {
-    public function testCustomProvidersPrepareOnceBeforeAnyResolutionWithTheApplicationViewport(): void
+    public function testCustomProvidersPrepareOnceBeforeAnyResolutionWithTheApplicationViewport()
     {
         $provider = new class implements StyleProviderInterface {
             public array $preparations = [];

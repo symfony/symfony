@@ -207,7 +207,8 @@ final class RenderSession
             }
         }
         $revision = $this->refreshShadowView(hash('xxh128', $serialized))['revision'];
-        if ($revision !== $this->revision) {
+        $result = $this->result;
+        if ($revision !== $this->revision || null === $result) {
             if (null !== $root = $this->document->documentElement) {
                 Html\IdAttributes::mark($root);
             }
@@ -330,9 +331,9 @@ final class RenderSession
                     $states[] = [$element, $state];
                 }
             }
-            $this->result = HtmlRenderer::compute($this->document, $this->context, $states, $this->timeline, $this->time, $this->resources, $this->resolver ??= new StyleResolver($this->resources, $this->context->defaultFont, $this->context->textMeasurer, $this->context->mediaFeatures, $this->context->userAgentStylesheet, $this->context->colors, $this->context->colorLookup, null, $this->context->layoutMetrics), $this->renderEmbedded(...), $this->shadowView);
+            $this->result = $result = HtmlRenderer::compute($this->document, $this->context, $states, $this->timeline, $this->time, $this->resources, $this->resolver ??= new StyleResolver($this->resources, $this->context->defaultFont, $this->context->textMeasurer, $this->context->mediaFeatures, $this->context->userAgentStylesheet, $this->context->colors, $this->context->colorLookup, null, $this->context->layoutMetrics), $this->renderEmbedded(...), $this->shadowView);
             foreach ($this->scroll as $element) {
-                $geometry = $this->result->getScrollGeometry($element);
+                $geometry = $result->getScrollGeometry($element);
                 $this->scroll[$element] = null === $geometry ? [0.0, 0.0] : [$geometry->offsetX, $geometry->offsetY];
             }
             $this->revision = $revision;
@@ -341,7 +342,7 @@ final class RenderSession
         if (!$this->initialScrollApplied) {
             $this->initialScrollApplied = true;
             foreach ($this->elements('*') as $element) {
-                if ('nearest' === ($this->result->getComputedStyle($element)['scroll-initial-target'] ?? 'none') && $this->result->getBounds($element)) {
+                if ('nearest' === ($result->getComputedStyle($element)['scroll-initial-target'] ?? 'none') && $result->getBounds($element)) {
                     $this->scrollIntoView($element);
 
                     return $this->render();
@@ -349,7 +350,7 @@ final class RenderSession
             }
         }
 
-        return $this->result;
+        return $result;
     }
 
     /**
@@ -400,6 +401,7 @@ final class RenderSession
         return null === $view ? $element->isConnected : isset($view['mirrors'][$element]);
     }
 
+    /** @return iterable<\Dom\Element> */
     private function elements(string $selector): iterable
     {
         if (null === $this->shadowView) {
@@ -1201,9 +1203,7 @@ final class RenderSession
                 $value = NumberStepper::constrain($value, $model['min'], $model['max'], $model['step']);
                 if ($value !== $model['value']) {
                     $this->input(NumberStepper::format($value, $model['step'], $model['min']));
-                    if ($this->containsElement($element) && !ControlState::isDisabled($element) && !$this->isBlocked($element) && !$element->hasAttribute('readonly') && 'range' === strtolower($element->getAttribute('type') ?? '')) {
-                        $this->dispatch(new DocumentEvent('change', $element));
-                    }
+                    $this->dispatchRangeChange($element);
                 }
             }
 
@@ -1368,6 +1368,7 @@ final class RenderSession
         return $changed || 0.0 === ($vertical ? $remainingY : $remainingX);
     }
 
+    /** @param list<\Dom\Element> $options */
     private function pageOptionIndex(\Dom\Element $select, array $options, int $index, bool $backward, bool $picker = false): int
     {
         $result = $this->render();
@@ -1545,8 +1546,8 @@ final class RenderSession
             $range = $this->rangeTarget;
             if ($this->containsElement($range) && !ControlState::isDisabled($range) && !$this->isBlocked($range) && !$range->hasAttribute('readonly')) {
                 $this->rangeAt($range, $pointer->x);
-                if ('up' === $pointer->type && $this->containsElement($range) && !ControlState::isDisabled($range) && !$this->isBlocked($range) && !$range->hasAttribute('readonly') && 'range' === strtolower($range->getAttribute('type') ?? '') && $this->rangeStartValue !== $this->getValue($range)) {
-                    $this->dispatch(new DocumentEvent('change', $range));
+                if ('up' === $pointer->type) {
+                    $this->dispatchRangeChange($range, $this->rangeStartValue);
                 }
             }
         }
@@ -1950,10 +1951,10 @@ final class RenderSession
         if (!$dialog->hasAttribute('open')) {
             return;
         }
-        if (!$this->beforeToggle($dialog, false)) {
+        if (null === $state = $this->beforeToggle($dialog, false)) {
             return;
         }
-        if (!$this->containsElement($dialog) || !$dialog->hasAttribute('open')) {
+        if (!$state['connected'] || !$state['open']) {
             return;
         }
         $previous = $this->modalFocus[$dialog] ?? null;
@@ -2004,7 +2005,7 @@ final class RenderSession
         if (\in_array($popover, $this->topLayers, true)) {
             return;
         }
-        if (!$this->beforeToggle($popover, true) || !$this->containsElement($popover) || !$popover->hasAttribute('popover') || \in_array($popover, $this->topLayers, true)) {
+        if (null === ($state = $this->beforeToggle($popover, true)) || !$state['connected'] || !$state['popover'] || $state['layered']) {
             return;
         }
         $mode = $this->popoverMode($popover);
@@ -2013,7 +2014,8 @@ final class RenderSession
                 $this->hidePopover($open);
             }
         }
-        if (!$this->containsElement($popover) || !$popover->hasAttribute('popover') || \in_array($popover, $this->topLayers, true)) {
+        $state = $this->overlayState($popover);
+        if (!$state['connected'] || !$state['popover'] || $state['layered']) {
             return;
         }
         $this->topLayers[] = $popover;
@@ -2029,10 +2031,10 @@ final class RenderSession
         if (!$popover->hasAttribute('popover') || !\in_array($popover, $this->topLayers, true) || isset($this->modalFocus[$popover])) {
             return;
         }
-        if (!$this->beforeToggle($popover, false)) {
+        if (null === $state = $this->beforeToggle($popover, false)) {
             return;
         }
-        if (!$this->containsElement($popover)) {
+        if (!$state['connected']) {
             $this->removeLayer($popover);
 
             return;
@@ -2121,16 +2123,45 @@ final class RenderSession
         }
     }
 
-    private function beforeToggle(\Dom\Element $element, bool $opening): bool
+    private function dispatchRangeChange(\Dom\Element $range, ?string $previousValue = null): void
+    {
+        if (!$this->containsElement($range) || ControlState::isDisabled($range) || $this->isBlocked($range) || $range->hasAttribute('readonly') || 'range' !== strtolower($range->getAttribute('type') ?? '')) {
+            return;
+        }
+        if (null !== $previousValue && $previousValue === $this->getValue($range)) {
+            return;
+        }
+        $this->dispatch(new DocumentEvent('change', $range));
+    }
+
+    /**
+     * @return array{connected: bool, open: bool, popover: bool, layered: bool}
+     */
+    private function overlayState(\Dom\Element $element): array
+    {
+        $connected = $this->containsElement($element);
+
+        return [
+            'connected' => $connected,
+            'open' => $connected && $element->hasAttribute('open'),
+            'popover' => $connected && $element->hasAttribute('popover'),
+            'layered' => $connected && \in_array($element, $this->topLayers, true),
+        ];
+    }
+
+    /**
+     * @return array{connected: bool, open: bool, popover: bool, layered: bool}|null the current state after listeners, or null when the transition was rejected
+     */
+    private function beforeToggle(\Dom\Element $element, bool $opening): ?array
     {
         if (isset($this->overlayTransitions[$element])) {
-            return false;
+            return null;
         }
         $this->overlayTransitions[$element] = true;
         try {
             $this->dispatch($event = new DocumentEvent('beforetoggle', $element, ['oldState' => $opening ? 'closed' : 'open', 'newState' => $opening ? 'open' : 'closed']));
 
-            return !$opening || !$event->isDefaultPrevented();
+            return $opening && $event->isDefaultPrevented() ? null : $this->overlayState($element);
         } finally {
             unset($this->overlayTransitions[$element]);
         }
@@ -2147,7 +2178,7 @@ final class RenderSession
         }
         $wasOpen = $dialog->hasAttribute('open');
         if (!$wasOpen) {
-            if (!$this->beforeToggle($dialog, true) || !$this->containsElement($dialog) || $dialog->hasAttribute('open')) {
+            if (null === ($state = $this->beforeToggle($dialog, true)) || !$state['connected'] || $state['open']) {
                 return;
             }
         }

@@ -21,7 +21,7 @@ use Symfony\Component\HtmlRenderer\RenderingContext;
 
 class ReplacedAutoHeightTest extends TestCase
 {
-    public function testAutoHeightCanExceedItsContainingRowButExplicitHeightAndMaximumStillConstrainIt(): void
+    public function testAutoHeightCanExceedItsContainingRowButExplicitHeightAndMaximumStillConstrainIt()
     {
         foreach (['' => [60.0, 60.0], 'height:24px' => [24.0, 24.0], 'max-height:32px' => [32.0, 32.0]] as $style => [$height, $room]) {
             $provider = new class implements ReplacedContentInterface {
@@ -47,7 +47,7 @@ class ReplacedAutoHeightTest extends TestCase
         }
     }
 
-    public function testWidthDependentContentCanReturnItsOwnWrappedHeight(): void
+    public function testWidthDependentContentCanReturnItsOwnWrappedHeight()
     {
         $provider = new class implements ReplacedContentInterface {
             public function getIntrinsicSize(): IntrinsicSize

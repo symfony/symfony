@@ -17,7 +17,7 @@ use Symfony\Component\HtmlRenderer\RenderingContext;
 
 class DocumentIdsTest extends TestCase
 {
-    public function testParserUnmarkedSvgIdsParticipateInNativeLookupAndNavigation(): void
+    public function testParserUnmarkedSvgIdsParticipateInNativeLookupAndNavigation()
     {
         $document = \Dom\HTMLDocument::createFromString('<!doctype html><style>svg:target{color:red}</style><svg id="logo" width="20" height="10"></svg>');
         $svg = $document->querySelector('svg');
@@ -31,7 +31,7 @@ class DocumentIdsTest extends TestCase
         self::assertSame($source, $document->saveHtml());
     }
 
-    public function testInsertedUnmarkedIdsCanBeNavigatedBeforeAnExplicitRender(): void
+    public function testInsertedUnmarkedIdsCanBeNavigatedBeforeAnExplicitRender()
     {
         $session = new HtmlRenderer()->createSession('<main></main>', new RenderingContext(100, 100));
         $session->render();
@@ -49,7 +49,7 @@ class DocumentIdsTest extends TestCase
         self::assertSame($source, $document->saveHtml());
     }
 
-    public function testRenderingRegistersUnmarkedIdsAfterDocumentMutation(): void
+    public function testRenderingRegistersUnmarkedIdsAfterDocumentMutation()
     {
         $session = new HtmlRenderer()->createSession('<main></main>', new RenderingContext(100, 100));
         $session->render();
@@ -64,7 +64,7 @@ class DocumentIdsTest extends TestCase
         self::assertSame($source, $document->saveHtml());
     }
 
-    public function testEmptyIdsDoNotBecomeNativeLookupTargets(): void
+    public function testEmptyIdsDoNotBecomeNativeLookupTargets()
     {
         $document = \Dom\HTMLDocument::createFromString('<!doctype html><svg id=""></svg>');
         $svg = $document->querySelector('svg');

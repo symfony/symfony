@@ -25,7 +25,7 @@ final class ContainerMetrics
         $snapped = new \SplObjectStorage();
         $visit = static function (Fragment $fragment) use (&$visit, $containers, $states, $groups, $ports, $snapped): void {
             $element = $fragment->node;
-            if ($element instanceof \Dom\Element && null === $fragment->pseudoElement && !isset(($containers[$element] ?? [])['width'])) {
+            if ($element instanceof \Dom\Element && null === $fragment->pseudoElement && !\array_key_exists('width', $containers[$element] ?? [])) {
                 $content = $fragment->getContentBox();
                 $entry = $containers[$element] ?? ['style' => []];
                 $entry['bounds'] = [$fragment->bounds->x, $fragment->bounds->y, $fragment->bounds->width, $fragment->bounds->height];

@@ -15,6 +15,7 @@ use Symfony\Bridge\TuiHtml\Content\FrameContentAdapter;
 use Symfony\Bridge\TuiHtml\Content\NativeContentAdapter;
 use Symfony\Bridge\TuiHtml\Content\TabsContentAdapter;
 use Symfony\Bridge\TuiHtml\Css\CssStyleSheet;
+use Symfony\Bridge\TuiHtml\Css\Value;
 use Symfony\Bridge\TuiHtml\Html\MirrorPresentation;
 use Symfony\Bridge\TuiHtml\Internal\ContainerState;
 use Symfony\Bridge\TuiHtml\Internal\FontFamilies;
@@ -248,9 +249,10 @@ final class FacadePresentation
                     });
                     continue;
                 }
-                $providerKey = [$widget instanceof CollapsibleWidget ? 'summary' : '', $widget->getRenderRevision(), $style, $media->getKey(), $context->getFontRegistry()];
+                $surfaceBackground = self::isNativePopup($widget) && 'absolute' === ($style['position'] ?? null) ? (Value::color($style['background-color'] ?? 'transparent', $media, $this->sheet->getBackdropColor($widget)) ?: $this->sheet->getBackdropColor($widget) ?: Color::named('default')) : null;
+                $providerKey = [$surfaceBackground?->toBackgroundCode(), $widget instanceof CollapsibleWidget ? 'summary' : '', $widget->getRenderRevision(), $style, $media->getKey(), $context->getFontRegistry()];
                 $cached = $this->providers[$widget] ?? null;
-                $adapter = null !== $cached && $cached[0] === $providerKey ? $cached[1] : new NativeContentAdapter(\WeakReference::create($widget), $widget->getRenderRevision(), $style, $this->metrics, $context->getFontRegistry(), $media, $widget instanceof CollapsibleWidget ? static fn (CollapsibleWidget $source, $context): array => $source->renderHeader($context) : null, $widget instanceof CollapsibleWidget ? 0.0 : null);
+                $adapter = null !== $cached && $cached[0] === $providerKey ? $cached[1] : new NativeContentAdapter(\WeakReference::create($widget), $widget->getRenderRevision(), $style, $this->metrics, $context->getFontRegistry(), $media, $widget instanceof CollapsibleWidget ? static fn (CollapsibleWidget $source, $context): array => $source->renderHeader($context) : null, $widget instanceof CollapsibleWidget ? 0.0 : null, $surfaceBackground);
                 $this->providers[$widget] = [$providerKey, $adapter];
                 $providers[$element] = $adapter;
             }
@@ -589,6 +591,11 @@ final class FacadePresentation
         return $metrics;
     }
 
+    private static function isNativePopup(AbstractWidget $widget): bool
+    {
+        return $widget instanceof \Symfony\Bridge\TuiHtml\Widget\SelectListWidget && ($widget->getParent() instanceof \Symfony\Bridge\TuiHtml\Widget\DropdownWidget || $widget->getParent() instanceof \Symfony\Bridge\TuiHtml\Widget\ComboboxWidget);
+    }
+
     private function prepareNativePolicies(array $snapshot): \SplObjectStorage
     {
         $colors = new \SplObjectStorage();
@@ -623,7 +630,7 @@ final class FacadePresentation
                 $colors[$node] = $policy;
             }
             $parent = $widget->getParent();
-            if ($widget instanceof \Symfony\Bridge\TuiHtml\Widget\SelectListWidget && ($parent instanceof \Symfony\Bridge\TuiHtml\Widget\DropdownWidget || $parent instanceof \Symfony\Bridge\TuiHtml\Widget\ComboboxWidget) && \Symfony\Bridge\TuiHtml\Style\PositionMode::Absolute === $native->getPosition()?->mode && null !== $width = $native->getMaxColumns()) {
+            if (self::isNativePopup($widget) && \Symfony\Bridge\TuiHtml\Style\PositionMode::Absolute === $native->getPosition()?->mode && null !== $width = $native->getMaxColumns()) {
                 $policy = $colors[$node];
                 $policy['']['width'] = $width.'ch';
                 $colors[$node] = $policy;
@@ -795,16 +802,23 @@ final class FacadePresentation
             if (null !== $offset) {
                 $style[$side] = $offset.$unit;
             } elseif ($percent instanceof PercentLength) {
-                if (1 !== \count($percent->terms) || !\is_array($term = $percent->terms[0]) || 2 !== \count($term) || !is_finite($term[0]) || !is_finite($term[1])) {
+                if (1 !== \count($percent->terms)) {
+                    throw new \LogicException('Native piecewise percentage insets require an explicit presentation projection.');
+                }
+                $term = $percent->terms[0];
+                if (!\is_array($term) || 2 !== \count($term)) {
+                    throw new \LogicException('Native piecewise percentage insets require an explicit presentation projection.');
+                }
+                if (!is_finite($term[0]) || !is_finite($term[1])) {
                     throw new \LogicException('Native piecewise percentage insets require an explicit presentation projection.');
                 }
                 $style[$side] = 0.0 === (float) $term[1] ? $term[0].'%' : 'calc('.$term[0].'% '.($term[1] < 0 ? '- ' : '+ ').abs($term[1]).$unit.')';
             } elseif (null === $percent) {
                 $style[$side] = 'auto';
-            } elseif (\is_int($percent) || \is_float($percent) && is_finite($percent)) {
+            } elseif (\is_int($percent)) {
                 $style[$side] = $percent.'%';
             } else {
-                throw new \LogicException('Native percentage insets require finite numeric values.');
+                throw new \LogicException('Native percentage insets require integer values.');
             }
         }
 

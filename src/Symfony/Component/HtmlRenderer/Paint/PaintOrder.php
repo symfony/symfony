@@ -166,7 +166,7 @@ final class PaintOrder
     private static function hasOutline(Fragment $fragment): bool
     {
         return !\in_array($fragment->style['outline-style'] ?? 'none', ['none', 'hidden'], true)
-            && max($fragment->style['-renderer-outline-width-x'] ?? 0.0, $fragment->style['-renderer-outline-width-y'] ?? 0.0) > 0;
+            && null !== $fragment->outline && max($fragment->outline->widthX, $fragment->outline->widthY) > 0;
     }
 
     private static function hasContent(Fragment $fragment): bool

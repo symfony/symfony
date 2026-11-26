@@ -16,7 +16,7 @@ use Symfony\Bridge\TuiHtml\Css\LayoutStyleTrial;
 
 class LayoutStyleTrialTest extends TestCase
 {
-    public function testOnlyTheChosenCandidateCommitsOnce(): void
+    public function testOnlyTheChosenCandidateCommitsOnce()
     {
         $commits = [];
         $trial = new LayoutStyleTrial(['value' => 'initial'], static fn ($metrics) => ['value' => \count($metrics)], static function ($candidate) use (&$commits): void { $commits[] = $candidate['value']; });
@@ -33,7 +33,7 @@ class LayoutStyleTrialTest extends TestCase
         $trial->commit($final);
     }
 
-    public function testCandidatesFromAnotherFrameCannotCommit(): void
+    public function testCandidatesFromAnotherFrameCannotCommit()
     {
         $trial = new LayoutStyleTrial([], static fn () => [], static function (): void {});
         $foreign = new LayoutStyleTrial([], static fn () => [], static function (): void {});
@@ -41,7 +41,7 @@ class LayoutStyleTrialTest extends TestCase
         $trial->commit($foreign->getInitial());
     }
 
-    public function testDisposalFreesCapturedInputsEvenWithAnExternallyRetainedInitialCandidate(): void
+    public function testDisposalFreesCapturedInputsEvenWithAnExternallyRetainedInitialCandidate()
     {
         $owner = new \stdClass();
         $owner->value = 'captured';

@@ -14,12 +14,12 @@ namespace Symfony\Bridge\TuiHtml\Tests\Css;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\TuiHtml\Css\CssParser;
-use Symfony\Bridge\TuiHtml\Css\Declaration;
 use Symfony\Bridge\TuiHtml\Css\MediaQuery;
-use Symfony\Bridge\TuiHtml\Css\Selector;
 use Symfony\Bridge\TuiHtml\Style\MediaContext;
 use Symfony\Bridge\TuiHtml\Tests\Fixtures\CollectingLogger;
 use Symfony\Component\HtmlRenderer\Css\CssRule;
+use Symfony\Component\HtmlRenderer\Css\Declaration;
+use Symfony\Component\HtmlRenderer\Css\Selector;
 use Symfony\Component\HtmlRenderer\Css\StylesheetLoaderInterface;
 use Symfony\Component\HtmlRenderer\Exception\InvalidArgumentException;
 

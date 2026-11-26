@@ -22,7 +22,7 @@ use Symfony\Component\Tui\Widget\TextWidget;
 
 class TabsContentRendererTest extends TestCase
 {
-    public function testContentCallbackRetainsNativeChromeAndReportsItsLocalViewport(): void
+    public function testContentCallbackRetainsNativeChromeAndReportsItsLocalViewport()
     {
         foreach (TabPosition::cases() as $position) {
             $body = new TextWidget('Body');

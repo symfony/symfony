@@ -19,7 +19,7 @@ use Symfony\Component\HtmlRenderer\Html\TreeScope;
 
 class TreeScopeTest extends TestCase
 {
-    public function testDetachedLeafRootsDoNotOfferElementLookup(): void
+    public function testDetachedLeafRootsDoNotOfferElementLookup()
     {
         $document = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><p id="outside">Outside</p>');
         foreach ([$document->createTextNode('text'), $document->createComment('comment')] as $node) {

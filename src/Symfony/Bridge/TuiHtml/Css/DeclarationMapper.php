@@ -12,14 +12,12 @@
 namespace Symfony\Bridge\TuiHtml\Css;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\TuiHtml\Compatibility\Support;
 use Symfony\Bridge\TuiHtml\Compatibility\SupportProviderInterface;
 use Symfony\Bridge\TuiHtml\Internal\FontFamilies;
 use Symfony\Bridge\TuiHtml\Style\Align;
 use Symfony\Bridge\TuiHtml\Style\AutoMargin;
 use Symfony\Bridge\TuiHtml\Style\BackgroundLayout;
 use Symfony\Bridge\TuiHtml\Style\BackgroundLength;
-use Symfony\Bridge\TuiHtml\Style\BlendMode;
 use Symfony\Bridge\TuiHtml\Style\Border;
 use Symfony\Bridge\TuiHtml\Style\BorderPattern;
 use Symfony\Bridge\TuiHtml\Style\Color;
@@ -47,7 +45,10 @@ use Symfony\Bridge\TuiHtml\Style\TableRole;
 use Symfony\Bridge\TuiHtml\Style\TextAlign;
 use Symfony\Bridge\TuiHtml\Style\UnderlineStyle;
 use Symfony\Bridge\TuiHtml\Style\VerticalAlign;
+use Symfony\Component\HtmlRenderer\Compatibility\Support;
+use Symfony\Component\HtmlRenderer\Css\Selector;
 use Symfony\Component\HtmlRenderer\Exception\InvalidArgumentException;
+use Symfony\Component\HtmlRenderer\Paint\BlendMode;
 
 /**
  * Maps computed CSS declarations to a Tui {@see Style}.

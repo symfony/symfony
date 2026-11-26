@@ -20,7 +20,7 @@ use Symfony\Component\Tui\Tui;
 
 class FacadeScrollControlTest extends TestCase
 {
-    public function testGeometryTrialsKeepFocusUaAndOneCommittedPseudoTransitionAcrossTimes(): void
+    public function testGeometryTrialsKeepFocusUaAndOneCommittedPseudoTransitionAcrossTimes()
     {
         $time = 0.0;
         $started = 0;
@@ -62,7 +62,7 @@ class FacadeScrollControlTest extends TestCase
         self::assertSame(1, $started);
     }
 
-    public function testNativeViewClickPagesTheActualContainerThroughCoreGeneratedControls(): void
+    public function testNativeViewClickPagesTheActualContainerThroughCoreGeneratedControls()
     {
         foreach ([false, true] as $tabs) {
             $html = '<style>#s{height:6;overflow:auto;border:1px solid;width:20ch}#s::scroll-button(up){content:"Up"}#s::scroll-button(down){content:"Down"}</style><div id="s"><p>one</p><p>two</p><p>three</p><p>four</p><p>five</p></div>';
@@ -100,7 +100,7 @@ class FacadeScrollControlTest extends TestCase
         }
     }
 
-    public function testNativeMarkerClickRevealsItsActualTargetAndPreservesFocus(): void
+    public function testNativeMarkerClickRevealsItsActualTargetAndPreservesFocus()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<style>#s{height:6;overflow:auto;border:1px solid;width:20ch;scroll-marker-group:after}p{margin:0}p::scroll-marker{content:attr(data-label)}</style><div id="s"><p id="a" data-label="A">one<br>two<br>three</p><p id="b" data-label="B">four<br>five<br>six</p></div>');
         $scroller = $view->getById('s');
@@ -130,7 +130,7 @@ class FacadeScrollControlTest extends TestCase
         }
     }
 
-    public function testNativeRepeatedSmallScrollsUseCommittedSnapHistoryInsideAndOutsideTabs(): void
+    public function testNativeRepeatedSmallScrollsUseCommittedSnapHistoryInsideAndOutsideTabs()
     {
         foreach ([false, true] as $tabs) {
             $html = '<style>#s{height:3;overflow:auto;scroll-snap-type:y mandatory}section.slide{height:3;scroll-snap-align:start}</style><div id="s"><section class="slide">one</section><section class="slide">two</section><section class="slide">three</section><section class="slide">four</section></div>';

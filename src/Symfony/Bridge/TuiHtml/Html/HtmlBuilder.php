@@ -13,7 +13,6 @@ namespace Symfony\Bridge\TuiHtml\Html;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\TuiHtml\Css\CssStyleSheet;
-use Symfony\Bridge\TuiHtml\Css\Selector;
 use Symfony\Bridge\TuiHtml\Event\PressEvent;
 use Symfony\Bridge\TuiHtml\Exception\LogicException;
 use Symfony\Bridge\TuiHtml\Html\Element\ImageElement;
@@ -22,7 +21,6 @@ use Symfony\Bridge\TuiHtml\Internal\ContainerState;
 use Symfony\Bridge\TuiHtml\Style\DefaultStyleSheet;
 use Symfony\Bridge\TuiHtml\Style\RasterImage;
 use Symfony\Bridge\TuiHtml\Style\Style;
-use Symfony\Bridge\TuiHtml\Style\SvgNames;
 use Symfony\Bridge\TuiHtml\Style\VectorImage;
 use Symfony\Bridge\TuiHtml\Widget\ButtonWidget;
 use Symfony\Bridge\TuiHtml\Widget\CollapsibleWidget;
@@ -33,9 +31,11 @@ use Symfony\Bridge\TuiHtml\Widget\HtmlRootWidget;
 use Symfony\Bridge\TuiHtml\Widget\LinkedTextWidget;
 use Symfony\Bridge\TuiHtml\Widget\RichTextWidget;
 use Symfony\Bridge\TuiHtml\Widget\Text\InlineNode;
+use Symfony\Component\HtmlRenderer\Css\Selector;
 use Symfony\Component\HtmlRenderer\Exception\InvalidArgumentException;
 use Symfony\Component\HtmlRenderer\Html\IdAttributes;
 use Symfony\Component\HtmlRenderer\Html\ShadowRoots;
+use Symfony\Component\HtmlRenderer\Vector\SvgNames;
 use Symfony\Component\Tui\Exception\InvalidArgumentException as TuiInvalidArgumentException;
 use Symfony\Component\Tui\Widget\AbstractWidget;
 use Symfony\Component\Tui\Widget\FocusableInterface;
@@ -222,7 +222,7 @@ final class HtmlBuilder
         if (!$this->userAgentStylesLoaded) {
             $this->styleSheet->addUserAgentStyles(file_get_contents(__DIR__.'/Resources/ua.css') ?: throw new LogicException('The user agent stylesheet cannot be read.'));
             if ($this->useHtmlRenderer) {
-                $this->styleSheet->addUserAgentStyles('::scroll-button(*):disabled { opacity: .5 } ::scroll-marker-group { display: flex; column-gap: 1ch }');
+                $this->styleSheet->addUserAgentStyles('table { border-spacing: var(--tui-cell-spacing, 1ch) 0 } ::scroll-button(*):disabled { opacity: .5 } ::scroll-marker-group { display: flex; column-gap: 1ch }');
             }
             if ($this->defaultStyles) {
                 $this->styleSheet->addUserAgentStyles(file_get_contents(__DIR__.'/Resources/default.css') ?: throw new LogicException('The default stylesheet cannot be read.'));

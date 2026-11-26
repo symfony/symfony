@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\TuiHtml\Css;
 
 use Symfony\Bridge\TuiHtml\Style\Color;
+use Symfony\Component\HtmlRenderer\Css\ColorSpace;
 
 /** @internal */
 final class ColorFunction

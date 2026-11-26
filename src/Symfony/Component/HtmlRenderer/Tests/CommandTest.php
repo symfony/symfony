@@ -18,7 +18,7 @@ use Symfony\Component\HtmlRenderer\RenderingContext;
 
 final class CommandTest extends TestCase
 {
-    public function testCustomCommandsPreserveCaseAndTargetAndSource(): void
+    public function testCustomCommandsPreserveCaseAndTargetAndSource()
     {
         $session = (new HtmlRenderer())->createSession('<button id="n" commandfor="p" command="--Next"><span>Next</span></button><button id="bad" commandfor="p" command="next">Bad</button><p id="p">1</p>', new RenderingContext(80, 24));
         $events = [];
@@ -30,7 +30,7 @@ final class CommandTest extends TestCase
         self::assertSame([['p', '--Next', 'n']], $events);
     }
 
-    public function testBuiltInCommandsCanBeCanceledAndRevalidateAfterListeners(): void
+    public function testBuiltInCommandsCanBeCanceledAndRevalidateAfterListeners()
     {
         $session = (new HtmlRenderer())->createSession('<button id="o" commandfor="d" command="SHOW-MODAL">Open</button><dialog id="d"><button id="x" commandfor="d" command="close">Close</button></dialog>', new RenderingContext(80, 24));
         $dialog = $session->getDocument()->getElementById('d');
@@ -68,7 +68,7 @@ final class CommandTest extends TestCase
         self::assertNull($session->activate($session->getDocument()->getElementById('missing')));
     }
 
-    public function testPopoverCommandsAndUnknownTargetsDoNotSubmitForms(): void
+    public function testPopoverCommandsAndUnknownTargetsDoNotSubmitForms()
     {
         $session = (new HtmlRenderer())->createSession('<form><button id="s" commandfor="p" command="show-popover">Show</button><button id="h" commandfor="p" command="hide-popover">Hide</button><button id="missing" commandfor="absent" command="close">Missing</button></form><div id="p" popover>Menu</div>', new RenderingContext(80, 24));
         self::assertNull($session->activate($session->getDocument()->getElementById('s')));

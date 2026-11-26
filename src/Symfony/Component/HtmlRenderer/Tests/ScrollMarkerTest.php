@@ -17,7 +17,7 @@ use Symfony\Component\HtmlRenderer\RenderingContext;
 
 class ScrollMarkerTest extends TestCase
 {
-    public function testTheGeneratedGroupReservesItsHeightAndRetainsNativeTargets(): void
+    public function testTheGeneratedGroupReservesItsHeightAndRetainsNativeTargets()
     {
         foreach (['before', 'after'] as $position) {
             $session = new HtmlRenderer()->createSession('<style>#s{width:160px;height:64px;line-height:16px;overflow:auto;scroll-marker-group:'.$position.'}p{margin:0}p::scroll-marker{content:attr(data-label)}</style><div id="s"><p id="a" data-label="A">one<br>two<br>three</p><p id="b" data-label="B">four<br>five<br>six</p></div>', new RenderingContext(320, 240));
@@ -33,7 +33,7 @@ class ScrollMarkerTest extends TestCase
         }
     }
 
-    public function testReorderingAndRemovingTargetsRebuildsTheGroupWithoutMovingSemanticNodes(): void
+    public function testReorderingAndRemovingTargetsRebuildsTheGroupWithoutMovingSemanticNodes()
     {
         $session = new HtmlRenderer()->createSession('<style>#s{height:64px;line-height:16px;overflow:auto;scroll-marker-group:before}p{margin:0}p::scroll-marker{content:attr(data-label)}</style><div id="s"><p id="a" data-label="A">one</p><p id="b" data-label="B">two</p></div>', new RenderingContext(320, 240));
         $document = $session->getDocument();
@@ -54,7 +54,7 @@ class ScrollMarkerTest extends TestCase
         self::assertSame([], $session->render()->getBounds($owner, 'scroll-marker-group'));
     }
 
-    public function testCurrentMarkerTracksActualScrollGeometry(): void
+    public function testCurrentMarkerTracksActualScrollGeometry()
     {
         $session = new HtmlRenderer()->createSession('<style>#s{width:160px;height:64px;line-height:16px;overflow:auto;scroll-marker-group:after}p{margin:0}p::scroll-marker{content:attr(data-label);color:red}p::scroll-marker:target-current{color:green}</style><div id="s"><p id="a" data-label="A">one<br>two<br>three</p><p id="b" data-label="B">four<br>five<br>six</p></div>', new RenderingContext(320, 240));
         $document = $session->getDocument();
@@ -84,7 +84,7 @@ class ScrollMarkerTest extends TestCase
         self::assertSame('green', $color($result, $document->getElementById('b')));
     }
 
-    public function testPointerMarkersRevealTheirTargetWithoutFollowingItsLinkOrMovingFocus(): void
+    public function testPointerMarkersRevealTheirTargetWithoutFollowingItsLinkOrMovingFocus()
     {
         $session = new HtmlRenderer()->createSession('<style>#s{width:160px;height:64px;line-height:16px;overflow:auto;scroll-marker-group:after}a{display:block}a::scroll-marker{content:attr(data-label)}</style><div id="s"><a id="a" href="#destination" data-label="A">one<br>two<br>three</a><a id="b" href="#destination" data-label="B">four<br>five<br>six</a></div><p id="destination">Destination</p>', new RenderingContext(320, 240));
         $document = $session->getDocument();
@@ -101,7 +101,7 @@ class ScrollMarkerTest extends TestCase
         self::assertNull($session->getFocusedElement());
     }
 
-    public function testCanceledOrRemovedMarkerTargetsNeverApplyTheDefaultScroll(): void
+    public function testCanceledOrRemovedMarkerTargetsNeverApplyTheDefaultScroll()
     {
         foreach ([false, true] as $remove) {
             $session = new HtmlRenderer()->createSession('<style>#s{width:160px;height:64px;line-height:16px;overflow:auto;scroll-marker-group:after}p{margin:0}p::scroll-marker{content:attr(data-label)}</style><div id="s"><p data-label="A">one<br>two<br>three</p><p id="b" data-label="B">four<br>five<br>six</p></div>', new RenderingContext(320, 240));

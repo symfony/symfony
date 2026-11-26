@@ -13,7 +13,7 @@ namespace Symfony\Bridge\TuiHtml\Tests\Style;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\TuiHtml\Style\BlendMode;
+use Symfony\Component\HtmlRenderer\Paint\BlendMode;
 
 class BlendModeTest extends TestCase
 {

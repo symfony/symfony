@@ -21,9 +21,9 @@ use Symfony\Component\HtmlRenderer\Content\ReplacedContentInterface;
 use Symfony\Component\Tui\Widget\Figlet\FontRegistry;
 
 /** @internal Independent document content; the containing engine owns iframe chrome and clipping. */
-final readonly class FrameContentAdapter implements ReplacedContentInterface
+final class FrameContentAdapter implements ReplacedContentInterface
 {
-    public function __construct(private HtmlRootWidget $root, private TerminalTextMeasurer $metrics, private MediaContext $media, private FontRegistry $fonts)
+    public function __construct(private readonly HtmlRootWidget $root, private readonly TerminalTextMeasurer $metrics, private readonly MediaContext $media, private readonly FontRegistry $fonts)
     {
     }
 

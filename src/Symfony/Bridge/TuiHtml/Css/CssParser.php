@@ -14,6 +14,7 @@ namespace Symfony\Bridge\TuiHtml\Css;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\TuiHtml\Style\MediaContext;
 use Symfony\Component\HtmlRenderer\Compatibility\Support;
+use Symfony\Component\HtmlRenderer\Css\Declaration;
 use Symfony\Component\HtmlRenderer\Css\StylesheetLoaderInterface;
 
 /**

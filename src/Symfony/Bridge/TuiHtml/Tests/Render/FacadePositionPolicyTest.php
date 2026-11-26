@@ -32,7 +32,7 @@ use Symfony\Component\Tui\Widget\ContainerWidget;
 
 class FacadePositionPolicyTest extends TestCase
 {
-    public function testOwnSimplePositionResetsAuthoredInsetsAndRetainsDeviceCoordinates(): void
+    public function testOwnSimplePositionResetsAuthoredInsetsAndRetainsDeviceCoordinates()
     {
         foreach ([new CellSize(8, 16), new CellSize(16, 32)] as $cell) {
             foreach ([new Position(PositionMode::Absolute, null, null, null, 1, 5, ['top' => 50]), new Position(PositionMode::Absolute, null, null, null, 1, 5, ['top' => -50]), new Position(PositionMode::Absolute, null, null, null, 1, 5, ['top' => new PercentLength(false, [[50, -2]])]), new Position(PositionMode::Absolute, null, null, null, 1, 5, ['top' => new PercentLength(false, [[-50, 2]])]), new Position(PositionMode::Absolute, 0, null, null, 1), new Position(PositionMode::Absolute, null, null, null, 1, 5, ['top' => 100]), new Position(PositionMode::Absolute, 0, null, null, 1, 5, ['top' => 100]), new Position(PositionMode::Absolute, null, null, null, null, 5, ['top' => new PercentLength(false, [[50, 1]]), 'left' => new PercentLength(false, [[50, -1]])])] as $position) {
@@ -41,7 +41,7 @@ class FacadePositionPolicyTest extends TestCase
         }
     }
 
-    public function testStyleProviderOrderUsesExistingNativeResolution(): void
+    public function testStyleProviderOrderUsesExistingNativeResolution()
     {
         $theme = new StyleSheet([RichTextWidget::class => new Style()->withPosition(new Position(PositionMode::Absolute, 0, null, null, 1))]);
         foreach ([false, true] as $before) {
@@ -49,11 +49,18 @@ class FacadePositionPolicyTest extends TestCase
         }
     }
 
-    public function testComplexNativePositionsAreExplicitlyUnsupported(): void
+    public function testComplexNativePositionsAreExplicitlyUnsupported()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Complex native positioned content');
         $this->paint(true, new CellSize(8, 16), new Position(PositionMode::Absolute)->withTranslate([50, 0]));
+    }
+
+    public function testNativePercentageInsetsRequireTheIntegerContractUsedByPosition()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Native percentage insets require integer values.');
+        $this->paint(true, new CellSize(8, 16), new Position(PositionMode::Absolute, null, null, null, null, 0, ['top' => 50.5]));
     }
 
     private function paint(bool $core, CellSize $cell, ?Position $own = null, ?StyleSheet $theme = null, bool $before = false): array

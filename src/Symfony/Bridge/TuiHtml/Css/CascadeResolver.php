@@ -51,11 +51,20 @@ final class CascadeResolver
         }
     }
 
+    /**
+     * @param \SplObjectStorage<\Dom\Element, array<string, string>> $styles
+     *
+     * @return array{\SplObjectStorage<\Dom\Element, array<string, string>>, \SplObjectStorage<\Dom\Element, array<string, string>>, \SplObjectStorage<\Dom\Element, array<string, true>>, \SplObjectStorage<\Dom\Element, int>, \WeakMap<\Dom\Element, string>}
+     */
     private function managedProjection(StyleResolver $resolver, \SplObjectStorage $styles, MediaContext $media, ?\SplObjectStorage $styleParents = null): array
     {
+        /** @var \SplObjectStorage<\Dom\Element, array<string, true>> $coverage */
         $coverage = new \SplObjectStorage();
+        /** @var \SplObjectStorage<\Dom\Element, array<string, string>> $rawStyles */
         $rawStyles = new \SplObjectStorage();
+        /** @var \SplObjectStorage<\Dom\Element, int> $origins */
         $origins = new \SplObjectStorage();
+        /** @var \WeakMap<\Dom\Element, string> $lineOrigins */
         $lineOrigins = new \WeakMap();
         foreach ($styles as $element) {
             $parentElement = $styleParents[$element] ?? $element->parentElement;
@@ -95,7 +104,9 @@ final class CascadeResolver
             }
             $rawStyles[$element] = $raw;
         }
+        /** @var \SplObjectStorage<\Dom\Element, array<string, string>> $fonts */
         $fonts = new \SplObjectStorage();
+        /** @var \SplObjectStorage<\Dom\Element, array<string, string>> $rawFonts */
         $rawFonts = new \SplObjectStorage();
         foreach ($styles as $element) {
             if (isset($styles[$element])) {
@@ -115,6 +126,14 @@ final class CascadeResolver
         return [$fonts, $rawFonts, $coverage, $origins, $lineOrigins];
     }
 
+    /**
+     * @param array<string, string> $style
+     * @param array<string, string> $semantic
+     * @param array<string, string> $raw
+     * @param array<string, true>   $coverage
+     *
+     * @return array<string, string>
+     */
     private function managedValues(array $style, array $semantic, array $raw, array $coverage, MediaContext $media): array
     {
         $specified = $coverage + array_filter($raw, static fn (string $value) => 'initial' === $value);
@@ -149,7 +168,7 @@ final class CascadeResolver
      * Evaluates the existing compatibility widget mirror, preserving its distinct control parts.
      * Native document rendering sessions do not use this compatibility projection.
      *
-     * @return \SplObjectStorage<\Dom\Element, array{computed: array<string, string>, raw: array<string, string>}>
+     * @return \SplObjectStorage<\Dom\Element, array{computed: array<string, string>, raw: array<string, string>, pseudos: array<string, array{computed: array<string, string>, own: array<string, string>}>, matched-rules: list<int>, starting-style?: array<string, string>, scroll-driven?: true}>
      */
     public function cascadeMirror(\Dom\HTMLDocument $document, array $elements, ParsedStylesheet $stylesheet, MediaContext $media, array $containers, array $presentations, array $controlStates = [], ?\Closure $valueResolver = null, ?\Closure $parseInline = null, ?\SplObjectStorage $styleParents = null, ?\Closure $capture = null, ?string $defaultColor = null, ?\SplObjectStorage $nodeColors = null, ?float $time = null): \SplObjectStorage
     {
@@ -294,7 +313,11 @@ final class CascadeResolver
         return $this->timeline?->hasPendingFrames($time) ?? false;
     }
 
-    /** The caller must have verified that only time changed in its native mirror. */
+    /**
+     * The caller must have verified that only time changed in its native mirror.
+     *
+     * @return \SplObjectStorage<\Dom\Element, array{computed: array<string, string>, raw: array<string, string>, pseudos: array<string, array{computed: array<string, string>, own: array<string, string>}>, matched-rules: list<int>, starting-style?: array<string, string>, scroll-driven?: true}>
+     */
     public function advanceMirror(\Dom\Document $document, float $time, MediaContext $media, ?\Closure $capture = null): \SplObjectStorage
     {
         if ($document !== $this->preparedDocument || $media->getKey() !== $this->preparedMediaKey || null === $this->timeline) {
@@ -308,6 +331,11 @@ final class CascadeResolver
         return $projected;
     }
 
+    /**
+     * @param \SplObjectStorage<\Dom\Element, array<string, string>> $styles
+     *
+     * @return \SplObjectStorage<\Dom\Element, array{computed: array<string, string>, raw: array<string, string>, pseudos: array<string, array{computed: array<string, string>, own: array<string, string>}>, matched-rules: list<int>, starting-style?: array<string, string>, scroll-driven?: true}>
+     */
     private function project(\SplObjectStorage $styles, MediaContext $media, ?\SplObjectStorage $styleParents, ?\Closure $capture, ?LayoutStyleTrial $layoutTrial = null, ?bool &$deferred = null): \SplObjectStorage
     {
         $resolver = $this->resolver;
@@ -316,13 +344,21 @@ final class CascadeResolver
                 $deferred = true === $capture($styles, clone $resolver, $layoutTrial) && null !== $layoutTrial;
             }
             [$managed, $raw, $coverage, $origins, $lineOrigins] = $this->managedProjection($resolver, $styles, $media, $styleParents);
+            /** @var \SplObjectStorage<\Dom\Element, array{computed: array<string, string>, raw: array<string, string>, pseudos: array<string, array{computed: array<string, string>, own: array<string, string>}>, matched-rules: list<int>, starting-style?: array<string, string>, scroll-driven?: true}> $projected */
             $projected = new \SplObjectStorage();
             $sharedRecords = [];
+            $lastProjectedRow = null;
             foreach ($styles as $element) {
                 if (!isset($styles[$element])) {
                     continue;
                 }
                 $record = $resolver->getCascadeRecord($element);
+                $rowInput = !isset($record['starting-style']) && !$record['declarations'] ? [$record, $raw[$element], $coverage[$element], $managed[$element], $origins[$element] ?? 0, $lineOrigins[$element] ?? null] : null;
+                if (null !== $rowInput && null !== $lastProjectedRow && $lastProjectedRow[0] === $rowInput) {
+                    $projected[$element] = $lastProjectedRow[1];
+                    continue;
+                }
+
                 $pseudoRecords = [];
                 foreach ($record['pseudos'] ?? [] as $role => $pseudo) {
                     $pseudoRecords[$role] = $this->projectVariant($resolver, $element, $pseudo, $styles, $origins, $lineOrigins, array_diff_key($raw[$element], ['background-color' => true]), array_diff_key($coverage[$element], ['background-color' => true]), $media, $styleParents, $role);
@@ -357,6 +393,9 @@ final class CascadeResolver
                     $record = $sharedRecords[$key] ??= $record;
                 }
                 $projected[$element] = $record;
+                if (null !== $rowInput) {
+                    $lastProjectedRow = [$rowInput, $record];
+                }
             }
 
             return $projected;
@@ -365,6 +404,11 @@ final class CascadeResolver
         }
     }
 
+    /**
+     * @param \SplObjectStorage<\Dom\Element, array<string, string>> $styles
+     *
+     * @return array{computed: array<string, string>, own: array<string, string>}
+     */
     private function projectVariant(StyleResolver $resolver, \Dom\Element $element, array $record, \SplObjectStorage $styles, \SplObjectStorage $origins, \WeakMap $lineOrigins, array $parentRaw, array $parentCoverage, MediaContext $media, ?\SplObjectStorage $styleParents, ?string $role = null): array
     {
         $raw = $parentRaw;
@@ -390,6 +434,11 @@ final class CascadeResolver
         return ['computed' => $values, 'own' => array_intersect_key($values, $record['declarations'])];
     }
 
+    /**
+     * @param \SplObjectStorage<\Dom\Element, array<string, string>> $styles
+     *
+     * @return array<string, string>
+     */
     private function projectRecord(StyleResolver $resolver, \Dom\Element $element, array $record, \SplObjectStorage $styles, \SplObjectStorage $origins, \WeakMap $lineOrigins, ?string $role = null, bool $variant = false): array
     {
         $values = NativeStyleProjection::project($record);

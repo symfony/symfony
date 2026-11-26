@@ -18,7 +18,7 @@ namespace Symfony\Component\HtmlRenderer\Layout;
  *
  * @internal
  */
-final readonly class CollapsedBorderGrid
+final class CollapsedBorderGrid
 {
     /**
      * @param array<int, array<int, int>>         $owners     Cell index at each occupied row and column
@@ -27,7 +27,7 @@ final readonly class CollapsedBorderGrid
      * @param list<array{bool, bool, bool, bool}> $rowSides   Row sides including applicable group sides
      * @param array{bool, bool, bool, bool}       $tableSides
      */
-    public function __construct(private array $owners, private array $cells, private array $cellSides, private array $rowSides, private array $tableSides, private int $columns)
+    public function __construct(private readonly array $owners, private readonly array $cells, private readonly array $cellSides, private readonly array $rowSides, private readonly array $tableSides, private readonly int $columns)
     {
     }
 

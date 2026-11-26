@@ -31,7 +31,7 @@ use Symfony\Component\Tui\Widget\Figlet\FontRegistry;
 
 class MirrorPresentationTest extends TestCase
 {
-    public function testMixedNativeGroupsEnrichTextWithoutChangingSelectorTopology(): void
+    public function testMixedNativeGroupsEnrichTextWithoutChangingSelectorTopology()
     {
         $view = new HtmlBuilder()->build('<!DOCTYPE html><div id="d">A<span>B</span><input id="i">C<strong>D</strong><p id="p">block</p>E</div><p id="empty"></p>');
         $sheet = $view->getStyleSheet();
@@ -65,7 +65,7 @@ class MirrorPresentationTest extends TestCase
         self::assertTrue($snapshot['nodes'][$paragraph]->matches(':empty'));
     }
 
-    public function testNativeMovesKeepActualMirrorIdentitiesAndTextOrder(): void
+    public function testNativeMovesKeepActualMirrorIdentitiesAndTextOrder()
     {
         $view = new HtmlBuilder()->build('<!DOCTYPE html><div id="d">A<input id="i">B<p id="p">block</p>E</div>');
         $sheet = $view->getStyleSheet();
@@ -86,7 +86,7 @@ class MirrorPresentationTest extends TestCase
         self::assertSame('blockEAB', $after['nodes'][$parent]->textContent);
     }
 
-    public function testPreparedMirrorUsesCoreBoxesLayoutAndPaintingWithLiveNativeLeaf(): void
+    public function testPreparedMirrorUsesCoreBoxesLayoutAndPaintingWithLiveNativeLeaf()
     {
         $view = new HtmlBuilder()->build('<!DOCTYPE html><style>p{margin:0}input{width:10ch}</style><div>A<span>B</span><input id="i" value="old">C<strong>D</strong><p>block</p>E</div>');
         $native = $view->getById('i');

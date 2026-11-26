@@ -72,8 +72,8 @@ final class IntrinsicSizingTest extends TestCase
     {
         foreach (['content-box' => 47.5, 'border-box' => 40.0] as $sizing => $width) {
             $box = new Box(null, 'block', ['width' => 'fit-content(40px)', 'box-sizing' => $sizing, 'padding' => '2.5px', 'border-width' => '1.25px', 'font-size' => '10px'], [], 'one two three');
-            $layout = (new LayoutEngine(new MonospaceTextMeasurer()))->layout($box,100,100);
-            self::assertSame($width,$layout->bounds->width);
+            $layout = (new LayoutEngine(new MonospaceTextMeasurer()))->layout($box, 100, 100);
+            self::assertSame($width, $layout->bounds->width);
         }
     }
 }

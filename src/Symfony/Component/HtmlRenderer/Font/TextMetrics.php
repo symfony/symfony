@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\HtmlRenderer\Font;
 
-final readonly class TextMetrics
+final class TextMetrics
 {
     /**
      * @param list<float>|null $caretPositions Visual advances indexed by logical grapheme boundary
      */
-    public function __construct(public float $width, public float $ascent, public float $descent, public ?array $caretPositions = null)
+    public function __construct(public readonly float $width, public readonly float $ascent, public readonly float $descent, public readonly ?array $caretPositions = null)
     {
         if (!is_finite($width) || !is_finite($ascent) || !is_finite($descent) || $width < 0 || $ascent < 0 || $descent < 0) {
             throw new \InvalidArgumentException('Text metrics must be finite and non-negative.');

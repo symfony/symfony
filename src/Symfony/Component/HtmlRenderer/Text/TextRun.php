@@ -14,9 +14,9 @@ namespace Symfony\Component\HtmlRenderer\Text;
 /**
  * @internal
  */
-final readonly class TextRun
+final class TextRun
 {
-    public function __construct(public int $start, public int $end, public ?TextSelection $selection = null, public ?array $sourceOffsets = null, public ?array $caretPositions = null)
+    public function __construct(public readonly int $start, public readonly int $end, public readonly ?TextSelection $selection = null, public readonly ?array $sourceOffsets = null, public readonly ?array $caretPositions = null)
     {
         if ($start < 0 || $end < $start) {
             throw new \InvalidArgumentException('A text run requires an ordered non-negative grapheme range.');

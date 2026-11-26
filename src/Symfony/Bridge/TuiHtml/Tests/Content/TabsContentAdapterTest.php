@@ -23,7 +23,7 @@ use Symfony\Component\Tui\Widget\TextWidget;
 
 class TabsContentAdapterTest extends TestCase
 {
-    public function testSecondPassMutationStillFailsTheNativeRevisionGuard(): void
+    public function testSecondPassMutationStillFailsTheNativeRevisionGuard()
     {
         $widget = new class([new TabItem('first', 'First', new TextWidget('Body'))]) extends TabsWidget {
             public function renderWithContent(RenderContext $context, \Closure $renderContent): array
@@ -39,7 +39,7 @@ class TabsContentAdapterTest extends TestCase
         $adapter->layout(160, 160);
     }
 
-    public function testDisposalReleasesPreparedBodyClosureAndRejectsReuse(): void
+    public function testDisposalReleasesPreparedBodyClosureAndRejectsReuse()
     {
         $owner = new \stdClass();
         $owner->text = 'Body';

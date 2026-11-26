@@ -18,7 +18,7 @@ use Symfony\Component\HtmlRenderer\RenderingContext;
 
 final class DatalistTest extends TestCase
 {
-    public function testCompletionPreservesTypedCaseAndIsAcceptedOnlyAtTheEnd(): void
+    public function testCompletionPreservesTypedCaseAndIsAcceptedOnlyAtTheEnd()
     {
         $session = (new HtmlRenderer())->createSession('<input list="langs"><button>Next</button><datalist id="langs"><option value="PHP"><option>Python</option><option value="Perl" disabled></datalist>', new RenderingContext(300, 200));
         $input = $session->getDocument()->querySelector('input');
@@ -35,7 +35,7 @@ final class DatalistTest extends TestCase
         self::assertSame('button', $session->getFocusedElement()->localName);
     }
 
-    public function testCompletionRespectsMaxlengthWithoutTrappingKeyboardFocus(): void
+    public function testCompletionRespectsMaxlengthWithoutTrappingKeyboardFocus()
     {
         $session = (new HtmlRenderer())->createSession('<input list="words" maxlength="2" value="p"><button>Next</button><datalist id="words"><option>Python</option></datalist>', new RenderingContext(300, 200));
         $input = $session->getDocument()->querySelector('input');
@@ -46,7 +46,7 @@ final class DatalistTest extends TestCase
         self::assertSame('button', $session->getFocusedElement()->localName);
     }
 
-    public function testNativeMutationAndReadonlyAndCaretDoNotAcceptStaleSuggestions(): void
+    public function testNativeMutationAndReadonlyAndCaretDoNotAcceptStaleSuggestions()
     {
         $session = (new HtmlRenderer())->createSession('<input list="langs" value="p"><button>Next</button><datalist id="langs"><option>PHP</option></datalist>', new RenderingContext(300, 200));
         $input = $session->getDocument()->querySelector('input');

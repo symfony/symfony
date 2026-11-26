@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\TuiHtml\Html;
 
-use Symfony\Bridge\TuiHtml\Compatibility\Support;
 use Symfony\Bridge\TuiHtml\Compatibility\SupportProviderInterface;
 use Symfony\Bridge\TuiHtml\Html\Element\ButtonElement;
 use Symfony\Bridge\TuiHtml\Html\Element\ContainerElement;
@@ -32,6 +31,7 @@ use Symfony\Bridge\TuiHtml\Html\Element\TabsElement;
 use Symfony\Bridge\TuiHtml\Html\Element\TextareaElement;
 use Symfony\Bridge\TuiHtml\Html\Element\TextElement;
 use Symfony\Bridge\TuiHtml\Widget\ContainerWidget;
+use Symfony\Component\HtmlRenderer\Compatibility\Support;
 use Symfony\Component\Tui\Widget\AbstractWidget;
 
 /**

@@ -22,12 +22,12 @@ use Symfony\Component\Tui\Tui;
 
 class FacadeNativeControlPolicyTest extends TestCase
 {
-    public function testComboboxesRemainAtomicInGeneratedInlineRows(): void
+    public function testComboboxesRemainAtomicInGeneratedInlineRows()
     {
         $this->assertLegacyCells('<label for="city">City</label><input id="city" list="cities" style="border:1px solid;max-width:24ch"><datalist id="cities"><option>Paris</option><option>Lyon</option></datalist>');
     }
 
-    public function testKnownFillControlsUseAllocatedWidthAndRespectAuthoredWidth(): void
+    public function testKnownFillControlsUseAllocatedWidthAndRespectAuthoredWidth()
     {
         foreach (['', 'style="width:20ch"'] as $width) {
             $this->assertLegacyCells('<input type="range" min="0" max="10" value="7" '.$width.'>');
@@ -35,12 +35,12 @@ class FacadeNativeControlPolicyTest extends TestCase
         }
     }
 
-    public function testPopupUsesItsPreparedNativeWidthAndItsNaturalOptionHeight(): void
+    public function testPopupUsesItsPreparedNativeWidthAndItsNaturalOptionHeight()
     {
         $this->assertLegacyCells('<style>select::picker(select){padding-right:2ch;border-color:cyan}</style><label>Fruit <select><option>Apple</option><option selected>Banana</option><option>Cherry</option></select></label><p>Below</p>', ['keys' => 'f6,enter']);
     }
 
-    public function testPopupPaintingInsideNativeTabsRetainsVisibleRowsWithinTheViewport(): void
+    public function testPopupPaintingInsideNativeTabsRetainsVisibleRowsWithinTheViewport()
     {
         $actual = FacadeScenario::render('<tui-tabs><section title="One"><style>select::picker(select){padding-right:2ch;border-color:cyan}</style><label>Fruit <select id="fruit"><option>Apple</option><option selected>Banana</option><option>Cherry</option></select></label><p>Below</p></section></tui-tabs>', ['columns' => 40, 'rows' => 15, 'focus' => '#fruit', 'keys' => 'enter'], true);
         $cells = TerminalCellSnapshot::normalize($actual, 40, 15, [229, 229, 229], [0, 0, 0]);
@@ -59,7 +59,7 @@ class FacadeNativeControlPolicyTest extends TestCase
         self::assertLessThanOrEqual(15, \count($cells));
     }
 
-    public function testOpeningATabsPopupDoesNotChangeItsFlowHeight(): void
+    public function testOpeningATabsPopupDoesNotChangeItsFlowHeight()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<tui-tabs id="tabs"><section title="One"><label>Fruit <select id="fruit"><option>Apple</option><option selected>Banana</option><option>Cherry</option></select></label><p>Below</p></section></tui-tabs>');
         $renderer = new FacadeRenderer(new Renderer());
@@ -72,7 +72,7 @@ class FacadeNativeControlPolicyTest extends TestCase
         self::assertSame($height, $result->getBounds($result->getDocument()->getElementById('tabs'))[0]->height);
     }
 
-    public function testPopupRowsOutsideTheTabsFlowBoxRemainInteractive(): void
+    public function testPopupRowsOutsideTheTabsFlowBoxRemainInteractive()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<tui-tabs><section title="One"><style>select::picker(select){padding-right:2ch;border-color:cyan}</style><label>Fruit <select id="fruit"><option>Apple</option><option selected>Banana</option><option>Cherry</option></select></label><p>Below</p></section></tui-tabs>');
         $tui = new Tui(null, new VirtualTerminal(40, 15), null, null, new FacadeRenderer(new Renderer()));
@@ -99,7 +99,7 @@ class FacadeNativeControlPolicyTest extends TestCase
         }
     }
 
-    public function testHostOverflowClipsThePopupPointerWitness(): void
+    public function testHostOverflowClipsThePopupPointerWitness()
     {
         foreach (['visible', 'hidden'] as $overflow) {
             $view = new HtmlBuilder()->useHtmlRenderer()->build('<tui-tabs style="overflow:'.$overflow.'"><section title="One"><style>select::picker(select){padding-right:2ch;border-color:cyan}</style><label>Fruit <select id="fruit"><option>Apple</option><option selected>Banana</option><option>Cherry</option></select></label><p>Below</p></section></tui-tabs>');
@@ -111,7 +111,7 @@ class FacadeNativeControlPolicyTest extends TestCase
         }
     }
 
-    public function testAuthorPopupWidthOverridesTheNativePreferredWidth(): void
+    public function testAuthorPopupWidthOverridesTheNativePreferredWidth()
     {
         $actual = FacadeScenario::render('<style>select::picker(select){padding-right:2ch;width:12ch}</style><label>Fruit <select><option>Apple</option><option selected>Banana</option><option>Cherry</option></select></label><p>Below</p>', ['columns' => 40, 'rows' => 15, 'keys' => 'f6,enter'], true);
         $cells = TerminalCellSnapshot::normalize($actual, 40, 15, [229, 229, 229], [0, 0, 0]);

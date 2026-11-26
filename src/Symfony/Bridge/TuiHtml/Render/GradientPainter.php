@@ -27,15 +27,15 @@ use Symfony\Bridge\TuiHtml\Style\RasterImage;
 final class GradientPainter
 {
     /**
-     * @param list<string>                                                $lines      The lines of the element, its margins included
-     * @param Gradient|Color                                              $paint      What is painted: a gradient, or a color for the glyphs of background-clip: text
-     * @param Color|null                                                  $background The background of the cells to paint, null for none
-     * @param int                                                         $top        The first row painted, the clip box
-     * @param int                                                         $left       The first column painted
-     * @param (\Closure(int, int): ?array{int, int, int, int})|null       $sample     The cell of the image a cell of the clip box shows, and the size of the image; null for none, the clip box being the image by default
-     * @param bool                                                        $text       Whether the glyphs are painted, not the cells, like background-clip: text
-     * @param (\Closure(array{int, int, int}): array{int, int, int})|null $blend      How a color painted blends with the background color, like background-blend-mode; null to paint it as it is
-     * @param (\Closure(int): ?int)|null                                  $rowOf      The row of the image a row of the clip box shows, null for none: two rows that show the same one, with the same text, are painted the same; null when it is not known
+     * @param list<string>                                                      $lines      The lines of the element, its margins included
+     * @param Gradient|Color|RasterImage|(\Closure(int, int, int, int): ?Color) $paint      A gradient, image, color, or sampler receiving source x, y, width and height
+     * @param Color|null                                                        $background The background of the cells to paint, null for none
+     * @param int                                                               $top        The first row painted, the clip box
+     * @param int                                                               $left       The first column painted
+     * @param (\Closure(int, int): ?array{int, int, int, int})|null             $sample     The cell of the image a cell of the clip box shows, and the size of the image; null for none, the clip box being the image by default
+     * @param bool                                                              $text       Whether the glyphs are painted, not the cells, like background-clip: text
+     * @param (\Closure(array{int, int, int}): array{int, int, int})|null       $blend      How a color painted blends with the background color, like background-blend-mode; null to paint it as it is
+     * @param (\Closure(int): ?int)|null                                        $rowOf      The row of the image a row of the clip box shows, null for none: two rows that show the same one, with the same text, are painted the same; null when it is not known
      *
      * @return list<string>
      */

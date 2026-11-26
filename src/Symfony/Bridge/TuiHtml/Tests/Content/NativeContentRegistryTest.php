@@ -24,7 +24,7 @@ use Symfony\Component\Tui\Widget\AbstractWidget;
 
 class NativeContentRegistryTest extends TestCase
 {
-    public function testPreparedLeafRetainsNativeIdentityAndCachesWidthDependentContent(): void
+    public function testPreparedLeafRetainsNativeIdentityAndCachesWidthDependentContent()
     {
         $document = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><app-widget></app-widget>');
         $element = $document->querySelector('app-widget');
@@ -59,7 +59,7 @@ class NativeContentRegistryTest extends TestCase
         $provider->layout(32, 100);
     }
 
-    public function testFigletUsesActualTrimmedGlyphHeight(): void
+    public function testFigletUsesActualTrimmedGlyphHeight()
     {
         $document = \Dom\HTMLDocument::createEmpty();
         $element = $document->createElement('p');
@@ -79,7 +79,7 @@ class NativeContentRegistryTest extends TestCase
         self::assertSame(0.0, $registry->resolve($element, ['font-family' => 'small'])->getIntrinsicSize()->height);
     }
 
-    public function testMeasurementMutationIsRejectedInsteadOfProducingStaleContent(): void
+    public function testMeasurementMutationIsRejectedInsteadOfProducingStaleContent()
     {
         $element = \Dom\HTMLDocument::createEmpty()->createElement('app-widget');
         $widget = new class extends AbstractWidget {
@@ -97,7 +97,7 @@ class NativeContentRegistryTest extends TestCase
         $registry->resolve($element, [])->getIntrinsicSize();
     }
 
-    public function testDocumentWidgetPreparesBeforeCascadeAndComposesActualFigletHeight(): void
+    public function testDocumentWidgetPreparesBeforeCascadeAndComposesActualFigletHeight()
     {
         $session = new HtmlRenderer()->createSession('<!DOCTYPE html><style>app-native{display:block;font-family:small}p{margin:0}</style><app-native id="n"></app-native><p>AFTER</p>', new RenderingContext(400, 200));
         $native = new TextWidget('Hi');
@@ -115,7 +115,7 @@ class NativeContentRegistryTest extends TestCase
         self::assertSame('AFTER', trim($lines[5]));
     }
 
-    public function testRegistrationOwnsWidgetAndNativeWrapperUntilReplacementOrUnregister(): void
+    public function testRegistrationOwnsWidgetAndNativeWrapperUntilReplacementOrUnregister()
     {
         $document = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><app-widget></app-widget>');
         $element = $document->querySelector('app-widget');

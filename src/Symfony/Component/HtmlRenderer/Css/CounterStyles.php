@@ -32,10 +32,10 @@ final class CounterStyles
     /** How many styles a style can extend or fall back to before decimal is taken */
     private const MAX_DEPTH = 16;
     /**
-     * @var array<string, array<string, mixed>> The descriptors of each style, by name: the predefined ones first
+     * @var array<string, array{system: string, first?: int, symbols?: list<string>, additive?: list<array{int, string}>, negative?: array{string, string}, prefix?: string, suffix?: string, range?: list<array{int|null, int|null}>|null, pad?: array{int, string}|null, fallback?: string, extends?: string, units?: list<string>, formal?: bool}> The descriptors of each style, by name: the predefined ones first
      */
     private array $styles = [];
-    /** @var array<string, array<string, mixed>> The resolved styles, extends applied */
+    /** @var array<string, array{system: string, first: int, symbols: list<string>, additive: list<array{int, string}>, negative: array{string, string}, prefix: string, suffix: string, range: list<array{int|null, int|null}>|null, pad: array{int, string}|null, fallback: string, units?: list<string>, formal?: bool}> The resolved styles, extends applied */
     private array $resolved = [];
 
     public function __construct()
@@ -78,7 +78,7 @@ final class CounterStyles
      *
      * @param array<string, string> $descriptors The descriptors, by lowercase name
      *
-     * @return array<string, mixed>|null The style, null when it is invalid
+     * @return array{system: string, first?: int, symbols?: list<string>, additive?: list<array{int, string}>, negative?: array{string, string}, prefix?: string, suffix?: string, range?: list<array{int|null, int|null}>|null, pad?: array{int, string}|null, fallback?: string, extends?: string, units?: list<string>, formal?: bool}|null The style, null when it is invalid
      */
     public static function parse(string $name, array $descriptors): ?array
     {
@@ -209,7 +209,7 @@ final class CounterStyles
     /**
      * Adds the styles of @counter-style rules: a later style of a name replaces the earlier one.
      *
-     * @param array<string, array<string, mixed>> $styles
+     * @param array<string, array{system: string, first?: int, symbols?: list<string>, additive?: list<array{int, string}>, negative?: array{string, string}, prefix?: string, suffix?: string, range?: list<array{int|null, int|null}>|null, pad?: array{int, string}|null, fallback?: string, extends?: string, units?: list<string>, formal?: bool}> $styles
      */
     public function add(array $styles): void
     {
@@ -287,7 +287,7 @@ final class CounterStyles
     }
 
     /**
-     * @return array{system: string, first: int, symbols: list<string>, additive: list<array{int, string}>, negative: array{string, string}, prefix: string, suffix: string, range: list<array{int|null, int|null}>|null, pad: array{int, string}|null, fallback: string}
+     * @return array{system: string, first: int, symbols: list<string>, additive: list<array{int, string}>, negative: array{string, string}, prefix: string, suffix: string, range: list<array{int|null, int|null}>|null, pad: array{int, string}|null, fallback: string, units?: list<string>, formal?: bool}
      */
     private function resolve(string $name, int $depth = 0): array
     {
@@ -298,10 +298,12 @@ final class CounterStyles
         $style = $this->styles[$name] ?? $this->styles['decimal'];
         if ('extends' === $style['system']) {
             $base = $depth < self::MAX_DEPTH && isset($this->styles[$style['extends']]) ? $this->resolve($style['extends'], $depth + 1) : $this->resolve('decimal', self::MAX_DEPTH);
-            unset($style['system'], $style['extends']);
+            unset($style['system']);
             // The algorithm of the base, with the other descriptors of the style
             $style = ['system' => $base['system'], 'first' => $base['first'], 'symbols' => $base['symbols'], 'additive' => $base['additive']] + $style + $base;
         }
+
+        unset($style['extends']);
 
         return $this->resolved[$name] = $style + ['first' => 1, 'symbols' => [], 'additive' => [], 'negative' => ['-', ''], 'prefix' => '', 'suffix' => '. ', 'range' => null, 'pad' => null, 'fallback' => 'decimal'];
     }

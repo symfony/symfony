@@ -25,7 +25,7 @@ use Symfony\Component\Tui\Widget\WidgetContext;
 
 class NativeContentLifecycleTest extends TestCase
 {
-    public function testAttachedNativeInputKeepsDocumentFocusAndItsOwnChangeEvent(): void
+    public function testAttachedNativeInputKeepsDocumentFocusAndItsOwnChangeEvent()
     {
         $session = new HtmlRenderer()->createSession('<!DOCTYPE html><app-native tabindex="0"></app-native><button>Next</button>', new RenderingContext(400, 200));
         $element = $session->getDocument()->querySelector('app-native');
@@ -78,7 +78,7 @@ class NativeContentLifecycleTest extends TestCase
         }
     }
 
-    public function testNativeTickLifecycleStopsOnUnregisterAndCanRemount(): void
+    public function testNativeTickLifecycleStopsOnUnregisterAndCanRemount()
     {
         $session = new HtmlRenderer()->createSession('<!DOCTYPE html><app-native tabindex="0"></app-native>', new RenderingContext(400, 200));
         $native = new class extends InputWidget {
@@ -132,7 +132,7 @@ class NativeContentLifecycleTest extends TestCase
         self::assertSame(2, $native->detached);
     }
 
-    public function testKeydownUnregisterDoesNotDeliverInputToStaleWidget(): void
+    public function testKeydownUnregisterDoesNotDeliverInputToStaleWidget()
     {
         $session = new HtmlRenderer()->createSession('<!DOCTYPE html><app-native tabindex="0"></app-native>', new RenderingContext(400, 200));
         $element = $session->getDocument()->querySelector('app-native');
@@ -156,7 +156,7 @@ class NativeContentLifecycleTest extends TestCase
         }
     }
 
-    public function testCanceledKeyAndNativeChangeDisposalDoNotDuplicateEvents(): void
+    public function testCanceledKeyAndNativeChangeDisposalDoNotDuplicateEvents()
     {
         $session = new HtmlRenderer()->createSession('<!DOCTYPE html><app-native tabindex="0"></app-native>', new RenderingContext(400, 200));
         $element = $session->getDocument()->querySelector('app-native');
@@ -193,7 +193,7 @@ class NativeContentLifecycleTest extends TestCase
         }
     }
 
-    public function testRegistrationRejectsAlreadyAttachedNativeWidget(): void
+    public function testRegistrationRejectsAlreadyAttachedNativeWidget()
     {
         $native = new InputWidget();
         $tui = new Tui(null, new VirtualTerminal(20, 4));

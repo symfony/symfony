@@ -14,15 +14,15 @@ namespace Symfony\Component\HtmlRenderer\Layout;
 use Symfony\Component\HtmlRenderer\Geometry\Rect;
 
 /** @internal */
-final readonly class ScrollGeometry
+final class ScrollGeometry
 {
-    public float $maxX;
-    public float $maxY;
-    public float $offsetX;
-    public float $offsetY;
+    public readonly float $maxX;
+    public readonly float $maxY;
+    public readonly float $offsetX;
+    public readonly float $offsetY;
 
     /** @param array<string, list<\Dom\Element>> $snapped Actual targets at the final snapped offset on each physical axis */
-    public function __construct(public Rect $port, public Rect $content, float $offsetX = 0.0, float $offsetY = 0.0, public bool $horizontal = true, public bool $vertical = true, public array $reserved = [0.0, 0.0, 0.0, 0.0], public bool $horizontalBar = false, public bool $verticalBar = false, public bool $cycleResolved = false, public array $snapped = [])
+    public function __construct(public readonly Rect $port, public readonly Rect $content, float $offsetX = 0.0, float $offsetY = 0.0, public readonly bool $horizontal = true, public readonly bool $vertical = true, public readonly array $reserved = [0.0, 0.0, 0.0, 0.0], public readonly bool $horizontalBar = false, public readonly bool $verticalBar = false, public readonly bool $cycleResolved = false, public readonly array $snapped = [])
     {
         if (4 !== \count($reserved) || array_any($reserved, static fn (float $value): bool => !is_finite($value) || $value < 0)) {
             throw new \InvalidArgumentException('Scrollbar insets must contain four finite non-negative lengths.');

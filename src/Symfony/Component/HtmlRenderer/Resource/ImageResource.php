@@ -15,11 +15,11 @@ use Symfony\Component\HtmlRenderer\Css\GeneratedContent;
 use Symfony\Component\HtmlRenderer\Vector\SvgDocument;
 use Symfony\Component\HtmlRenderer\Vector\SvgStyle;
 
-final readonly class ImageResource
+final class ImageResource
 {
     public const MAX_PIXELS = 4194304;
 
-    public function __construct(public string $data, public string $mimeType, public float $width, public float $height)
+    public function __construct(public readonly string $data, public readonly string $mimeType, public readonly float $width, public readonly float $height)
     {
         if (!is_finite($width) || !is_finite($height) || $width <= 0 || $height <= 0) {
             throw new \InvalidArgumentException('Image dimensions must be finite and positive.');

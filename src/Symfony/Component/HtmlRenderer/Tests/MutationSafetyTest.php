@@ -165,9 +165,9 @@ class MutationSafetyTest extends TestCase
     private function adoptOn($session, string $event, \Dom\Element $element): \Dom\HTMLDocument
     {
         $other = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><main></main>');
-        $session->on($event,static function () use ($other,$element) {
+        $session->on($event, static function () use ($other, $element) {
             $other->querySelector('main')->appendChild($other->adoptNode($element));
-        },$element);
+        }, $element);
 
         return $other;
     }

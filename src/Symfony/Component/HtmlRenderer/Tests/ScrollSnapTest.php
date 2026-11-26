@@ -18,7 +18,7 @@ use Symfony\Component\HtmlRenderer\RenderingContext;
 
 class ScrollSnapTest extends TestCase
 {
-    public function testRepeatedSmallScrollsUseTheActualCommittedSnapOffset(): void
+    public function testRepeatedSmallScrollsUseTheActualCommittedSnapOffset()
     {
         $session = new HtmlRenderer()->createSession('<style>#s{width:160px;height:48px;overflow:auto}section{height:48px;scroll-snap-align:start}#s{scroll-snap-type:y mandatory}</style><div id="s"><section>one</section><section>two</section><section>three</section><section>four</section></div>', new RenderingContext(320, 240));
         $owner = $session->getDocument()->getElementById('s');
@@ -31,7 +31,7 @@ class ScrollSnapTest extends TestCase
         self::assertSame([0.0, 48.0], $session->getScroll($owner));
     }
 
-    public function testChosenTargetsDriveContainerStateAndClearingTheAxisRemovesIt(): void
+    public function testChosenTargetsDriveContainerStateAndClearingTheAxisRemovesIt()
     {
         $session = new HtmlRenderer()->createSession('<style>#s{width:160px;height:48px;overflow:auto;scroll-snap-type:y mandatory}section{height:48px;scroll-snap-align:start;container-type:scroll-state}@container scroll-state(snapped:y){span{color:green}}</style><div id="s"><section><span id="a">one</span></section><section><span id="b">two</span></section><section>three</section><section>four</section></div>', new RenderingContext(320, 240));
         $document = $session->getDocument();
@@ -50,7 +50,7 @@ class ScrollSnapTest extends TestCase
         self::assertNotSame('green', $result->getComputedStyle($b)['color']);
     }
 
-    public function testBothAxesRetainTheirOwnTargetsAndNestedPortsOwnTheirDescendants(): void
+    public function testBothAxesRetainTheirOwnTargetsAndNestedPortsOwnTheirDescendants()
     {
         $session = new HtmlRenderer()->createSession('<style>#s{display:grid;grid-template-columns:100px 100px;grid-auto-rows:100px;width:50px;height:50px;overflow:auto;scroll-snap-type:both mandatory}section{scroll-snap-align:start}#n{width:25px;height:25px;overflow:auto;scroll-snap-type:y mandatory}p{margin:0;height:50px;scroll-snap-align:start}</style><div id="s"><section id="a"><div id="n"><p id="inner">nested</p></div></section><section id="b">two</section><section id="c">three</section><section id="d">four</section></div>', new RenderingContext(320, 240));
         $document = $session->getDocument();
@@ -68,7 +68,7 @@ class ScrollSnapTest extends TestCase
         self::assertSame([$document->getElementById('c'), $document->getElementById('d')], $geometry->snapped['y']);
     }
 
-    public function testResolvedPaddingMarginsStopsAndProximityUseTheSameCandidates(): void
+    public function testResolvedPaddingMarginsStopsAndProximityUseTheSameCandidates()
     {
         $html = '<style>#s{width:160px;height:48px;overflow:auto;scroll-snap-type:y mandatory;scroll-padding-top:4px}section{height:48px;scroll-snap-align:start;scroll-margin-top:2px}#b{scroll-snap-stop:always}</style><div id="s"><section>one</section><section id="b">two</section><section>three</section><section>four</section></div>';
         $session = new HtmlRenderer()->createSession($html, new RenderingContext(320, 240));
@@ -82,7 +82,7 @@ class ScrollSnapTest extends TestCase
         self::assertSame([0.0, 42.0], $session->getScroll($owner));
     }
 
-    public function testRemovedOwnersAndAxesWithoutOverflowDoNotRetainSnapHistory(): void
+    public function testRemovedOwnersAndAxesWithoutOverflowDoNotRetainSnapHistory()
     {
         $session = new HtmlRenderer()->createSession('<style>#s{width:160px;height:48.5px;overflow:auto;scroll-snap-type:y mandatory}section{height:48.5px;scroll-snap-align:start}</style><div id="s"><section>one</section><section>two</section><section>three</section></div>', new RenderingContext(320, 240));
         $document = $session->getDocument();

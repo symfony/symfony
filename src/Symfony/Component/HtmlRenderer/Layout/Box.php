@@ -18,7 +18,7 @@ use Symfony\Component\HtmlRenderer\Text\TextSelection;
 /**
  * @internal
  */
-final readonly class Box
+final class Box
 {
     /**
      * @param array<string, string>                            $style
@@ -26,7 +26,7 @@ final readonly class Box
      * @param array<string, ?\Dom\Element>                     $anchorReferences
      * @param list<array{array<string, string>, list<string>}> $positionTries
      */
-    public function __construct(public ?\Dom\Node $node, public string $display, public array $style = [], public array $children = [], public ?string $text = null, public ?ImageResource $image = null, public ?TextSelection $selection = null, public ?string $pseudoElement = null, public ?int $topLayer = null, public ?ImageResource $borderImage = null, public ?\Dom\Element $anchor = null, public ?ReplacedContentInterface $replacedContent = null, public array $anchorReferences = [], public array $positionTries = [])
+    public function __construct(public readonly ?\Dom\Node $node, public readonly string $display, public readonly array $style = [], public readonly array $children = [], public readonly ?string $text = null, public readonly ?ImageResource $image = null, public readonly ?TextSelection $selection = null, public readonly ?string $pseudoElement = null, public readonly ?int $topLayer = null, public readonly ?ImageResource $borderImage = null, public readonly ?\Dom\Element $anchor = null, public readonly ?ReplacedContentInterface $replacedContent = null, public readonly array $anchorReferences = [], public readonly array $positionTries = [])
     {
     }
 }

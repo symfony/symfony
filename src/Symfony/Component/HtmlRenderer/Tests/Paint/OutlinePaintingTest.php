@@ -17,6 +17,22 @@ use Symfony\Component\HtmlRenderer\RenderingContext;
 
 final class OutlinePaintingTest extends TestCase
 {
+    public function testResolvedOutlineGeometryIsSeparateFromCssValues()
+    {
+        $result = (new HtmlRenderer())->render('<div style="outline:0.125px solid red;outline-offset:-0.375px">A</div>', new RenderingContext(100, 100));
+        $pending = [$result->getLayout()];
+        while ($pending) {
+            $fragment = array_pop($pending);
+            foreach ($fragment->style as $property => $value) {
+                self::assertIsString($value, $property);
+            }
+            array_push($pending, ...$fragment->children);
+        }
+        $outline = array_values(array_filter($result->getDisplayList()->getOperations(), static fn (array $operation): bool => 'border' === $operation['type']))[0];
+        self::assertSame(0.125, $outline['thickness']);
+        self::assertSame(0.25, $outline['x']);
+    }
+
     public function testFractionalOutlineDoesNotChangeLayoutAndPaintsOutsideOwnClip()
     {
         $document = \Dom\HTMLDocument::createFromString('<!doctype html><div id="a" style="width:20.5px;height:10.25px;overflow:hidden;outline:1.5px dashed red;outline-offset:2.25px">A</div>');

@@ -22,7 +22,7 @@ use Symfony\Component\HtmlRenderer\RenderingResult;
 
 class OverflowContentTest extends TestCase
 {
-    public function testLocalContentCanOverflowItsFlowBoundsWithoutRemovingCssClipping(): void
+    public function testLocalContentCanOverflowItsFlowBoundsWithoutRemovingCssClipping()
     {
         foreach ([true, false] as $clip) {
             foreach (['visible', 'hidden'] as $overflow) {

@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\HtmlRenderer\Resource;
 
-final readonly class ResourceLoader
+final class ResourceLoader
 {
     public const MAX_BYTES = 8388608;
 
-    public function __construct(private ?\Closure $loader = null, private int $maxBytes = self::MAX_BYTES)
+    public function __construct(private readonly ?\Closure $loader = null, private readonly int $maxBytes = self::MAX_BYTES)
     {
         if ($maxBytes < 1) {
             throw new \InvalidArgumentException('The resource size limit must be positive.');

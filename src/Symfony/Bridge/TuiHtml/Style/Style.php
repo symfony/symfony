@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\TuiHtml\Style;
 
+use Symfony\Component\HtmlRenderer\Paint\BlendMode;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 
 /**

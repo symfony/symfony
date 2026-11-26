@@ -18,17 +18,17 @@ use Symfony\Component\HtmlRenderer\Hyphenation\HyphenatorInterface;
 use Symfony\Component\HtmlRenderer\Layout\LayoutMetricsInterface;
 use Symfony\Component\HtmlRenderer\Resource\ResourceLoader;
 
-final readonly class RenderingContext
+final class RenderingContext
 {
-    public TextMeasurerInterface $textMeasurer;
-    public ResourceLoader $resourceLoader;
-    public FontStyle $defaultFont;
+    public readonly TextMeasurerInterface $textMeasurer;
+    public readonly ResourceLoader $resourceLoader;
+    public readonly FontStyle $defaultFont;
 
     /**
      * @param (\Closure(\Dom\Element, array<string, string>): ?Content\ReplacedContentInterface)|null $replacedContentResolver
      * @param (\Closure(string, string): ?array{array{float, float, float}, float})|null              $colorLookup             A stable name lookup returning normalized sRGBA, or null to use CSS defaults
      */
-    public function __construct(public float $width, public float $height, ?TextMeasurerInterface $textMeasurer = null, ?ResourceLoader $resourceLoader = null, public ?LayoutMetricsInterface $layoutMetrics = null, ?FontStyle $defaultFont = null, public array $mediaFeatures = [], public string $userAgentStylesheet = '', public array $colors = [], public ?HyphenatorInterface $hyphenator = null, public ?\Closure $replacedContentResolver = null, public ?\Closure $colorLookup = null)
+    public function __construct(public readonly float $width, public readonly float $height, ?TextMeasurerInterface $textMeasurer = null, ?ResourceLoader $resourceLoader = null, public readonly ?LayoutMetricsInterface $layoutMetrics = null, ?FontStyle $defaultFont = null, public readonly array $mediaFeatures = [], public readonly string $userAgentStylesheet = '', public readonly array $colors = [], public readonly ?HyphenatorInterface $hyphenator = null, public readonly ?\Closure $replacedContentResolver = null, public readonly ?\Closure $colorLookup = null)
     {
         if (!is_finite($width) || !is_finite($height) || $width <= 0 || $height <= 0) {
             throw new \InvalidArgumentException('Viewport dimensions must be finite and positive.');

@@ -61,6 +61,6 @@ class ColorSchemeTest extends TestCase
         $paragraph = $session->getDocument()->querySelector('p');
         $session->render();
         $session->advance(1);
-        self::assertSame('#000080',$session->render()->getComputedStyle($paragraph)['color']);
+        self::assertSame('#000080', $session->render()->getComputedStyle($paragraph)['color']);
     }
 }

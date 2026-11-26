@@ -27,7 +27,7 @@ use Symfony\Component\Tui\Widget\ContainerWidget;
 
 class FacadeColorPolicyTest extends TestCase
 {
-    public function testDefaultForegroundPolicyPrecedesAuthoredHtmlBodyAndInheritedColors(): void
+    public function testDefaultForegroundPolicyPrecedesAuthoredHtmlBodyAndInheritedColors()
     {
         foreach (['', 'html{color:red}', 'body{color:blue}', 'body{color:green}p{color:inherit}'] as $css) {
             foreach ([ColorScheme::Dark, ColorScheme::Light] as $scheme) {
@@ -36,7 +36,7 @@ class FacadeColorPolicyTest extends TestCase
         }
     }
 
-    public function testOwnColorWinsImportantAndLeavesAuthoredInlineDescendantsUntouched(): void
+    public function testOwnColorWinsImportantAndLeavesAuthoredInlineDescendantsUntouched()
     {
         foreach (['p{color:red}', 'p{color:red!important}', 'p{color:red}span{color:green}'] as $css) {
             $this->assertLegacyEqual('<style>p{margin:0}'.$css.'</style><p id="p">A<span>B</span></p>', 'p', 'blue');
@@ -47,14 +47,14 @@ class FacadeColorPolicyTest extends TestCase
         $this->assertLegacyEqual('<style>p{margin:0;color:red}</style><div id="p"><p>A<span>B</span></p></div>', 'p', 'blue');
     }
 
-    public function testPseudoKeywordsAndInvalidVariablesRetainDistinctNativeColorBehavior(): void
+    public function testPseudoKeywordsAndInvalidVariablesRetainDistinctNativeColorBehavior()
     {
         foreach (['inherit', 'unset', 'initial', 'revert', 'var(--missing)', 'var(--missing,green)'] as $value) {
             $this->assertLegacyEqual('<style>p{margin:0;color:red}p::before{content:"X";color:'.$value.'}</style><p id="p">A<span>B</span></p>', 'p', 'blue');
         }
     }
 
-    public function testNativeStylesheetColorIsBelowAuthoredCssAndOwnColor(): void
+    public function testNativeStylesheetColorIsBelowAuthoredCssAndOwnColor()
     {
         $theme = new NativeStyleSheet([RichTextWidget::class => new Style()->withColor('green')]);
         $this->assertLegacyEqual('<p style="margin:0">A<span>B</span></p>', null, null, null, $theme);
@@ -63,7 +63,7 @@ class FacadeColorPolicyTest extends TestCase
         $this->assertLegacyEqual('<p id="p" style="margin:0;color:red">A<span>B</span></p>', null, null, null, $theme, true);
     }
 
-    public function testCallerForegroundAndOwnStyleMutationsInvalidatePreparedFrame(): void
+    public function testCallerForegroundAndOwnStyleMutationsInvalidatePreparedFrame()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<p id="p" style="margin:0">A</p>');
         $outer = new ContainerWidget();
@@ -84,7 +84,7 @@ class FacadeColorPolicyTest extends TestCase
         self::assertSame('#00cd00', $view->getRoot()->getPresentation()->getResult()->getDisplayList()->getOperations()[0]['color']);
     }
 
-    public function testNativeParentForegroundIsInheritedBelowAuthoredColorsAndConfiguredFallback(): void
+    public function testNativeParentForegroundIsInheritedBelowAuthoredColorsAndConfiguredFallback()
     {
         foreach (['' => '#cd0000', 'color:blue' => 'blue'] as $declaration => $expected) {
             $view = new HtmlBuilder()->useHtmlRenderer()->build('<p style="margin:0;'.$declaration.'">A</p>');
@@ -98,7 +98,7 @@ class FacadeColorPolicyTest extends TestCase
         }
     }
 
-    public function testTerminalBorderBoxDefaultRemainsBelowAuthoredBoxSizing(): void
+    public function testTerminalBorderBoxDefaultRemainsBelowAuthoredBoxSizing()
     {
         foreach (['' => 80.0, 'box-sizing:content-box' => 112.0, 'box-sizing:inherit' => 112.0] as $declaration => $width) {
             $view = new HtmlBuilder()->useHtmlRenderer()->build('<style>body{box-sizing:content-box}p{margin:0;width:10ch;padding:0 2ch;'.$declaration.'}</style><p id="p">A</p>');

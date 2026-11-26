@@ -89,8 +89,8 @@ final class InlineMarginTest extends TestCase
     {
         $html = '<style>main{width:50px;font-size:10px;line-height:10px}ul{display:inline;list-style:none;padding:0;margin-block:1em}li{display:inline-block;padding:0 1ch}</style><main>P <ul><li>aaa</li><li>bbb</li></ul></main>';
         $result = (new HtmlRenderer())->render($html, new RenderingContext(100, 100));
-        $text = array_values(array_filter($result->getDisplayList()->getOperations(),static fn (array $op): bool => 'text' === $op['type']));
-        self::assertSame($text[0]['y'],$text[1]['y']);
-        self::assertCount(2,$result->getBounds($result->getDocument()->querySelector('ul')));
+        $text = array_values(array_filter($result->getDisplayList()->getOperations(), static fn (array $op): bool => 'text' === $op['type']));
+        self::assertSame($text[0]['y'], $text[1]['y']);
+        self::assertCount(2, $result->getBounds($result->getDocument()->querySelector('ul')));
     }
 }

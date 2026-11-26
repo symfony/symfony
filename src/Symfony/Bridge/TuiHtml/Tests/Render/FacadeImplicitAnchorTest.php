@@ -21,7 +21,7 @@ use Symfony\Component\Tui\Widget\ContainerWidget;
 
 class FacadeImplicitAnchorTest extends TestCase
 {
-    public function testNativeAnchorsUseTheExistingDocumentLayoutState(): void
+    public function testNativeAnchorsUseTheExistingDocumentLayoutState()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<style>*{margin:0}#anchor{width:4ch;height:1lh;margin-left:5ch;margin-top:2lh}#popup{position:absolute;position-area:bottom;width:4ch;height:1lh}</style><div id="anchor">A</div><div id="popup">Menu</div>');
         $outer = new ContainerWidget();
@@ -46,7 +46,7 @@ class FacadeImplicitAnchorTest extends TestCase
         self::assertNotSame($popupRect->row, $renderer->getWidgetRect($popup)->row);
     }
 
-    public function testNativePopoverInputKeepsItsInvokerAsDocumentAnchor(): void
+    public function testNativePopoverInputKeepsItsInvokerAsDocumentAnchor()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<style>*{margin:0}button{margin-left:3ch;margin-top:2lh}#popup{inset:auto;margin:0;width:6ch;height:1lh;position-area:bottom span-right}</style><button id="show" popovertarget="popup">Show</button><div id="popup" popover>Menu</div>');
         $renderer = new FacadeRenderer(new Renderer());

@@ -12,10 +12,10 @@
 namespace Symfony\Component\HtmlRenderer\Layout;
 
 /** @internal */
-final readonly class MarginStrut
+final class MarginStrut
 {
-    public float $positive;
-    public float $negative;
+    public readonly float $positive;
+    public readonly float $negative;
 
     public function __construct(float ...$margins)
     {

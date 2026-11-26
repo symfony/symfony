@@ -56,12 +56,12 @@ final class FlowGeometry
         return $y;
     }
 
-    public static function nextEnd(array $floats, float $y): ?float
+    public static function nextEnd(array $floats, float $y, float $height = 0.0): ?float
     {
         $next = null;
         foreach ($floats as $float) {
             $bottom = $float['bounds']->y + $float['bounds']->height;
-            if ($float['bounds']->y <= $y && $bottom > $y) {
+            if (($float['bounds']->y <= $y || $height > 0 && $float['bounds']->y < $y + $height) && $bottom > $y) {
                 $next = null === $next ? $bottom : min($next, $bottom);
             }
         }

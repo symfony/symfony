@@ -64,6 +64,6 @@ Actual</textarea><input type="file" value="ignored"><input type="color" value=" 
     {
         $result = new HtmlRenderer()->render('<!DOCTYPE html><textarea value="Wrong">Actual</textarea><button value="sent"><span hidden>Wrong</span>Label</button><input type="submit"><input type="reset">', new RenderingContext(800, 400));
         $texts = array_values(array_filter(array_column(array_filter($result->getDisplayList()->getOperations(), static fn (array $operation) => 'text' === $operation['type']), 'text'), static fn (string $text) => '' !== $text));
-        self::assertSame(['Actual', 'Label', 'Submit', 'Reset'],$texts);
+        self::assertSame(['Actual', 'Label', 'Submit', 'Reset'], $texts);
     }
 }

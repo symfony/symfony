@@ -14,8 +14,8 @@ namespace Symfony\Bridge\TuiHtml\Tests\Compatibility;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\TuiHtml\Compatibility\CompatibilityReport;
-use Symfony\Bridge\TuiHtml\Compatibility\SupportLevel;
 use Symfony\Bridge\TuiHtml\Style\Density;
+use Symfony\Component\HtmlRenderer\Compatibility\SupportLevel;
 
 /**
  * Renders the fixtures of Fixtures/Compat and compares them to their snapshots.

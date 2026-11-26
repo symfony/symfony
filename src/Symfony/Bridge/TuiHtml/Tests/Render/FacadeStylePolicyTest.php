@@ -31,7 +31,7 @@ use Symfony\Component\Tui\Widget\ContainerWidget;
 
 class FacadeStylePolicyTest extends TestCase
 {
-    public function testOwnMaximumWidthRetainsNativePrecedenceAndMinimumConflict(): void
+    public function testOwnMaximumWidthRetainsNativePrecedenceAndMinimumConflict()
     {
         foreach (['max-width:15ch', 'max-width:3ch!important', 'width:15ch', 'min-width:12ch;max-width:15ch', 'padding:0 1ch;border:1px solid;max-width:15ch'] as $css) {
             foreach ([new CellSize(8, 16), new CellSize(16, 32)] as $cell) {
@@ -40,14 +40,14 @@ class FacadeStylePolicyTest extends TestCase
         }
     }
 
-    public function testExplicitNativeVisibilityOverridesCssNoneWithoutChangingOtherDisplays(): void
+    public function testExplicitNativeVisibilityOverridesCssNoneWithoutChangingOtherDisplays()
     {
         $this->assertLegacyEqual('display:none', new Style()->withHidden(false));
         $this->assertLegacyEqual('display:block', new Style()->withHidden(true));
         $this->assertLegacyEqual('display:inline-block;width:8ch', new Style()->withHidden(false));
     }
 
-    public function testNativeProviderOrderRemainsAuthoritativeForExplicitFields(): void
+    public function testNativeProviderOrderRemainsAuthoritativeForExplicitFields()
     {
         foreach ([false, true] as $before) {
             $theme = new StyleSheet([RichTextWidget::class => new Style()->withMaxColumns(8)]);
@@ -57,7 +57,7 @@ class FacadeStylePolicyTest extends TestCase
         }
     }
 
-    public function testNativeUsedValuesDoNotRewriteCssFactsAndRefreshWithWidgetMutations(): void
+    public function testNativeUsedValuesDoNotRewriteCssFactsAndRefreshWithWidgetMutations()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<p id="p" style="margin:0;max-width:3ch!important">abcdefghijklmnop</p>');
         $widget = $view->getById('p');
@@ -80,7 +80,7 @@ class FacadeStylePolicyTest extends TestCase
         self::assertSame(32.0, $second->getBounds($node)[0]->width);
     }
 
-    public function testDirectNativeRulesRefreshTheirBoundedPreCascadeSnapshot(): void
+    public function testDirectNativeRulesRefreshTheirBoundedPreCascadeSnapshot()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<p id="p" style="margin:0">abcdefghijklmnop</p>');
         $outer = new ContainerWidget();
@@ -99,7 +99,7 @@ class FacadeStylePolicyTest extends TestCase
         self::assertSame(32.0, $view->getRoot()->getPresentation()->getResult()->getBounds($node)[0]->width);
     }
 
-    public function testCssProvidersInsideNativeStylesheetsAreNotReversedIntoNativeConstraints(): void
+    public function testCssProvidersInsideNativeStylesheetsAreNotReversedIntoNativeConstraints()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<p id="p" style="margin:0;box-sizing:content-box;max-width:8ch;padding:0 1ch">abcdefghijklmnop</p>');
         $outer = new ContainerWidget();
@@ -113,7 +113,7 @@ class FacadeStylePolicyTest extends TestCase
         self::assertSame(80.0, $result->getBounds($node)[0]->width);
     }
 
-    public function testAuthorWrappingAndWhitespaceOverrideTheTerminalUaPolicy(): void
+    public function testAuthorWrappingAndWhitespaceOverrideTheTerminalUaPolicy()
     {
         foreach (['overflow-wrap:normal', 'white-space:nowrap', 'white-space:pre'] as $css) {
             $cells = $this->render(true, 'max-width:8ch;'.$css);
@@ -122,14 +122,14 @@ class FacadeStylePolicyTest extends TestCase
         }
     }
 
-    public function testOuterNativeCapWithAuthoredContentBoxChromeIsExplicitlyUnsupported(): void
+    public function testOuterNativeCapWithAuthoredContentBoxChromeIsExplicitlyUnsupported()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Native outer width caps');
         $this->render(true, 'box-sizing:content-box;padding:0 1ch', new Style()->withMaxColumns(8));
     }
 
-    public function testNativeSpanMutationThatDiffersFromTheMirrorIsExplicitlyUnsupported(): void
+    public function testNativeSpanMutationThatDiffersFromTheMirrorIsExplicitlyUnsupported()
     {
         $view = new HtmlBuilder()->useHtmlRenderer()->build('<table><colgroup><col span="2" width="64"></colgroup><tr><td>A</td><td>B</td></tr></table>');
         $column = $view->querySelector('col');

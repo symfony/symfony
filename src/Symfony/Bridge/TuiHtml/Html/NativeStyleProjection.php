@@ -18,7 +18,7 @@ final class NativeStyleProjection
      * Avoid applying a shorthand and its unchanged expansion twice to a device style.
      * Longhands won by another declaration remain authoritative over the shorthand.
      *
-     * @param array{computed: array<string, string>, declarations: array<string, array>} $record
+     * @param array{computed: array<string, string>, cascaded?: array<string, string>, declarations: array<string, array{source: string, expansion: list<string>, priority: array, order: array{int, int}, valid: bool, value: string, source-value: string, initial: bool, implicit: bool, explicit-candidate: array{0: string, ...}|null}>} $record
      *
      * @return array<string, string>
      */

@@ -14,9 +14,9 @@ namespace Symfony\Bridge\TuiHtml\Tests\Css;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\TuiHtml\Css\CssStyleSheet;
-use Symfony\Bridge\TuiHtml\Css\Selector;
 use Symfony\Bridge\TuiHtml\Html\HtmlBuilder;
 use Symfony\Bridge\TuiHtml\Tests\Fixtures\CpuTime;
+use Symfony\Component\HtmlRenderer\Css\Selector;
 
 final class SelectorMatchingTest extends TestCase
 {

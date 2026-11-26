@@ -36,7 +36,7 @@ final class OverflowClipTest extends TestCase
             self::assertSame('border', $operations[0]['type']);
             $result = new RenderingResult($document, new \SplObjectStorage(), $layout, (new Painter())->paint($layout));
             self::assertSame($owner, $result->hitTest(2, 6));
-            self::assertSame($child, $result->hitTest(6,6));
+            self::assertSame($child, $result->hitTest(6, 6));
         }
     }
 }

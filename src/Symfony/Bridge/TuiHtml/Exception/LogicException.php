@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\TuiHtml\Exception;
 
+use Symfony\Component\HtmlRenderer\Exception\ExceptionInterface;
 use Symfony\Component\Tui\Exception\LogicException as TuiLogicException;
 
 /**

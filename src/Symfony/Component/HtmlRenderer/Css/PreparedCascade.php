@@ -29,8 +29,8 @@ final class PreparedCascade
         public readonly \WeakMap $startingElements,
         public readonly \WeakMap $matchedRules,
         public readonly array $pseudoWinners,
-        public readonly \WeakMap $userAgentWinners,
-        public readonly \WeakMap $explicitWinners,
+        public readonly \SplObjectStorage $userAgentWinners,
+        public readonly \SplObjectStorage $explicitWinners,
         public readonly ?\SplObjectStorage $identities,
         public readonly ?\SplObjectStorage $styleParents,
     ) {

@@ -37,8 +37,9 @@ final class StyleResolver
     private \SplObjectStorage $pseudoStyles;
     private \SplObjectStorage $pseudoDeclaredStyles;
     private \SplObjectStorage $cascadeRecords;
-    private \WeakMap $userAgentWinners;
-    private \WeakMap $explicitWinners;
+    // Metadata owns its winner-map snapshot keys for the prepared/computed stage lifetime.
+    private \SplObjectStorage $userAgentWinners;
+    private \SplObjectStorage $explicitWinners;
     private array $expansionDefaults = [];
     private array $expansions = [];
     private array $expansionProperties = [];
@@ -155,8 +156,8 @@ final class StyleResolver
         $rules = $parsedStylesheet->rules;
         $registered = $parsedStylesheet->registered;
         $keyframes = $parsedStylesheet->keyframes;
-        $this->userAgentWinners = new \WeakMap();
-        $this->explicitWinners = new \WeakMap();
+        $this->userAgentWinners = new \SplObjectStorage();
+        $this->explicitWinners = new \SplObjectStorage();
         $this->expansionDefaults = [];
         $this->expansions = [];
         $this->expansionProperties = [];
@@ -1292,8 +1293,8 @@ final class StyleResolver
         $this->cascadeRecords = new \SplObjectStorage();
         $this->pseudoStyles = new \SplObjectStorage();
         $this->pseudoDeclaredStyles = new \SplObjectStorage();
-        $this->userAgentWinners = new \WeakMap();
-        $this->explicitWinners = new \WeakMap();
+        $this->userAgentWinners = new \SplObjectStorage();
+        $this->explicitWinners = new \SplObjectStorage();
         $this->expansionDefaults = [];
         $this->expansions = [];
         $this->expansionProperties = [];

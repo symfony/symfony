@@ -217,12 +217,14 @@ final class GridGeometry
                 $reserve($index, $row, $column, $rowSpan, $columnSpan);
             }
         }
+        $rowEnds = [];
         foreach ($items as $index => [$row, $column, $rowSpan, $columnSpan]) {
             if (isset($placed[$index]) || null === $row) {
                 continue;
             }
-            for ($column = 0; $column < 1000 && !self::isFree($occupied, $row, $column, $rowSpan, $columnSpan); ++$column) {
+            for ($column = $dense ? 0 : ($rowEnds[$row] ?? 0); $column < 1000 && !self::isFree($occupied, $row, $column, $rowSpan, $columnSpan); ++$column) {
             }
+            $rowEnds[$row] = $column + $columnSpan;
             $reserve($index, $row, $column, $rowSpan, $columnSpan);
         }
         $cursorRow = $cursorColumn = 0;

@@ -120,6 +120,34 @@ final class GridGeometryTest extends TestCase
         self::assertSame([1, 0, 1, 2], $placed[2]);
     }
 
+    public function testSparseRowLockedItemsDoNotBackfillEarlierGaps()
+    {
+        $styles = [
+            ['grid-row' => '1', 'grid-column' => '2'],
+            ['grid-row' => '1', 'grid-column' => 'span 2'],
+            ['grid-row' => '1'],
+            ['grid-row' => '1', 'grid-column' => 'span 2'],
+            ['grid-row' => '2'],
+        ];
+
+        self::assertSame([[0, 1, 1, 1], [0, 2, 1, 2], [0, 4, 1, 1], [0, 5, 1, 2], [1, 0, 1, 1]], GridGeometry::place($styles, 3));
+        self::assertSame([[0, 1, 1, 1], [0, 2, 1, 2], [0, 0, 1, 1], [0, 4, 1, 2], [1, 0, 1, 1]], GridGeometry::place($styles, 3, true));
+    }
+
+    public function testExplicitCellsAreReservedWithoutAdvancingTheRowLockedCursor()
+    {
+        $styles = [
+            ['grid-row' => '1', 'grid-column' => '4'],
+            ['grid-row' => '1'],
+            ['grid-row' => '1', 'grid-column' => '2'],
+            ['grid-row' => '1', 'grid-column' => 'span 2'],
+            ['grid-row' => '1'],
+        ];
+
+        self::assertSame([[0, 3, 1, 1], [0, 0, 1, 1], [0, 1, 1, 1], [0, 4, 1, 2], [0, 6, 1, 1]], GridGeometry::place($styles, 4));
+        self::assertSame([[0, 3, 1, 1], [0, 0, 1, 1], [0, 1, 1, 1], [0, 4, 1, 2], [0, 2, 1, 1]], GridGeometry::place($styles, 4, true));
+    }
+
     public function testUntrustedGridPlacementCannotAllocateUnboundedImplicitTracks()
     {
         $this->expectException(\LengthException::class);

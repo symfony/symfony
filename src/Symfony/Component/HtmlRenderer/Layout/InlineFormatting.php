@@ -27,7 +27,7 @@ final class InlineFormatting
         if (!\in_array($box->display, ['inline', 'ruby'], true) || null !== $box->replacedContent || null !== $box->image || null !== $box->selection || null !== $box->topLayer || 'static' !== ($box->style['position'] ?? 'static') || 'none' !== ($box->style['transform'] ?? 'none') || !\in_array($box->style['white-space'] ?? 'normal', ['normal', 'pre-line'], true)) {
             return null;
         }
-        if (!self::undecorated($box)) {
+        if (!self::undecorated($box, true)) {
             return null;
         }
         if ($emergency && \in_array($box->style['overflow-wrap'] ?? '', ['anywhere', 'break-word'], true)) {
@@ -110,9 +110,13 @@ final class InlineFormatting
         return $parts;
     }
 
-    private static function undecorated(Box $box): bool
+    private static function undecorated(Box $box, bool $allowSolidBackground = false): bool
     {
+        $backgroundDefaults = ['background-image' => 'none', 'background-position' => '0% 0%', 'background-size' => 'auto', 'background-repeat' => 'repeat', 'background-origin' => 'padding-box', 'background-clip' => 'border-box', 'background-attachment' => 'scroll'];
         foreach ($box->style as $property => $value) {
+            if ($allowSolidBackground && ('background-color' === $property || isset($box->style['background-color']) && 'none' === ($box->style['background-image'] ?? null) && ('background' === $property || ($backgroundDefaults[$property] ?? null) === $value))) {
+                continue;
+            }
             if (\in_array($property, ['margin-top', 'margin-bottom', 'margin-block', 'margin-block-start', 'margin-block-end'], true)) {
                 continue;
             }

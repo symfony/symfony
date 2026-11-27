@@ -86,9 +86,19 @@ final class SlidingWindow implements LimiterStateInterface
         return microtime(true) > $this->windowEndAt;
     }
 
+    public function getSlidingWindowEndAt(): float
+    {
+        return $this->windowEndAt;
+    }
+
     public function add(int $hits = 1): void
     {
         $this->hitCount = max(0, $this->hitCount + $hits);
+    }
+
+    public function addForLastWindow(int $hits = 1): void
+    {
+        $this->hitCountForLastWindow = max(0, $this->hitCountForLastWindow + $hits);
     }
 
     /**

@@ -32,6 +32,14 @@ class NoLimiterTest extends TestCase
         $this->assertInstanceOf(Reservation::class, $limiter->reserve());
     }
 
+    public function testRefund()
+    {
+        $limiter = new NoLimiter();
+        $rateLimit = $limiter->consume();
+
+        $this->assertSame($rateLimit, $limiter->refund($rateLimit));
+    }
+
     #[Group('time-sensitive')]
     public function testRetryAfterIsNowInTheDefaultTimezone()
     {

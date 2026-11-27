@@ -78,6 +78,16 @@ final class Window implements LimiterStateInterface
         return $this->hitCount;
     }
 
+    public function getTimer(): float
+    {
+        return $this->timer;
+    }
+
+    public function getIntervalInSeconds(): int
+    {
+        return $this->intervalInSeconds;
+    }
+
     public function getAvailableTokens(float $now): int
     {
         return $this->maxSize - $this->getCarriedHitCount($now);

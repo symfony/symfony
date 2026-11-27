@@ -37,6 +37,14 @@ final class NoLimiter implements LimiterInterface
         return new RateLimit(\PHP_INT_MAX, \DateTimeImmutable::createFromTimestamp(microtime(true))->setTimezone(new \DateTimeZone(date_default_timezone_get())), true, \PHP_INT_MAX);
     }
 
+    /**
+     * Does nothing: no token is ever consumed, so there is nothing to give back.
+     */
+    public function refund(RateLimit $rateLimit): RateLimit
+    {
+        return $rateLimit;
+    }
+
     public function reset(): void
     {
     }

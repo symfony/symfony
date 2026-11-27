@@ -96,7 +96,7 @@ class Node
 
     protected function dumpString(string $value): string
     {
-        return \sprintf('"%s"', addcslashes($value, "\0\t\"\\"));
+        return \sprintf('"%s"', addcslashes($value, "\0\t\n\v\f\r\"\\"));
     }
 
     protected function isHash(array $value): bool

@@ -572,6 +572,14 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame(eval(\sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo']))), 'default');
     }
 
+    public function testNullCoalescingOfAnUnknownNameInsideAnOperation()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+
+        $this->assertSame(1, $expressionLanguage->evaluate('1 + bar ?? 2'));
+        $this->assertSame(1, eval(\sprintf('return %s;', $expressionLanguage->compile('1 + bar ?? 2'))));
+    }
+
     public function testNullCoalescingEvaluateFailsOnObjectWithoutArrayAccess()
     {
         $expressionLanguage = new ExpressionLanguage();
@@ -755,5 +763,37 @@ class ExpressionLanguageTest extends TestCase
         yield 'not an enum case' => ['enum("PHP_VERSION")', [], TypeError::class];
         yield 'division by zero' => ['1 / 0', [], DivisionByZeroError::class];
         yield 'modulo by zero' => ['1 % 0', [], DivisionByZeroError::class];
+    }
+
+    #[DataProvider('provideDumpedExpressions')]
+    public function testDumpedExpressionEvaluatesTheSame(string $expression)
+    {
+        $el = new ExpressionLanguage();
+        $values = ['a' => 1, 'b' => 2, 'm' => 'v', 'n' => null, 'f' => false, 'obj' => (object) ['foo' => 'bar']];
+
+        $dump = $el->parse($expression, array_keys($values))->getNodes()->dump();
+
+        $this->assertSame($el->evaluate($expression, $values), $el->evaluate($dump, $values));
+        $this->assertSame($dump, $el->parse($dump, array_keys($values))->getNodes()->dump());
+    }
+
+    public static function provideDumpedExpressions(): iterable
+    {
+        yield ['(m ?? a) ~ "s"'];
+        yield ['(m ?? f) ? 1 : 2'];
+        yield ['-(n ?? 3)'];
+        yield ['(n ?? a) * 2 + b'];
+        yield ['(n ?? obj).foo'];
+        yield ['max(n ?? a, (n ?? b) * 2)'];
+        yield ['n ?? a ?? b'];
+        yield ['obj?.foo ?? n'];
+        yield ['(null)?.foo ?? m'];
+        yield ['a - (b - a) * -(a ** b ** 2)'];
+        yield ['not (f or a > b) and a in [1, 2]'];
+        yield ['(f ? a : b) ~ (f ?: m)'];
+        yield ['{(m ~ "k"): [a, -b], "x": obj.foo}["vk"][1]'];
+        yield ['"a\tb\nc\rd\ve\ff" ~ m'];
+        yield ['0.30000000000000004 - 0.3'];
+        yield ['1e3 === 1000'];
     }
 }

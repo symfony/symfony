@@ -600,15 +600,25 @@ abstract class AbstractBrowser
     }
 
     /**
-     * @see https://dev.w3.org/html5/spec-preview/the-meta-element.html#attr-meta-http-equiv-refresh
+     * @see https://html.spec.whatwg.org/multipage/semantics.html#shared-declarative-refresh-steps
      */
     private function getMetaRefreshUrl(): ?string
     {
         $metaRefresh = $this->getCrawler()->filter('head meta[http-equiv="refresh"]');
         foreach ($metaRefresh->extract(['content']) as $content) {
-            if (preg_match('/^\s*0\s*;\s*URL\s*=\s*(?|\'([^\']++)|"([^"]++)|([^\'"].*))/is', $content, $m)) {
-                return str_replace(["\t", "\r", "\n"], '', trim($m[1], "\x00..\x20"));
+            if (!preg_match('/^[\t\n\f\r ]*+(?:([0-9]++)|(?=\.))[0-9.]*+(?:(?=[;,\t\n\f\r ])[\t\n\f\r ]*+[;,]?[\t\n\f\r ]*+(.*+))?+\z/s', $content, $m)) {
+                continue;
             }
+
+            $url = preg_replace('/^(?:url[\t\n\f\r ]*+=[\t\n\f\r ]*+)?+(?|\'([^\']*+)|"([^"]*+)|(.*+)).*+\z/is', '$1', $m[2] ?? '');
+            $url = str_replace(["\t", "\r", "\n"], '', trim($url, "\x00..\x20"));
+
+            if (preg_match('/^javascript:/i', $url)) {
+                continue;
+            }
+
+            // The first valid refresh wins, and it is followed only when it has a URL and no delay
+            return '' === ltrim($m[1] ?? '', '0') && '' !== $url ? $url : null;
         }
 
         return null;

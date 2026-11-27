@@ -19,6 +19,7 @@ use Symfony\Component\Mailer\Bridge\Mailomat\Transport\MailomatApiTransport;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class MailomatApiTransportTest extends TestCase
@@ -98,6 +99,37 @@ class MailomatApiTransportTest extends TestCase
             ->replyTo(new Address('replyto@mailomat.swiss', 'ReplyTo Doe'), 'replyto-simple@mailomat.swiss')
             ->text('Hello There!')
             ->html('<p>Hello There!</p>');
+
+        $message = $transport->send($mail);
+
+        $this->assertSame('foobar', $message->getMessageId());
+    }
+
+    public function testSendWithInlineAttachments()
+    {
+        $image = (new DataPart('image', 'logo.png', 'image/png'))->asInline();
+        $html = '<img src="cid:'.$image->getContentId().'"><img src="cid:photo.jpg">';
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options) use ($image, $html): ResponseInterface {
+            $body = json_decode($options['body'], true);
+            $this->assertSame($html, $body['html']);
+            $this->assertSame('cid:'.$image->getContentId(), $body['attachments'][0]['ContentID']);
+            $this->assertSame('cid:photo.jpg', $body['attachments'][1]['ContentID']);
+
+            return new JsonMockResponse(['messageUuid' => 'foobar'], [
+                'http_code' => 202,
+            ]);
+        });
+
+        $transport = new MailomatApiTransport(self::KEY, $client);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->from(new Address('from@mailomat.swiss', 'From Doe'))
+            ->to(new Address('to@mailomat.swiss', 'To Doe'))
+            ->html($html)
+            ->addPart($image)
+            ->embed('photo', 'photo.jpg', 'image/jpeg');
 
         $message = $transport->send($mail);
 

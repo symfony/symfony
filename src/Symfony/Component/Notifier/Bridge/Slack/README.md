@@ -53,7 +53,7 @@ $contributeToSymfonyBlocks = (new SlackActionsBlock())
         'Report bugs',
         'https://symfony.com/doc/current/contributing/code/bugs.html',
         'danger',
-        'reportBugs'
+        'reportBugs',
         [
             'title' => ['type' => 'plain_text', 'text' => 'Report a bug'],
             'text' => ['type' => 'plain_text', 'text' => 'By proceeding I confirm I\'ve read the guidelines.'],
@@ -61,7 +61,7 @@ $contributeToSymfonyBlocks = (new SlackActionsBlock())
             'deny' => ['type' => 'plain_text', 'text' => 'Go back to reading']
         ]
     )
-    ->id('contribute_block);
+    ->id('contribute_block');
 
 $slackOptions = (new SlackOptions())
     ->block((new SlackSectionBlock())

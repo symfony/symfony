@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\RequiresPhp;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 
-/**
- * @requires PHP 8.4
- *
- * @runTestsInSeparateProcesses
- */
+#[RequiresPhp('>=8.4.0')]
+#[RunTestsInSeparateProcesses]
 class ChainAdapterLazyGhostTest extends TestCase
 {
     public function testSave()

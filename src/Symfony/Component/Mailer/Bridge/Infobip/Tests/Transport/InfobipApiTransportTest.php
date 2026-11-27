@@ -242,6 +242,23 @@ class InfobipApiTransportTest extends TestCase
         );
     }
 
+    public function testSendEmailWithInlineImagesShouldReferenceThemByFileName()
+    {
+        $image = (new DataPart('some image', 'logo.png', 'image/png'))->asInline();
+
+        $email = $this->basicValidEmail()
+            ->html('<img src="cid:'.$image->getContentId().'"><img src="cid:photo.jpg">')
+            ->addPart($image)
+            ->embed('some photo', 'photo.jpg', 'image/jpeg');
+
+        $this->transport->send($email);
+
+        $options = $this->response->getRequestOptions();
+        $this->assertStringContainsString("name=\"HTML\"\r\n\r\n<img src=\"cid:logo.png\"><img src=\"cid:photo.jpg\">\r\n", $options['body']);
+        $this->assertStringContainsString('name="inlineImage"; filename="logo.png"', $options['body']);
+        $this->assertStringContainsString('name="inlineImage"; filename="photo.jpg"', $options['body']);
+    }
+
     public function testSendEmailWithHeadersShouldCalledInfobipWithTheRightParameters()
     {
         $email = $this->basicValidEmail();

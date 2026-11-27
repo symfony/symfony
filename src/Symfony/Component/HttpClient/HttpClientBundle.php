@@ -229,10 +229,7 @@ class HttpClientBundle extends AbstractBundle
         }
 
         $configurator->import('Resources/config/http_client.php');
-
-        if ($container->getParameter('kernel.debug')) {
-            $configurator->import('Resources/config/http_client_debug.php');
-        }
+        $configurator->import('Resources/config/http_client_debug.php');
 
         $options = $config['default_options'] ?? [];
         $cachingOptions = $options['caching'] ?? ['enabled' => false];

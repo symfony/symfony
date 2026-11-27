@@ -22,7 +22,6 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
-use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -82,9 +81,11 @@ class HttpClientBundleTest extends TestCase
         $this->assertSame($container->get('test.scoped_client'), $container->get('test.autowired_scoped_client')->client);
     }
 
-    public function testTheClientsAreTracedInDebugMode()
+    #[TestWith(['debug', true])]
+    #[TestWith(['profiler', false])]
+    public function testTheClientsAreTracedWhenTheProfilerIsEnabled(string $env, bool $debug)
     {
-        $kernel = new TestHttpClientKernel('debug', true, $this->varDir);
+        $kernel = new TestHttpClientKernel($env, $debug, $this->varDir);
         $kernel->boot();
         $container = $kernel->getContainer();
 
@@ -144,19 +145,20 @@ class HttpClientBundleTest extends TestCase
         $container = $this->createContainer();
         new HttpClientBundle()->getContainerExtension()->load([[]], $container);
 
-        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
         $this->assertFalse($container->hasDefinition('cache.http_client.pool'), 'dropped without "cache.app"');
         $this->assertFalse($container->hasDefinition('cache.http_client'), 'and the tag-aware adapter goes with the pool');
+        $this->assertFalse($container->hasDefinition('data_collector.http_client'), 'dropped without "profiler"');
 
         $container = $this->createContainer();
         $container->register('cache.app');
+        $container->register('profiler');
         new HttpClientBundle()->getContainerExtension()->load([[]], $container);
 
-        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
         $this->assertTrue($container->hasDefinition('cache.http_client.pool'));
         $this->assertTrue($container->hasDefinition('cache.http_client'));
+        $this->assertTrue($container->hasDefinition('data_collector.http_client'));
     }
 
     private function createContainer(): ContainerBuilder
@@ -355,7 +357,7 @@ class TestHttpClientKernel extends AbstractKernel
             ->alias('test.cached_client', 'cached_client')->public()
         ;
 
-        if ($this->debug) {
+        if ($this->debug || 'profiler' === $this->environment) {
             // the data collector is kept only when a profiler collects it
             $services->set('profiler', \stdClass::class);
             $services->alias('test.data_collector', 'data_collector.http_client')->public();

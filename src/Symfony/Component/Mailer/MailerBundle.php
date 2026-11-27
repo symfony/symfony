@@ -281,7 +281,7 @@ class MailerBundle extends AbstractBundle
                             ->defaultValue('')
                         ->end()
                         ->arrayNode('keys')
-                            ->info('Recipient PGP public keys, as a map of email address to public key file path. Cannot be used together with "repository".')
+                            ->info('Recipient PGP public keys, as a map of email address to the path of a file holding exactly one key with a user ID for that address. Cannot be used together with "repository".')
                             ->useAttributeAsKey('email')
                             ->scalarPrototype()->end()
                         ->end()
@@ -299,7 +299,7 @@ class MailerBundle extends AbstractBundle
                             ->defaultValue(60.0)
                         ->end()
                         ->booleanNode('hide_recipients')
-                            ->info('Hide every recipient\'s key ID in the encrypted message (gpg --hidden-recipient). Recipients listed in the Bcc header are always hidden regardless of this option; set it to true to also hide To and Cc recipients.')
+                            ->info('Hide every recipient\'s key ID in the encrypted message (gpg --hidden-recipient-file). Recipients listed in the Bcc header are always hidden regardless of this option; set it to true to also hide To and Cc recipients.')
                             ->defaultFalse()
                         ->end()
                         ->enumNode('on_missing_key')
@@ -325,10 +325,7 @@ class MailerBundle extends AbstractBundle
 
         $configurator->import('Resources/config/mailer.php');
         $configurator->import('Resources/config/mailer_transports.php');
-
-        if ($container->getParameter('kernel.debug')) {
-            $configurator->import('Resources/config/mailer_debug.php');
-        }
+        $configurator->import('Resources/config/mailer_debug.php');
 
         if (!class_exists(Application::class)) {
             $container->removeDefinition('console.command.mailer_test');

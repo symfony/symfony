@@ -127,10 +127,7 @@ class SerializerBundle extends AbstractBundle
         }
 
         $configurator->import('Resources/config/serializer.php');
-
-        if ($container->getParameter('kernel.debug')) {
-            $configurator->import('Resources/config/serializer_debug.php');
-        }
+        $configurator->import('Resources/config/serializer_debug.php');
 
         $container->registerForAutoconfiguration(EncoderInterface::class)
             ->addTag('serializer.encoder');

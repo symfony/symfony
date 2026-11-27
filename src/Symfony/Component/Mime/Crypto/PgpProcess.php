@@ -91,15 +91,17 @@ final class PgpProcess
     }
 
     /**
-     * @param array<string, string> $pgpKeys          The public keys to encrypt the data with. The array keys are the user email addresses and the values are the file paths to the public keys.
-     * @param string[]              $hiddenRecipients The email addresses whose key ID must be hidden (gpg --hidden-recipient) instead of disclosed (gpg --recipient)
+     * @param array<string, string> $pgpKeys          The public keys to encrypt the data with. The array keys are the user email addresses and the values are the file paths to the public keys; each file must hold exactly one key, with a user ID for its address.
+     * @param string[]              $hiddenRecipients The email addresses whose key ID must be hidden (gpg --hidden-recipient-file) instead of disclosed (gpg --recipient-file)
      */
     public function encrypt(string $data, array $pgpKeys, array $hiddenRecipients = []): string
     {
         $temporaryGnupgHome = $this->createTemporaryGnupgHome();
 
         try {
-            $this->storeKeys($pgpKeys, $temporaryGnupgHome);
+            foreach ($pgpKeys as $recipient => $filePath) {
+                $this->checkRecipientKey($recipient, $filePath, $temporaryGnupgHome);
+            }
 
             $command = [
                 '--auto-key-locate',
@@ -107,12 +109,27 @@ final class PgpProcess
                 '--encrypt',
                 '--cipher-algo',
                 $this->cipherAlgorithm,
-                '--always-trust',
                 '--armor',
             ];
-            foreach (array_keys($pgpKeys) as $recipient) {
-                $command[] = \in_array($recipient, $hiddenRecipients, true) ? '--hidden-recipient' : '--recipient';
-                $command[] = $recipient;
+
+            $hiddenKeyFiles = [];
+            $visibleKeyFiles = [];
+            foreach ($pgpKeys as $recipient => $filePath) {
+                if (\in_array($recipient, $hiddenRecipients, true)) {
+                    $hiddenKeyFiles[] = $filePath;
+                } else {
+                    $visibleKeyFiles[] = $filePath;
+                }
+            }
+
+            // gpg keeps the last flag given for a key, so a key shared with a visible recipient stays visible instead of revealing a hidden one.
+            foreach ($hiddenKeyFiles as $filePath) {
+                $command[] = '--hidden-recipient-file';
+                $command[] = $this->convertToMsysPath($filePath);
+            }
+            foreach ($visibleKeyFiles as $filePath) {
+                $command[] = '--recipient-file';
+                $command[] = $this->convertToMsysPath($filePath);
             }
 
             $output = $this->execute($command, $data, $temporaryGnupgHome);
@@ -146,13 +163,37 @@ final class PgpProcess
     }
 
     /**
-     * @param string[] $filePaths
+     * gpg only uses the first key of a --recipient-file, so a file with several keys, or one keyed to another address, would silently encrypt to the wrong key.
      */
-    private function storeKeys(array $filePaths, string $gnupgHome): void
+    private function checkRecipientKey(string $recipient, string $filePath, string $gnupgHome): void
     {
-        foreach ($filePaths as $filePath) {
-            $this->storeKey($filePath, null, $gnupgHome);
+        $output = $this->execute(['--with-colons', '--import-options', 'show-only', '--import', '--', $this->convertToMsysPath($filePath)], null, $gnupgHome);
+
+        $keyCount = 0;
+        $hasRecipientUserId = false;
+        foreach (explode("\n", $output) as $line) {
+            $fields = explode(':', $line);
+            if ('pub' === $fields[0]) {
+                ++$keyCount;
+            } elseif ('uid' === $fields[0] && 'r' !== ($fields[1] ?? '') && 0 === strcasecmp($recipient, $this->getUserIdMailbox($fields[9] ?? ''))) {
+                $hasRecipientUserId = true;
+            }
         }
+
+        if (1 !== $keyCount) {
+            throw new RuntimeException(\sprintf('The PGP public key file "%s" must hold exactly one key, %d found.', $filePath, $keyCount));
+        }
+
+        if (!$hasRecipientUserId) {
+            throw new RuntimeException(\sprintf('The PGP public key in "%s" has no user ID for "%s".', $filePath, $recipient));
+        }
+    }
+
+    private function getUserIdMailbox(string $userId): string
+    {
+        $userId = preg_replace_callback('/\\\\x([0-9a-fA-F]{2})/', static fn (array $matches) => \chr(hexdec($matches[1])), $userId);
+
+        return preg_match('/<([^>]*)>/', $userId, $matches) ? $matches[1] : $userId;
     }
 
     private function storeKey(string $filePath, ?string $passphraseFile, string $gnupgHome): void

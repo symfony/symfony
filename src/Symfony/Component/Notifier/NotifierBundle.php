@@ -91,10 +91,7 @@ class NotifierBundle extends AbstractBundle
 
         $configurator->import('Resources/config/notifier.php');
         $configurator->import('Resources/config/notifier_transports.php');
-
-        if ($container->getParameter('kernel.debug')) {
-            $configurator->import('Resources/config/notifier_debug.php');
-        }
+        $configurator->import('Resources/config/notifier_debug.php');
 
         if ($config['chatter_transports']) {
             $container->getDefinition('chatter.transports')->setArgument(0, $config['chatter_transports']);

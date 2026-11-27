@@ -61,6 +61,89 @@ class PgpEncrypterTest extends TestCase
         }
     }
 
+    public function testKeyFileWithSeveralKeysIsRejected()
+    {
+        $keyFile = tempnam(sys_get_temp_dir(), 'pgp');
+        file_put_contents($keyFile, file_get_contents(__DIR__.'/../Fixtures/pgp_test_public_key.asc').file_get_contents(__DIR__.'/../Fixtures/pgp_two_user_ids_public_key.asc'));
+
+        try {
+            (new PgpProcess())->encrypt('Hello there!', [self::KEY_EMAIL_ADDRESS => $keyFile]);
+            $this->fail('A key file with several keys should have been rejected.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('must hold exactly one key, 2 found', $e->getMessage());
+        } finally {
+            unlink($keyFile);
+        }
+    }
+
+    public function testKeyWithoutAUserIdForTheRecipientIsRejected()
+    {
+        try {
+            (new PgpProcess())->encrypt('Hello there!', ['someone@example.com' => __DIR__.'/../Fixtures/pgp_test_public_key.asc']);
+            $this->fail('A key without a user ID for the recipient should have been rejected.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('has no user ID for "someone@example.com"', $e->getMessage());
+        }
+    }
+
+    public function testRevokedUserIdIsNotAUserIdForTheRecipient()
+    {
+        try {
+            (new PgpProcess())->encrypt('Hello there!', ['revoked@example.com' => __DIR__.'/../Fixtures/pgp_user_id_comment_and_revoked_public_key.asc']);
+            $this->fail('A key whose user ID for the recipient is revoked should have been rejected.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('has no user ID for "revoked@example.com"', $e->getMessage());
+        }
+    }
+
+    public function testUserIdWithACommentAfterTheAddressMatchesTheRecipient()
+    {
+        $output = (new PgpProcess())->encrypt('Hello there!', ['comment@example.com' => __DIR__.'/../Fixtures/pgp_user_id_comment_and_revoked_public_key.asc']);
+
+        $this->assertStringContainsString('-----BEGIN PGP MESSAGE-----', $output);
+    }
+
+    public function testEachRecipientIsEncryptedToTheKeyOfItsOwnFile()
+    {
+        // This newer key also carries the "pgp@pulli.dev" user ID.
+        $recipientKeys = [
+            'mallory@example.com' => __DIR__.'/../Fixtures/pgp_two_user_ids_public_key.asc',
+            self::KEY_EMAIL_ADDRESS => __DIR__.'/../Fixtures/pgp_test_public_key.asc',
+        ];
+        $email = (new Email())
+            ->from(new Address(self::KEY_EMAIL_ADDRESS, 'PuLLi'))
+            ->to(new Address('mallory@example.com'))
+            ->bcc(new Address(self::KEY_EMAIL_ADDRESS, 'PuLLi'))
+            ->text('Secret content')
+            ->subject('PGP Mail');
+
+        $encrypted = (new PgpEncrypter())->encrypt($email, $recipientKeys);
+        $messagePart = $encrypted->getBody()->getParts()[1]->toString();
+
+        $tester = new PgpTestingProcess();
+        $decrypted = $tester->decrypt($messagePart, __DIR__.'/../Fixtures/pgp_test_secret_key.asc', self::KEY_PASSWORD);
+        $this->assertStringContainsString('Secret content', $decrypted);
+    }
+
+    public function testBccRecipientSharingAToRecipientKeyLeavesItsKeyIdVisible()
+    {
+        $recipientKeys = [
+            'mallory@example.com' => __DIR__.'/../Fixtures/pgp_two_user_ids_public_key.asc',
+            self::KEY_EMAIL_ADDRESS => __DIR__.'/../Fixtures/pgp_two_user_ids_public_key.asc',
+        ];
+        $email = (new Email())
+            ->from(new Address(self::KEY_EMAIL_ADDRESS, 'PuLLi'))
+            ->to(new Address('mallory@example.com'))
+            ->bcc(new Address(self::KEY_EMAIL_ADDRESS, 'PuLLi'))
+            ->text('Secret content')
+            ->subject('PGP Mail');
+
+        $encrypted = (new PgpEncrypter())->encrypt($email, $recipientKeys);
+        $messagePart = $encrypted->getBody()->getParts()[1]->toString();
+
+        $this->assertStringNotContainsString('keyid 0000000000000000', $this->listPackets($messagePart), 'A Bcc recipient must not change how a To recipient key ID is shown.');
+    }
+
     public function testTimeoutThrowsAMimeException()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {

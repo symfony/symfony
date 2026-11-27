@@ -35,6 +35,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\IriReferenceClassSchemaResolver;
 use Symfony\Component\JsonSchema\Tests\Fixtures\JsonSchemaBundleTestAppBundle;
 use Symfony\Component\JsonSchema\Tests\Fixtures\JsonSchemaBundleTestKernel;
 use Symfony\Component\JsonSchema\Tests\Fixtures\MarkingPropertySchemaEnricher;
+use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoBundle;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\SerializerBundle;
@@ -87,7 +88,11 @@ class JsonSchemaBundleTest extends TestCase
     #[RequiresMethod(Type::class, 'map')]
     public function testGenericPropertiesAreExtracted()
     {
-        $generator = $this->bootKernel('generics')->getContainer()->get('test.json_schema.generator');
+        $generator = $this->bootKernel('generics', build: static function (ContainerBuilder $container) {
+            // PropertyInfoBundle does not register this extractor when phpstan/phpdoc-parser is only a dev dependency of the root package
+            $container->register('property_info.phpstan_extractor', PhpStanExtractor::class)
+                ->addTag('property_info.type_extractor', ['priority' => -1000]);
+        })->getContainer()->get('test.json_schema.generator');
         $definitions = $generator->generate(Type::object(Inbox::class))->getDefinitions();
 
         $this->assertSame(['type' => 'string'], $definitions['Envelope-of.string']['properties']['data']);

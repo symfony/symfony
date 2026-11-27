@@ -2527,6 +2527,34 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame(SwitchEnum::On, $dummy->foo);
     }
 
+    public function testXmlAndCsvIntegerStaysIntWhenUnionAcceptsInt()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        foreach ([XmlEncoder::FORMAT, CsvEncoder::FORMAT] as $format) {
+            $this->assertSame(50, $normalizer->denormalize(['foo' => '50'], UnionIntFloatPropertyDummy::class, $format)->foo);
+            $this->assertSame(-50, $normalizer->denormalize(['foo' => '-50'], UnionIntFloatPropertyDummy::class, $format)->foo);
+            $this->assertSame(1.5, $normalizer->denormalize(['foo' => '1.5'], UnionIntFloatPropertyDummy::class, $format)->foo);
+            $this->assertSame(50.0, $normalizer->denormalize(['foo' => '50.0'], UnionIntFloatPropertyDummy::class, $format)->foo);
+            $this->assertSame(1.0E20, $normalizer->denormalize(['foo' => '100000000000000000000'], UnionIntFloatPropertyDummy::class, $format)->foo);
+        }
+
+        $this->assertSame(50, $normalizer->denormalize(['foo' => 50], UnionIntFloatPropertyDummy::class, XmlEncoder::FORMAT)->foo);
+        $this->assertSame(1.5, $normalizer->denormalize(['foo' => 1.5], UnionIntFloatPropertyDummy::class, XmlEncoder::FORMAT)->foo);
+    }
+
+    public function testXmlFloatIsNotTruncatedToInt()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        $this->assertSame(50, $normalizer->denormalize(['foo' => 50], IntPropertyDummy::class, XmlEncoder::FORMAT)->foo);
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The type of the "foo" attribute for class "Symfony\\Component\\Serializer\\Tests\\Normalizer\\IntPropertyDummy" must be one of "int" ("float" given).');
+
+        $normalizer->denormalize(['foo' => 1.5], IntPropertyDummy::class, XmlEncoder::FORMAT);
+    }
+
     public static function provideDenormalizeWithFilterBoolData(): array
     {
         return [
@@ -3566,6 +3594,16 @@ class UnionArrayBoolPropertyDummy
 class UnionEnumBoolPropertyDummy
 {
     public bool|SwitchEnum $foo;
+}
+
+class IntPropertyDummy
+{
+    public int $foo;
+}
+
+class UnionIntFloatPropertyDummy
+{
+    public int|float $foo;
 }
 
 class DummyWithArrayObject

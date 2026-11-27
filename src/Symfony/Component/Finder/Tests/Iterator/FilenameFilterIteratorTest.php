@@ -36,6 +36,14 @@ class FilenameFilterIteratorTest extends IteratorTestCase
             [['/\.php$/'], [], ['test.php', 'foo.php']],
             [[], ['/\.php$/'], ['test.py']],
             [['{*.php,*.py}'], [], ['test.php', 'test.py', 'foo.php']],
+            [['/\.php$/S'], [], ['test.php', 'foo.php']],
+            [['/\.php$/X'], [], ['test.php', 'foo.php']],
+            [['/(?<name>test)|(?<name>foo)/J'], [], ['test.php', 'test.py', 'foo.php']],
+            [[], ['/\.php$/J'], ['test.py']],
+            ...(false !== @preg_match('//r', '') ? [
+                [['/\.php$/r'], [], ['test.php', 'foo.php']],
+                [[], ['/\.php$/r'], ['test.py']],
+            ] : []),
         ];
     }
 }

@@ -743,8 +743,24 @@ class AbstractBrowserTest extends TestCase
             ["<html><head><meta http-equiv=\"refresh\" content=\"0;URL='http://www.example.com/\r\n\tredirected'\"/></head></html>", 'http://www.example.com/redirected'],
             ["<html><head><meta http-equiv=\"refresh\" content=\"0;URL=' http://www.example.com/redirected'\"/></head></html>", 'http://www.example.com/redirected'],
             ["<html><head><meta http-equiv=\"refresh\" content=\"0;URL=http://www.example.com/redirected\f\"/></head></html>", 'http://www.example.com/redirected'],
+            ['<html><head><meta http-equiv="refresh" content="0,URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'],
+            ['<html><head><meta http-equiv="refresh" content="0 URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'],
+            ['<html><head><meta http-equiv="refresh" content="0;http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'],
+            ['<html><head><meta http-equiv="refresh" content="0;\'http://www.example.com/redirected\'"/></head></html>', 'http://www.example.com/redirected'],
+            ['<html><head><meta http-equiv="refresh" content="00;URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'],
+            ['<html><head><meta http-equiv="refresh" content="0.5;URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'],
+            ['<html><head><meta http-equiv="refresh" content=".5;URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'],
+            // A javascript: URL is never followed.
+            ['<html><head><meta http-equiv="refresh" content="0;URL=JavaScript:alert(1)"/></head></html>', 'http://www.example.com/foo/foobar'],
+            ['<html><head><meta http-equiv="refresh" content="0;URL=javascript:alert(1)"/><meta http-equiv="refresh" content="0;URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'],
+            // Vertical tabs are not ASCII whitespace.
+            ["<html><head><meta http-equiv=\"refresh\" content=\"\v0;URL=http://www.example.com/redirected\"/></head></html>", 'http://www.example.com/foo/foobar'],
+            // A refresh without URL reloads the page, which is not followed.
+            ['<html><head><meta http-equiv="refresh" content="0"/></head></html>', 'http://www.example.com/foo/foobar'],
+            ['<html><head><meta http-equiv="refresh" content="0; URL="/></head></html>', 'http://www.example.com/foo/foobar'],
             // Non-zero timeout should not result in a redirect.
             ['<html><head><meta http-equiv="refresh" content="4; URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/foo/foobar'],
+            ['<html><head><meta http-equiv="refresh" content="4; URL=http://www.example.com/foo"/><meta http-equiv="refresh" content="0; URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/foo/foobar'],
             ['<html><body></body></html>', 'http://www.example.com/foo/foobar'],
             // Invalid meta tag placement should not result in a redirect.
             ['<html><body><meta http-equiv="refresh" content="0;url=http://www.example.com/redirected"/></body></html>', 'http://www.example.com/foo/foobar'],

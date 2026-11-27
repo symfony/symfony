@@ -54,14 +54,16 @@ class ConstantNode extends Node
             $array[] = 'false';
         } elseif (null === $value) {
             $array[] = 'null';
-        } elseif (\is_int($value) || \is_float($value)) {
+        } elseif (\is_int($value)) {
             $array[] = $value;
+        } elseif (\is_float($value)) {
+            $array[] = var_export($value, true);
         } elseif (!\is_array($value)) {
             $array[] = $this->dumpString($value);
         } elseif ($this->isHash($value)) {
             foreach ($value as $k => $v) {
                 $array[] = ', ';
-                $array[] = new self($k);
+                $array[] = \is_int($k) && $k < 0 ? '('.$k.')' : new self($k);
                 $array[] = ': ';
                 $array[] = new self($v);
             }

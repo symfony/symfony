@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -60,6 +61,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\FailingDummyMessageHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
+use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\Messenger\Transport\CloseableTransportInterface;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -488,6 +490,21 @@ class MessengerBundleTest extends TestCase
         $kernel->boot();
 
         $this->assertContains(DummyCommand::class, $kernel->handledMessages);
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testTheBusIsTracedWhenTheProfilerIsEnabled(bool $debug)
+    {
+        $kernel = new TestTracedMessengerKernel('test', $debug, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $bus = $container->get('test.messenger.default_bus');
+        $this->assertInstanceOf(TraceableMessageBus::class, $bus);
+
+        $bus->dispatch(new DummyMessage('hello'));
+        $this->assertCount(1, $bus->getDispatchedMessages());
     }
 
     private static function hideTheUidComponent(): void
@@ -1209,5 +1226,37 @@ class HandlersLocatorTestHandler
     #[AsMessageHandler(bus: 'command.bus')]
     public function __invoke(DummyCommand $command): void
     {
+    }
+}
+
+class TestTracedMessengerKernel extends AbstractKernel
+{
+    use KernelTrait;
+
+    public function __construct(string $env, bool $debug, private string $dir)
+    {
+        parent::__construct($env, $debug);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new MessengerBundle();
+    }
+
+    private function configureContainer(ContainerConfigurator $container): void
+    {
+        $container->extension('messenger', [
+            'transports' => ['async' => 'in-memory://'],
+            'routing' => [DummyMessage::class => 'async'],
+        ]);
+        $container->services()
+            ->set('profiler', \stdClass::class)
+            ->alias('test.messenger.default_bus', 'messenger.default_bus')->public()
+        ;
     }
 }

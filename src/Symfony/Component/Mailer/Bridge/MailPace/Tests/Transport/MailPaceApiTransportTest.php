@@ -22,6 +22,7 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class MailPaceApiTransportTest extends TestCase
@@ -91,6 +92,37 @@ final class MailPaceApiTransportTest extends TestCase
             ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
+
+        $message = $transport->send($mail);
+
+        $this->assertSame('foobar', $message->getMessageId());
+    }
+
+    public function testSendWithInlineAttachments()
+    {
+        $image = (new DataPart('image', 'logo.png', 'image/png'))->asInline();
+        $html = '<img src="cid:'.$image->getContentId().'"><img src="cid:photo.jpg">';
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options) use ($image, $html): ResponseInterface {
+            $body = json_decode($options['body'], true);
+            $this->assertSame($html, $body['htmlbody']);
+            $this->assertSame('cid:'.$image->getContentId(), $body['attachments'][0]['cid']);
+            $this->assertSame('cid:photo.jpg', $body['attachments'][1]['cid']);
+
+            return new JsonMockResponse(['id' => 'foobar', 'status' => 'pending'], [
+                'http_code' => 200,
+            ]);
+        });
+
+        $transport = new MailPaceApiTransport('KEY', $client);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->html($html)
+            ->addPart($image)
+            ->embed('photo', 'photo.jpg', 'image/jpeg');
 
         $message = $transport->send($mail);
 

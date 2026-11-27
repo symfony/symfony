@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Serializer\Normalizer\CollectionDenormalizer;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
@@ -418,14 +419,17 @@ class SerializerBundleTest extends TestCase
         $this->assertFalse($this->load(['enabled' => true], cache: false)->has('cache.serializer'));
     }
 
-    public function testDataCollectorFollowsTheProfilerInDebugMode()
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testDataCollectorFollowsTheProfiler(bool $debug)
     {
-        $container = $this->load(['enabled' => true], debug: true, profiler: true);
+        $container = $this->load(['enabled' => true], debug: $debug, profiler: true);
         $this->assertTrue($container->hasDefinition('serializer.data_collector'));
         $this->assertTrue($container->hasDefinition('debug.serializer'));
 
-        $this->assertFalse($this->load(['enabled' => true], debug: true)->hasDefinition('serializer.data_collector'));
-        $this->assertFalse($this->load(['enabled' => true], profiler: true)->hasDefinition('serializer.data_collector'));
+        $container = $this->load(['enabled' => true], debug: $debug);
+        $this->assertFalse($container->hasDefinition('serializer.data_collector'));
+        $this->assertFalse($container->hasDefinition('debug.serializer'));
     }
 
     public function testJsonDetailedErrorMessagesEnabledInDebugMode()

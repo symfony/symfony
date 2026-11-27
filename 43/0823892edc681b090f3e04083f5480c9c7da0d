@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-27T13:02:57Z
+
+I moved this to 7.4, since 6.4 is close to its end of life and this isn't on the main path.
+
+With PCRE JIT on, which is PHP's default, `snake()` already runs in linear time. The quadratic time shows only when JIT is off. With JIT, an uppercase run longer than `pcre.backtrack_limit` makes `snake()` return an empty string instead.
+
+I added a test that lowers `pcre.backtrack_limit`, so that it fails without the fix, and I removed the comments. Thanks @irfanm96!

@@ -80,7 +80,7 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
      */
     protected function isRegex(string $str): bool
     {
-        $availableModifiers = 'imsxuADUn';
+        $availableModifiers = 'imsxuADUnSXJr';
 
         if (preg_match('/^(.{3,}?)['.$availableModifiers.']*$/', $str, $m)) {
             $start = substr($m[1], 0, 1);

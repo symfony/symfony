@@ -116,13 +116,6 @@ final class UrlSanitizer
             $url['scheme'] = 'https';
         }
 
-        // In absence of a scheme and of an authority, RFC 3986 forbids a colon in the
-        // first path segment, which would otherwise be read as a scheme. league/uri
-        // enforces this in UriString::build(), but only since version 7.
-        if (!$url['scheme'] && null === $url['host'] && preg_match('#^[^/:]*+:#', $url['path'])) {
-            return null;
-        }
-
         try {
             return UriString::build($url);
         } catch (SyntaxError) {
@@ -190,6 +183,12 @@ final class UrlSanitizer
             $parsedUrl = UriString::parse($url);
             if (isset($parsedUrl['scheme'])) {
                 $parsedUrl['scheme'] = strtolower($parsedUrl['scheme']);
+            }
+
+            // Without a scheme and an authority, RFC 3986 forbids a colon in the first path segment (section 4.2), which would otherwise be read as a scheme.
+            // Older league/uri versions only reject it when a slash follows (":foo/"), so check it here for every version.
+            if (!isset($parsedUrl['scheme']) && !isset($parsedUrl['host']) && preg_match('#^[^/:]*+:#', $parsedUrl['path'])) {
+                return null;
             }
 
             if (isset($parsedUrl['host']) && self::decodeUnreservedCharacters($parsedUrl['host']) !== $parsedUrl['host']) {

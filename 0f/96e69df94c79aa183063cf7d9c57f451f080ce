@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-27T13:03:40Z
+
+I moved this to 7.4 and pushed a fix for unquoted URLs. They were still cut at the first line break, so `0;URL=http://www.example.com/redi\nrected` went to `/redi`. The URL is now also trimmed the way the URL parser does it, so `0;URL=' http://www.example.com/redirected'` works too. Thanks for the PR!

@@ -7,6 +7,92 @@ in 7.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v7.4.0...v7.4.1
 
+## 7.4.25 (2026-11-27)
+
+### BrowserKit
+
+ * bug #68478 [BrowserKit] Fix meta refresh parsing to follow the HTML spec (nicolas-grekas)
+ * bug #68434 [BrowserKit] Strip tabs and newlines from meta refresh URLs (tandrezone)
+ * bug #68433 [BrowserKit] Make `CookieJar` match cookie domains case-insensitively (tandrezone)
+
+### Cache
+
+ * bug #68477 [Cache] Fix NullAdapter and commit() failing on an uninitialized lazy ghost (nicolas-grekas)
+ * bug #68456 [Cache] Fix ChainAdapter failing on an uninitialized lazy ghost (lazerg)
+ * minor #68475 [Cache] Use attributes to skip ChainAdapterLazyGhostTest before PHP 8.4 (nicolas-grekas)
+
+### DependencyInjection
+
+ * bug #68415 [DependencyInjection] Compare service IDs strictly when resolving circular references (malekkadri)
+
+### ExpressionLanguage
+
+ * bug #68481 [ExpressionLanguage] Fix compiling an unknown name followed by `??` inside an operation (nicolas-grekas)
+ * bug #68476 [ExpressionLanguage] Fix dumping nodes that don't parse back to the same expression (nicolas-grekas)
+ * bug #68449 [ExpressionLanguage] Preserve hash keys when dumping array nodes (malekkadri)
+ * bug #68416 [ExpressionLanguage] Preserve numeric strings when dumping constants (malekkadri)
+
+### Filesystem
+
+ * bug #68460 [Filesystem] Match complete extensions in Path::getFilenameWithoutExtension() (ahbaqdadi)
+
+### Finder
+
+ * bug #68468 [Finder] Recognize missing PCRE pattern modifiers (malekkadri)
+
+### Form
+
+ * minor #68419 [Form][Security][Validator] Add Standard Moroccan Amazigh (zgh) translations (malekkadri)
+
+### HtmlSanitizer
+
+ * bug #68441 [HtmlSanitizer] Reject relative URLs with a colon in the first path segment when parsing (vasikmansuri)
+
+### HttpClient
+
+ * bug #68431 [HttpClient] Don't cache responses canceled before their body was received (Tiriel, nicolas-grekas)
+
+### HttpFoundation
+
+ * bug #68472 [HttpFoundation] Match query parameter names regardless of order (malekkadri)
+ * bug #68453 [HttpFoundation] Reject non-integer CIDR netmasks in IpUtils (bsulyan)
+ * bug #68414 [HttpFoundation] Handle zero filter flags in InputBag and ParameterBag (malekkadri)
+ * bug #68424 [HttpFoundation] Clear cookies when replacing headers in ResponseHeaderBag (bsulyan)
+
+### Mailer
+
+ * bug #68471 [Mailer] Fix inline images referenced by Content-ID in the MailPace, Infobip and Mailomat transports (nicolas-grekas)
+ * bug #68454 [Mailer][Mailgun] Fix rewriting cid references of inline parts with a Content-ID for Mailgun (jkabat)
+
+### Notifier
+
+ * minor #68451 [Notifier][Mercure] Add support for Mercure 0.10 (dunglas)
+ * minor #68442 [Notifier][Bluesky] Remove duplicated `keywords` in the `composer.json` file (kevinonthebit)
+
+### PropertyAccess
+
+ * bug #68458 [PropertyAccess] Preserve escaped elements when resolving parent paths (malekkadri)
+
+### Serializer
+
+ * bug #68473 [Serializer] Fix denormalizing XML and CSV numbers into `int|float` and `int` properties (nicolas-grekas)
+ * bug #68448 [Serializer] Keep JSON integers as int when the union also accepts int (cestercian)
+ * bug #68428 [Serializer] Read the current value with deep_object_to_populate when there is no property type extractor (dhrupo)
+ * bug #68426 [Serializer] Fix denormalizing inherited private properties (Tong-bit-art)
+ * bug #68427 [Serializer] Validate target type before data in NumberNormalizer::denormalize() (bsulyan)
+
+### Stopwatch
+
+ * bug #68450 [Stopwatch] Preserve explicit zero section origin (malekkadri)
+
+### String
+
+ * bug #68432 [String] Fix quadratic running time in snake() on long uppercase runs (irfanm96)
+
+### Yaml
+
+ * bug #68445 [Yaml] Dump floats without losing precision (bardrop)
+
 ## 7.4.24 (2026-11-25)
 
 ### Asset

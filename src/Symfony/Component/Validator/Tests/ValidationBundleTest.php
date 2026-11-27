@@ -292,14 +292,17 @@ class ValidationBundleTest extends TestCase
         $this->assertNotContains('setMappingCache', array_column($container->getDefinition('validator.builder')->getMethodCalls(), 0));
     }
 
-    public function testDataCollectorFollowsTheProfilerInDebugMode()
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testDataCollectorFollowsTheProfiler(bool $debug)
     {
-        $container = $this->load([], debug: true, profiler: true);
+        $container = $this->load([], debug: $debug, profiler: true);
         $this->assertTrue($container->hasDefinition('data_collector.validator'));
         $this->assertTrue($container->hasDefinition('debug.validator'));
 
-        $this->assertFalse($this->load([], debug: true)->hasDefinition('data_collector.validator'));
-        $this->assertFalse($this->load([], profiler: true)->hasDefinition('data_collector.validator'));
+        $container = $this->load([], debug: $debug);
+        $this->assertFalse($container->hasDefinition('data_collector.validator'));
+        $this->assertFalse($container->hasDefinition('debug.validator'));
     }
 
     public function testValidatorService()

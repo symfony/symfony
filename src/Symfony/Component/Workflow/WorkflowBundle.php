@@ -465,9 +465,7 @@ class WorkflowBundle extends AbstractBundle
             $container->removeDefinition('console.command.workflow_dump');
         }
 
-        if ($container->getParameter('kernel.debug')) {
-            $configurator->import('Resources/config/workflow_debug.php');
-        }
+        $configurator->import('Resources/config/workflow_debug.php');
 
         $registrar = new WorkflowServiceRegistrar();
         foreach ($config['workflows'] as $name => $workflow) {

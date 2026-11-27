@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping\Entity;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\SchemaListener\AbstractSchemaListener;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
@@ -539,13 +540,15 @@ class KeyManagementBundleExtensionTest extends TestCase
         });
     }
 
-    public function testProfilerTracesTheClientsAndTheirEnvelopeEncrypters()
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testProfilerTracesTheClientsAndTheirEnvelopeEncrypters(bool $debug)
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->register('profiler', \stdClass::class);
             $container->register('app.kms', \stdClass::class)->addTag('key_management.client', ['key' => 'tagged']);
             $container->loadFromExtension('key_management', ['clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U=']]);
-        }, true);
+        }, $debug);
 
         $this->assertTrue($container->hasDefinition('key_management.data_collector'));
         $this->assertSame(['tagged', 'app'], $container->getDefinition('key_management.data_collector')->getArgument(0), 'a client the application tags itself is traced like a configured one.');
@@ -563,24 +566,15 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('debug.key_management.envelope_encrypter.tagged'), 'a tagged client has no envelope encrypter of its own to trace.');
     }
 
-    public function testProfilerLeavesTheServicesAloneWhenItIsNotThere()
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testProfilerLeavesTheServicesAloneWhenItIsNotThere(bool $debug)
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('key_management', ['clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U=']]);
-        }, true);
+        }, $debug);
 
         $this->assertFalse($container->hasDefinition('key_management.data_collector'), 'the collector goes when no profiler collects it.');
-        $this->assertFalse($container->hasDefinition('debug.key_management.app'));
-    }
-
-    public function testProfilerLeavesTheServicesAloneOutsideDebugMode()
-    {
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->register('profiler', \stdClass::class);
-            $container->loadFromExtension('key_management', ['clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U=']]);
-        });
-
-        $this->assertFalse($container->hasDefinition('key_management.data_collector'));
         $this->assertFalse($container->hasDefinition('debug.key_management.app'));
     }
 

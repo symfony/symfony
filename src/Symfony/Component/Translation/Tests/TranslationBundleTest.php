@@ -319,14 +319,17 @@ class TranslationBundleTest extends TestCase
         ], $pool->getTags());
     }
 
-    public function testDataCollectorFollowsTheProfilerInDebugMode()
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testDataCollectorFollowsTheProfiler(bool $debug)
     {
-        $container = $this->load([], debug: true, profiler: true);
+        $container = $this->load([], debug: $debug, profiler: true);
         $this->assertTrue($container->hasDefinition('data_collector.translation'));
         $this->assertSame('translator', $container->getDefinition('translator.data_collector')->getDecoratedService()[0]);
 
-        $this->assertFalse($this->load([], debug: true)->hasDefinition('data_collector.translation'));
-        $this->assertFalse($this->load([], profiler: true)->hasDefinition('data_collector.translation'));
+        $container = $this->load([], debug: $debug);
+        $this->assertFalse($container->hasDefinition('data_collector.translation'));
+        $this->assertFalse($container->hasDefinition('translator.data_collector'));
     }
 
     public function testLocaleSwitcherServiceRegistered()

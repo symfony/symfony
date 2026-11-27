@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
@@ -244,10 +245,12 @@ class NotifierBundleTest extends TestCase
         $this->assertSame($container->getDefinition('notifier'), $container->findDefinition((string) $adminRecipients));
     }
 
-    public function testTheDataCollectorIsDroppedWithoutAProfiler()
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testTheDataCollectorIsDroppedWithoutAProfiler(bool $debug)
     {
-        $this->assertFalse($this->load(self::TRANSPORTS, ['mailer', 'messenger'], true)->hasDefinition('notifier.data_collector'));
-        $this->assertTrue($this->load(self::TRANSPORTS, ['mailer', 'messenger', 'profiler'], true)->hasDefinition('notifier.data_collector'));
+        $this->assertFalse($this->load(self::TRANSPORTS, ['mailer', 'messenger'], $debug)->hasDefinition('notifier.data_collector'));
+        $this->assertTrue($this->load(self::TRANSPORTS, ['mailer', 'messenger', 'profiler'], $debug)->hasDefinition('notifier.data_collector'));
     }
 
     /**

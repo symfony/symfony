@@ -126,9 +126,11 @@ class KeyManagementBundleTest extends TestCase
     }
 
     #[RequiresPhpExtension('sodium')]
-    public function testTheClientsAreTracedInDebugMode()
+    #[TestWith(['debug', true])]
+    #[TestWith(['profiler', false])]
+    public function testTheClientsAreTracedWhenTheProfilerIsEnabled(string $env, bool $debug)
     {
-        $kernel = new TestKeyManagementKernel('debug', true, $this->varDir);
+        $kernel = new TestKeyManagementKernel($env, $debug, $this->varDir);
         $kernel->boot();
         $container = $kernel->getContainer();
 
@@ -321,9 +323,11 @@ class KeyManagementBundleTest extends TestCase
         $this->assertSame(['encrypt' => 2], $services['secondary']['operations'], 'the second member wraps everything and is never asked to read while the first one answers.');
     }
 
-    public function testTheDataCollectorGoesWithTheProfiler()
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testTheDataCollectorGoesWithTheProfiler(bool $debug)
     {
-        $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => true]));
+        $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => $debug]));
         new KeyManagementBundle()->getContainerExtension()->load([['clients' => ['app' => 'sodium://?keys[app]=AAAA']]], $container);
         $this->assertTrue($container->hasDefinition('key_management.data_collector'));
         $this->assertSame([['service' => 'profiler']], $container->getDefinition('key_management.data_collector')->getTag('container.remove_if_missing'));
@@ -446,7 +450,7 @@ class TestKeyManagementKernel extends AbstractKernel
             $config = ['clients' => 'service://app.kms'];
         }
 
-        if ($this->isDebug()) {
+        if ($this->isDebug() || 'profiler' === $this->environment) {
             // the data collector is kept only when a profiler collects it
             $services->set('profiler', \stdClass::class);
             $services->alias('test.data_collector', 'key_management.data_collector')->public();

@@ -196,10 +196,7 @@ class ValidationBundle extends AbstractBundle
         }
 
         $configurator->import('Resources/config/validator.php');
-
-        if ($container->getParameter('kernel.debug')) {
-            $configurator->import('Resources/config/validator_debug.php');
-        }
+        $configurator->import('Resources/config/validator_debug.php');
 
         $validatorBuilder = $container->getDefinition('validator.builder');
 

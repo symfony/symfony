@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -62,13 +63,15 @@ class RemoveMissingDependenciesPassTest extends TestCase
         $this->assertContains('traceable', array_column($container->getParameter('messenger.bus.default.middleware'), 'id'));
     }
 
-    public function testTheDataCollectorIsRemovedWithoutAProfiler()
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testTheDataCollectorIsRemovedWithoutAProfiler(bool $debug)
     {
-        $this->assertFalse($this->process(debug: true)->hasDefinition('data_collector.messenger'));
+        $this->assertFalse($this->process(debug: $debug)->hasDefinition('data_collector.messenger'));
 
         $container = $this->process(static function (ContainerBuilder $container) {
             $container->register('profiler', \stdClass::class);
-        }, debug: true);
+        }, debug: $debug);
 
         $this->assertTrue($container->hasDefinition('data_collector.messenger'));
     }

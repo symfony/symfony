@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Workflow\DataCollector\WorkflowDataCollector;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\StateMachine;
 use Symfony\Component\Workflow\Tests\Fixtures\AttributeWorkflow\Task;
@@ -93,6 +94,14 @@ class WorkflowBundleTest extends TestCase
         $this->assertStringContainsString('digraph workflow', $command->getDisplay());
         $this->assertSame(2, substr_count($command->getDisplay(), 'label="finish"'));
     }
+
+    public function testTheDataCollectorIsRegisteredWhenTheProfilerIsEnabled()
+    {
+        $kernel = new TestWorkflowKernel('profiler', false, $this->varDir);
+        $kernel->boot();
+
+        $this->assertInstanceOf(WorkflowDataCollector::class, $kernel->getContainer()->get('test.data_collector'));
+    }
 }
 
 class TestWorkflowKernel extends AbstractKernel
@@ -133,5 +142,10 @@ class TestWorkflowKernel extends AbstractKernel
         $services->alias('test.workflow.registry', 'workflow.registry')->public();
         $services->alias('test.workflow.task_consumer', TaskConsumer::class)->public();
         $services->alias('test.workflow.dump_command', 'console.command.workflow_dump')->public();
+
+        if ('profiler' === $this->environment) {
+            $services->set('profiler', \stdClass::class);
+            $services->alias('test.data_collector', 'data_collector.workflow')->public();
+        }
     }
 }

@@ -170,10 +170,8 @@ class TranslationBundle extends AbstractBundle
             $configurator->import('Resources/config/console.php');
         }
 
-        if ($container->getParameter('kernel.debug')) {
-            $configurator->import('Resources/config/translation_debug.php');
-            $container->getDefinition('translator.data_collector')->setDecoratedService('translator');
-        }
+        $configurator->import('Resources/config/translation_debug.php');
+        $container->getDefinition('translator.data_collector')->setDecoratedService('translator');
 
         // don't use ContainerBuilder::willBeAvailable() as these are not needed in production
         if (interface_exists(Parser::class)) {

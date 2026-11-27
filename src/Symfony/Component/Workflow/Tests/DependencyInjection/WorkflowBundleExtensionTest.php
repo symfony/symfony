@@ -12,9 +12,11 @@
 namespace Symfony\Component\Workflow\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -438,12 +440,19 @@ class WorkflowBundleExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('console.command.workflow_dump'));
     }
 
-    public function testDebugServicesAreLoadedInDebugMode()
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testDataCollectorFollowsTheProfiler(bool $debug)
     {
-        $container = $this->createContainerFromFile('workflows_enabled');
+        $container = $this->createContainerFromFile('workflows_enabled', compile: false, debug: $debug);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new RemoveMissingDependenciesPass()]);
+        $container->compile();
         $this->assertFalse($container->hasDefinition('data_collector.workflow'));
 
-        $container = $this->createContainerFromFile('workflows_enabled', debug: true);
+        $container = $this->createContainerFromFile('workflows_enabled', compile: false, debug: $debug);
+        $container->register('profiler', \stdClass::class);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new RemoveMissingDependenciesPass()]);
+        $container->compile();
         $this->assertTrue($container->hasDefinition('data_collector.workflow'));
     }
 

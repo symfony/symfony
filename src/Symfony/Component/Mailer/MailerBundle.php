@@ -325,10 +325,7 @@ class MailerBundle extends AbstractBundle
 
         $configurator->import('Resources/config/mailer.php');
         $configurator->import('Resources/config/mailer_transports.php');
-
-        if ($container->getParameter('kernel.debug')) {
-            $configurator->import('Resources/config/mailer_debug.php');
-        }
+        $configurator->import('Resources/config/mailer_debug.php');
 
         if (!class_exists(Application::class)) {
             $container->removeDefinition('console.command.mailer_test');

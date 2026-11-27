@@ -35,6 +35,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
@@ -46,6 +47,7 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
@@ -1450,6 +1452,313 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame([], $obj->values);
     }
 
+    public function testDenormalizePropertyPathTypesExistingObject()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-nested-mapping.yaml'));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer(
+            [new DateTimeNormalizer(), new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor)],
+            [new JsonEncoder()],
+        );
+
+        $existingCompany = new PropertyPathCompany();
+        $existingCompany->note = 'keep';
+        $person = new PropertyPathPerson();
+        $person->company = $existingCompany;
+
+        $json = '{"name":"Jane Doe","company_name":"Acme Inc.","company_founded_at":"2001-02-03T00:00:00+00:00"}';
+        $result = $serializer->deserialize($json, PropertyPathPerson::class, 'json', [
+            'groups' => 'api',
+            'object_to_populate' => $person,
+        ]);
+
+        $this->assertSame($person, $result);
+        $this->assertSame($existingCompany, $result->company);
+        $this->assertSame('Jane Doe', $result->name);
+        $this->assertSame('Acme Inc.', $result->company->name);
+        $this->assertEquals(new \DateTimeImmutable('2001-02-03T00:00:00+00:00'), $result->company->foundedAt);
+        $this->assertSame('keep', $result->company->note);
+    }
+
+    public function testDenormalizePropertyPathRoundTripsMissingNestedObject()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-nested-mapping.yaml'));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer(
+            [new DateTimeNormalizer(), new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor)],
+            [new JsonEncoder()],
+        );
+
+        $original = new PropertyPathPerson();
+        $original->name = 'Jane Doe';
+        $original->company = new PropertyPathCompany();
+        $original->company->name = 'Acme Inc.';
+        $original->company->foundedAt = new \DateTimeImmutable('2001-02-03T00:00:00+00:00');
+        $original->company->address = new PropertyPathAddress();
+        $original->company->address->city = 'Paris';
+        $original->company->address->zip = '75001';
+
+        $json = $serializer->serialize($original, 'json', ['groups' => 'api']);
+        $denormalized = $serializer->deserialize($json, PropertyPathPerson::class, 'json', ['groups' => 'api']);
+
+        $this->assertEquals($original, $denormalized);
+    }
+
+    public function testDenormalizeNullSafePropertyPathCreatesObjectAndRoundTripsNull()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-nested-mapping.yaml'));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer(
+            [new DateTimeNormalizer(), new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor)],
+            [new JsonEncoder()],
+        );
+
+        $populated = $serializer->deserialize(
+            '{"name":"Jane Doe","company_name":"Acme Inc.","company_founded_at":"2001-02-03T00:00:00+00:00","company_city":null}',
+            PropertyPathNullSafePerson::class,
+            'json',
+            ['groups' => 'api'],
+        );
+
+        $this->assertSame('Jane Doe', $populated->name);
+        $this->assertInstanceOf(PropertyPathCompany::class, $populated->company);
+        $this->assertSame('Acme Inc.', $populated->company->name);
+        $this->assertEquals(new \DateTimeImmutable('2001-02-03T00:00:00+00:00'), $populated->company->foundedAt);
+        $this->assertNull($populated->company->address);
+
+        // Serializing a Person whose company is null outputs null for nullsafe paths and must round-trip back to null
+        $empty = new PropertyPathNullSafePerson();
+        $empty->name = 'Jane Doe';
+        $jsonWithNulls = $serializer->serialize($empty, 'json', ['groups' => 'api']);
+        $roundTripped = $serializer->deserialize($jsonWithNulls, PropertyPathNullSafePerson::class, 'json', ['groups' => 'api']);
+
+        $this->assertSame('Jane Doe', $roundTripped->name);
+        $this->assertNull($roundTripped->company);
+    }
+
+    public function testDenormalizePropertyPathWithConstructorReadonlyAndPerPathContext()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-nested-mapping.yaml'));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer(
+            [new DateTimeNormalizer(), new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor)],
+            [new JsonEncoder()],
+        );
+
+        $person = $serializer->deserialize(
+            '{"name":"Jane Doe","company_name":"acme inc.","company_founded_at":"03/02/2001"}',
+            PropertyPathReadonlyPerson::class,
+            'json',
+            [
+                'groups' => 'api',
+                AbstractNormalizer::CALLBACKS => [
+                    'company?.name' => static fn (string $v): string => strtoupper($v),
+                ],
+            ],
+        );
+
+        $this->assertSame('Jane Doe', $person->name);
+        $this->assertInstanceOf(PropertyPathReadonlyCompany::class, $person->company);
+        $this->assertSame('ACME INC.', $person->company->name);
+        $this->assertSame('2001-02-03', $person->company->foundedAt?->format('Y-m-d'));
+
+        $withoutCompany = $serializer->deserialize(
+            '{"name":"Jane Doe","company_name":null,"company_founded_at":null}',
+            PropertyPathReadonlyPerson::class,
+            'json',
+            ['groups' => 'api'],
+        );
+
+        $this->assertSame('Jane Doe', $withoutCompany->name);
+        $this->assertNull($withoutCompany->company);
+    }
+
+    public function testDenormalizeDeepPropertyPathPreservesExistingIntermediateObject()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-nested-mapping.yaml'));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer(
+            [new DateTimeNormalizer(), new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor)],
+            [new JsonEncoder()],
+        );
+
+        $existingCompany = new PropertyPathCompany();
+        $existingCompany->name = 'Existing Co.';
+        $existingCompany->note = 'keep';
+        $person = new PropertyPathPerson();
+        $person->company = $existingCompany;
+
+        $result = $serializer->deserialize(
+            '{"company_city":"Lyon","company_zip":"69001"}',
+            PropertyPathPerson::class,
+            'json',
+            ['groups' => 'api', 'object_to_populate' => $person],
+        );
+
+        $this->assertSame($existingCompany, $result->company);
+        $this->assertSame('Existing Co.', $result->company->name);
+        $this->assertSame('keep', $result->company->note);
+        $this->assertInstanceOf(PropertyPathAddress::class, $result->company->address);
+        $this->assertSame('Lyon', $result->company->address->city);
+        $this->assertSame('69001', $result->company->address->zip);
+    }
+
+    public function testDenormalizePropertyPathWithSnakeCaseConverterAndStrictExtraAttributes()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-nested-mapping.yaml'));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+        $serializer = new Serializer(
+            [new DateTimeNormalizer(), new ObjectNormalizer($classMetadataFactory, $nameConverter, null, $extractor)],
+            [new JsonEncoder()],
+        );
+
+        $person = $serializer->deserialize(
+            '{"name":"Jane Doe","company_name":"Acme Inc.","company_founded_at":"2001-02-03T00:00:00+00:00"}',
+            PropertyPathPerson::class,
+            'json',
+            ['groups' => 'api', AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false],
+        );
+
+        $this->assertSame('Acme Inc.', $person->company?->name);
+        $this->assertEquals(new \DateTimeImmutable('2001-02-03T00:00:00+00:00'), $person->company?->foundedAt);
+
+        $this->expectException(ExtraAttributesException::class);
+        $serializer->deserialize(
+            '{"name":"Jane Doe","company":{"name":"Injected"}}',
+            PropertyPathPerson::class,
+            'json',
+            ['groups' => 'api', AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false],
+        );
+    }
+
+    public function testDenormalizePropertyPathCollectsErrorsAndSkipsInvalidAttributesForInvalidLeafTypes()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-nested-mapping.yaml'));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer(
+            [new DateTimeNormalizer(), new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor)],
+            [new JsonEncoder()],
+        );
+
+        // When company is null
+        try {
+            $serializer->deserialize(
+                '{"name":"Jane Doe","company_name":123,"company_founded_at":"not-a-date"}',
+                PropertyPathPerson::class,
+                'json',
+                ['groups' => 'api', DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true],
+            );
+            $this->fail('Expected PartialDenormalizationException.');
+        } catch (PartialDenormalizationException $e) {
+            $paths = array_map(static fn (NotNormalizableValueException $ex) => $ex->getPath(), $e->getNotNormalizableValueErrors());
+            $this->assertSame(['company.name', 'company.foundedAt'], $paths);
+        }
+
+        // When company already exists
+        $person = new PropertyPathPerson();
+        $person->company = new PropertyPathCompany();
+        try {
+            $serializer->deserialize(
+                '{"company_name":123,"company_founded_at":"not-a-date"}',
+                PropertyPathPerson::class,
+                'json',
+                ['groups' => 'api', 'object_to_populate' => $person, DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true],
+            );
+            $this->fail('Expected PartialDenormalizationException.');
+        } catch (PartialDenormalizationException $e) {
+            $paths = array_map(static fn (NotNormalizableValueException $ex) => $ex->getPath(), $e->getNotNormalizableValueErrors());
+            $this->assertSame(['company.name', 'company.foundedAt'], $paths);
+        }
+
+        // SKIP_INVALID_ATTRIBUTES skips bad leaves while populating valid ones
+        $skipped = $serializer->deserialize(
+            '{"name":"Jane Doe","company_name":"Acme Inc.","company_founded_at":"not-a-date"}',
+            PropertyPathPerson::class,
+            'json',
+            ['groups' => 'api', AbstractObjectNormalizer::SKIP_INVALID_ATTRIBUTES => true],
+        );
+        $this->assertSame('Jane Doe', $skipped->name);
+        $this->assertSame('Acme Inc.', $skipped->company?->name);
+        $this->assertNull($skipped->company?->foundedAt);
+    }
+
+    public function testDenormalizePropertyPathWithTypedArrayAndObjectArrayElement()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-nested-mapping.yaml'));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer(
+            [new DateTimeNormalizer(), new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor)],
+            [new JsonEncoder()],
+        );
+
+        $result = $serializer->deserialize(
+            '{"start_date":"2020-05-06T00:00:00+00:00","primary_company_name":"Acme Inc.","primary_company_founded_at":"2001-02-03T00:00:00+00:00"}',
+            PropertyPathTypedCollections::class,
+            'json',
+            ['groups' => 'api'],
+        );
+
+        $this->assertEquals(new \DateTimeImmutable('2020-05-06T00:00:00+00:00'), $result->dates['start']);
+        $this->assertInstanceOf(PropertyPathCompany::class, $result->companies['primary']);
+        $this->assertSame('Acme Inc.', $result->companies['primary']->name);
+        $this->assertEquals(new \DateTimeImmutable('2001-02-03T00:00:00+00:00'), $result->companies['primary']->foundedAt);
+
+        $existingCompany = $result->companies['primary'];
+        $existingCompany->note = 'keep';
+        $updated = $serializer->deserialize(
+            '{"primary_company_name":"Updated Inc.","primary_company_founded_at":"2022-07-08T00:00:00+00:00"}',
+            PropertyPathTypedCollections::class,
+            'json',
+            ['groups' => 'api', 'object_to_populate' => $result],
+        );
+
+        $this->assertSame($existingCompany, $updated->companies['primary']);
+        $this->assertSame('Updated Inc.', $updated->companies['primary']->name);
+        $this->assertEquals(new \DateTimeImmutable('2022-07-08T00:00:00+00:00'), $updated->companies['primary']->foundedAt);
+        $this->assertSame('keep', $updated->companies['primary']->note);
+    }
+
+    public function testDenormalizePropertyPathIgnoresNestedClassGroupsWithLoaderChainAndUninitializedProperty()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new LoaderChain([
+            new YamlFileLoader(__DIR__.'/../Fixtures/property-path-nested-mapping.yaml'),
+            new AttributeLoader(),
+        ]));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer(
+            [new DateTimeNormalizer(), new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor)],
+            [new JsonEncoder()],
+        );
+
+        // PropertyPathCompany::$name only has #[Groups(['internal'])], yet Person's 'api' path still populates it
+        $person = $serializer->deserialize(
+            '{"company_name":"Acme Inc.","company_founded_at":"2001-02-03T00:00:00+00:00"}',
+            PropertyPathUninitializedPerson::class,
+            'json',
+            ['groups' => 'api', AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false],
+        );
+
+        $this->assertInstanceOf(PropertyPathCompany::class, $person->company);
+        $this->assertSame('Acme Inc.', $person->company->name);
+        $this->assertEquals(new \DateTimeImmutable('2001-02-03T00:00:00+00:00'), $person->company->foundedAt);
+
+        $defaultGroupsSerializer = new Serializer(
+            [new DateTimeNormalizer(), new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor, null, null, [AbstractNormalizer::GROUPS => ['api']])],
+            [new JsonEncoder()],
+        );
+        $personFromDefaultGroups = $defaultGroupsSerializer->deserialize(
+            '{"company_name":"Acme Inc.","company_founded_at":"2001-02-03T00:00:00+00:00"}',
+            PropertyPathUninitializedPerson::class,
+            'json',
+            [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false],
+        );
+
+        $this->assertInstanceOf(PropertyPathCompany::class, $personFromDefaultGroups->company);
+        $this->assertSame('Acme Inc.', $personFromDefaultGroups->company->name);
+        $this->assertEquals(new \DateTimeImmutable('2001-02-03T00:00:00+00:00'), $personFromDefaultGroups->company->foundedAt);
+    }
+
     public function testObjectNormalizerWithAttributeLoaderAndObjectHasStaticProperty()
     {
         $class = new class {
@@ -2698,6 +3007,65 @@ class ObjectWithNullableInner
 class ObjectWithUninitializedInner
 {
     public ObjectInner $inner;
+}
+
+class PropertyPathAddress
+{
+    public string $city = '';
+    public string $zip = '';
+}
+
+class PropertyPathCompany
+{
+    #[Groups(['internal'])]
+    public string $name = '';
+    public ?\DateTimeImmutable $foundedAt = null;
+    public ?PropertyPathAddress $address = null;
+    public string $note = '';
+}
+
+class PropertyPathPerson
+{
+    public string $name = '';
+    public ?PropertyPathCompany $company = null;
+}
+
+class PropertyPathNullSafePerson
+{
+    public string $name = '';
+    public ?PropertyPathCompany $company = null;
+}
+
+class PropertyPathReadonlyCompany
+{
+    public function __construct(
+        public readonly string $name,
+        public readonly ?\DateTimeImmutable $foundedAt = null,
+    ) {
+    }
+}
+
+class PropertyPathReadonlyPerson
+{
+    public function __construct(
+        public readonly string $name,
+        public readonly ?PropertyPathReadonlyCompany $company = null,
+    ) {
+    }
+}
+
+class PropertyPathTypedCollections
+{
+    /** @var array<string, \DateTimeImmutable> */
+    public array $dates = [];
+
+    /** @var array<string, PropertyPathCompany> */
+    public array $companies = [];
+}
+
+class PropertyPathUninitializedPerson
+{
+    public PropertyPathCompany $company;
 }
 
 class Order

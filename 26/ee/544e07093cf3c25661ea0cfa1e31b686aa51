@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-27T14:34:23Z
+
+Thanks @jack-worman, the per-file approach is the right one. I pushed a small follow-up. The address of a user ID is now read like gpg's `mailbox_from_userid()` does, between the first `<` and the next `>`. Before, a key with the user ID `X <c@example.com> (work)` was rejected, while `gpg --recipient '<c@example.com>'` selects it. I also added a test for revoked user IDs.

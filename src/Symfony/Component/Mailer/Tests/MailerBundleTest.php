@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Mailer\Bridge\Mailgun\Webhook\MailgunRequestParser;
+use Symfony\Component\Mailer\Bridge\Sendora\Webhook\SendoraRequestParser;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\EventListener\InMemoryPgpPublicKeyRepository;
 use Symfony\Component\Mailer\EventListener\InMemorySmimeCertificateRepository;
@@ -298,12 +299,20 @@ class MailerBundleTest extends TestCase
         $this->assertTrue($container->getAlias(MailgunRequestParser::class)->isDeprecated());
     }
 
+    public function testTheWebhookRequestParsersAddedSince82HaveNoAliasNamedAfterTheirClass()
+    {
+        $container = $this->load([]);
+
+        $this->assertTrue($container->hasDefinition('mailer.webhook.request_parser.sendora'));
+        $this->assertFalse($container->hasAlias(SendoraRequestParser::class));
+    }
+
     public function testTheWebhookRequestParsersAreGivenTheClock()
     {
         $container = $this->load([]);
         $clock = new Reference('clock', ContainerInterface::NULL_ON_INVALID_REFERENCE);
 
-        foreach (['ahasend' => 1, 'mailgun' => 1, 'mailomat' => 2, 'resend' => 1, 'scaleway' => '$clock', 'sendgrid' => 1, 'sweego' => 1] as $provider => $argument) {
+        foreach (['ahasend' => 1, 'mailgun' => 1, 'mailomat' => 2, 'resend' => 1, 'scaleway' => '$clock', 'sendgrid' => 1, 'sendora' => 1, 'sweego' => 1] as $provider => $argument) {
             $this->assertEquals($clock, $container->getDefinition('mailer.webhook.request_parser.'.$provider)->getArgument($argument), $provider);
         }
     }

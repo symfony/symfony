@@ -1,0 +1,18 @@
+{
+    "id": "9e5a3b4c-6d7f-4a8b-8c9d-1e2f3a4b5c6d",
+    "attempt": 1,
+    "messageId": "5f432ffd-c005-499b-aa3a-5b8a088ea20e",
+    "recipient": "anna@example.com",
+    "occurredAt": "2026-09-15T12:00:03.000Z",
+    "serverId": "0f8a1b2c-3d4e-4f5a-8b6c-7d8e9f0a1b2c",
+    "streamId": "3d1a2b4c-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+    "broadcastId": null,
+    "tag": null,
+    "metadata": {},
+    "test": false,
+    "event": "deferred",
+    "details": {
+        "code": 451,
+        "response": "4.7.1 Greylisted, try again later"
+    }
+}

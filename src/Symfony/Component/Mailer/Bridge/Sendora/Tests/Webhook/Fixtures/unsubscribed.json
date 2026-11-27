@@ -1,0 +1,17 @@
+{
+    "id": "b07c5d6e-8f9b-4c0d-8e1f-3a4b5c6d7e8f",
+    "attempt": 1,
+    "messageId": "5f432ffd-c005-499b-aa3a-5b8a088ea20e",
+    "recipient": "anna@example.com",
+    "occurredAt": "2026-09-15T12:00:03.000Z",
+    "serverId": "0f8a1b2c-3d4e-4f5a-8b6c-7d8e9f0a1b2c",
+    "streamId": "3d1a2b4c-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+    "broadcastId": "2c4e6a8b-0d1f-4a3b-8c5d-7e9f1a3b5c7d",
+    "tag": "newsletter",
+    "metadata": {},
+    "test": false,
+    "event": "unsubscribed",
+    "details": {
+        "source": "one_click"
+    }
+}

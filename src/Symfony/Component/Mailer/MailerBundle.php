@@ -392,6 +392,7 @@ class MailerBundle extends AbstractBundle
             Bridge\Resend\Transport\ResendTransportFactory::class => ['symfony/resend-mailer', 'mailer.transport_factory.resend'],
             Bridge\Scaleway\Transport\ScalewayTransportFactory::class => ['symfony/scaleway-mailer', 'mailer.transport_factory.scaleway'],
             Bridge\Sendgrid\Transport\SendgridTransportFactory::class => ['symfony/sendgrid-mailer', 'mailer.transport_factory.sendgrid'],
+            Bridge\Sendora\Transport\SendoraTransportFactory::class => ['symfony/sendora-mailer', 'mailer.transport_factory.sendora'],
             Bridge\Amazon\Transport\SesTransportFactory::class => ['symfony/amazon-mailer', 'mailer.transport_factory.amazon'],
             Bridge\Sweego\Transport\SweegoTransportFactory::class => ['symfony/sweego-mailer', 'mailer.transport_factory.sweego'],
             Bridge\TurboSmtp\Transport\TurboSmtpTransportFactory::class => ['symfony/turbo-smtp-mailer', 'mailer.transport_factory.turbosmtp'],
@@ -527,13 +528,17 @@ class MailerBundle extends AbstractBundle
                 Bridge\Resend\Webhook\ResendRequestParser::class => ['symfony/resend-mailer', 'mailer.webhook.request_parser.resend'],
                 Bridge\Scaleway\Webhook\ScalewayRequestParser::class => ['symfony/scaleway-mailer', 'mailer.webhook.request_parser.scaleway'],
                 Bridge\Sendgrid\Webhook\SendgridRequestParser::class => ['symfony/sendgrid-mailer', 'mailer.webhook.request_parser.sendgrid'],
+                Bridge\Sendora\Webhook\SendoraRequestParser::class => ['symfony/sendora-mailer', 'mailer.webhook.request_parser.sendora'],
                 Bridge\Sweego\Webhook\SweegoRequestParser::class => ['symfony/sweego-mailer', 'mailer.webhook.request_parser.sweego'],
                 Bridge\TurboSmtp\Webhook\TurboSmtpRequestParser::class => ['symfony/turbo-smtp-mailer', 'mailer.webhook.request_parser.turbosmtp'],
             ];
 
             foreach ($webhookRequestParsers as $class => [$package, $service]) {
                 $target = 'mailer.'.substr(strrchr($service, '.'), 1);
-                $container->getAlias($class)->setDeprecated('symfony/mailer', '8.2', 'The "%alias_id%" alias is deprecated, use #[Target(\''.$target.'\')] with "'.RequestParserInterface::class.'" instead.');
+                // the parsers added since 8.2 have no such alias
+                if ($container->hasAlias($class)) {
+                    $container->getAlias($class)->setDeprecated('symfony/mailer', '8.2', 'The "%alias_id%" alias is deprecated, use #[Target(\''.$target.'\')] with "'.RequestParserInterface::class.'" instead.');
+                }
 
                 if (!ContainerBuilder::willBeAvailable($package, $class, ['symfony/mailer'])) {
                     $container->removeDefinition($service);

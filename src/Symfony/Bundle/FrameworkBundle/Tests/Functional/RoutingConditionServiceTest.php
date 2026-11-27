@@ -12,6 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 
 class RoutingConditionServiceTest extends AbstractWebTestCase
 {
@@ -22,6 +25,19 @@ class RoutingConditionServiceTest extends AbstractWebTestCase
 
         $client->request('GET', $path);
         $this->assertSame($code, $client->getResponse()->getStatusCode());
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[RunInSeparateProcess]
+    public function testDeprecatedAttributeStillTagsTheService()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: The "Symfony\Bundle\FrameworkBundle\Routing\Attribute\AsRoutingConditionService" class is deprecated, use "Symfony\Component\Routing\Attribute\AsRoutingConditionService" instead.');
+
+        $client = static::createClient(['test_case' => 'RoutingConditionService', 'root_config' => 'config_legacy.yml', 'environment' => 'legacy']);
+
+        $client->request('GET', '/allowed/legacy-auto-configured');
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
     }
 
     public function testContextParametersAreResetBetweenRequests()

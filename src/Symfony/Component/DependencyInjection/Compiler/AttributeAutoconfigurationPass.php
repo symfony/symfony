@@ -157,7 +157,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
     }
 
     /**
-     * Find the first configurator for the given attribute name, looking up the class hierarchy.
+     * Find the first configurator for the given attribute name, resolving class aliases and looking up the class hierarchy.
      */
     private function findConfigurators(array &$configurators, string $attributeName): array
     {
@@ -165,7 +165,15 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
             return $configurators[$attributeName];
         }
 
-        if (class_exists($attributeName) && $parent = get_parent_class($attributeName)) {
+        if (!class_exists($attributeName)) {
+            return $configurators[$attributeName] = [];
+        }
+
+        if ($attributeName !== $className = (new \ReflectionClass($attributeName))->name) {
+            return $configurators[$attributeName] = $this->findConfigurators($configurators, $className);
+        }
+
+        if ($parent = get_parent_class($attributeName)) {
             return $configurators[$attributeName] = $this->findConfigurators($configurators, $parent);
         }
 

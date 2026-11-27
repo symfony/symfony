@@ -44,6 +44,15 @@ class DefaultController
     }
 
     #[Route(
+        path: '/allowed/legacy-auto-configured',
+        condition: 'service("legacy_auto_configured").alwaysTrue()',
+    )]
+    public function allowedByLegacyAutoConfigured(): Response
+    {
+        return new Response();
+    }
+
+    #[Route(
         path: '/denied/manually-tagged',
         condition: 'service("manually_tagged").giveMeFalse()',
     )]

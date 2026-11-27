@@ -173,7 +173,7 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
             $constraint instanceof Choice => $this->applyChoice($constraint, $schema, $values, $minCount, $maxCount),
             $constraint instanceof Unique => [...$schema, 'uniqueItems' => true],
             $constraint instanceof Email => [...$schema, 'format' => 'email'],
-            $constraint instanceof Url => [...$schema, 'format' => 'uri'],
+            $constraint instanceof Url => [...$schema, 'format' => $constraint->relativeProtocol ? 'uri-reference' : 'uri'],
             $constraint instanceof Uuid => [...$schema, 'format' => 'uuid'],
             $constraint instanceof Ulid => [...$schema, 'format' => 'ulid'],
             $constraint instanceof Hostname => [...$schema, 'format' => 'hostname'],

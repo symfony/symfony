@@ -265,8 +265,12 @@ final class Path
         }
 
         if (null !== $extension) {
-            // remove extension and trailing dot
-            return rtrim(basename($path, $extension), '.');
+            $filename = basename($path);
+            if (str_starts_with($extension, '.') || str_ends_with($filename, '.'.$extension)) {
+                $filename = basename($filename, $extension);
+            }
+
+            return rtrim($filename, '.');
         }
 
         return pathinfo($path, \PATHINFO_FILENAME);

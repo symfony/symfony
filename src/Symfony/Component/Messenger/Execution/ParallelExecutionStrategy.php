@@ -101,10 +101,21 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
     {
         $this->removeFailedChannels($onHandled);
 
+        $affinityKey = $this->getAffinityKey($envelope);
+        $pinnedChannelId = $this->batchingKeyAffinities[$affinityKey] ?? null;
+
+        if (!$this->releasingHeldRequests && null !== $pinnedChannelId && isset($this->busyChannels[$pinnedChannelId])) {
+            // a busy worker doesn't read its channel, so the messages of its batching keys wait here until the worker is free
+            // sending them anyway would block this process once the socket buffer is full
+            $this->heldRequests[$affinityKey][] = [$envelope, $transportName, $onHandled];
+            $this->drainReadyResponses($onHandled);
+
+            return;
+        }
+
         $settlementFailure = null;
 
         try {
-            $affinityKey = $this->getAffinityKey($envelope);
             $keyMode = $this->keyModes[$affinityKey] ?? null;
 
             if (!$this->releasingHeldRequests && null === $keyMode && isset($this->pendingProbeRequests[$affinityKey])) {
@@ -214,7 +225,7 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         $handled = $this->drainReadyResponses($onHandled);
 
         if (true === $force) {
-            // a worker that stops must not strand the messages held by a pending probe
+            // a worker that stops must not strand the held messages
             $handled = $this->releaseAllHeldRequests() || $handled;
         }
 
@@ -233,18 +244,20 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
                 continue;
             }
 
-            try {
-                $channel->send(new FlushBatchHandlersMessage($force));
-                $this->unansweredFlushes[$channelId] = 1 + ($this->unansweredFlushes[$channelId] ?? 0);
-            } catch (\Throwable $e) {
-                $handled = $this->removeChannel($channelId, $onHandled, $e) || $handled;
-            }
+            $handled = $this->sendFlush($channelId, $channel, $force, $onHandled) || $handled;
         }
 
         $handled = $this->drainReadyResponses($onHandled) || $handled;
 
         if (true === $force) {
             while ($this->pendingRequests) {
+                // a message that reached a worker after its forced flush needs another flush, for example a message that a stopped worker did not read
+                foreach ($this->pendingRequests as $channelId => $requests) {
+                    if (!isset($this->unansweredFlushes[$channelId]) && isset($this->channels[$channelId])) {
+                        $handled = $this->sendFlush($channelId, $this->channels[$channelId], true, $onHandled) || $handled;
+                    }
+                }
+
                 $handled = $this->wait($onHandled) || $handled;
             }
         }
@@ -284,8 +297,7 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
     {
         $channelId = $this->batchingKeyAffinities[$affinityKey] ?? null;
 
-        // a pinned key goes back to its channel even when that channel is busy, which is what
-        // serializes batching keys; the pin is dropped only when the channel dies
+        // a pinned key goes back to its channel, which is what serializes batching keys; the pin is dropped only when the channel dies
         if (isset($channelId, $this->channels[$channelId])) {
             return $this->channels[$channelId];
         }
@@ -300,15 +312,24 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
             return $channel;
         }
 
-        /** @var int $channelId At least one channel exists at this point */
-        $channelId = array_key_first($this->channels);
+        $freeChannelId = null;
 
         foreach ($this->channels as $id => $channel) {
-            if (!isset($this->busyChannels[$id])) {
-                $channelId = $id;
+            if (isset($this->busyChannels[$id])) {
+                continue;
+            }
+
+            // a worker that didn't answer its last flush may still run a batch, so the other free workers come first
+            if (!isset($this->unansweredFlushes[$id])) {
+                $freeChannelId = $id;
                 break;
             }
+
+            $freeChannelId ??= $id;
         }
+
+        /** @var int $channelId At least one channel exists at this point */
+        $channelId = $freeChannelId ?? array_key_first($this->channels);
 
         if (self::KEY_MODE_BATCHING === $keyMode) {
             $this->batchingKeyAffinities[$affinityKey] = $channelId;
@@ -436,6 +457,8 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
                 $this->releaseHeldRequests($pendingRequest->affinityKey);
             }
 
+            $this->releaseWaitingRequests($channelId);
+
             return true;
         }
 
@@ -478,6 +501,8 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
             $this->releaseHeldRequests($pendingRequest->affinityKey);
         }
 
+        $this->releaseWaitingRequests($channelId);
+
         return true;
     }
 
@@ -503,7 +528,7 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
     {
         $handled = false;
         $previous = $this->taskFailures[$channelId] ?? $previous;
-        $releasedProbeKeys = [];
+        $releasedKeys = [];
 
         unset($this->workers[$channelId], $this->channels[$channelId], $this->busyChannels[$channelId], $this->unansweredFlushes[$channelId], $this->receiveFutures[$channelId], $this->taskFailures[$channelId]);
         $channelPendingRequests = $this->pendingRequests[$channelId] ?? [];
@@ -512,13 +537,14 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         foreach ($this->batchingKeyAffinities as $key => $affinityChannelId) {
             if ($channelId === $affinityChannelId) {
                 unset($this->batchingKeyAffinities[$key]);
+                $releasedKeys[] = $key;
             }
         }
 
         foreach ($channelPendingRequests as $requestId => $pendingRequest) {
             if ($pendingRequest->isProbe && ($this->pendingProbeRequests[$pendingRequest->affinityKey] ?? null) === $requestId) {
                 unset($this->pendingProbeRequests[$pendingRequest->affinityKey]);
-                $releasedProbeKeys[] = $pendingRequest->affinityKey;
+                $releasedKeys[] = $pendingRequest->affinityKey;
             }
 
             $this->completeRequest($pendingRequest, $onHandled, $pendingRequest->envelope, new \RuntimeException('The parallel worker stopped before returning a result.', 0, $previous));
@@ -526,7 +552,8 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         }
 
         // the messages held by a settled probe get another chance: the next message of their key probes again
-        foreach ($releasedProbeKeys as $affinityKey) {
+        // the messages that waited for this worker go to another one
+        foreach ($releasedKeys as $affinityKey) {
             $this->releaseHeldRequests($affinityKey);
         }
 
@@ -540,6 +567,16 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
     {
         $channelPendingRequests = $this->pendingRequests[$channelId] ?? [];
         unset($this->pendingRequests[$channelId]);
+        $waitingRequests = [];
+
+        // the messages that wait for this worker go after the ones that it did not read
+        foreach ($this->batchingKeyAffinities as $affinityKey => $affinityChannelId) {
+            if ($channelId === $affinityChannelId && isset($this->heldRequests[$affinityKey])) {
+                array_push($waitingRequests, ...$this->heldRequests[$affinityKey]);
+                unset($this->heldRequests[$affinityKey]);
+            }
+        }
+
         $this->removeChannel($channelId, $onHandled);
 
         foreach ($channelPendingRequests as $requestId => $pendingRequest) {
@@ -549,6 +586,10 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
             }
 
             $this->execute($pendingRequest->envelope, $pendingRequest->transportName, $this->completionCallbacks[$pendingRequest] ?? $onHandled);
+        }
+
+        foreach ($waitingRequests as [$envelope, $transportName, $callback]) {
+            $this->execute($envelope, $transportName, $callback);
         }
     }
 
@@ -578,6 +619,22 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
     }
 
     /**
+     * Sends the messages of the batching keys of a worker once that worker is free.
+     */
+    private function releaseWaitingRequests(int $channelId): void
+    {
+        foreach ($this->heldRequests as $affinityKey => $requests) {
+            if (isset($this->busyChannels[$channelId])) {
+                return;
+            }
+
+            if ($channelId === ($this->batchingKeyAffinities[$affinityKey] ?? null)) {
+                $this->releaseHeldRequests($affinityKey);
+            }
+        }
+    }
+
+    /**
      * @phpstan-impure
      */
     private function releaseAllHeldRequests(): bool
@@ -603,6 +660,23 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         }
 
         return $handled;
+    }
+
+    /**
+     * Sends a flush to a worker, and removes that worker when the send fails.
+     *
+     * @phpstan-impure
+     */
+    private function sendFlush(int $channelId, Channel $channel, bool|float $force, callable $onHandled): bool
+    {
+        try {
+            $channel->send(new FlushBatchHandlersMessage($force));
+            $this->unansweredFlushes[$channelId] = 1 + ($this->unansweredFlushes[$channelId] ?? 0);
+        } catch (\Throwable $e) {
+            return $this->removeChannel($channelId, $onHandled, $e);
+        }
+
+        return false;
     }
 
     /**

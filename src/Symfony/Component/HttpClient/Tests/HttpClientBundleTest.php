@@ -22,7 +22,6 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
-use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -144,7 +143,6 @@ class HttpClientBundleTest extends TestCase
         $container = $this->createContainer();
         new HttpClientBundle()->getContainerExtension()->load([[]], $container);
 
-        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
         $this->assertFalse($container->hasDefinition('cache.http_client.pool'), 'dropped without "cache.app"');
         $this->assertFalse($container->hasDefinition('cache.http_client'), 'and the tag-aware adapter goes with the pool');
@@ -153,7 +151,6 @@ class HttpClientBundleTest extends TestCase
         $container->register('cache.app');
         new HttpClientBundle()->getContainerExtension()->load([[]], $container);
 
-        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
         $this->assertTrue($container->hasDefinition('cache.http_client.pool'));
         $this->assertTrue($container->hasDefinition('cache.http_client'));

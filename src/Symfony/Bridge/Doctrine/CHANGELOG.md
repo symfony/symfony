@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add `ConnectionWarmer` to open DBAL connections before a worker handles its first request
+
 8.2
 ---
 

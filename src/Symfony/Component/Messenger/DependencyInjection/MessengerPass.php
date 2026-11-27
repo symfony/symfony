@@ -89,7 +89,7 @@ class MessengerPass implements CompilerPassInterface
                 foreach ($tags as $tag) {
                     $receiverNames[$tag['alias'] ?? $id] = $id;
                     // messages can be trusted when their transport signs every message or handles them in this process
-                    $trustedTransports[$tag['alias'] ?? $id] = $trustedTransports[$id] = ($tag['sign'] ?? false) || false === ($tag['is_consumable'] ?? true);
+                    $trustedTransports[$tag['alias'] ?? $id] = $trustedTransports[$id] = ($tag['sign'] ?? false) || ($tag['is_sync'] ?? false);
                 }
             }
         }

@@ -492,6 +492,21 @@ class MessengerBundleExtensionTest extends TestCase
             'priority' => 10,
         ]], $container->getDefinition('messenger.transport.prioritized')->getTag('messenger.receiver'));
 
+        $this->assertEquals([[
+            'alias' => 'not_consumable',
+            'is_failure_transport' => false,
+            'priority' => 0,
+            'is_consumable' => false,
+        ]], $container->getDefinition('messenger.transport.not_consumable')->getTag('messenger.receiver'));
+
+        $this->assertEquals([[
+            'alias' => 'sync',
+            'is_failure_transport' => false,
+            'priority' => 0,
+            'is_sync' => true,
+            'is_consumable' => false,
+        ]], $container->getDefinition('messenger.transport.sync')->getTag('messenger.receiver'));
+
         $this->assertEquals([new Reference('messenger.transport_factory'), 'createTransport'], $transportFactory);
         $this->assertCount(3, $transportArguments);
         $this->assertSame('amqp://localhost/%2f/messages?exchange_name=exchange_name', $transportArguments[0]);
@@ -544,6 +559,8 @@ class MessengerBundleExtensionTest extends TestCase
         $failureTransports = $container->getDefinition((string) $failureTransportsByTransportNameServiceLocator)->getArgument(0);
         $expectedTransportsByFailureTransports = [
             'prioritized' => new Reference('messenger.transport.failed'),
+            'not_consumable' => new Reference('messenger.transport.failed'),
+            'sync' => new Reference('messenger.transport.failed'),
             'beanstalkd' => new Reference('messenger.transport.failed'),
             'customised' => new Reference('messenger.transport.failed'),
             'default' => new Reference('messenger.transport.failed'),

@@ -612,4 +612,36 @@ class ExpressionLanguageTest extends TestCase
         $parsed = $el->parse('1 + 1', []);
         $this->assertSame($parsed, $el->parse($parsed, []));
     }
+
+    #[DataProvider('provideDumpedExpressions')]
+    public function testDumpedExpressionEvaluatesTheSame(string $expression)
+    {
+        $el = new ExpressionLanguage();
+        $values = ['a' => 1, 'b' => 2, 'm' => 'v', 'n' => null, 'f' => false, 'obj' => (object) ['foo' => 'bar']];
+
+        $dump = $el->parse($expression, array_keys($values))->getNodes()->dump();
+
+        $this->assertSame($el->evaluate($expression, $values), $el->evaluate($dump, $values));
+        $this->assertSame($dump, $el->parse($dump, array_keys($values))->getNodes()->dump());
+    }
+
+    public static function provideDumpedExpressions(): iterable
+    {
+        yield ['(m ?? a) ~ "s"'];
+        yield ['(m ?? f) ? 1 : 2'];
+        yield ['-(n ?? 3)'];
+        yield ['(n ?? a) * 2 + b'];
+        yield ['(n ?? obj).foo'];
+        yield ['max(n ?? a, (n ?? b) * 2)'];
+        yield ['n ?? a ?? b'];
+        yield ['obj?.foo ?? n'];
+        yield ['(null)?.foo ?? m'];
+        yield ['a - (b - a) * -(a ** b ** 2)'];
+        yield ['not (f or a > b) and a in [1, 2]'];
+        yield ['(f ? a : b) ~ (f ?: m)'];
+        yield ['{(m ~ "k"): [a, -b], "x": obj.foo}["vk"][1]'];
+        yield ['"a\tb\nc\rd\ve\ff" ~ m'];
+        yield ['0.30000000000000004 - 0.3'];
+        yield ['1e3 === 1000'];
+    }
 }

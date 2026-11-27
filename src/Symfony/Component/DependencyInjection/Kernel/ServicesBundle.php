@@ -18,6 +18,7 @@ use Psr\EventDispatcher\EventDispatcherInterface as PsrEventDispatcherInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Config\ResourceCheckerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AsWorkerWarmer;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AddBehaviorDescribingTagsPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -26,6 +27,7 @@ use Symfony\Component\DependencyInjection\Compiler\JsonSchemaConfigDumpPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Component\DependencyInjection\Compiler\ResettableServicePass;
+use Symfony\Component\DependencyInjection\Compiler\WorkerWarmerPass;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
@@ -71,8 +73,10 @@ class ServicesBundle extends AbstractBundle
             'kernel.event_subscriber',
             'kernel.event_listener',
             'kernel.reset',
+            'kernel.worker_warmer',
         ]), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);
         $container->addCompilerPass(new ResettableServicePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
+        $container->addCompilerPass(new WorkerWarmerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
 
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug') && $container->hasParameter('.kernel.config_dir') && $container->hasParameter('.kernel.bundles_definition')) {
             $configTrees = new ExtensionConfigTrees($container->getParameter('.kernel.bundles_definition'));
@@ -116,6 +120,12 @@ class ServicesBundle extends AbstractBundle
             ->addTag('container.excluded', ['source' => 'because it\'s an enum']);
         $container->registerAttributeForAutoconfiguration(\Attribute::class, static function (ChildDefinition $definition) {
             $definition->addTag('container.excluded', ['source' => 'because it\'s a PHP attribute']);
+        });
+        $container->registerAttributeForAutoconfiguration(AsWorkerWarmer::class, static function (ChildDefinition $definition, AsWorkerWarmer $attribute, \ReflectionClass|\ReflectionMethod $reflector) {
+            if ($reflector instanceof \ReflectionMethod && null !== $attribute->method) {
+                throw new LogicException(\sprintf('AsWorkerWarmer attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
+            }
+            $definition->addTag('kernel.worker_warmer', ['method' => $reflector instanceof \ReflectionMethod ? $reflector->name : $attribute->method ?? '__invoke']);
         });
         $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector) {
             $tagAttributes = get_object_vars($attribute);

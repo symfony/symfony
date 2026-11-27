@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add the `#[AsWorkerWarmer]` attribute, the `kernel.worker_warmer` tag and the `worker_warmer` service to warm services up before a worker handles its first request
+
 8.2
 ---
 

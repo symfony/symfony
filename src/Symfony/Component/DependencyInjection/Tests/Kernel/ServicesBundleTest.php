@@ -12,12 +12,14 @@
 namespace Symfony\Component\DependencyInjection\Tests\Kernel;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Attribute\AsWorkerWarmer;
 use Symfony\Component\DependencyInjection\Compiler\JsonSchemaConfigDumpPass;
 use Symfony\Component\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Filesystem\Filesystem;
 
 class ServicesBundleTest extends TestCase
@@ -64,6 +66,50 @@ class ServicesBundleTest extends TestCase
 
         $this->assertFileDoesNotExist($this->projectDir.'/config/reference.php');
         $this->assertFileDoesNotExist($this->projectDir.'/config/schema.json');
+    }
+
+    public function testWorkerWarmersAreAutoconfiguredAndInstantiatedOnWarmUp()
+    {
+        file_put_contents($this->projectDir.'/config/services.php', '<?php return static function (\\'.ContainerConfigurator::class.' $c) { $c->services()->defaults()->autoconfigure()->set('.ServicesBundleTestWorkerWarmer::class.'::class); };');
+        ServicesBundleTestWorkerWarmer::$calls = [];
+        $kernel = new ServicesBundleTestKernel('test', false, $this->projectDir);
+        $kernel->boot();
+
+        $warmer = $kernel->getContainer()->get('worker_warmer');
+        $this->assertSame([], ServicesBundleTestWorkerWarmer::$calls);
+
+        $warmer->warmUp();
+        $this->assertSame(['__construct', '__invoke', 'connect'], ServicesBundleTestWorkerWarmer::$calls);
+    }
+
+    public function testWorkerWarmerIsRemovedWithoutWarmers()
+    {
+        $kernel = new ServicesBundleTestKernel('test', false, $this->projectDir);
+        $kernel->boot();
+
+        $this->assertFalse($kernel->getContainer()->has('worker_warmer'));
+    }
+}
+
+#[AsWorkerWarmer]
+class ServicesBundleTestWorkerWarmer
+{
+    public static array $calls = [];
+
+    public function __construct()
+    {
+        self::$calls[] = __FUNCTION__;
+    }
+
+    public function __invoke(): void
+    {
+        self::$calls[] = __FUNCTION__;
+    }
+
+    #[AsWorkerWarmer]
+    public function connect(): void
+    {
+        self::$calls[] = __FUNCTION__;
     }
 }
 

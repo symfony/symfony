@@ -785,6 +785,79 @@ class KernelTest extends TestCase
         }
     }
 
+    #[Group('time-sensitive')]
+    public function testStartTimeIsRefreshedForTheFirstRequestOfAKernelBootedAheadOfIt()
+    {
+        $kernel = null;
+        $startTimes = [];
+        $httpKernel = $this->createStub(HttpKernelInterface::class);
+        $httpKernel->method('handle')->willReturnCallback(static function (Request $request, int $type) use (&$kernel, &$startTimes) {
+            $startTimes[] = $kernel->getStartTime();
+            if (HttpKernelInterface::MAIN_REQUEST === $type) {
+                sleep(10);
+                $kernel->handle(new Request(), HttpKernelInterface::SUB_REQUEST);
+            }
+
+            return new Response();
+        });
+        $kernel = new CustomProjectDirKernel(null, $httpKernel);
+        $kernel->boot();
+        $bootTime = $kernel->getStartTime();
+
+        sleep(10);
+        $kernel->handle(new Request());
+
+        $this->assertGreaterThan($bootTime, $startTimes[0]);
+        $this->assertSame($startTimes[0], $startTimes[1]);
+    }
+
+    #[Group('time-sensitive')]
+    public function testStartTimeIncludesBootingForTheFirstRequestOfAKernelBootedByIt()
+    {
+        $httpKernel = $this->createStub(HttpKernelInterface::class);
+        $httpKernel->method('handle')->willReturnCallback(static function () {
+            sleep(10);
+
+            return new Response();
+        });
+        $kernel = new CustomProjectDirKernel(null, $httpKernel);
+        $before = microtime(true);
+
+        $kernel->handle(new Request());
+
+        $this->assertLessThan($before + 10, $kernel->getStartTime());
+    }
+
+    public function testRemoteAddrTrustedProxyIsResolvedForEachRequest()
+    {
+        $httpKernel = $this->createStub(HttpKernelInterface::class);
+        $httpKernel->method('handle')->willReturn(new Response());
+        $kernel = new CustomProjectDirKernel(static function (ContainerBuilder $container) {
+            $container->setParameter('kernel.trusted_proxies', 'a,REMOTE_ADDR');
+            $container->setParameter('kernel.trusted_headers', 'x-forwarded-for');
+        }, $httpKernel);
+        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? null;
+        $_SERVER['REMOTE_ADDR'] = '';
+
+        try {
+            $kernel->boot();
+
+            $kernel->handle(Request::create('/', server: ['REMOTE_ADDR' => '10.0.0.1']));
+            $this->assertSame(['a', '10.0.0.1'], Request::getTrustedProxies());
+
+            $kernel->handle(Request::create('/', server: ['REMOTE_ADDR' => '10.0.0.2']));
+            $this->assertSame(['a', '10.0.0.2'], Request::getTrustedProxies());
+            $this->assertSame(Request::HEADER_X_FORWARDED_FOR, Request::getTrustedHeaderSet());
+        } finally {
+            if (null === $remoteAddr) {
+                unset($_SERVER['REMOTE_ADDR']);
+            } else {
+                $_SERVER['REMOTE_ADDR'] = $remoteAddr;
+            }
+            Request::setTrustedProxies([], 0);
+        }
+    }
+
     public function testSourceDateEpoch()
     {
         $sourceDateEpoch = 1609459200; // 2021-01-01 00:00:00 UTC

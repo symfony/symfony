@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Resolve the `REMOTE_ADDR` trusted proxy for each main request, and restart the debug start time of kernels booted ahead of their first request
+
 8.2
 ---
 

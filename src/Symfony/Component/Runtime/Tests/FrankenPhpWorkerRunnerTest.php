@@ -16,6 +16,7 @@ require_once __DIR__.'/Fixtures/gc-function-mock.php';
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -155,6 +156,9 @@ class FrankenPhpWorkerRunnerTest extends TestCase
     {
         $calls = [];
         $kernel = $this->createMock(TestKernelInterface::class);
+        $kernel->expects($this->once())->method('boot')->willReturnCallback(static function () use (&$calls) {
+            $calls[] = 'boot';
+        });
         $kernel->expects($this->once())->method('handle')->willReturn(new Response());
         $kernel->expects($this->once())->method('terminate')->willReturnCallback(static function () use (&$calls) {
             $calls[] = 'terminate';
@@ -168,8 +172,164 @@ class FrankenPhpWorkerRunnerTest extends TestCase
 
         $runner = new FrankenPhpWorkerRunner($kernel, 1);
         $this->assertSame(0, $runner->run());
-        $this->assertSame(['terminate', 'shutdown'], $calls);
+        $this->assertSame(['boot', 'terminate', 'shutdown'], $calls);
         $this->assertSame(1, self::$gcCollections);
+    }
+
+    #[DataProvider('provideKernelBootSequences')]
+    public function testKernelBootsOutsideOfEachRequest(int $loopMax, array $expectedCalls)
+    {
+        $calls = [];
+        $kernel = $this->createStub(TestKernelInterface::class);
+        $kernel->method('boot')->willReturnCallback(static function () use (&$calls) {
+            $calls[] = self::$handlingRequest ? 'boot during request' : 'boot';
+        });
+        $kernel->method('handle')->willReturnCallback(static function () use (&$calls): Response {
+            $calls[] = 'handle';
+
+            return new Response();
+        });
+        self::$requests = 2;
+        $server = $_SERVER;
+
+        try {
+            $this->assertSame(0, (new FrankenPhpWorkerRunner($kernel, $loopMax))->run());
+        } finally {
+            $_SERVER = $server;
+        }
+
+        $this->assertSame($expectedCalls, $calls);
+    }
+
+    public static function provideKernelBootSequences(): iterable
+    {
+        yield 'worker stopped by FrankenPHP' => [500, ['boot', 'handle', 'boot', 'handle', 'boot']];
+        yield 'request limit reached' => [2, ['boot', 'handle', 'boot', 'handle']];
+    }
+
+    #[DataProvider('provideRuntimeModes')]
+    public function testKernelBootsWithTheRuntimeMode(bool $resetKernel, string $expectedMode)
+    {
+        $modes = [];
+        $kernel = $this->createStub(TestKernelInterface::class);
+        $kernel->method('boot')->willReturnCallback(static function () use (&$modes) {
+            $modes[] = $_SERVER['APP_RUNTIME_MODE'] ?? null;
+            // FrankenPHP replaces $_SERVER with the variables of each request
+            unset($_SERVER['APP_RUNTIME_MODE']);
+        });
+        $kernel->method('handle')->willReturn(new Response());
+        if ($resetKernel) {
+            $_SERVER['FRANKENPHP_RESET_KERNEL'] = '1';
+        }
+        self::$requests = 1;
+        $server = $_SERVER;
+
+        try {
+            $this->assertSame(0, (new FrankenPhpWorkerRunner($kernel, 500))->run());
+        } finally {
+            $_SERVER = $server;
+        }
+
+        $this->assertSame([$expectedMode, $expectedMode], $modes);
+    }
+
+    public static function provideRuntimeModes(): iterable
+    {
+        yield 'kept kernel' => [false, 'web=1&worker=1'];
+        yield 'reset kernel' => [true, 'web=1&worker=2'];
+    }
+
+    #[DataProvider('provideWorkerWarmerSequences')]
+    public function testWorkerWarmerRunsOncePerKernelBeforeItsFirstRequest(bool $resetKernel, array $expectedCalls)
+    {
+        $calls = [];
+        $warmer = new class($calls) {
+            public function __construct(private array &$calls)
+            {
+            }
+
+            public function warmUp(): void
+            {
+                $this->calls[] = FrankenPhpWorkerRunnerTest::$handlingRequest ? 'warm during request' : 'warm';
+            }
+        };
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('has')->willReturnCallback(static fn (string $id) => 'worker_warmer' === $id);
+        $container->method('get')->willReturn($warmer);
+        $kernel = $this->createStub(TestKernelInterface::class);
+        $kernel->method('getContainer')->willReturn($container);
+        $kernel->method('boot')->willReturnCallback(static function () use (&$calls) {
+            $calls[] = 'boot';
+        });
+        $kernel->method('handle')->willReturnCallback(static function () use (&$calls): Response {
+            $calls[] = 'handle';
+
+            return new Response();
+        });
+        if ($resetKernel) {
+            $_SERVER['FRANKENPHP_RESET_KERNEL'] = '1';
+        }
+        self::$requests = 2;
+        $server = $_SERVER;
+
+        try {
+            $this->assertSame(0, (new FrankenPhpWorkerRunner($kernel, 500))->run());
+        } finally {
+            $_SERVER = $server;
+        }
+
+        $this->assertSame($expectedCalls, $calls);
+    }
+
+    public static function provideWorkerWarmerSequences(): iterable
+    {
+        yield 'kept kernel' => [false, ['boot', 'warm', 'handle', 'boot', 'handle', 'boot']];
+        yield 'reset kernel' => [true, ['boot', 'warm', 'handle', 'boot', 'warm', 'handle', 'boot', 'warm']];
+    }
+
+    public function testWorkerWarmerFailureStopsTheWorkerBeforeHandlingRequests()
+    {
+        $exception = new \LogicException('Warm-up failed');
+        $warmer = new class($exception) {
+            public function __construct(private \LogicException $exception)
+            {
+            }
+
+            public function warmUp(): void
+            {
+                throw $this->exception;
+            }
+        };
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('has')->willReturn(true);
+        $container->method('get')->willReturn($warmer);
+        $kernel = $this->createMock(TestKernelInterface::class);
+        $kernel->method('getContainer')->willReturn($container);
+        $kernel->expects($this->never())->method('handle');
+
+        try {
+            (new FrankenPhpWorkerRunner($kernel, 500))->run();
+            $this->fail('The warm-up failure must be thrown.');
+        } catch (\LogicException $caught) {
+            $this->assertSame($exception, $caught);
+            $this->assertSame(1, self::$requests);
+        }
+    }
+
+    public function testKernelBootFailureStopsTheWorkerBeforeHandlingRequests()
+    {
+        $exception = new \LogicException('Boot failed');
+        $kernel = $this->createMock(TestKernelInterface::class);
+        $kernel->expects($this->once())->method('boot')->willThrowException($exception);
+        $kernel->expects($this->never())->method('handle');
+
+        try {
+            (new FrankenPhpWorkerRunner($kernel, 500))->run();
+            $this->fail('The boot failure must be thrown.');
+        } catch (\LogicException $caught) {
+            $this->assertSame($exception, $caught);
+            $this->assertSame(1, self::$requests);
+        }
     }
 
     public function testRunDoesNotCollectCyclesBeforeTheRootBufferIsHalfFull()

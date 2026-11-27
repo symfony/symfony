@@ -72,6 +72,8 @@ class FragmentHandlerTest extends TestCase
                 $this->callback(static function (Request $request) use ($expectedRequest) {
                     $expectedRequest->server->remove('REQUEST_TIME_FLOAT');
                     $request->server->remove('REQUEST_TIME_FLOAT');
+                    $expectedRequest->server->remove('REQUEST_TIME');
+                    $request->server->remove('REQUEST_TIME');
 
                     return $expectedRequest == $request;
                 }),

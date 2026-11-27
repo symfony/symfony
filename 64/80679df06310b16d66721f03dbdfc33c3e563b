@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-27T13:00:46Z
+
+Thanks for the fix! I updated the test so that it also runs with symfony/mime < 6.2, as this bridge still allows it. `addPart()` and `setContentId()` don't exist there, so the low-deps job was failing.

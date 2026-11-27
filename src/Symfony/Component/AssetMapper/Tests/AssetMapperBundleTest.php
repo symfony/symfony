@@ -249,6 +249,15 @@ class AssetMapperBundleTest extends TestCase
         $this->assertSame($this->varDir.'/public/static', $container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')->getArgument(0));
     }
 
+    public function testTheGitHubTokenIsPassedToTheAuditor()
+    {
+        $this->assertNull($this->createContainer()->getDefinition('asset_mapper.importmap.auditor')->getArgument(2));
+
+        $container = $this->createContainer(['github_token' => '%env(default::GITHUB_TOKEN)%']);
+
+        $this->assertSame('%env(default::GITHUB_TOKEN)%', $container->getDefinition('asset_mapper.importmap.auditor')->getArgument(2));
+    }
+
     public function testDefaultConfig()
     {
         $config = new Processor()->processConfiguration($this->getConfiguration(), [[]]);
@@ -270,6 +279,7 @@ class AssetMapperBundleTest extends TestCase
             'importmap_integrity_algorithms' => [],
             'vendor_dir' => '%kernel.project_dir%/assets/vendor',
             'minimum_release_age' => 0,
+            'github_token' => null,
             'precompress' => [
                 'enabled' => false,
                 'formats' => [],

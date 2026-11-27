@@ -216,6 +216,7 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('asset_mapper.importmap.config_reader'),
             service('asset_mapper.http_client'),
+            abstract_arg('GitHub token'),
         ])
         ->set('asset_mapper.importmap.update_checker', ImportMapUpdateChecker::class)
         ->args([

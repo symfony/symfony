@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add the `asset_mapper.github_token` option and the `$githubToken` argument of `ImportMapAuditor` to authenticate the requests of `importmap:audit` to the GitHub advisory API
+
 8.2
 ---
 

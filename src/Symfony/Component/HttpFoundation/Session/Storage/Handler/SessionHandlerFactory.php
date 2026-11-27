@@ -25,7 +25,9 @@ class SessionHandlerFactory
 {
     public static function createHandler(#[\SensitiveParameter] object|string $connection, #[\SensitiveParameter] array $options = []): AbstractSessionHandler
     {
-        if ($query = \is_string($connection) ? parse_url($connection) : false) {
+        $query = \is_string($connection) && !str_starts_with($connection, 'mongodb://') && !str_starts_with($connection, 'mongodb+srv://') ? parse_url($connection) : false;
+
+        if ($query) {
             parse_str($query['query'] ?? '', $query);
 
             if (($options['ttl'] ?? null) instanceof \Closure) {
@@ -35,6 +37,9 @@ class SessionHandlerFactory
         $options = ($query ?: []) + $options;
 
         switch (true) {
+            case \is_string($connection) && (str_starts_with($connection, 'mongodb://') || str_starts_with($connection, 'mongodb+srv://')):
+                return MongoDbSessionHandler::createFromDsn($connection, $options);
+
             case $connection instanceof \Redis:
             case $connection instanceof Relay:
             case $connection instanceof \RedisArray:

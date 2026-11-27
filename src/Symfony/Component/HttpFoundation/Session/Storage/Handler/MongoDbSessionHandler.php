@@ -28,10 +28,67 @@ use MongoDB\Driver\Query;
  */
 class MongoDbSessionHandler extends AbstractSessionHandler implements ClearableSessionHandlerInterface
 {
+    /**
+     * The handler options read from the DSN query string, with their default
+     * value. They are removed from the DSN before passing it to the driver, so
+     * that the driver reuses the same connection for a given MONGODB_URI.
+     */
+    private const DEFAULT_OPTIONS = [
+        'database' => 'app',
+        'collection' => 'sessions',
+        'ttl' => null,
+        'id_field' => '_id',
+        'data_field' => 'data',
+        'time_field' => 'time',
+        'expiry_field' => 'expires_at',
+    ];
+
     private Manager $manager;
     private string $namespace;
     private array $options;
     private int|\Closure|null $ttl;
+
+    /**
+     * Creates a handler from a "mongodb://" or "mongodb+srv://" DSN.
+     *
+     * The database is read from the DSN path or the "database" query parameter
+     * [default: app], the collection from the "collection" query parameter
+     * [default: sessions]. The other query parameters are forwarded to the
+     * MongoDB driver. Explicit options take precedence over the DSN.
+     */
+    public static function createFromDsn(#[\SensitiveParameter] string $dsn, array $options = []): self
+    {
+        if (!class_exists(Manager::class)) {
+            throw new \InvalidArgumentException('Unsupported MongoDB DSN. The "mongodb" PHP extension is required.');
+        }
+
+        if (!str_starts_with($dsn, 'mongodb://') && !str_starts_with($dsn, 'mongodb+srv://')) {
+            throw new \InvalidArgumentException('The given MongoDB DSN is invalid. Expecting "mongodb://" or "mongodb+srv://".');
+        }
+
+        [$uri, $query, $path] = self::parseDsn($dsn);
+
+        if (isset($options['database']) && '' === $options['database']) {
+            throw new \InvalidArgumentException('The "database" option must not be empty.');
+        }
+        if (isset($options['collection']) && '' === $options['collection']) {
+            throw new \InvalidArgumentException('The "collection" option must not be empty.');
+        }
+
+        $database = rawurldecode(ltrim($path, '/'));
+        $options['database'] ??= '' !== $database ? $database : ($query['database'] ?? self::DEFAULT_OPTIONS['database']);
+        unset($query['database']);
+        $options += array_intersect_key($query, self::DEFAULT_OPTIONS) + self::DEFAULT_OPTIONS;
+
+        if (isset($options['ttl']) && !$options['ttl'] instanceof \Closure) {
+            if (!is_numeric($options['ttl'])) {
+                throw new \InvalidArgumentException('The "ttl" option must be an integer or a Closure.');
+            }
+            $options['ttl'] = (int) $options['ttl'];
+        }
+
+        return new self(new Manager($uri), array_intersect_key($options, self::DEFAULT_OPTIONS));
+    }
 
     /**
      * Constructor.
@@ -189,6 +246,53 @@ class MongoDbSessionHandler extends AbstractSessionHandler implements ClearableS
         $write = new BulkWrite();
         $write->delete([]);
         $this->manager->executeBulkWrite($this->namespace, $write);
+    }
+
+    /**
+     * Removes the handler options from the DSN and returns the remaining URI,
+     * the query options and the path.
+     *
+     * URI options are kept in order, including repeated ones such as
+     * "readPreferenceTags".
+     *
+     * @return array{0: string, 1: array<string, string>, 2: string}
+     */
+    private static function parseDsn(#[\SensitiveParameter] string $dsn): array
+    {
+        if (false === $params = parse_url($dsn)) {
+            throw new \InvalidArgumentException('The given MongoDB DSN is invalid.');
+        }
+
+        if ('' === ($params['host'] ?? '')) {
+            throw new \InvalidArgumentException('The given MongoDB DSN is invalid: no host specified.');
+        }
+
+        $query = $kept = [];
+        foreach (explode('&', $params['query'] ?? '') as $pair) {
+            if ('' === $pair) {
+                continue;
+            }
+
+            $eq = strpos($pair, '=');
+            $key = rawurldecode(false === $eq ? $pair : substr($pair, 0, $eq));
+            $value = false === $eq ? '' : rawurldecode(substr($pair, $eq + 1));
+
+            if (('database' === $key || 'collection' === $key) && '' === $value) {
+                throw new \InvalidArgumentException(\sprintf('The "%s" DSN option must not be empty.', $key));
+            }
+
+            $query[$key] = $value;
+            if (!\array_key_exists($key, self::DEFAULT_OPTIONS)) {
+                $kept[] = $pair;
+            }
+        }
+
+        $uri = $dsn;
+        if (isset($params['query'])) {
+            $uri = str_replace('?'.$params['query'], $kept ? '?'.implode('&', $kept) : '', $uri);
+        }
+
+        return [$uri, $query, $params['path'] ?? ''];
     }
 
     private function getUTCDateTime(int $additionalSeconds = 0): UTCDateTime

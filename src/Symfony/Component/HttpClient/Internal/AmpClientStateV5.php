@@ -46,6 +46,7 @@ final class AmpClientStateV5 extends ClientState
     public array $dnsCache = [];
     public int $responseCount = 0;
     public array $pushedResponses = [];
+    public array $streamingResponses = [];
 
     private array $clients = [];
     private \Closure $clientConfigurator;

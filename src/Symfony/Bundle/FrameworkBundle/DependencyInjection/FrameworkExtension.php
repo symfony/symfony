@@ -556,6 +556,7 @@ class FrameworkExtension extends Extension
         }
 
         $definition = $container->findDefinition('debug.error_handler_configurator');
+        $definition->replaceArgument(6, !$debug);
 
         $config['log'] ??= $debug;
 

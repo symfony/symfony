@@ -144,7 +144,7 @@ class StubCasterTest extends TestCase
 
         $expectedDump = <<<'EODUMP'
             <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp data-depth=1 class=sf-dump-expanded>
-              <span class=sf-dump-index>0</span> => "<a href="%sStubCasterTest.php:0" rel="noopener noreferrer"><span class=sf-dump-str title="55 characters">Symfony\Component\VarDumper\Tests\Caster\StubCasterTest</span></a>"
+              <span class=sf-dump-index data-key="&quot;0&quot;">0</span> => "<a href="%sStubCasterTest.php:0" rel="noopener noreferrer"><span class=sf-dump-str title="55 characters">Symfony\Component\VarDumper\Tests\Caster\StubCasterTest</span></a>"
             </samp>]
             </bar>
             EODUMP;
@@ -165,7 +165,7 @@ class StubCasterTest extends TestCase
 
         $expectedDump = <<<'EODUMP'
             <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp data-depth=1 class=sf-dump-expanded>
-              <span class=sf-dump-index>0</span> => "<a href="http://example.com" target="_blank" rel="noopener noreferrer"><span class=sf-dump-str title="11 characters">example.com</span></a>"
+              <span class=sf-dump-index data-key="&quot;0&quot;">0</span> => "<a href="http://example.com" target="_blank" rel="noopener noreferrer"><span class=sf-dump-str title="11 characters">example.com</span></a>"
             </samp>]
             </bar>
             EODUMP;
@@ -185,7 +185,7 @@ class StubCasterTest extends TestCase
 
         $expectedDump = <<<'EODUMP'
             <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp data-depth=1 class=sf-dump-expanded>
-              <span class=sf-dump-index>0</span> => "<a href="%sFooInterface.php:10" rel="noopener noreferrer"><span class=sf-dump-str title="40 characters">hello(?stdClass $a, ?stdClass $b = null)</span></a>"
+              <span class=sf-dump-index data-key="&quot;0&quot;">0</span> => "<a href="%sFooInterface.php:10" rel="noopener noreferrer"><span class=sf-dump-str title="40 characters">hello(?stdClass $a, ?stdClass $b = null)</span></a>"
             </samp>]
             </bar>
             EODUMP;
@@ -205,7 +205,7 @@ class StubCasterTest extends TestCase
 
         $expectedDump = <<<'EODUMP'
             <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp data-depth=1 class=sf-dump-expanded>
-              <span class=sf-dump-index>0</span> => "<span class="sf-dump-str sf-dump-ellipsization" title="Symfony\Component\VarDumper\Tests\Caster\NotExisting
+              <span class=sf-dump-index data-key="&quot;0&quot;">0</span> => "<span class="sf-dump-str sf-dump-ellipsization" title="Symfony\Component\VarDumper\Tests\Caster\NotExisting
             52 characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-class">Symfony\Component\VarDumper\Tests\Caster</span><span class="sf-dump-ellipsis sf-dump-ellipsis-class">\</span><span class="sf-dump-ellipsis-tail">NotExisting</span></span>"
             </samp>]
             </bar>
@@ -226,7 +226,7 @@ class StubCasterTest extends TestCase
 
         $expectedDump = <<<'EODUMP'
             <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp data-depth=1 class=sf-dump-expanded>
-              <span class=sf-dump-index>0</span> => "<a href="%sFooInterface.php:5" rel="noopener noreferrer"><span class=sf-dump-str title="5 characters">hello</span></a>"
+              <span class=sf-dump-index data-key="&quot;0&quot;">0</span> => "<a href="%sFooInterface.php:5" rel="noopener noreferrer"><span class=sf-dump-str title="5 characters">hello</span></a>"
             </samp>]
             </bar>
             EODUMP;
@@ -247,7 +247,7 @@ class StubCasterTest extends TestCase
 
         $expectedDump = <<<'EODUMP'
             <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp data-depth=1 class=sf-dump-expanded>
-              <span class=sf-dump-index>0</span> => "<a href="%sStubCasterTest.php:239" rel="noopener noreferrer"><span class=sf-dump-str title="19 characters">Exception@anonymous</span></a>"
+              <span class=sf-dump-index data-key="&quot;0&quot;">0</span> => "<a href="%sStubCasterTest.php:239" rel="noopener noreferrer"><span class=sf-dump-str title="19 characters">Exception@anonymous</span></a>"
             </samp>]
             </bar>
             EODUMP;
@@ -266,11 +266,11 @@ class StubCasterTest extends TestCase
         $dump = $dumper->dump($cloner->cloneVar($var), true);
 
         $expectedDump = <<<'EODUMP'
-<foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp data-depth=1 class=sf-dump-expanded>
-  <span class=sf-dump-index>0</span> => "<span class=sf-dump-str title="24 characters">javascript:alert(1)//://</span>"
-</samp>]
-</bar>
-EODUMP;
+            <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp data-depth=1 class=sf-dump-expanded>
+              <span class=sf-dump-index data-key="&quot;0&quot;">0</span> => "<span class=sf-dump-str title="24 characters">javascript:alert(1)//://</span>"
+            </samp>]
+            </bar>
+            EODUMP;
 
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }

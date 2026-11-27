@@ -20,8 +20,11 @@ Sponsor
 Symfony 8.2 is backed by:
 
 * [TYPO3][27]
+* [Mailtrap][28]
 
 **TYPO3** is an open source enterprise content management system, built with open web standards. It delivers high-performance digital solutions through a robust feature set renowned for its scalable architecture, multisite and multilingual capabilities, and connectivity. TYPO3 has been certified as a digital public good by the Digital Public Goods Alliance, bringing a trusted CMS platform to the broader PHP and Symfony ecosystem.
+
+**Mailtrap** is a platform for testing and delivering emails, designed to support modern development workflows and production-grade sending. It offers secure sandboxes, email APIs, and monitoring tools for reliable email delivery.
 
 Help Symfony by [sponsoring][31] its development!
 
@@ -86,4 +89,5 @@ and supported by [Symfony contributors][19].
 [25]: https://symfony.com/doc/current/contributing/code_of_conduct/care_team.html
 [26]: https://symfony.com/book
 [27]: https://typo3.com/
+[28]: https://l.rw.rw/symfony8.0_backers
 [31]: https://symfony.com/sponsor

@@ -20,6 +20,7 @@ enum Requirement
     public const CATCH_ALL = '.+';
     public const DATE_YMD = '[0-9]{4}-(?:0[1-9]|1[012])-(?:0[1-9]|[12][0-9]|(?<!02-)3[01])'; // YYYY-MM-DD
     public const DIGITS = '[0-9]+';
+    public const INT32_POSITIVE = '(?:[1-9][0-9]{0,8}|1[0-9]{9}|20[0-9]{8}|21[0-3][0-9]{7}|214[0-6][0-9]{6}|2147[0-3][0-9]{5}|21474[0-7][0-9]{4}|214748[0-2][0-9]{3}|2147483[0-5][0-9]{2}|21474836[0-3][0-9]|214748364[0-7])'; // 1 to 2147483647 (signed 32-bit integer)
     public const MONGODB_ID = '[0-9a-f]{24}';
     public const POSITIVE_INT = '[1-9][0-9]*';
     public const UID_BASE32 = '[0-9A-HJKMNP-TV-Z]{26}';

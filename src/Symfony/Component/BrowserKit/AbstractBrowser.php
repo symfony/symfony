@@ -636,8 +636,8 @@ abstract class AbstractBrowser
     {
         $metaRefresh = $this->getCrawler()->filter('head meta[http-equiv="refresh"]');
         foreach ($metaRefresh->extract(['content']) as $content) {
-            if (preg_match('/^\s*0\s*;\s*URL\s*=\s*(?|\'([^\']++)|"([^"]++)|([^\'"].*))/i', $content, $m)) {
-                return str_replace("\t\r\n", '', rtrim($m[1]));
+            if (preg_match('/^\s*0\s*;\s*URL\s*=\s*(?|\'([^\']++)|"([^"]++)|([^\'"].*))/is', $content, $m)) {
+                return str_replace(["\t", "\r", "\n"], '', trim($m[1], "\x00..\x20"));
             }
         }
 

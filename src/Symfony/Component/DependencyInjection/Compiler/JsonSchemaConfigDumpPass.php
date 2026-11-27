@@ -64,7 +64,7 @@ class JsonSchemaConfigDumpPass implements CompilerPassInterface
         $allDefs['nodes'] = $defs;
         $allProperties = [];
         foreach ($allAliases as $alias) {
-            $allProperties[$alias] = ['$ref' => '#/$defs/nodes/'.$alias];
+            $allProperties[$alias] = $allProperties[$alias.'@optional'] = ['$ref' => '#/$defs/nodes/'.$alias];
         }
 
         ksort($allProperties);
@@ -74,12 +74,14 @@ class JsonSchemaConfigDumpPass implements CompilerPassInterface
             // Like the root of a file, the block of an environment accepts the sections of a service file
             $whenProperties = $allProperties + ['imports' => true, 'parameters' => true, 'services' => true];
             foreach ($aliases as $alias) {
-                $whenProperties[$alias] = ['$ref' => '#/$defs/nodes/'.$alias];
+                $whenProperties[$alias] = $whenProperties[$alias.'@optional'] = ['$ref' => '#/$defs/nodes/'.$alias];
             }
             ksort($whenProperties);
             $rootProperties['when@'.$env] = [
                 '$ref' => '#/$defs/types/object_null',
                 'properties' => $whenProperties,
+                // The configuration of an extension that is not registered is skipped
+                'patternProperties' => ['@optional$' => true],
                 'additionalProperties' => false,
             ];
         }

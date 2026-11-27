@@ -285,6 +285,14 @@ abstract class FileLoader extends BaseFileLoader
 
     final protected function loadExtensionConfig(string $namespace, mixed $config, string $file = '?'): void
     {
+        if (str_ends_with($namespace, '@optional')) {
+            $namespace = substr($namespace, 0, -9);
+
+            if (!$this->container->hasExtension($namespace)) {
+                return;
+            }
+        }
+
         $config ??= [];
 
         if (!$this->prepend) {

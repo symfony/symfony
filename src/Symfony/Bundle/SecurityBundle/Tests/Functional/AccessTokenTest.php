@@ -607,7 +607,7 @@ class AccessTokenTest extends AbstractWebTestCase
         $client->request('GET', '/foo', [], [], $server);
 
         $this->assertSame(401, $client->getResponse()->getStatusCode());
-        $this->assertSame('DPoP realm="My API",error="invalid_dpop_proof",error_description="Invalid credentials.",algs="ES256 PS256 RS256"', $client->getResponse()->headers->get('WWW-Authenticate'));
+        $this->assertSame('DPoP realm="My API",error="invalid_dpop_proof",error_description="Invalid credentials.",algs="ES256 RS256"', $client->getResponse()->headers->get('WWW-Authenticate'));
     }
 
     #[RequiresPhpExtension('openssl')]
@@ -620,7 +620,7 @@ class AccessTokenTest extends AbstractWebTestCase
         $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => 'Bearer '.$token, 'HTTP_DPOP' => self::createDpopProof($key, $token, 'http://localhost/foo')]);
 
         $this->assertSame(401, $client->getResponse()->getStatusCode());
-        $this->assertSame('DPoP realm="My API",algs="ES256 PS256 RS256"', $client->getResponse()->headers->get('WWW-Authenticate'));
+        $this->assertSame('DPoP realm="My API",algs="ES256 RS256"', $client->getResponse()->headers->get('WWW-Authenticate'));
     }
 
     #[RequiresPhpExtension('openssl')]

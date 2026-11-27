@@ -21,7 +21,7 @@ namespace Symfony\Component\Mailer\EventListener;
 interface PgpPublicKeyRepositoryInterface
 {
     /**
-     * @return ?string The path to the PGP public key. null if not found
+     * @return ?string The path to the PGP public key, a file holding exactly one key with a user ID for $email. null if not found
      */
     public function findPublicKeyPathFor(string $email): ?string;
 }

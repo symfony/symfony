@@ -42,6 +42,11 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     private int $length;
 
     /**
+     * @var list<int>
+     */
+    private array $elementPositions = [];
+
+    /**
      * Contains a Boolean for each property in $elements denoting whether this
      * element is an index. It is a property otherwise.
      *
@@ -73,6 +78,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         // Can be used as copy constructor
         if ($propertyPath instanceof self) {
             $this->elements = $propertyPath->elements;
+            $this->elementPositions = $propertyPath->elementPositions;
             $this->length = $propertyPath->length;
             $this->isIndex = $propertyPath->isIndex;
             $this->isNullSafe = $propertyPath->isNullSafe;
@@ -115,6 +121,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             }
             $this->elements[] = $element;
 
+            $this->elementPositions[] = $position;
             $position += \strlen($matches[1]);
             $remaining = $matches[4];
             $pattern = '/^(\.((?:[^\\\\.\[]|\\\\.)++)|\[([^\]]++)\])(.*)/';
@@ -146,7 +153,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         $parent = clone $this;
 
         --$parent->length;
-        $parent->pathAsString = substr($parent->pathAsString, 0, max(strrpos($parent->pathAsString, '.'), strrpos($parent->pathAsString, '[')));
+        $parent->elementPositions = $this->elementPositions ?: (new self($this->pathAsString))->elementPositions;
+        $parent->pathAsString = substr($parent->pathAsString, 0, array_pop($parent->elementPositions));
         array_pop($parent->elements);
         array_pop($parent->isIndex);
         array_pop($parent->isNullSafe);

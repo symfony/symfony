@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\JsonSchema\ClassSchemaResolver\NativeClassSchemaResolver;
 use Symfony\Component\JsonSchema\DefinitionPolicy\ShortNameDefinitionPolicy;
+use Symfony\Component\JsonSchema\ParameterSchemaEnricher\AttributeParameterSchemaEnricher;
 use Symfony\Component\JsonSchema\PropertySchemaEnricher\AttributePropertySchemaEnricher;
 use Symfony\Component\JsonSchema\PropertySchemaEnricher\ValidatorPropertySchemaEnricher;
 use Symfony\Component\JsonSchema\SchemaGenerator;
@@ -32,6 +33,7 @@ return static function (ContainerConfigurator $container) {
                 service('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(),
                 service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
                 service('type_info.resolver')->ignoreOnInvalid(),
+                tagged_iterator('json_schema.parameter_schema_enricher'),
             ])
         ->alias(SchemaGeneratorInterface::class, 'json_schema.generator')
 
@@ -54,5 +56,9 @@ return static function (ContainerConfigurator $container) {
         // runs last, so that the keywords of #[JsonSchemaConstraint] win
         ->set('json_schema.property_schema_enricher.attribute', AttributePropertySchemaEnricher::class)
             ->tag('json_schema.property_schema_enricher', ['priority' => -100])
+
+        // runs last, so that the keywords of #[JsonSchemaConstraint] win
+        ->set('json_schema.parameter_schema_enricher.attribute', AttributeParameterSchemaEnricher::class)
+            ->tag('json_schema.parameter_schema_enricher', ['priority' => -100])
     ;
 };

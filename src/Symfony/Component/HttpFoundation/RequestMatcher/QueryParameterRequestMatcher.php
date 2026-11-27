@@ -32,7 +32,7 @@ class QueryParameterRequestMatcher implements RequestMatcherInterface
      */
     public function __construct(array|string $parameters)
     {
-        $this->parameters = array_reduce(array_map(strtolower(...), (array) $parameters), static fn (array $parameters, string $parameter) => array_merge($parameters, preg_split('/\s*,\s*/', $parameter)), []);
+        $this->parameters = array_reduce((array) $parameters, static fn (array $parameters, string $parameter) => array_merge($parameters, preg_split('/\s*,\s*/', $parameter)), []);
     }
 
     public function matches(Request $request): bool
@@ -41,6 +41,6 @@ class QueryParameterRequestMatcher implements RequestMatcherInterface
             return true;
         }
 
-        return !array_diff_assoc($this->parameters, $request->query->keys());
+        return !array_diff($this->parameters, $request->query->keys());
     }
 }

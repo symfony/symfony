@@ -25,7 +25,7 @@ class NullCoalescedNameNodeTest extends AbstractNodeTestCase
     public static function getCompileData(): array
     {
         return [
-            ['$foo ?? null', new NullCoalescedNameNode('foo')],
+            ['($foo ?? null)', new NullCoalescedNameNode('foo')],
         ];
     }
 

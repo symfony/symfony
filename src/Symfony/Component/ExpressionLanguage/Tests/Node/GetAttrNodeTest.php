@@ -101,6 +101,10 @@ class GetAttrNodeTest extends AbstractNodeTestCase
 
             ['foo?.foo()', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo', true, true), new ArgumentsNode(), GetAttrNode::METHOD_CALL)],
             ['foo?.[0]', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), new ArgumentsNode(), GetAttrNode::ARRAY_CALL, true)],
+
+            ['(null)?.foo', new GetAttrNode(new ConstantNode(null), new ConstantNode('foo', true, true), new ArgumentsNode(), GetAttrNode::PROPERTY_CALL)],
+            ['("foo")[0]', new GetAttrNode(new ConstantNode('foo'), new ConstantNode(0), new ArgumentsNode(), GetAttrNode::ARRAY_CALL)],
+            ['["a"][0]', new GetAttrNode(new ConstantNode(['a']), new ConstantNode(0), new ArgumentsNode(), GetAttrNode::ARRAY_CALL)],
         ];
     }
 

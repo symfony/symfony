@@ -632,6 +632,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                             break;
                         case TypeIdentifier::FLOAT:
                             if (is_numeric($data)) {
+                                if ($type->isIdentifiedBy(TypeIdentifier::INT) && ctype_digit(ltrim($data, '-')) && \is_int($data + 0)) {
+                                    // an integer string goes to the int member of the union, like a JSON integer
+                                    continue 2;
+                                }
+
                                 return (float) $data;
                             }
 
@@ -651,9 +656,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                         case TypeIdentifier::STRING:
                             return (string) $data;
                         case TypeIdentifier::FLOAT:
+                            if (\is_int($data) && $type->isIdentifiedBy(TypeIdentifier::INT)) {
+                                continue 2;
+                            }
+
                             return (float) $data;
-                        case TypeIdentifier::INT:
-                            return (int) $data;
                     }
                 }
 

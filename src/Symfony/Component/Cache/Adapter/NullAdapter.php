@@ -46,12 +46,12 @@ class NullAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInt
     {
         $save = true;
 
-        return $callback((self::$createCacheItem)($key), $save);
+        return $callback($this->createCacheItem($key), $save);
     }
 
     public function getItem(mixed $key): CacheItem
     {
-        return (self::$createCacheItem)($key);
+        return $this->createCacheItem($key);
     }
 
     public function getItems(array $keys = []): iterable
@@ -106,15 +106,23 @@ class NullAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInt
 
     private function generateItems(array $keys): \Generator
     {
-        $f = self::$createCacheItem;
-
         foreach ($keys as $key) {
-            yield $key => $f($key);
+            yield $key => $this->createCacheItem($key);
         }
     }
 
     public function invalidateTags(array $tags): bool
     {
         return true;
+    }
+
+    private function createCacheItem(mixed $key): CacheItem
+    {
+        if (!isset(self::$createCacheItem)) {
+            // A lazy ghost of this class is never initialized since it has no properties
+            self::__construct();
+        }
+
+        return (self::$createCacheItem)($key);
     }
 }

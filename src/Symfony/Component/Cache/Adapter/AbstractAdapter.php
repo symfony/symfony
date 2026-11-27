@@ -142,6 +142,10 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Name
 
     public function commit(): bool
     {
+        if (!$this->deferred) {
+            return true;
+        }
+
         $ok = true;
         $byLifetime = (self::$mergeByLifetime)($this->deferred, $this->namespace, $expiredIds, $this->getId(...), $this->defaultLifetime);
         $retry = $this->deferred = [];

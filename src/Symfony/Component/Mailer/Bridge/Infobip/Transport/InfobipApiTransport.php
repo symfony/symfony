@@ -146,6 +146,7 @@ final class InfobipApiTransport extends AbstractApiTransport
 
     private function attachmentsFormData(array &$message, Email $email): void
     {
+        $replacements = [];
         foreach ($email->getAttachments() as $attachment) {
             $headers = $attachment->getPreparedHeaders();
             $filename = $headers->getHeaderParameter('Content-Disposition', 'filename');
@@ -154,9 +155,18 @@ final class InfobipApiTransport extends AbstractApiTransport
 
             if ('inline' === $headers->getHeaderBody('Content-Disposition')) {
                 $message[] = ['inlineImage' => $dataPart];
+
+                // Infobip references inline images by their file name only
+                if ($attachment->hasContentId()) {
+                    $replacements['cid:'.$attachment->getContentId()] = 'cid:'.$filename;
+                }
             } else {
                 $message[] = ['attachment' => $dataPart];
             }
+        }
+
+        if ($replacements && \is_string($message['HTML'] ?? null)) {
+            $message['HTML'] = strtr($message['HTML'], $replacements);
         }
     }
 

@@ -183,15 +183,18 @@ class GetAttrNode extends Node
     public function toArray(): array
     {
         $nullSafe = $this->nodes['attribute'] instanceof ConstantNode && $this->nodes['attribute']->isNullSafe;
+        // A scalar literal must be enclosed in parentheses before accessing its attributes or items
+        $node = $this->nodes['node'] instanceof ConstantNode && !\is_array($this->nodes['node']->attributes['value']) ? ['(', $this->nodes['node'], ')'] : [$this->nodes['node']];
+
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:
-                return [$this->nodes['node'], $nullSafe ? '?.' : '.', $this->nodes['attribute']];
+                return [...$node, $nullSafe ? '?.' : '.', $this->nodes['attribute']];
 
             case self::METHOD_CALL:
-                return [$this->nodes['node'], $nullSafe ? '?.' : '.', $this->nodes['attribute'], '(', $this->nodes['arguments'], ')'];
+                return [...$node, $nullSafe ? '?.' : '.', $this->nodes['attribute'], '(', $this->nodes['arguments'], ')'];
 
             case self::ARRAY_CALL:
-                return [$this->nodes['node'], $this->attributes['is_null_safe'] ? '?.[' : '[', $this->nodes['attribute'], ']'];
+                return [...$node, $this->attributes['is_null_safe'] ? '?.[' : '[', $this->nodes['attribute'], ']'];
         }
     }
 

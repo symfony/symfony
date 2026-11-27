@@ -82,6 +82,14 @@ class PathFilterIteratorTest extends IteratorTestCase
             [$inner, ['/A\\/B\\//'], [], ['abc.dat', 'ab.dat', 'abc.dat.copy', 'ab.dat.copy']],
             [$inner, ['{^A/B/}'], [], ['abc.dat', 'ab.dat']],
             [$inner, ['/[unterminated/'], [], []],
+            [$inner, ['/^A/S'], [], ['abc.dat', 'ab.dat', 'a.dat']],
+            [$inner, ['/^A/X'], [], ['abc.dat', 'ab.dat', 'a.dat']],
+            [$inner, ['{^A/B/}J'], [], ['abc.dat', 'ab.dat']],
+            [$inner, [], ['/^copy/J'], ['abc.dat', 'ab.dat', 'a.dat']],
+            ...(false !== @preg_match('//r', '') ? [
+                [$inner, ['/^A/r'], [], ['abc.dat', 'ab.dat', 'a.dat']],
+                [$inner, [], ['/^copy/r'], ['abc.dat', 'ab.dat', 'a.dat']],
+            ] : []),
         ];
     }
 }

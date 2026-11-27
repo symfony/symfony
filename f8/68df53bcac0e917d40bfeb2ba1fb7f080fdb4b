@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-27T12:59:59Z
+
+Thank you @dhrupo. I prefer this generic fix over registering the configurator for the old name too, as #63305 did for the legacy `Route` class on 7.4. It covers any aliased attribute, and the extra reflection runs once per attribute name.
+
+About your open question, I pushed a commit so that names written in another letter case resolve too, using `!==` instead of `strcasecmp()`. PHP sees the same class, so there's no reason to skip them.

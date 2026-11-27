@@ -137,7 +137,7 @@ final class MailPaceApiTransport extends AbstractApiTransport
             ];
 
             if ('inline' === $disposition) {
-                $att['cid'] = 'cid:'.$filename;
+                $att['cid'] = 'cid:'.($attachment->hasContentId() ? $attachment->getContentId() : $filename);
             }
 
             $attachments[] = $att;

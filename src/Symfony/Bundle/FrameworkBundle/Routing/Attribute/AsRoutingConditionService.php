@@ -21,7 +21,8 @@ if (false) {
     /**
      * @deprecated since Symfony 8.2, use Symfony\Component\Routing\Attribute\AsRoutingConditionService instead
      */
-    class AsRoutingConditionService
+    #[\Attribute(\Attribute::TARGET_CLASS)]
+    class AsRoutingConditionService extends BaseAsRoutingConditionService
     {
     }
 }

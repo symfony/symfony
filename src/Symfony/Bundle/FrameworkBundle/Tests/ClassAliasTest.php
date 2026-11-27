@@ -41,4 +41,41 @@ class ClassAliasTest extends TestCase
 
         $this->assertSame([], $missing, 'Composer cannot index a file that declares no class, so these aliases are unreachable with an authoritative class map. Declare the aliased class in an "if (false)" block.');
     }
+
+    public function testAliasedAttributesAreDeclaredAsAttributes()
+    {
+        $root = \dirname(__DIR__);
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS));
+        $missing = [];
+
+        foreach ($files as $file) {
+            $path = str_replace('\\', '/', $file->getPathname());
+
+            if ('php' !== $file->getExtension() || preg_match('{/(?:Tests|Resources)/}', $path)) {
+                continue;
+            }
+
+            $code = file_get_contents($path);
+
+            if (!str_contains($code, 'class_alias(') || !preg_match('{^use ([^ ;]++) as (\w++);$}m', $code, $m) || !class_exists($m[1])) {
+                continue;
+            }
+
+            $target = new \ReflectionClass($m[1]);
+
+            if (!$target->getAttributes(\Attribute::class)) {
+                continue;
+            }
+
+            preg_match('{^#\[\\\\Attribute\b.*$}m', file_get_contents($target->getFileName()), $attribute);
+
+            if (!$attribute || !preg_match('{^ *+'.preg_quote($attribute[0], '{}').'\n *+class '.$file->getBasename('.php').' extends '.$m[2].'\b}m', $code)) {
+                $missing[] = substr($path, 1 + \strlen($root));
+            }
+        }
+
+        sort($missing);
+
+        $this->assertSame([], $missing, 'Static analyzers read the "if (false)" block of these aliases, so they report the alias as not being an attribute. Declare it with the same #[\Attribute] as the aliased class, and make it extend the aliased class.');
+    }
 }

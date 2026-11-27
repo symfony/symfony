@@ -76,7 +76,10 @@ class ConstantNodeTest extends AbstractNodeTestCase
             ['null', new ConstantNode(null)],
             ['3', new ConstantNode(3)],
             ['3.3', new ConstantNode(3.3)],
+            ['3.0', new ConstantNode(3.0)],
+            ['0.30000000000000004', new ConstantNode(0.1 + 0.2)],
             ['"foo"', new ConstantNode('foo')],
+            ['"a\\tb\\nc\\rd\\ve\\ff"', new ConstantNode("a\tb\nc\rd\ve\ff")],
             ['"0"', new ConstantNode('0')],
             ['"01"', new ConstantNode('01')],
             ['"1e3"', new ConstantNode('1e3')],
@@ -89,6 +92,7 @@ class ConstantNodeTest extends AbstractNodeTestCase
             ['{"a\\"b": "c", "a\\\\b": "d"}', new ConstantNode(['a"b' => 'c', 'a\\b' => 'd'])],
             ['["c", "d"]', new ConstantNode(['c', 'd'])],
             ['{"a": ["b"]}', new ConstantNode(['a' => ['b']])],
+            ['{(-1): "a", 1: "b"}', new ConstantNode([-1 => 'a', 1 => 'b'])],
         ];
     }
 }

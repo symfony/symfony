@@ -47,7 +47,7 @@ class NullCoalesceNode extends Node
 
     public function toArray(): array
     {
-        return ['(', $this->nodes['expr1'], ') ?? (', $this->nodes['expr2'], ')'];
+        return ['((', $this->nodes['expr1'], ') ?? (', $this->nodes['expr2'], '))'];
     }
 
     private function addNullCoalesceAttributeToGetAttrNodes(Node $node): void

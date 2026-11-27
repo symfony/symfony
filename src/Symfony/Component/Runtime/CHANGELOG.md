@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Boot the kernel in `FrankenPhpWorkerRunner` before waiting for each request
+
 8.2
 ---
 

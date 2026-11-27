@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Tong-bit-art at 2026-11-27T12:39:31Z
+
+Note: the Unit Tests (8.4+) failures are in HtmlSanitizer/UrlSanitizerTest and also occur on the 8.2 base commit 5dd24b6919; the JsonSchema test jobs pass.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-27T12:43:07Z
+
+Thanks for the PR. I switched to `format: uri-reference`, which accepts protocol-relative URLs. I also kept `format: email` for the no-TLD mode: RFC 5321 allows a domain with a single label, so `user@localhost` is valid for that format.
+
+---------------------------------------------------------------------------
+
+by Tong-bit-art at 2026-11-27T12:45:03Z
+
+Thanks for the `uri-reference` fix — that's more precise than omitting the format. And you're right about RFC 5321: `format: email` allows a single-label domain; the Opis validator I used for comparison is stricter there, so keeping `format: email` is correct.

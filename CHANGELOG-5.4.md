@@ -7,6 +7,12 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+## 5.4.58 (2026-11-27)
+
+### Serializer
+
+ * bug #68428 [Serializer] Read the current value with deep_object_to_populate when there is no property type extractor (dhrupo)
+
 ## 5.4.57 (2026-11-25)
 
 ### BrowserKit

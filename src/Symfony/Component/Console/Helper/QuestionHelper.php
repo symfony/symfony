@@ -433,6 +433,17 @@ class QuestionHelper extends Helper
      */
     private function getHiddenResponse(OutputInterface $output, $inputStream, bool $trimmable = true): string
     {
+        if (self::$stty && Terminal::hasExtTerminal() && @stream_isatty($inputStream)) {
+            try {
+                $value = \Io\Terminal\Terminal::fromStreams($inputStream)->readSecret();
+            } catch (\RuntimeException $e) {
+                throw new RuntimeException('Unable to hide the response.', 0, $e);
+            }
+            $output->writeln('');
+
+            return $trimmable ? trim($value) : $value;
+        }
+
         if ('\\' === \DIRECTORY_SEPARATOR && $this->isInteractiveInput($inputStream)) {
             $exe = __DIR__.'/../Resources/bin/hiddeninput.exe';
 

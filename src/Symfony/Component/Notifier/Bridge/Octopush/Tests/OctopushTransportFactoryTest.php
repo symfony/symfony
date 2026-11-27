@@ -32,6 +32,16 @@ final class OctopushTransportFactoryTest extends AbstractTransportFactoryTestCas
             'octopush://host.test?from=Heyliot&type=FR',
             'octopush://userLogin:apiKey@host.test?from=Heyliot&type=FR',
         ];
+
+        yield [
+            'octopush://api.octopush.com?from=Heyliot&type=sms_premium',
+            'octopush://userLogin:apiKey@default?from=Heyliot&type=sms_premium',
+        ];
+
+        yield [
+            'octopush://api.octopush.com?from=Heyliot&type=sms_low_cost&purpose=wholesale',
+            'octopush://userLogin:apiKey@default?from=Heyliot&type=sms_low_cost&purpose=wholesale',
+        ];
     }
 
     public static function supportsProvider(): iterable

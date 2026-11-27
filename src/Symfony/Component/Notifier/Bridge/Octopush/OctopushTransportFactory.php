@@ -32,11 +32,12 @@ final class OctopushTransportFactory extends AbstractTransportFactory
         $apiKey = $this->getPassword($dsn);
         $from = $dsn->getRequiredOption('from');
         $type = $dsn->getRequiredOption('type');
+        $purpose = $dsn->getOption('purpose');
 
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new OctopushTransport($userLogin, $apiKey, $from, $type, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSsl($this->getSsl($dsn));
+        return (new OctopushTransport($userLogin, $apiKey, $from, $type, $this->client, $this->dispatcher, $purpose))->setHost($host)->setPort($port)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-27T13:00:14Z
+
+Thanks @mattleads. A long batch flush blocks the parent the same way. When all the messages of a child are in a batch, the child isn't busy and keeps receiving flushes. With a 12s `process()`, the parent still stalled for 11s with this PR. I pushed a change where each child answers every flush it reads. The parent waits for that answer before it sends the next timed flush.

@@ -55,8 +55,14 @@ class ConstrainedOrder
     #[Assert\Email(normalizer: 'trim')]
     public string $email = '';
 
+    #[Assert\Email(mode: Assert\Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD)]
+    public string $noTldEmail = '';
+
     #[Assert\Url(normalizer: 'trim')]
     public string $website = '';
+
+    #[Assert\Url(relativeProtocol: true)]
+    public string $relativeWebsite = '';
 
     #[Assert\Ip(normalizer: 'trim')]
     public string $ip = '';

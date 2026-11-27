@@ -45,6 +45,8 @@ abstract class Kernel extends AbstractKernel implements KernelInterface, Reboota
     private int $requestStackSize = 0;
     private bool $resetServices = false;
     private bool $handlingHttpCache = false;
+    /** @var array{list<string>, int}|null */
+    private ?array $remoteAddrTrustedProxies = null;
 
     public const VERSION = '8.3.0-DEV';
     public const VERSION_ID = 80300;
@@ -133,6 +135,24 @@ abstract class Kernel extends AbstractKernel implements KernelInterface, Reboota
     {
         if (!$this->container) {
             $this->preBoot();
+        } elseif (!$this->requestStackSize && !$this->handlingHttpCache && HttpKernelInterface::MAIN_REQUEST === $type) {
+            if ($this->debug && $this->booted && !$this->resetServices) {
+                // The kernel was booted ahead of this request, by a worker runtime for instance
+                $this->startTime = microtime(true);
+            }
+
+            if (null !== $this->remoteAddrTrustedProxies) {
+                $proxies = [];
+                foreach ($this->remoteAddrTrustedProxies[0] as $proxy) {
+                    if ('REMOTE_ADDR' === $proxy) {
+                        $proxy = (string) $request->server->get('REMOTE_ADDR');
+                    }
+                    if ('' !== $proxy) {
+                        $proxies[] = $proxy;
+                    }
+                }
+                Request::setTrustedProxies($proxies, $this->remoteAddrTrustedProxies[1]);
+            }
         }
 
         if (HttpKernelInterface::MAIN_REQUEST === $type && !$this->handlingHttpCache && $this->container->has('http_cache')) {
@@ -282,6 +302,7 @@ abstract class Kernel extends AbstractKernel implements KernelInterface, Reboota
             Request::setTrustedHosts(\is_array($trustedHosts) ? $trustedHosts : preg_split('/\s*+,\s*+(?![^{]*})/', $trustedHosts));
         }
 
+        $this->remoteAddrTrustedProxies = null;
         if ($container->hasParameter('kernel.trusted_proxies') && $container->hasParameter('kernel.trusted_headers') && $trustedProxies = $container->getParameter('kernel.trusted_proxies')) {
             $trustedHeaders = $container->getParameter('kernel.trusted_headers');
 
@@ -302,7 +323,9 @@ abstract class Kernel extends AbstractKernel implements KernelInterface, Reboota
                 $trustedHeaderSet = $trustedHeaders ?? (Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
             }
 
-            Request::setTrustedProxies(\is_array($trustedProxies) ? $trustedProxies : array_map('trim', explode(',', $trustedProxies)), $trustedHeaderSet);
+            $trustedProxies = \is_array($trustedProxies) ? $trustedProxies : array_map('trim', explode(',', $trustedProxies));
+            $this->remoteAddrTrustedProxies = \in_array('REMOTE_ADDR', $trustedProxies, true) ? [$trustedProxies, $trustedHeaderSet] : null;
+            Request::setTrustedProxies($trustedProxies, $trustedHeaderSet);
         }
     }
 

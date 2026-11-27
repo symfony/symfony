@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Resolve a concrete subclass when mapping to an abstract class or an interface
+ * Make `ReverseClassObjectMapperMetadataFactory` use the class map entry of the closest parent class when the source class has none
+
 8.2
 ---
 

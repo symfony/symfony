@@ -124,12 +124,19 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             throw new MappingException(\sprintf('Mapping target not found for source "%s".', get_debug_type($source)));
         }
 
-        if (\is_string($target) && !class_exists($target)) {
-            throw new MappingException(\sprintf('Mapping target class "%s" does not exist for source "%s".', $target, get_debug_type($source)));
+        if (\is_string($target)) {
+            if (!class_exists($target) && !interface_exists($target)) {
+                throw new MappingException(\sprintf('Mapping target class "%s" does not exist for source "%s".', $target, get_debug_type($source)));
+            }
+
+            $targetRefl = $this->getReflectionClass($target);
+            if ($targetRefl->isInterface() || $targetRefl->isAbstract()) {
+                $target = $this->resolveConcreteTarget($source, $target);
+            }
         }
 
         $targetRefl = $this->getReflectionClass($target);
-        $declaredTarget = $mappedTarget = $mappingToObject ? $target : $targetRefl->newInstanceWithoutConstructor();
+        $declaredTarget = $mappedTarget = \is_object($target) ? $target : $targetRefl->newInstanceWithoutConstructor();
         $classMetadata = $this->classMetadataFactory->create($source, $declaredTarget);
         $pairMetadata = &$this->propertyMetadata[$source::class][$declaredTarget::class];
 
@@ -650,5 +657,37 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         } while ($class = $class->getParentClass());
 
         return true;
+    }
+
+    /**
+     * Finds the class to instantiate when the caller asks for an abstract class or an interface.
+     *
+     * @param class-string $target
+     *
+     * @return class-string
+     */
+    private function resolveConcreteTarget(object $source, string $target): string
+    {
+        $candidates = [];
+        foreach ($this->metadataFactory->create($source) as $mapping) {
+            if (\is_string($mapping->target) && is_a($mapping->target, $target, true) && class_exists($mapping->target)
+                && !$this->getReflectionClass($mapping->target)->isAbstract()
+                && $this->getMapTarget([$mapping], null, $source, null)
+            ) {
+                $candidates[$mapping->target] = true;
+            }
+        }
+
+        $candidates = array_keys($candidates);
+
+        if (1 === \count($candidates)) {
+            return $candidates[0];
+        }
+
+        if (!$candidates) {
+            throw new MappingException(\sprintf('Cannot map "%1$s" to "%2$s": no subclass of "%2$s" maps from it.', get_debug_type($source), $target));
+        }
+
+        throw new MappingException(\sprintf('Ambiguous mapping for "%s" to "%s": "%s" match.', get_debug_type($source), $target, implode('", "', $candidates)));
     }
 }

@@ -79,6 +79,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'kernel.locale_aware',
         'kernel.reset',
         'kernel.test_state',
+        'kernel.worker_warmer',
         'key_management.blind_index',
         'key_management.client',
         'key_management.factory',

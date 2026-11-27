@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Boot the kernel in `FrankenPhpWorkerRunner` before waiting for each request
+ * Call the `worker_warmer` service in `FrankenPhpWorkerRunner` before the first request of each kernel
 
 8.2
 ---

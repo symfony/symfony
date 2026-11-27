@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\ReverseContainer;
 use Symfony\Component\DependencyInjection\ServicesResetter;
 use Symfony\Component\DependencyInjection\ServicesResetterInterface;
+use Symfony\Component\DependencyInjection\WorkerWarmer;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -94,6 +95,9 @@ return static function (ContainerConfigurator $container) {
         ->set('services_resetter', ServicesResetter::class)
             ->public()
         ->alias(ServicesResetterInterface::class, 'services_resetter')
+
+        ->set('worker_warmer', WorkerWarmer::class)
+            ->public()
 
         ->set('container.env_var_processor', EnvVarProcessor::class)
             ->args([

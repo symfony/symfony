@@ -174,6 +174,105 @@ final class TranslationLintCommandTest extends TestCase
         $this->assertStringContainsString('Translation key "<comment>invalid_key</comment>" is invalid:', $display);
     }
 
+    #[RequiresPhpExtension('intl')]
+    public function testLintMixedAlphabets()
+    {
+        $command = $this->createCommand($this->createTranslatorWithMixedAlphabets(), ['uk', 'el', 'mn', 'hy', 'ja', 'zh', 'ko']);
+        $commandTester = new CommandTester($command);
+
+        $this->assertSame(1, $commandTester->execute(['--check-mixed-alphabets' => true], ['decorated' => false]));
+
+        $display = $this->getNormalizedDisplay($commandTester);
+        $this->assertStringContainsString(<<<EOF
+            Errors for locale "uk" and domain "security"
+            --------------------------------------------
+
+             Translation key "Cookie has already been used by someone else." is invalid:
+
+             [ERROR] The word "сookie" mixes letters from different alphabets: Cyrillic "с", Latin "ookie".
+
+            Errors for locale "el" and domain "validators"
+            ----------------------------------------------
+
+             Translation key "This collection should contain exactly {{ limit }} element." is invalid:
+
+             [ERROR] The word "στοιχείo" mixes letters from different alphabets: Greek "στοιχεί", Latin "o".
+
+            Errors for locale "mn" and domain "validators"
+            ----------------------------------------------
+
+             Translation key "This value should be equal to {{ compared_value }}." is invalid:
+
+             [ERROR] The word "тaй" mixes letters from different alphabets: Cyrillic "тй", Latin "a".
+
+            Errors for locale "hy" and domain "messages"
+            --------------------------------------------
+
+             Translation key "Sign in with Google" is invalid:
+
+             [ERROR] The word "Gօօgle" mixes letters from different alphabets: Latin "Ggle", Armenian "օօ".
+            EOF,
+            $display
+        );
+        $this->assertStringNotContainsString('Errors for locale "ja"', $display);
+        $this->assertStringNotContainsString('Errors for locale "zh"', $display);
+        $this->assertStringNotContainsString('Errors for locale "ko"', $display);
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testMixedAlphabetsAreNotCheckedByDefault()
+    {
+        $command = $this->createCommand($this->createTranslatorWithMixedAlphabets(), ['uk', 'el', 'mn', 'hy', 'ja', 'zh', 'ko']);
+        $commandTester = new CommandTester($command);
+
+        $commandTester->execute([], ['decorated' => false]);
+
+        $commandTester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('[OK] All translations are valid.', $this->getNormalizedDisplay($commandTester));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testMixedAlphabetsIgnorePlaceholdersAndMarkup()
+    {
+        $translator = new Translator('uk');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['cookies' => '{сount, plural, one {сookie} other {# сookies}}'], 'uk', 'messages+intl-icu');
+        $translator->addResource('array', ['files' => '<a href="/сookies">%сount% файлів</a><br>files'], 'uk', 'messages');
+
+        $command = $this->createCommand($translator, ['uk']);
+        $commandTester = new CommandTester($command);
+
+        $this->assertSame(1, $commandTester->execute(['--check-mixed-alphabets' => true], ['decorated' => false]));
+
+        $display = $this->getNormalizedDisplay($commandTester);
+        $this->assertStringContainsString(<<<EOF
+             Translation key "cookies" is invalid:
+
+             [ERROR] The word "сookie" mixes letters from different alphabets: Cyrillic "с", Latin "ookie".
+
+             [ERROR] The word "сookies" mixes letters from different alphabets: Cyrillic "с", Latin "ookies".
+            EOF,
+            $display
+        );
+        $this->assertStringNotContainsString('"files"', $display);
+        $this->assertStringNotContainsString('сount', $display);
+    }
+
+    private function createTranslatorWithMixedAlphabets(): Translator
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['Cookie has already been used by someone else.' => 'Хтось інший вже використав цей сookie.'], 'uk', 'security');
+        $translator->addResource('array', ['This collection should contain exactly {{ limit }} element.' => 'Αυτή η συλλογή πρέπει να περιέχει ακριβώς {{ limit }} στοιχείo.'], 'el', 'validators');
+        $translator->addResource('array', ['This value should be equal to {{ compared_value }}.' => 'Энэ утга {{ compared_value }} -тaй тэнцүү байх ёстой.'], 'mn', 'validators');
+        $translator->addResource('array', ['Sign in with Google' => 'Մուտք գործել Gօօgle-ով'], 'hy', 'messages');
+        $translator->addResource('array', ['I bought a T-shirt.' => 'Tシャツを買いました。'], 'ja', 'messages');
+        $translator->addResource('array', ['Enter your PIN.' => '请输入PIN码。'], 'zh', 'messages');
+        $translator->addResource('array', ['Enter your PIN.' => 'PIN을 입력하세요.'], 'ko', 'messages');
+
+        return $translator;
+    }
+
     private function createCommand(Translator $translator, array $enabledLocales): Command
     {
         $command = new TranslationLintCommand($translator, $enabledLocales);

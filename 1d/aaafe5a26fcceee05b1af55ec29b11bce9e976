@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-27T13:37:22Z
+
+Thanks for the PR. I kept your restored `PathFilterIteratorTest` and changed the `r` cases to check that PCRE supports the modifier: PHP 8.4 built with PCRE2 older than 10.43 rejects it.

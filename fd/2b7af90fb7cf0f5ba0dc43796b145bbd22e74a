@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-27T13:04:36Z
+
+I pushed a commit on top of yours: HEAD requests, 204 responses and responses with `Content-Length: 0` are still cached when canceled or destructed. They have no body, so they're complete as soon as the headers arrive. Without this, a HEAD response was cached only when `getContent()` was called on it. The commit also skips responses that the decorated client cancels, for example with `yield $context->cancel()`, since their body is truncated too.

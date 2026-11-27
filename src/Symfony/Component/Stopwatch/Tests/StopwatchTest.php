@@ -138,6 +138,28 @@ class StopwatchTest extends TestCase
         $this->assertCount(2, $stopwatch->getSectionEvents('0'));
     }
 
+    public function testSectionWithZeroOrigin()
+    {
+        $section = new Section(0.0);
+
+        $this->assertSame(0.0, $section->startEvent('foo', null)->getOrigin());
+        $this->assertSame(0.0, $section->startEvent('bar', null)->getOrigin());
+    }
+
+    public function testSectionWithExplicitOrigin()
+    {
+        $section = new Section(123.5);
+
+        $this->assertSame(123.5, $section->startEvent('foo', null)->getOrigin());
+    }
+
+    public function testSectionWithoutOrigin()
+    {
+        $section = new Section();
+
+        $this->assertEqualsWithDelta(microtime(true) * 1000, $section->startEvent('foo', null)->getOrigin(), self::DELTA);
+    }
+
     public function testReopenASection()
     {
         $stopwatch = new Stopwatch();

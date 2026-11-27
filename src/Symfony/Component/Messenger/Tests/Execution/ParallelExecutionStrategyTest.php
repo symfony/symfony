@@ -344,6 +344,69 @@ class ParallelExecutionStrategyTest extends TestCase
         $this->assertFalse($strategy->shouldPauseConsumption());
     }
 
+    public function testFlushSkipsTheWorkersThatAreInsideAHandler()
+    {
+        $first = new Envelope(new DummyMessage('A'));
+        $second = new Envelope(new SecondMessage());
+        // the first worker runs a handler and does not answer: it is not reading its channel either, so it only answers once a flush reaches it
+        $busy = $this->createFakeChannel([], [new HandledEnvelopeMessage(1, $first, null)]);
+        $batching = $this->createFakeChannel([new DeferredEnvelopeMessage(2)], [new HandledEnvelopeMessage(2, $second, null)]);
+        $strategy = $this->createStrategy([$busy, $batching], 2);
+        $this->setPrivateProperty($strategy, 'keyModes', ['message.bus||'.SecondMessage::class => 2]);
+        $calls = [];
+
+        $strategy->execute($first, 'async', $this->createOnHandled($calls));
+        $strategy->execute($second, 'async', $this->createOnHandled($calls));
+        $this->assertCount(1, $busy->sent);
+        $this->assertCount(1, $batching->sent);
+
+        $this->assertTrue($strategy->flush($this->createOnHandled($calls), 30.0));
+
+        $this->assertCount(1, $busy->sent);
+        $this->assertCount(2, $batching->sent);
+        $this->assertInstanceOf(FlushBatchHandlersMessage::class, $batching->sent[1]);
+        $this->assertSame(30.0, $batching->sent[1]->force);
+        $this->assertCount(1, $calls);
+        $this->assertSame($second->getMessage(), $calls[0][0]->getMessage());
+
+        $this->assertTrue($strategy->flush($this->createOnHandled($calls), true));
+
+        $this->assertCount(2, $busy->sent);
+        $this->assertInstanceOf(FlushBatchHandlersMessage::class, $busy->sent[1]);
+        $this->assertTrue($busy->sent[1]->force);
+        $this->assertCount(2, $calls);
+        $this->assertFalse($strategy->shouldPauseConsumption());
+    }
+
+    public function testFlushSkipsTheWorkersThatDidNotAnswerThePreviousFlush()
+    {
+        $envelope = new Envelope(new DummyMessage('Hello'));
+        $channel = $this->createFakeChannel([new DeferredEnvelopeMessage(1)]);
+        $strategy = $this->createStrategy($channel);
+        $calls = [];
+
+        $strategy->execute($envelope, 'async', $this->createOnHandled($calls));
+        $this->assertFalse($strategy->flush($this->createOnHandled($calls)));
+        $this->assertFalse($strategy->flush($this->createOnHandled($calls), 30.0));
+
+        $this->assertCount(2, $channel->sent);
+        $this->assertFalse($channel->sent[1]->force);
+
+        $channel->push(new FlushBatchHandlersMessage(false));
+        $this->assertFalse($strategy->flush($this->createOnHandled($calls), 30.0));
+
+        $this->assertCount(3, $channel->sent);
+        $this->assertSame(30.0, $channel->sent[2]->force);
+
+        $this->setPrivateProperty($channel, 'flushResponses', [new HandledEnvelopeMessage(1, $envelope, null)]);
+        $this->assertTrue($strategy->flush($this->createOnHandled($calls), true));
+
+        $this->assertCount(4, $channel->sent);
+        $this->assertTrue($channel->sent[3]->force);
+        $this->assertCount(1, $calls);
+        $this->assertFalse($strategy->shouldPauseConsumption());
+    }
+
     public function testHandlerErrorsAreRebuiltAroundTheLocalEnvelope()
     {
         $envelope = new Envelope(new DummyMessage('Hello'));

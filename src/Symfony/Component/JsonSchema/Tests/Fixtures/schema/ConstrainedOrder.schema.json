@@ -84,9 +84,19 @@
                     "type": "string",
                     "default": ""
                 },
+                "noTldEmail": {
+                    "type": "string",
+                    "default": "",
+                    "format": "email"
+                },
                 "website": {
                     "type": "string",
                     "default": ""
+                },
+                "relativeWebsite": {
+                    "type": "string",
+                    "default": "",
+                    "format": "uri-reference"
                 },
                 "ip": {
                     "type": "string",

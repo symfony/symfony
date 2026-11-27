@@ -37,7 +37,7 @@ use Symfony\Contracts\Service\ContainerProviderInterface;
 /**
  * @internal
  *
- * @implements Task<null, DispatchEnvelopeMessage|FlushBatchHandlersMessage, DeferredEnvelopeMessage|HandledEnvelopeMessage|null>
+ * @implements Task<null, DispatchEnvelopeMessage|FlushBatchHandlersMessage, DeferredEnvelopeMessage|FlushBatchHandlersMessage|HandledEnvelopeMessage|null>
  */
 final class DispatchTask implements Task
 {
@@ -60,6 +60,8 @@ final class DispatchTask implements Task
         while ($message = $channel->receive($cancellation)) {
             if ($message instanceof FlushBatchHandlersMessage) {
                 $this->flush($bus, $channel, $message->force, $unacks, $heldAcks);
+                // the parent sends no other flush until this one is answered
+                $channel->send($message);
 
                 continue;
             }

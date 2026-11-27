@@ -489,6 +489,17 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
             }
 
             if ($chunk->isLast()) {
+                // The last chunk comes before the full body when the response is canceled or destructed, or when the decorated client cancels it, unless there is no body
+                $canceled = $context->getInfo('canceled') || $context->getResponse()->getInfo('canceled');
+
+                if ($canceled && 'HEAD' !== $method && 204 !== $context->getStatusCode() && '0' !== ($headers['content-length'][0] ?? null)) {
+                    $this->cache->invalidateTags([$attemptTag]);
+
+                    yield $chunk;
+
+                    return;
+                }
+
                 if (null !== $tagsFromResponseResolver) {
                     $accumulatedContent .= $chunk->getContent();
                     $extraTags = self::mergeCacheTags(

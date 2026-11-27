@@ -68,6 +68,42 @@ class AttributeAutoconfigurationPassTest extends TestCase
         $this->assertEquals($expected, $abstractService->getInstanceofConditionals());
     }
 
+    public function testConfiguratorRunsForAttributeWrittenWithAnAliasedName()
+    {
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, static function (ChildDefinition $definition) {
+            $definition->addTag('processed.tag');
+        });
+        $definition = $container->register('foo', TestServiceWithAliasedAttribute::class)
+            ->setAutoconfigured(true)
+        ;
+
+        (new AttributeAutoconfigurationPass())->process($container);
+
+        $expected = [
+            TestServiceWithAliasedAttribute::class => (new ChildDefinition(''))->addTag('processed.tag'),
+        ];
+        $this->assertEquals($expected, $definition->getInstanceofConditionals());
+    }
+
+    public function testConfiguratorRunsForAttributeWrittenInAnotherLetterCase()
+    {
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(TestAttribute::class, static function (ChildDefinition $definition) {
+            $definition->addTag('processed.tag');
+        });
+        $definition = $container->register('foo', TestServiceWithLowercaseAttribute::class)
+            ->setAutoconfigured(true)
+        ;
+
+        (new AttributeAutoconfigurationPass())->process($container);
+
+        $expected = [
+            TestServiceWithLowercaseAttribute::class => (new ChildDefinition(''))->addTag('processed.tag'),
+        ];
+        $this->assertEquals($expected, $definition->getInstanceofConditionals());
+    }
+
     public function testProcessDoesNotKeepTheContainer()
     {
         $container = new ContainerBuilder();
@@ -88,5 +124,22 @@ class AttributeAutoconfigurationPassTest extends TestCase
 
 #[AsTaggedItem]
 class TestServiceWithAttributes
+{
+}
+
+class_alias(AsTaggedItem::class, __NAMESPACE__.'\AliasedAsTaggedItem');
+
+#[AliasedAsTaggedItem]
+class TestServiceWithAliasedAttribute
+{
+}
+
+#[\Attribute(\Attribute::TARGET_CLASS)]
+class TestAttribute
+{
+}
+
+#[testattribute]
+class TestServiceWithLowercaseAttribute
 {
 }

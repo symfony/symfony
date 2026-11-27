@@ -184,6 +184,9 @@ class MailgunApiTransport extends AbstractApiTransport implements RemoteTemplate
                     $filename = $headers->getHeaderParameter('Content-Disposition', 'filename');
                     $new = basename($filename);
                     $replacements['cid:'.$filename] = 'cid:'.$new;
+                    if ($attachment->hasContentId()) {
+                        $replacements['cid:'.$attachment->getContentId()] = 'cid:'.$new;
+                    }
                     $p = new \ReflectionProperty($attachment, 'filename');
                     $p->setValue($attachment, $new);
                 }

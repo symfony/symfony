@@ -276,6 +276,9 @@ class CookieJar
 
     private static function normalizeDomain(string $domain): string
     {
+        // domain names are case-insensitive (RFC 6265 section 5.2.3)
+        $domain = strtolower($domain);
+
         if (!str_contains($domain, ':') || str_contains($domain, "\0")) {
             return $domain;
         }

@@ -1108,6 +1108,17 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame(10.0, $serializer->denormalize(['number' => 10], JsonNumber::class, 'jsonld')->number);
     }
 
+    public function testJsonIntegerStaysIntWhenUnionAcceptsInt()
+    {
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
+
+        $this->assertSame(50, $serializer->denormalize(['number' => 50], JsonIntOrFloat::class, 'json')->number);
+        $this->assertSame(50, $serializer->denormalize(['nullableNumber' => 50], JsonIntOrFloat::class, 'json')->nullableNumber);
+        $this->assertSame(1.5, $serializer->denormalize(['number' => 1.5], JsonIntOrFloat::class, 'json')->number);
+    }
+
     public function testDoesntHaveIssuesWithUnionConstTypes()
     {
         if (!class_exists(PhpDocParser::class)) {
@@ -2760,6 +2771,19 @@ class JsonNumber
      * @var float
      */
     public $number;
+}
+
+class JsonIntOrFloat
+{
+    /**
+     * @var int|float
+     */
+    public $number;
+
+    /**
+     * @var int|float|null
+     */
+    public $nullableNumber;
 }
 
 class DummyWithConstructorObjectAndDefaultValue

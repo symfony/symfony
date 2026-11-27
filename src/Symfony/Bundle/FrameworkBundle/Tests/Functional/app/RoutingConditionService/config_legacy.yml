@@ -1,0 +1,6 @@
+imports:
+  - { resource: config.yml }
+
+services:
+  Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\RoutingConditionServiceBundle\Service\LegacyAutoConfiguredService:
+    autoconfigure: true

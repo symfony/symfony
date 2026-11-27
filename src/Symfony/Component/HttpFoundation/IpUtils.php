@@ -197,7 +197,7 @@ class IpUtils
             }
 
             if ('0' === $netmask) {
-                return (bool) unpack('n*', @inet_pton($address));
+                return self::setCacheResult($cacheKey, (bool) unpack('n*', @inet_pton($address)));
             }
 
             if (!ctype_digit($netmask) || 1 > (int) $netmask || 128 < (int) $netmask) {

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-27T13:00:37Z
+
+PR updated: I used the same check as #65186 on 8.2, so that the merge-up has no conflict. `/00` keeps its current meaning for IPv6 subnets.

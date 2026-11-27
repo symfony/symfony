@@ -320,8 +320,8 @@ class ProfilerController
         $this->cspHandler?->disableCsp();
 
         ob_start();
-        phpinfo();
-        $phpinfo = ob_get_clean();
+        phpinfo(\INFO_ALL & ~(\INFO_ENVIRONMENT | \INFO_VARIABLES));
+        $phpinfo = preg_replace('#<h2>Apache Environment</h2>\s*<table>.*?</table>#s', '', ob_get_clean());
 
         return new Response($phpinfo, 200, ['Content-Type' => \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? 'text/plain' : 'text/html']);
     }

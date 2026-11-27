@@ -480,6 +480,25 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertSame('text/plain; charset=UTF-8', $client->getResponse()->headers->get('Content-Type'));
     }
 
+    public function testPhpinfoActionDoesNotShowEnvVars()
+    {
+        putenv('PROFILER_PHPINFO_SECRET=from-the-environment');
+        $_SERVER['PROFILER_PHPINFO_SECRET'] = $_ENV['PROFILER_PHPINFO_SECRET'] = 'from-a-superglobal';
+
+        try {
+            $client = new KernelBrowser(new WebProfilerBundleKernel());
+            $client->request('GET', '/_profiler/phpinfo');
+        } finally {
+            putenv('PROFILER_PHPINFO_SECRET');
+            unset($_SERVER['PROFILER_PHPINFO_SECRET'], $_ENV['PROFILER_PHPINFO_SECRET']);
+        }
+
+        $content = $client->getResponse()->getContent();
+
+        $this->assertStringContainsString('PHP Version', $content);
+        $this->assertStringNotContainsString('PROFILER_PHPINFO_SECRET', $content);
+    }
+
     public function testFontActionWithProfilerDisabled()
     {
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);

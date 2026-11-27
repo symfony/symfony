@@ -38,6 +38,26 @@ class KillRing
     }
 
     /**
+     * @return array{string[], ?string, array{start_line: int, start_col: int, end_line: int, end_col: int}|null}
+     *
+     * @internal
+     */
+    public function saveState(): array
+    {
+        return [$this->entries, $this->lastAction, $this->lastYank];
+    }
+
+    /**
+     * @param array{string[], ?string, array{start_line: int, start_col: int, end_line: int, end_col: int}|null} $state See saveState()
+     *
+     * @internal
+     */
+    public function restoreState(array $state): void
+    {
+        [$this->entries, $this->lastAction, $this->lastYank] = $state;
+    }
+
+    /**
      * Add text to the kill ring.
      *
      * If the last action was also a kill, the text is appended/prepended

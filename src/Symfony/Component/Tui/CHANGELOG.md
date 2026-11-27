@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add `InputWidget::setPlaceholder()`, `setReadOnly()`, `setMaxLength()` and `setMasked()`, with their getters, `setSuggestions()` and `getCompletion()`, `getPrompt()`, and a `$dispatch` argument to `InputWidget::setValue()`
+ * Add `EditorWidget::setPlaceholder()`, `setReadOnly()`, `setMaxLength()`, `setLineWrapping()` and `setFramed()`, with their getters
+ * Add a `group` key to the items of `SelectListWidget`, drawn as headings, and `SelectListWidget::getItems()` and `getSelectedIndex()`
+ * Add `TextWidget::setTruncate()`, with the ellipsis to end truncated lines, and `TextWidget::isTruncated()`
+
 8.2
 ---
 

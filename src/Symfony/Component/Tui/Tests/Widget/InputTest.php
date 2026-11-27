@@ -24,6 +24,166 @@ use Symfony\Component\Tui\Widget\InputWidget;
 
 class InputTest extends TestCase
 {
+    public function testThePlaceholderIsDrawnWhileTheValueIsEmpty()
+    {
+        $input = (new InputWidget())->setPlaceholder("Your\nname");
+        $this->assertSame('Your name', $input->getPlaceholder(), 'On one line.');
+        $this->assertSame('> Your name', rtrim(AnsiUtils::stripAnsiCodes($input->render(new RenderContext(40, 1))[0])));
+        $this->assertSame('> Your', rtrim(AnsiUtils::stripAnsiCodes($input->render(new RenderContext(6, 1))[0])), 'Cut to the room.');
+
+        $input->setValue('Ann');
+        $this->assertSame('> Ann', rtrim(AnsiUtils::stripAnsiCodes($input->render(new RenderContext(40, 1))[0])));
+        $this->assertSame('', (new InputWidget())->getPlaceholder());
+    }
+
+    public function testThePlaceholderIsStyledByItsElement()
+    {
+        $tui = new Tui(null, new VirtualTerminal(40, 3));
+        $tui->add($input = (new InputWidget())->setPlaceholder('hint'));
+
+        // Gray by default
+        $this->assertStringContainsString("\x1b[90mhint", $input->render(new RenderContext(40, 1))[0]);
+    }
+
+    public function testAReadOnlyInputIgnoresEdits()
+    {
+        $input = (new InputWidget())->setValue('abc')->setReadOnly();
+        $changes = 0;
+        $input->onChange(static function () use (&$changes) { ++$changes; });
+
+        // Deleting backward at the end, forward at the start
+        foreach (['x', "\x7f", "\x17", "\x15", "\x1b[200~pasted\x1b[201~", "\x1b[H", "\x1b[3~", "\x0b"] as $key) {
+            $input->handleInput($key);
+        }
+        $this->assertSame('abc', $input->getValue());
+        $this->assertSame(0, $changes);
+        $this->assertTrue($input->isReadOnly());
+
+        $input->handleInput("\x1b[F"); // End
+        $input->handleInput("\x1b[D"); // Left
+        $submitted = null;
+        $input->onSubmit(static function (SubmitEvent $event) use (&$submitted) { $submitted = $event->getValue(); });
+        $input->handleInput("\r");
+        $this->assertSame('abc', $submitted);
+
+        $input->setReadOnly(false);
+        $input->handleInput('x');
+        $this->assertSame('abxc', $input->getValue());
+    }
+
+    public function testTheMaxLengthLimitsTypingAndPasting()
+    {
+        $input = (new InputWidget())->setMaxLength(4);
+        foreach (['a', 'b', 'c'] as $key) {
+            $input->handleInput($key);
+        }
+        $input->handleInput("\x1b[200~défg\x1b[201~");
+        $this->assertSame('abcd', $input->getValue(), 'A paste is cut to the room left.');
+        $input->handleInput('e');
+        $this->assertSame('abcd', $input->getValue());
+        $this->assertSame(4, $input->getMaxLength());
+
+        $input->setValue('longer than four');
+        $this->assertSame('longer than four', $input->getValue(), 'setValue() is not limited.');
+        $input->handleInput("\x7f");
+        $this->assertSame('longer than fou', $input->getValue(), 'Deleting still works past the limit.');
+
+        $input = (new InputWidget())->setMaxLength(2);
+        $input->handleInput('é');
+        $input->handleInput('日');
+        $input->handleInput('x');
+        $this->assertSame('é日', $input->getValue(), 'Counted in characters, not bytes.');
+    }
+
+    public function testAMaskedInputDrawsBullets()
+    {
+        $input = (new InputWidget())->setMasked()->setValue('sécret');
+        $this->assertSame('> ••••••', rtrim(AnsiUtils::stripAnsiCodes($input->render(new RenderContext(40, 1))[0])));
+        $this->assertSame('sécret', $input->getValue());
+        $this->assertTrue($input->isMasked());
+
+        $input->setMasked(false);
+        $this->assertSame('> sécret', rtrim(AnsiUtils::stripAnsiCodes($input->render(new RenderContext(40, 1))[0])));
+    }
+
+    public function testASuggestionIsDrawnAfterTheCursorAndTakenWithTab()
+    {
+        $input = (new InputWidget())->setSuggestions(['admin', 'Alice', "bo\nb"]);
+        $changes = [];
+        $input->onChange(static function (ChangeEvent $event) use (&$changes) { $changes[] = $event->getValue(); });
+        $input->handleInput('a');
+        $input->handleInput('l');
+
+        $this->assertSame('ice', $input->getCompletion(), 'Ignoring case.');
+        $this->assertSame('> alice', rtrim(AnsiUtils::stripAnsiCodes($input->render(new RenderContext(40, 1))[0])));
+        $this->assertSame('al', $input->getValue(), 'Drawn, not taken.');
+
+        $input->handleInput("\t");
+        $this->assertSame('Alice', $input->getValue(), 'As written in the suggestion.');
+        $this->assertSame(['a', 'al', 'Alice'], $changes);
+        $this->assertNull($input->getCompletion());
+    }
+
+    public function testTakingASuggestionGivesItAsWritten()
+    {
+        $input = (new InputWidget())->setSuggestions(['Symfony']);
+        $input->handleInput('S');
+        $input->handleInput('Y');
+        $input->handleInput("\t");
+        $this->assertSame('Symfony', $input->getValue());
+    }
+
+    public function testTakingASuggestionRespectsTheMaxLength()
+    {
+        $input = (new InputWidget())->setSuggestions(['symfony'])->setMaxLength(5);
+        $input->handleInput('s');
+        $input->handleInput("\t");
+        $this->assertSame('symfo', $input->getValue());
+    }
+
+    public function testTheMaxLengthCountsCharactersNotCodePoints()
+    {
+        $input = (new InputWidget())->setMaxLength(2);
+        $input->handleInput("\x1b[200~👨‍👩‍👧e\u{301}x\x1b[201~");
+        $this->assertSame("👨‍👩‍👧e\u{301}", $input->getValue(), 'A family emoji and an accented e, whole.');
+    }
+
+    public function testRightAtTheEndTakesTheSuggestion()
+    {
+        $input = (new InputWidget())->setSuggestions(['admin']);
+        $input->handleInput('a');
+        $input->handleInput('d');
+        $input->handleInput("\x1b[D"); // Left
+        $this->assertSame('> ad', rtrim(AnsiUtils::stripAnsiCodes($input->render(new RenderContext(40, 1))[0])), 'Not drawn before the end.');
+        $input->handleInput("\x1b[C"); // Right: moves to the end
+        $this->assertSame('ad', $input->getValue());
+        $input->handleInput("\x1b[C"); // Right at the end: takes it
+        $this->assertSame('admin', $input->getValue());
+    }
+
+    public function testNoSuggestionForAMaskedOrReadOnlyInput()
+    {
+        $input = (new InputWidget())->setSuggestions(['secret'])->setValue('se');
+        $input->setMasked();
+        $this->assertNull($input->getCompletion());
+        $this->assertSame('> ••', rtrim(AnsiUtils::stripAnsiCodes($input->render(new RenderContext(40, 1))[0])));
+
+        $input = (new InputWidget())->setSuggestions(['secret'])->setValue('se')->setReadOnly();
+        $input->handleInput("\t");
+        $this->assertSame('se', $input->getValue());
+    }
+
+    public function testSetValueDispatchesAChangeWhenAsked()
+    {
+        $input = new InputWidget();
+        $changes = [];
+        $input->onChange(static function (ChangeEvent $event) use (&$changes) { $changes[] = $event->getValue(); });
+        $input->setValue('a');
+        $input->setValue('b', true);
+        $input->setValue('b', true);
+        $this->assertSame(['b'], $changes, 'Once, when it changes.');
+    }
+
     public function testRenderEmpty()
     {
         $input = new InputWidget();

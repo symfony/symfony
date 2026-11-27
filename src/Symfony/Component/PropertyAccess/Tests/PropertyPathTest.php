@@ -112,6 +112,33 @@ class PropertyPathTest extends TestCase
         $this->assertEquals(new PropertyPath('grandpa.parent'), $propertyPath->getParent());
     }
 
+    #[DataProvider('providePathsWithEscapedElements')]
+    public function testGetParentWithEscapedElements(string $path, string $parent)
+    {
+        $propertyPath = new PropertyPath($path);
+
+        $this->assertEquals(new PropertyPath($parent), $propertyPath->getParent());
+        $this->assertEquals(new PropertyPath($parent), (new PropertyPath($propertyPath))->getParent());
+    }
+
+    public static function providePathsWithEscapedElements(): iterable
+    {
+        yield ['root.first\.name', 'root'];
+        yield ['root.first\[name]', 'root'];
+        yield ['root[first\.name]', 'root'];
+        yield ['root[first\[name]', 'root'];
+        yield ['root?.child[first\.name?]', 'root?.child'];
+        yield ['root[first\.name].child\.name', 'root[first\.name]'];
+        yield ['[root][first\.name]', '[root]'];
+    }
+
+    public function testGetParentOfParentWithEscapedElements()
+    {
+        $propertyPath = new PropertyPath('root[first\.name].child\[name]');
+
+        $this->assertEquals(new PropertyPath('root'), $propertyPath->getParent()->getParent());
+    }
+
     public function testGetParentWhenThereIsNoParent()
     {
         $propertyPath = new PropertyPath('path');

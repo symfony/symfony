@@ -30,7 +30,7 @@ class NullCoalescedNameNode extends Node
 
     public function compile(Compiler $compiler): void
     {
-        $compiler->raw('$'.$this->attributes['name'].' ?? null');
+        $compiler->raw('($'.$this->attributes['name'].' ?? null)');
     }
 
     public function evaluate(array $functions, array $values): null

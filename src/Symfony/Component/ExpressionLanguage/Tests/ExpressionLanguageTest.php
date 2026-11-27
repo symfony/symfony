@@ -467,6 +467,14 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame(eval(\sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo']))), 'default');
     }
 
+    public function testNullCoalescingOfAnUnknownNameInsideAnOperation()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+
+        $this->assertSame(1, $expressionLanguage->evaluate('1 + bar ?? 2'));
+        $this->assertSame(1, eval(\sprintf('return %s;', $expressionLanguage->compile('1 + bar ?? 2'))));
+    }
+
     public function testNullCoalescingEvaluateFailsOnObjectWithoutArrayAccess()
     {
         $expressionLanguage = new ExpressionLanguage();

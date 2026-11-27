@@ -7,6 +7,28 @@ in 6.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.4.0...v6.4.1
 
+## 6.4.52 (2026-11-27)
+
+### Cache
+
+ * bug #68456 [Cache] Fix ChainAdapter failing on an uninitialized lazy ghost (lazerg)
+
+### Form
+
+ * minor #68419 [Form][Security][Validator] Add Standard Moroccan Amazigh (zgh) translations (malekkadri)
+
+### HtmlSanitizer
+
+ * bug #68441 [HtmlSanitizer] Reject relative URLs with a colon in the first path segment when parsing (vasikmansuri)
+
+### Mailer
+
+ * bug #68454 [Mailer][Mailgun] Fix rewriting cid references of inline parts with a Content-ID for Mailgun (jkabat)
+
+### Serializer
+
+ * bug #68428 [Serializer] Read the current value with deep_object_to_populate when there is no property type extractor (dhrupo)
+
 ## 6.4.51 (2026-11-25)
 
 ### AssetMapper

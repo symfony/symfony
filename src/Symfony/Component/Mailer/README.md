@@ -67,7 +67,11 @@ $mailer->send($email);
 Sponsor
 -------
 
-This package is looking for a [backer][1].
+The Mailer component for Symfony 8.2 is [backed][1] by [Mailtrap][2].
+
+Mailtrap is a platform for testing and delivering emails, designed to support
+modern development workflows and production-grade sending. It offers secure
+sandboxes, email APIs, and monitoring tools for reliable email delivery.
 
 Help Symfony by [sponsoring][3] its development!
 
@@ -81,4 +85,5 @@ Resources
    in the [main Symfony repository](https://github.com/symfony/symfony)
 
 [1]: https://symfony.com/backers
+[2]: https://l.rw.rw/symfony8.0_backers
 [3]: https://symfony.com/sponsor

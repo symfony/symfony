@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-11-27T03:17:24Z
+
+The HtmlSanitizer failures are not caused by this change. Other PRs from the last day fail on the same UrlSanitizerTest cases.

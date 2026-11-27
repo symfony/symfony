@@ -1,1 +1,7 @@
-{"just here": "for the detection"}
+{
+    "packages": [
+        {"name": "acme/first", "install-path": "../../fake_external/first"},
+        {"name": "acme/second", "install-path": "../../fake_external/first-extra"},
+        {"name": "acme/virtual", "install-path": null}
+    ]
+}

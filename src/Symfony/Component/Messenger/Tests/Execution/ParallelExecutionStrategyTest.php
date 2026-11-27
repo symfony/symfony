@@ -28,6 +28,7 @@ use Symfony\Component\Messenger\Execution\Message\HandledEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\MessageExecutionCallback;
 use Symfony\Component\Messenger\Execution\ParallelExecutionStrategy;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 
@@ -407,6 +408,133 @@ class ParallelExecutionStrategyTest extends TestCase
         $this->assertFalse($strategy->shouldPauseConsumption());
     }
 
+    public function testMessagesAvoidTheWorkersThatDidNotAnswerAFlush()
+    {
+        $flushing = $this->createFakeChannel([new DeferredEnvelopeMessage(1)]);
+        $idle = $this->createFakeChannel();
+        $strategy = $this->createStrategy([$flushing, $idle], 2);
+        $this->setPrivateProperty($strategy, 'keyModes', ['message.bus||'.SecondMessage::class => 2, 'message.bus||'.DummyMessage::class => 1]);
+        $calls = [];
+
+        $strategy->execute(new Envelope(new SecondMessage()), 'async', $this->createOnHandled($calls));
+        $this->assertFalse($strategy->flush($this->createOnHandled($calls)));
+        $this->assertCount(2, $flushing->sent);
+
+        $strategy->execute($envelope = new Envelope(new DummyMessage('Hello')), 'async', $this->createOnHandled($calls));
+
+        $this->assertCount(2, $flushing->sent);
+        $this->assertSame([$envelope], array_map(static fn (DispatchEnvelopeMessage $message) => $message->envelope, $idle->sent));
+        $this->assertSame([], $calls);
+    }
+
+    public function testMessagesOfABatchingKeyWaitWhileTheirWorkerIsBusy()
+    {
+        $channel = $this->createFakeChannel();
+        $idle = $this->createFakeChannel();
+        $strategy = $this->createStrategy([$channel, $idle], 2);
+        $this->setPrivateProperty($strategy, 'keyModes', ['message.bus||'.SecondMessage::class => 2]);
+        $this->setPrivateProperty($strategy, 'batchingKeyAffinities', ['message.bus||'.SecondMessage::class => spl_object_id($channel)]);
+        $calls = [];
+
+        $strategy->execute($first = new Envelope(new SecondMessage()), 'async', $this->createOnHandled($calls));
+        $strategy->execute($second = new Envelope(new SecondMessage()), 'async', $this->createOnHandled($calls));
+
+        $this->assertCount(1, $channel->sent);
+        $this->assertTrue($strategy->shouldPauseConsumption());
+
+        $channel->push(new DeferredEnvelopeMessage(1));
+        $this->assertTrue($strategy->wait($this->createOnHandled($calls)));
+
+        $this->assertSame([$first, $second], array_map(static fn (DispatchEnvelopeMessage $message) => $message->envelope, $channel->sent));
+        $this->assertFalse($strategy->shouldPauseConsumption());
+
+        $strategy->execute($third = new Envelope(new SecondMessage()), 'async', $this->createOnHandled($calls));
+        $this->assertCount(2, $channel->sent);
+
+        $this->setPrivateProperty($channel, 'flushResponses', [new HandledEnvelopeMessage(1, $first, null), new HandledEnvelopeMessage(2, $second, null), new HandledEnvelopeMessage(3, $third, null)]);
+        $this->assertTrue($strategy->flush($this->createOnHandled($calls), true));
+
+        $this->assertSame([$first->getMessage(), $second->getMessage(), $third->getMessage()], array_map(static fn (array $call) => $call[0]->getMessage(), $calls));
+        $this->assertSame([], $idle->sent);
+        $this->assertFalse($strategy->shouldPauseConsumption());
+    }
+
+    public function testTheMessagesThatWaitForAFailedWorkerGoToAnotherWorker()
+    {
+        $failing = $this->createFakeChannel();
+        $channel = $this->createFakeChannel();
+        $strategy = $this->createStrategy([$failing, $channel]);
+        $this->setPrivateProperty($strategy, 'keyModes', ['message.bus||'.SecondMessage::class => 2]);
+        $this->setPrivateProperty($strategy, 'batchingKeyAffinities', ['message.bus||'.SecondMessage::class => spl_object_id($failing)]);
+        $calls = [];
+
+        $strategy->execute($first = new Envelope(new SecondMessage()), 'async', $this->createOnHandled($calls));
+        $strategy->execute($second = new Envelope(new SecondMessage()), 'async', $this->createOnHandled($calls));
+        $this->assertCount(1, $failing->sent);
+
+        $failing->push(new ChannelException('Channel source closed unexpectedly'));
+        $this->assertTrue($strategy->wait($this->createOnHandled($calls)));
+
+        $this->assertCount(1, $calls);
+        $this->assertSame($first, $calls[0][0]);
+        $this->assertSame('The parallel worker stopped before returning a result.', $calls[0][2]->getMessage());
+        $this->assertSame([$second], array_map(static fn (DispatchEnvelopeMessage $message) => $message->envelope, $channel->sent));
+    }
+
+    public function testTheMessagesThatWaitForAnExitingWorkerGoToAnotherWorkerAfterTheOnesItDidNotRead()
+    {
+        $exiting = $this->createFakeChannel();
+        $channel = $this->createFakeChannel();
+        $strategy = $this->createStrategy([$exiting, $channel]);
+        $this->setPrivateProperty($strategy, 'keyModes', ['message.bus||'.SecondMessage::class => 2]);
+        $this->setPrivateProperty($strategy, 'batchingKeyAffinities', ['message.bus||'.SecondMessage::class => spl_object_id($exiting)]);
+        $calls = [];
+
+        $strategy->execute($first = new Envelope(new SecondMessage()), 'async', $this->createOnHandled($calls));
+        $strategy->execute($second = new Envelope(new SecondMessage()), 'async', $this->createOnHandled($calls));
+        $strategy->execute($third = new Envelope(new SecondMessage()), 'async', $this->createOnHandled($calls));
+        $this->assertCount(1, $exiting->sent);
+
+        $exiting->push(new HandledEnvelopeMessage(1, $first, null));
+        $this->assertTrue($strategy->wait($this->createOnHandled($calls)));
+        $this->assertSame([$first, $second], array_map(static fn (DispatchEnvelopeMessage $message) => $message->envelope, $exiting->sent));
+
+        $exiting->push(null);
+        $this->assertFalse($strategy->wait($this->createOnHandled($calls), 0.2));
+        $this->assertCount(1, $calls);
+        $this->assertSame([$second], array_map(static fn (DispatchEnvelopeMessage $message) => $message->envelope, $channel->sent));
+
+        $channel->push(new DeferredEnvelopeMessage($channel->sent[0]->requestId));
+        $this->assertTrue($strategy->wait($this->createOnHandled($calls)));
+        $this->assertSame([$second, $third], array_map(static fn (DispatchEnvelopeMessage $message) => $message->envelope, $channel->sent));
+    }
+
+    public function testAForcedFlushCompletesTheMessagesThatAnExitingWorkerDidNotRead()
+    {
+        $first = new Envelope(new DummyMessage('A'));
+        $second = new Envelope(new DummyMessage('B'));
+        $exiting = $this->createFakeChannel([], [new HandledEnvelopeMessage(1, $first, null), null]);
+        $channel = $this->createFakeChannel([new DeferredEnvelopeMessage(3)], [new HandledEnvelopeMessage(3, $second, null)]);
+        $strategy = $this->createStrategy([$exiting, $channel]);
+        $this->setPrivateProperty($strategy, 'keyModes', ['message.bus||'.DummyMessage::class => 2]);
+        $this->setPrivateProperty($strategy, 'batchingKeyAffinities', ['message.bus||'.DummyMessage::class => spl_object_id($exiting)]);
+        $calls = [];
+
+        $strategy->execute($first, 'async', $this->createOnHandled($calls));
+        $strategy->execute($second, 'async', $this->createOnHandled($calls));
+        $stuck = EventLoop::delay(2, static fn () => $channel->push(new ChannelException('The forced flush never reached this worker.')));
+
+        try {
+            $this->assertTrue($strategy->flush($this->createOnHandled($calls), true));
+        } finally {
+            EventLoop::cancel($stuck);
+        }
+
+        $this->assertSame([[$first->getMessage(), null], [$second->getMessage(), null]], array_map(static fn (array $call) => [$call[0]->getMessage(), $call[2]], $calls));
+        $this->assertInstanceOf(FlushBatchHandlersMessage::class, $channel->sent[1]);
+        $this->assertTrue($channel->sent[1]->force);
+    }
+
     public function testHandlerErrorsAreRebuiltAroundTheLocalEnvelope()
     {
         $envelope = new Envelope(new DummyMessage('Hello'));
@@ -603,7 +731,7 @@ class ParallelExecutionStrategyTest extends TestCase
     {
         $channel = $this->createFakeChannel([new DeferredEnvelopeMessage(1)]);
         $strategy = $this->createStrategy($channel);
-        $this->setPrivateProperty($strategy, 'keyModes', ['message.bus||'.SecondMessage::class => 1]);
+        $this->setPrivateProperty($strategy, 'keyModes', ['message.bus||'.SecondMessage::class => 1, 'message.bus||'.ChildDummyMessage::class => 1]);
         $calls = [];
 
         $strategy->execute(new Envelope(new DummyMessage('A')), 'async', $this->createOnHandled($calls));
@@ -613,7 +741,7 @@ class ParallelExecutionStrategyTest extends TestCase
         $this->assertTrue($strategy->shouldPauseConsumption());
 
         $channel->push(new DeferredEnvelopeMessage(3));
-        $strategy->execute(new Envelope(new DummyMessage('C')), 'async', $this->createOnHandled($calls));
+        $strategy->execute(new Envelope(new ChildDummyMessage('C')), 'async', $this->createOnHandled($calls));
 
         $this->assertSame([], $calls);
         $this->assertTrue($strategy->shouldPauseConsumption());

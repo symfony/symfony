@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `--format=json` and `--format=github` to `lint:expressions`, with GitHub annotations enabled by default in GitHub Actions
  * Add `#[RecoverableAttribute]` to declare the exceptions of a controller attribute that are passed to the controller parameter typed to receive them instead of being thrown
  * Make `#[RateLimit]`, `#[Lock]` and `#[IsSignatureValid]` recoverable, so a controller can receive a `RateLimitExceededException`, `LockConflictedException` or `SignedUriException`
  * Add `ControllerArgumentsEvent::getControllerReflector()`

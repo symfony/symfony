@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Preserve known tag versions when saving values computed by `TagAwareAdapter::get()`
+
 8.2
 ---
 

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-27T13:01:50Z
+
+I retargeted to 7.4. On 6.4, numeric string keys are still dumped as numbers, so `{"-1": "a"}` dumps as `{-1: "a"}`, which does not parse. #68416 fixed that on 7.4 only. I added that case to the tests.
+
+---------------------------------------------------------------------------
+
+by malekkadri at 2026-11-27T13:13:52Z
+
+Thanks for taking the time to fix it and add the test, Nicolas!

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mailer\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\RuntimeException;
@@ -30,6 +31,7 @@ class MessageListener implements EventSubscriberInterface
     public const HEADER_SET_IF_EMPTY = 1;
     public const HEADER_ADD = 2;
     public const HEADER_REPLACE = 3;
+    public const HEADER_EXPRESSION = 4;
     public const DEFAULT_RULES = [
         'from' => self::HEADER_SET_IF_EMPTY,
         'return-path' => self::HEADER_SET_IF_EMPTY,
@@ -53,7 +55,7 @@ class MessageListener implements EventSubscriberInterface
 
     public function addHeaderRule(string $headerName, int $rule): void
     {
-        if ($rule < 1 || $rule > 3) {
+        if ($rule < 1 || $rule > 4) {
             throw new InvalidArgumentException(\sprintf('The "%d" rule is not supported.', $rule));
         }
 
@@ -77,39 +79,54 @@ class MessageListener implements EventSubscriberInterface
             return;
         }
 
-        $headers = $message->getHeaders();
-        foreach ($this->headers->all() as $name => $header) {
-            if (!$headers->has($name)) {
-                $headers->add($header);
+        $messageHeaders = $message->getHeaders();
+        foreach ($this->headers->all() as $name => $defaultHeader) {
+            $headerRule = $this->headerRules[$name] ?? self::HEADER_SET_IF_EMPTY;
+
+            if (!$messageHeaders->has($name) && self::HEADER_EXPRESSION !== $headerRule) {
+                $messageHeaders->add($defaultHeader);
 
                 continue;
             }
 
-            switch ($this->headerRules[$name] ?? self::HEADER_SET_IF_EMPTY) {
+            switch ($headerRule) {
                 case self::HEADER_SET_IF_EMPTY:
                     break;
 
                 case self::HEADER_REPLACE:
-                    $headers->remove($name);
-                    $headers->add($header);
+                    $messageHeaders->remove($name);
+                    $messageHeaders->add($defaultHeader);
 
                     break;
 
                 case self::HEADER_ADD:
                     if (!Headers::isUniqueHeader($name)) {
-                        $headers->add($header);
+                        $messageHeaders->add($defaultHeader);
 
                         break;
                     }
 
-                    $h = $headers->get($name);
-                    if (!$h instanceof MailboxListHeader || !$header instanceof MailboxListHeader) {
+                    $h = $messageHeaders->get($name);
+                    if (!$h instanceof MailboxListHeader || !$defaultHeader instanceof MailboxListHeader) {
                         throw new RuntimeException(\sprintf('Unable to set header "%s".', $name));
                     }
 
-                    foreach ($header->getAddressList() as $address) {
+                    foreach ($defaultHeader->getAddressList() as $address) {
                         $h->addAddress($address);
                     }
+
+                    break;
+
+                case self::HEADER_EXPRESSION:
+                    $expressionLanguage = new ExpressionLanguage();
+                    $body = $expressionLanguage->evaluate($defaultHeader->getBody(), ['headers' => $messageHeaders]);
+
+                    $defaultHeader->setBody($body);
+
+                    $messageHeaders->remove($name);
+                    $messageHeaders->add($defaultHeader);
+
+                    break;
             }
         }
     }

@@ -26,6 +26,7 @@ CHANGELOG
  * Use the global clock of symfony/clock, when installed, for the throttling of `AbstractTransport::setMaxPerSecond()` and the retry period of `RoundRobinTransport` and `FailoverTransport`
  * Add `Transports::close()`, `RoundRobinTransport::stop()` and `SendmailTransport::stop()`
  * Stop the SMTP transports when the kernel shuts down
+ * Add the `headers.Subject.expression` option to globally prefix/suffix the `Subject` header
 
 8.0
 ---

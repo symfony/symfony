@@ -123,6 +123,32 @@ class MailerBundleTest extends TestCase
         $this->assertSame(['foobar@example\.org'], $listener->getArgument(2));
     }
 
+    public function testTheMessageListenerIsWiredWithTheConfiguredSubject()
+    {
+        $expectedSubject = 'Foo';
+        $container = $this->load(['dsn' => 'smtp://example.com', 'headers' => [
+            'Subject' => $expectedSubject,
+        ]]);
+
+        $listener = $container->getDefinition('mailer.message_listener');
+        $this->assertSame([['addHeader', ['Subject', $expectedSubject]]], $listener->getArgument(0)->getMethodCalls());
+        $this->assertArrayNotHasKey('subject', $listener->getArgument(2));
+    }
+
+    public function testTheMessageListenerIsWiredWithTheConfiguredSubjectExpression()
+    {
+        $expectedExpression = 'Foo';
+        $container = $this->load(['dsn' => 'smtp://example.com', 'headers' => [
+            'Subject' => [
+                'expression' => $expectedExpression,
+            ],
+        ]]);
+
+        $listener = $container->getDefinition('mailer.message_listener');
+        $this->assertSame([['addHeader', ['Subject', $expectedExpression]]], $listener->getArgument(0)->getMethodCalls());
+        $this->assertSame(4, $listener->getArgument(2)['subject']);
+    }
+
     public function testTheDefaultMessageBusIsUsed()
     {
         $container = $this->load([]);

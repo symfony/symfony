@@ -12,7 +12,10 @@
 namespace Symfony\Component\HttpKernel\Tests\Debug;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Symfony\Component\ErrorHandler\BufferingLogger;
@@ -21,18 +24,54 @@ use Symfony\Component\HttpKernel\Debug\ErrorHandlerConfigurator;
 
 class ErrorHandlerConfiguratorTest extends TestCase
 {
+    private int $errorReporting;
+
+    protected function setUp(): void
+    {
+        $this->errorReporting = error_reporting(\E_ALL);
+    }
+
+    protected function tearDown(): void
+    {
+        error_reporting($this->errorReporting);
+    }
+
+    public function testConfigureDoesNotUseLegacyLoggerConfiguration()
+    {
+        if (!method_exists(ErrorHandler::class, 'configure')) {
+            $this->markTestSkipped('The error handler does not support configuring the default loggers.');
+        }
+
+        $logger = new BufferingLogger();
+        $deprecationLogger = new BufferingLogger();
+        $handler = new class extends ErrorHandler {
+            public function setDefaultLogger(LoggerInterface $logger, array|int|null $levels = \E_ALL, bool $replace = false): void
+            {
+                throw new \LogicException('Legacy logger configuration was called.');
+            }
+        };
+
+        (new ErrorHandlerConfigurator($logger, \E_ALL, 0, true, true, $deprecationLogger))->configure($handler);
+        $handler->handleError(\E_USER_WARNING, 'Warning', __FILE__, __LINE__);
+        $handler->handleError(\E_USER_DEPRECATED, 'Deprecation', __FILE__, __LINE__);
+
+        $this->assertSame('User Warning: Warning', $logger->cleanLogs()[0][1] ?? null);
+        $this->assertSame('User Deprecated: Deprecation', $deprecationLogger->cleanLogs()[0][1] ?? null);
+    }
+
     public function testConfigure()
     {
-        $logger = new NullLogger();
+        $logger = new BufferingLogger();
         $configurator = new ErrorHandlerConfigurator($logger);
         $handler = new ErrorHandler();
 
         $configurator->configure($handler);
 
-        $loggers = $handler->setLoggers([]);
+        $handler->handleError(\E_USER_DEPRECATED, 'Deprecation', __FILE__, __LINE__);
+        $logs = $logger->cleanLogs();
 
-        $this->assertArrayHasKey(\E_DEPRECATED, $loggers);
-        $this->assertSame([$logger, LogLevel::INFO], $loggers[\E_DEPRECATED]);
+        $this->assertSame(LogLevel::INFO, $logs[0][0] ?? null);
+        $this->assertSame('User Deprecated: Deprecation', $logs[0][1] ?? null);
     }
 
     public function testConfigureReplacesTheLoggersOfAPreviousConfigurator()
@@ -61,6 +100,55 @@ class ErrorHandlerConfiguratorTest extends TestCase
         $this->assertSame('User Deprecated: Bar', $secondDeprecationLogger->cleanLogs()[0][1] ?? null);
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[DataProvider('provideIndependentDebugModes')]
+    public function testConfigureKeepsIndependentDebugModes(bool $scream, bool $scope)
+    {
+        $firstLogger = new BufferingLogger();
+        $logger = new BufferingLogger();
+        $handler = new ErrorHandler();
+        (new ErrorHandlerConfigurator($firstLogger, \E_ALL, 0, false, false))->configure($handler);
+        (new ErrorHandlerConfigurator($logger, \E_ALL, 0, $scream, $scope))->configure($handler);
+
+        $previousReporting = error_reporting(0);
+        try {
+            $handler->handleError(\E_USER_WARNING, 'Silenced warning', __FILE__, __LINE__);
+        } finally {
+            error_reporting($previousReporting);
+        }
+
+        $this->assertSame([], $firstLogger->cleanLogs());
+        $this->assertCount((int) $scream, $logger->cleanLogs());
+
+        $handler->handleError(\E_USER_WARNING, 'Warning', __FILE__, __LINE__);
+        $this->assertSame('User Warning: Warning', $logger->cleanLogs()[0][1] ?? null);
+    }
+
+    public static function provideIndependentDebugModes(): iterable
+    {
+        yield [true, false];
+        yield [false, true];
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testConfigureKeepsCustomThrownErrors()
+    {
+        $logger = new BufferingLogger();
+        $handler = new ErrorHandler();
+        (new ErrorHandlerConfigurator($logger, \E_ALL, \E_WARNING))->configure($handler);
+
+        $handler->handleError(\E_USER_NOTICE, 'Notice', __FILE__, __LINE__);
+        $this->assertSame('User Notice: Notice', $logger->cleanLogs()[0][1] ?? null);
+
+        $this->expectException(\ErrorException::class);
+        $this->expectExceptionMessage('Warning: Warning');
+        $handler->handleError(\E_WARNING, 'Warning', __FILE__, __LINE__);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testConfigureKeepsTheLoggersSetOnTheHandler()
     {
         $appLogger = new NullLogger();
@@ -85,37 +173,36 @@ class ErrorHandlerConfiguratorTest extends TestCase
     #[DataProvider('provideLevelsAssignedToLoggers')]
     public function testLevelsAssignedToLoggers(bool $hasLogger, bool $hasDeprecationLogger, array|int $levels, array|int|null $expectedLoggerLevels, array|int|null $expectedDeprecationLoggerLevels)
     {
-        $handler = $this->createMock(ErrorHandler::class);
+        $handler = new ErrorHandler();
+        $logger = $hasLogger ? new BufferingLogger() : null;
+        $deprecationLogger = $hasDeprecationLogger ? new BufferingLogger() : null;
+        (new ErrorHandlerConfigurator($logger, $levels, 0, true, true, $deprecationLogger))->configure($handler);
 
-        $expectedCalls = [];
-        $logger = null;
-        $deprecationLogger = null;
+        $types = [\E_WARNING => LogLevel::ERROR, \E_ERROR => LogLevel::CRITICAL, \E_DEPRECATED => LogLevel::INFO, \E_USER_DEPRECATED => LogLevel::INFO];
+        $handled = [];
+        foreach ($types as $type => $level) {
+            $handled[] = $handler->handleError($type, 'Error', __FILE__, __LINE__);
+        }
+        if (!$logger && !$deprecationLogger) {
+            $this->assertSame([false, false, false, false], $handled);
 
-        if ($hasDeprecationLogger) {
-            $deprecationLogger = new NullLogger();
-            if (null !== $expectedDeprecationLoggerLevels) {
-                $expectedCalls[] = [$deprecationLogger, $expectedDeprecationLoggerLevels, false];
-            }
+            return;
         }
 
-        if ($hasLogger) {
-            $logger = new NullLogger();
-            if (null !== $expectedLoggerLevels) {
-                $expectedCalls[] = [$logger, $expectedLoggerLevels, false];
+        foreach ([[$logger, $expectedLoggerLevels], [$deprecationLogger, $expectedDeprecationLoggerLevels]] as [$targetLogger, $expectedLevels]) {
+            if (!$targetLogger) {
+                continue;
             }
+
+            $expected = [];
+            foreach ($types as $type => $level) {
+                if (\is_array($expectedLevels) ? isset($expectedLevels[$type]) : ($type & ($expectedLevels ?? 0))) {
+                    $expected[] = [\is_array($expectedLevels) ? $expectedLevels[$type] : $level, $type];
+                }
+            }
+
+            $this->assertSame($expected, array_map(static fn (array $log) => [$log[0], $log[2]['exception']->getSeverity()], $targetLogger->cleanLogs()));
         }
-
-        $handler
-            ->expects($this->exactly(\count($expectedCalls)))
-            ->method('setDefaultLogger')
-            ->willReturnCallback(function (...$args) use (&$expectedCalls) {
-                $this->assertSame(array_shift($expectedCalls), $args);
-            })
-        ;
-
-        $configurator = new ErrorHandlerConfigurator($logger, $levels, null, true, true, $deprecationLogger);
-
-        $configurator->configure($handler);
     }
 
     public static function provideLevelsAssignedToLoggers(): iterable

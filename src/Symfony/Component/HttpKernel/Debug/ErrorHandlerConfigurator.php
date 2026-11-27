@@ -54,6 +54,36 @@ class ErrorHandlerConfigurator
      */
     public function configure(ErrorHandler $handler): void
     {
+        if (method_exists($handler, 'configure')) {
+            $throwErrors = match ($this->throwAt) {
+                -1, \E_ALL => true,
+                0 => false,
+                default => null,
+            };
+            $previousScream = ($this->logger || $this->deprecationLogger) && $this->scope && !$this->scream ? $handler->screamAt(0) : null;
+            $handler->configure($this->logger, $this->deprecationLogger, $this->scope, $throwErrors, $this->levels);
+            if ($this->logger || $this->deprecationLogger) {
+                if (null !== $previousScream) {
+                    $handler->screamAt($previousScream, true);
+                } elseif ($this->scream && !$this->scope) {
+                    $levels = $this->levels;
+                    if (\is_array($levels)) {
+                        $levels = 0;
+                        foreach ($this->levels as $type => $level) {
+                            $levels |= $type;
+                        }
+                    }
+                    $handler->screamAt($levels);
+                }
+                $this->logger = $this->deprecationLogger = $this->levels = null;
+            }
+            if (null !== $this->throwAt && null === $throwErrors) {
+                $handler->throwAt($this->throwAt, true);
+            }
+
+            return;
+        }
+
         if ($this->logger || $this->deprecationLogger) {
             $this->setDefaultLoggers($handler);
             if (\is_array($this->levels)) {

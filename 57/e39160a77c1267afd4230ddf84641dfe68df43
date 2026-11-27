@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by vasikmansuri at 2026-11-26T06:15:37Z
+
+I checked the list against 8.1's `FrameworkExtension::registerProfilerConfiguration()`. With the profiler enabled it loaded `form_debug.php` plus the nine `*_debug.php` files this PR un-gates. `form_debug.php` is still loaded from FrameworkExtension on 8.2 with no `kernel.debug` check, so Form isn't affected and the nine bundles here are the complete set.
+
+The 6 red Unit Tests jobs are unrelated: they're all the same 8 `UrlSanitizerTest::testParse` cases, caused by a league/uri dev-branch change from yesterday. #68438 fails the same way. The fix is in #68441.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-27T13:45:56Z
+
+Thanks for the fix. I removed the UPGRADE note that announced the debug-only behavior, since this PR brings back the 8.1 behavior. I also added a test for the Workflow collector in a kernel without FrameworkBundle, which is the case `nullOnInvalid()` is for.

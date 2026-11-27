@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-27T13:04:03Z
+
+I moved this to 7.4, since 6.4 is close to its end of life. The dumped YAML changes for floats that need more than 14 digits.

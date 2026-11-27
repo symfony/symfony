@@ -791,8 +791,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 // floating-point numbers like 12.0 to 12 (the decimal part is dropped when possible).
                 // PHP's json_decode automatically converts Numbers without a decimal part to integers.
                 // To circumvent this behavior, integers are converted to floats when denormalizing JSON based formats and when
-                // a float is expected.
-                if (TypeIdentifier::FLOAT === $typeIdentifier && \is_int($data) && null !== $format && str_contains($format, JsonEncoder::FORMAT)) {
+                // a float is expected, unless int is accepted as well.
+                if (TypeIdentifier::FLOAT === $typeIdentifier && \is_int($data) && !$type->isIdentifiedBy(TypeIdentifier::INT) && null !== $format && str_contains($format, JsonEncoder::FORMAT)) {
                     return (float) $data;
                 }
 

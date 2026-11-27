@@ -143,7 +143,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
 
     public function getItem(mixed $key): CacheItem
     {
-        $syncItem = self::$syncItem;
         $misses = [];
 
         foreach ($this->adapters as $i => $adapter) {
@@ -151,7 +150,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
 
             if ($item->isHit()) {
                 while (0 <= --$i) {
-                    $this->adapters[$i]->save($syncItem($item, $misses[$i], $this->defaultLifetime));
+                    $this->adapters[$i]->save((self::$syncItem)($item, $misses[$i], $this->defaultLifetime));
                 }
 
                 return $item;
@@ -252,9 +251,9 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
 
     public function save(CacheItemInterface $item): bool
     {
-        (self::$setExpiryMetadata)($item);
         $saved = true;
         $i = $this->adapterCount;
+        (self::$setExpiryMetadata)($item);
 
         while ($i--) {
             $saved = $this->adapters[$i]->save($item) && $saved;
@@ -265,9 +264,9 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
 
     public function saveDeferred(CacheItemInterface $item): bool
     {
-        (self::$setExpiryMetadata)($item);
         $saved = true;
         $i = $this->adapterCount;
+        (self::$setExpiryMetadata)($item);
 
         while ($i--) {
             $saved = $this->adapters[$i]->saveDeferred($item) && $saved;

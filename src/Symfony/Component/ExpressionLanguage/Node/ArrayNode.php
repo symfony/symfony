@@ -56,30 +56,34 @@ class ArrayNode extends Node
 
     public function toArray(): array
     {
-        $value = [];
-        foreach ($this->getKeyValuePairs() as $pair) {
-            $value[$pair['key']->attributes['value']] = $pair['value'];
+        $pairs = $this->getKeyValuePairs();
+        $isList = true;
+        foreach ($pairs as $i => $pair) {
+            if (!$pair['key'] instanceof ConstantNode || $i !== $pair['key']->attributes['value']) {
+                $isList = false;
+                break;
+            }
         }
 
         $array = [];
-
-        if ($this->isHash($value)) {
-            foreach ($value as $k => $v) {
-                $array[] = ', ';
-                $array[] = new ConstantNode($k);
+        foreach ($pairs as $pair) {
+            $array[] = ', ';
+            if (!$isList) {
+                $key = $pair['key'];
+                // Non-literal hash keys must be enclosed in parentheses.
+                if (!$key instanceof ConstantNode || !(\is_string($key->attributes['value']) || ((\is_int($key->attributes['value']) || \is_float($key->attributes['value'])) && $key->attributes['value'] >= 0))) {
+                    $array[] = '(';
+                    $array[] = $key;
+                    $array[] = ')';
+                } else {
+                    $array[] = $key;
+                }
                 $array[] = ': ';
-                $array[] = $v;
             }
-            $array[0] = '{';
-            $array[] = '}';
-        } else {
-            foreach ($value as $v) {
-                $array[] = ', ';
-                $array[] = $v;
-            }
-            $array[0] = '[';
-            $array[] = ']';
+            $array[] = $pair['value'];
         }
+        $array[0] = $isList ? '[' : '{';
+        $array[] = $isList ? ']' : '}';
 
         return $array;
     }

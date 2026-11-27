@@ -211,6 +211,38 @@ class MailgunApiTransportTest extends TestCase
         $this->assertSame('foobar', $message->getMessageId());
     }
 
+    public function testSendWithInlineAttachmentsReferencedByContentId()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $content = '';
+            while ($chunk = $options['body']()) {
+                $content .= $chunk;
+            }
+
+            $this->assertStringContainsString("name=\"inline[0]\"; filename=\"logo.png\"\r\n", $content);
+            $this->assertStringContainsString("\r\n\r\n<img src=\"cid:logo.png\">\r\n", $content);
+
+            return new JsonMockResponse(['id' => 'foobar'], [
+                'http_code' => 200,
+            ]);
+        });
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'symfony', 'us-east-1', $client);
+
+        $part = (new DataPart('image', '@images/logo.png', 'image/png'))->asInline();
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->html('<img src="cid:'.$part->getContentId().'">');
+
+        method_exists($mail, 'addPart') ? $mail->addPart($part) : $mail->attachPart($part);
+
+        $message = $transport->send($mail);
+
+        $this->assertSame('foobar', $message->getMessageId());
+    }
+
     public function testSendThrowsForErrorResponse()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {

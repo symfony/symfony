@@ -20,16 +20,21 @@ use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
+use Symfony\Component\HttpClient\AsyncDecoratorTrait;
 use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
+use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\TraceableHttpClient;
+use Symfony\Contracts\HttpClient\ChunkInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 #[CoversClass(CachingHttpClient::class)]
@@ -2375,6 +2380,88 @@ class CachingHttpClientTest extends TestCase
         $response = $client->request('GET', 'http://example.com/vary-asterisk');
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('bar', $response->getContent());
+    }
+
+    #[DataProvider('provideDiscardedResponses')]
+    public function testDiscardedResponseIsNotCached(\Closure $discard)
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse(['foo', 'bar'], ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse(['foo', 'bar'], ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $response = $client->request('GET', 'http://example.com/discarded');
+        $this->assertSame(200, $response->getStatusCode());
+        $discard($response);
+        unset($response);
+
+        $response = $client->request('GET', 'http://example.com/discarded');
+        $this->assertSame('foobar', $response->getContent());
+        $this->assertSame(2, $mockClient->getRequestsCount());
+
+        $response = $client->request('GET', 'http://example.com/discarded');
+        $this->assertSame('foobar', $response->getContent());
+        $this->assertSame(2, $mockClient->getRequestsCount());
+    }
+
+    public static function provideDiscardedResponses(): iterable
+    {
+        yield 'canceled' => [static fn (ResponseInterface $response) => $response->cancel()];
+        yield 'destructed' => [static fn (ResponseInterface $response) => null];
+    }
+
+    #[DataProvider('provideDiscardedResponsesWithoutContent')]
+    public function testDiscardedResponseWithoutContentIsCached(string $method, int $statusCode, array $headers)
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('', ['http_code' => $statusCode, 'response_headers' => ['Cache-Control' => 'max-age=300'] + $headers]),
+            new MockResponse('', ['http_code' => $statusCode, 'response_headers' => ['Cache-Control' => 'max-age=300'] + $headers]),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $response = $client->request($method, 'http://example.com/discarded');
+        $this->assertSame($statusCode, $response->getStatusCode());
+        unset($response);
+
+        $response = $client->request($method, 'http://example.com/discarded');
+        $this->assertSame($statusCode, $response->getStatusCode());
+        $this->assertSame('', $response->getContent());
+        $this->assertSame(1, $mockClient->getRequestsCount());
+    }
+
+    public static function provideDiscardedResponsesWithoutContent(): iterable
+    {
+        yield 'HEAD' => ['HEAD', 200, ['Content-Length' => '3']];
+        yield '204' => ['GET', 204, []];
+        yield 'Content-Length: 0' => ['GET', 200, ['Content-Length' => '0']];
+    }
+
+    public function testResponseCanceledByDecoratedClientIsNotCached()
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse(['foo', 'bar'], ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse(['foo', 'bar'], ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+        ]);
+
+        $decoratedClient = new class($mockClient) implements HttpClientInterface {
+            use AsyncDecoratorTrait;
+
+            public function request(string $method, string $url, array $options = []): ResponseInterface
+            {
+                return new AsyncResponse($this->client, $method, $url, $options, static function (ChunkInterface $chunk, AsyncContext $context): \Generator {
+                    yield 'bar' === $chunk->getContent() ? $context->cancel() : $chunk;
+                });
+            }
+        };
+
+        $client = new CachingHttpClient($decoratedClient, $this->cacheAdapter);
+
+        $this->assertSame('foo', $client->request('GET', 'http://example.com/canceled')->getContent());
+        $this->assertSame('foo', $client->request('GET', 'http://example.com/canceled')->getContent());
+        $this->assertSame(2, $mockClient->getRequestsCount());
     }
 
     public function testExcludedHeadersAreNotCached()

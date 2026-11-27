@@ -210,6 +210,39 @@ class CookieJarTest extends TestCase
         $this->assertSame('example.com', $cookieJar->get('foo')->getDomain());
     }
 
+    public function testDomainAttributeIsCaseInsensitive()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['foo=bar; Domain=Example.COM'], 'http://example.com/');
+
+        $this->assertSame(['foo' => 'bar'], $cookieJar->allValues('http://example.com/'));
+        $this->assertSame(['foo' => 'bar'], $cookieJar->allValues('http://WWW.Example.com/'));
+        $this->assertSame('bar', $cookieJar->get('foo', '/', 'EXAMPLE.com')?->getValue());
+
+        $cookieJar->expire('foo', '/', 'example.COM');
+        $this->assertSame([], $cookieJar->all());
+    }
+
+    public function testDomainFromTheUriIsCaseInsensitive()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['foo=bar'], 'http://EXAMPLE.com/');
+
+        $this->assertSame(['foo' => 'bar'], $cookieJar->allValues('http://example.com/'));
+        $this->assertSame(['foo' => 'bar'], $cookieJar->allValues('http://Example.Com/'));
+        $this->assertSame('bar', $cookieJar->get('foo', '/', 'example.com')?->getValue());
+    }
+
+    public function testCookiesWithDifferentlyCasedDomainsOverwriteEachOther()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->set(new Cookie('foo', 'first', null, '/', 'Example.com'));
+        $cookieJar->set(new Cookie('foo', 'second', null, '/', 'example.COM'));
+
+        $this->assertCount(1, $cookieJar->all());
+        $this->assertSame(['foo' => 'second'], $cookieJar->allValues('http://example.com/'));
+    }
+
     public function testUpdateFromEmptySetCookie()
     {
         $cookieJar = new CookieJar();

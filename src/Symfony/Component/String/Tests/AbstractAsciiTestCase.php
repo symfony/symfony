@@ -1124,7 +1124,25 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['url_value', 'URLValue'],
             ['io_error', 'IOError'],
             ['symfony5', 'SYMFONY5'],
+            ['abbr_value', 'ABBRValue'],
+            ['a_json_data', 'aJSONData'],
+            ['parse_url_now', 'parseURLNow'],
+            ['https_connection', 'HTTPSConnection'],
+            ['abcdefghij', 'ABCDEFGHIJ'],
         ];
+    }
+
+    public function testSnakeWithLongUppercaseRun()
+    {
+        // a pattern that gives an uppercase run back one letter at a time exceeds a low limit
+        $backtrackLimit = ini_set('pcre.backtrack_limit', '1000');
+
+        try {
+            $this->assertEquals(static::createFromString(str_repeat('a', 2000)), static::createFromString(str_repeat('A', 2000))->snake());
+            $this->assertEquals(static::createFromString(str_repeat('a', 2000).'_ab'), static::createFromString(str_repeat('A', 2001).'b')->snake());
+        } finally {
+            ini_set('pcre.backtrack_limit', $backtrackLimit);
+        }
     }
 
     #[DataProvider('provideKebab')]

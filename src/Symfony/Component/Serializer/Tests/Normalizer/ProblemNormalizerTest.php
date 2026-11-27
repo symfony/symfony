@@ -53,6 +53,29 @@ class ProblemNormalizerTest extends TestCase
         $this->assertSame($expected, $this->normalizer->normalize(FlattenException::createFromThrowable(new \RuntimeException('Error'))));
     }
 
+    public function testNormalizeAboutBlankTypeUsesTheStatusPhraseAsTitle()
+    {
+        $normalizer = new ProblemNormalizer(false, [ProblemNormalizer::TYPE => 'about:blank']);
+        $exception = FlattenException::createFromThrowable(new HttpException(404, 'Not here'));
+
+        $this->assertSame([
+            'type' => 'about:blank',
+            'title' => 'Not Found',
+            'status' => 404,
+            'detail' => 'Not Found',
+        ], $normalizer->normalize($exception));
+
+        $this->assertSame('Service Unavailable', $normalizer->normalize($exception, null, [ProblemNormalizer::STATUS => 503])['title']);
+        $this->assertSame('Custom title', $normalizer->normalize($exception, null, [ProblemNormalizer::TITLE => 'Custom title'])['title']);
+    }
+
+    public function testNormalizeAboutBlankTypeWithAnUnknownStatusKeepsTheGenericTitle()
+    {
+        $normalizer = new ProblemNormalizer(false, [ProblemNormalizer::TYPE => 'about:blank']);
+
+        $this->assertSame('An error occurred', $normalizer->normalize(FlattenException::createFromThrowable(new HttpException(499)))['title']);
+    }
+
     public function testNormalizePartialDenormalizationException()
     {
         $this->normalizer->setSerializer(new Serializer());

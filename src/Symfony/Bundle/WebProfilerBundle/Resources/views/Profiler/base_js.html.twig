@@ -241,7 +241,9 @@
                 toggle.addEventListener('click', (e) => {
                     const toggle = e.currentTarget;
 
-                    if (e.target.closest('a, .sf-toggle') !== toggle) {
+                    const target = e.target.closest('a, button, input, select, textarea, .sf-toggle');
+
+                    if (target !== toggle && target !== toggleControl) {
                         return;
                     }
 

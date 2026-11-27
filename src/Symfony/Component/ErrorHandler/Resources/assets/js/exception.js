@@ -225,7 +225,7 @@
             addEventListener(toggles[i], 'click', function(e) {
                 var toggle = e.currentTarget;
 
-                if (e.target.closest('a, .sf-toggle') !== toggle) {
+                if (e.target.closest('a, button, input, select, textarea, .sf-toggle') !== toggle) {
                     return;
                 }
 

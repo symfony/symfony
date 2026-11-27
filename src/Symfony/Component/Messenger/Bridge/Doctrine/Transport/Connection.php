@@ -71,6 +71,15 @@ class Connection implements ResetInterface
     private bool $autoSetup;
 
     /**
+     * The "delivered_at" this connection wrote for the messages it delivered and that were not acknowledged, rejected nor released since, by id.
+     *
+     * A message whose "delivered_at" changed since was delivered again, e.g. to another worker after the redeliver timeout.
+     *
+     * @var array<string, \DateTimeImmutable>
+     */
+    private array $deliveredAt = [];
+
+    /**
      * Constructor.
      *
      * Available options:
@@ -307,6 +316,10 @@ class Connection implements ResetInterface
 
             $this->driverConnection->commit();
 
+            foreach ($doctrineEnvelopes as $doctrineEnvelope) {
+                $this->deliveredAt[$doctrineEnvelope['id']] = $now;
+            }
+
             return $doctrineEnvelopes;
         } catch (\Throwable $e) {
             if ($this->driverConnection->isTransactionActive()) {
@@ -324,6 +337,8 @@ class Connection implements ResetInterface
 
     public function ack(string $id): bool
     {
+        unset($this->deliveredAt[$id]);
+
         try {
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
         } catch (DBALException $exception) {
@@ -333,6 +348,8 @@ class Connection implements ResetInterface
 
     public function reject(string $id): bool
     {
+        unset($this->deliveredAt[$id]);
+
         try {
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
         } catch (DBALException $exception) {
@@ -350,19 +367,60 @@ class Connection implements ResetInterface
         // No transaction here: the keepalive runs from a SIGALRM handler that can interrupt the
         // connection between the driver call and the nesting-level update, where beginTransaction()
         // would issue a SAVEPOINT against an idle session and corrupt the nesting state.
+        $deliveredAt = $this->deliveredAt[$id] ?? null;
+        $now = \DateTimeImmutable::createFromTimestamp(microtime(true));
+
         try {
             $queryBuilder = $this->driverConnection->createQueryBuilder()
                 ->update($this->configuration['table_name'])
                 ->set('delivered_at', '?')
                 ->where('id = ?');
-            $this->executeStatement($queryBuilder->getSQL(), [
-                \DateTimeImmutable::createFromTimestamp(microtime(true)),
-                $id,
-            ], [
-                Types::DATETIME_IMMUTABLE,
-            ]);
+            $parameters = [$now, $id];
+            $types = [Types::DATETIME_IMMUTABLE];
+
+            if (null !== $deliveredAt) {
+                // a late keepalive must not renew a message that was delivered again since, e.g. to another worker after the redeliver timeout
+                $queryBuilder->andWhere('delivered_at = ?');
+                $parameters[] = $deliveredAt;
+                $types[2] = Types::DATETIME_IMMUTABLE;
+            }
+
+            $updated = $this->executeStatement($queryBuilder->getSQL(), $parameters, $types);
         } catch (\Throwable $e) {
             throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        if (null !== $deliveredAt && 0 < $updated) {
+            $this->deliveredAt[$id] = $now;
+        }
+    }
+
+    /**
+     * Makes a message that get() returned available again, unless it was delivered again since, e.g. to another worker after the redeliver timeout.
+     */
+    public function release(string $id): void
+    {
+        if (null === $deliveredAt = $this->deliveredAt[$id] ?? null) {
+            return;
+        }
+
+        unset($this->deliveredAt[$id]);
+
+        try {
+            $queryBuilder = $this->driverConnection->createQueryBuilder()
+                ->update($this->configuration['table_name'])
+                ->set('delivered_at', 'NULL')
+                ->where('id = ?')
+                ->andWhere('delivered_at = ?');
+
+            $released = $this->driverConnection->executeStatement($queryBuilder->getSQL(), [$id, $deliveredAt], [1 => Types::DATETIME_IMMUTABLE]);
+
+            if ($released && $this->driverConnection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+                // wake up the workers that wait for a message, as sending one does
+                $this->driverConnection->executeStatement('SELECT pg_notify(?, ?)', [$this->configuration['table_name'], $this->configuration['queue_name']]);
+            }
+        } catch (DBALException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
         }
     }
 

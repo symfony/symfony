@@ -22,13 +22,14 @@ use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
+use Symfony\Component\Messenger\Transport\Receiver\ReleasableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  */
-class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareInterface, KeepaliveReceiverInterface
+class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareInterface, KeepaliveReceiverInterface, ReleasableReceiverInterface
 {
     private const MAX_RETRIES = 3;
     // How long, in seconds, ack() and reject() wait for a lost connection to come back: less than the 10 seconds supervisor gives a worker to stop by default
@@ -98,6 +99,11 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
     public function keepalive(Envelope $envelope, ?int $seconds = null): void
     {
         $this->connection->keepalive($this->findDoctrineReceivedStampId($envelope), $seconds);
+    }
+
+    public function release(Envelope $envelope): void
+    {
+        $this->connection->release($this->findDoctrineReceivedStampId($envelope));
     }
 
     public function reject(Envelope $envelope): void

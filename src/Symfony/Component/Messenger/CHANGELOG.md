@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add `ReleasableReceiverInterface` to let the worker give back to the transport the messages it fetched but did not start handling when it stops
+
 8.2
 ---
 

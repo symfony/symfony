@@ -107,6 +107,87 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $this->assertSame(0, (int) $this->driverConnection->fetchOne('SELECT COUNT(*) FROM queue_table'));
     }
 
+    public function testReleaseMakesTheMessagesAvailableAgain()
+    {
+        foreach (['first', 'second', 'third'] as $message) {
+            $this->connection->send('{"message": "'.$message.'"}', ['type' => DummyMessage::class]);
+        }
+        $encoded = $this->connection->get(3);
+
+        $this->connection->release($encoded[1]['id']);
+        $this->connection->release($encoded[2]['id']);
+
+        $this->assertNotNull($this->getDeliveredAt($encoded[0]['id']));
+        $this->assertNull($this->getDeliveredAt($encoded[1]['id']));
+        $this->assertNull($this->getDeliveredAt($encoded[2]['id']));
+        // another worker gets them at once, without the message that was not released
+        $otherConnection = new PostgreSqlConnection(['table_name' => 'queue_table'], $this->driverConnection);
+        $this->assertSame(['{"message": "second"}', '{"message": "third"}'], array_column($otherConnection->get(3), 'body'));
+    }
+
+    #[Group('time-sensitive')]
+    public function testReleaseAndALateKeepaliveLeaveAMessageThatAnotherWorkerReceivedSince()
+    {
+        $connection = new PostgreSqlConnection(['table_name' => 'queue_table', 'redeliver_timeout' => 10], $this->driverConnection);
+        $otherConnection = new PostgreSqlConnection(['table_name' => 'queue_table', 'redeliver_timeout' => 10], $this->driverConnection);
+        $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $id = $connection->get()[0]['id'];
+
+        // the redeliver timeout passes without a keepalive: another worker receives the message
+        sleep(11);
+        $this->assertSame($id, $otherConnection->get()[0]['id']);
+        $deliveredAt = $this->getDeliveredAt($id);
+
+        sleep(1);
+        $connection->keepalive($id);
+        $this->assertSame($deliveredAt, $this->getDeliveredAt($id));
+
+        $connection->release($id);
+        $this->assertSame($deliveredAt, $this->getDeliveredAt($id));
+        $this->assertNull((new PostgreSqlConnection(['table_name' => 'queue_table', 'redeliver_timeout' => 10], $this->driverConnection))->get());
+
+        // the message stays with the worker that received it last
+        $otherConnection->keepalive($id);
+        $this->assertGreaterThan($deliveredAt, $this->getDeliveredAt($id));
+        $otherConnection->release($id);
+        $this->assertNull($this->getDeliveredAt($id));
+    }
+
+    public function testReleaseNotifiesTheWorkersThatWaitForAMessage()
+    {
+        $waitingConnection = new PostgreSqlConnection(['table_name' => 'queue_table'], DriverManager::getConnection($this->driverConnection->getParams(), $this->driverConnection->getConfiguration()));
+        $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $id = $this->connection->get()[0]['id'];
+        $waitingConnection->listen();
+        $this->assertNull($waitingConnection->get());
+
+        // nothing is released: no worker is woken up
+        (new PostgreSqlConnection(['table_name' => 'queue_table'], $this->driverConnection))->release($id);
+        $this->assertFalse($waitingConnection->waitForNotify(200));
+
+        $this->connection->release($id);
+
+        $this->assertTrue($waitingConnection->waitForNotify(10000));
+        $this->assertSame($id, $waitingConnection->get()[0]['id']);
+    }
+
+    public function testAWorkerThatStopsInTheMiddleOfABatchLeavesTheRestAvailable()
+    {
+        $serializer = new PhpSerializer();
+        foreach (['first', 'second', 'third'] as $message) {
+            $this->connection->send($serializer->encode(new Envelope(new DummyMessage($message)))['body'], []);
+        }
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        // what "messenger:consume --fetch-size=3 --limit=1" does
+        (new Worker(['async' => new DoctrineReceiver($this->connection)], new MessageBus(), $dispatcher))->run(['sleep' => 0, 'fetch_size' => 3]);
+
+        $this->assertSame([null, null], $this->driverConnection->fetchFirstColumn('SELECT delivered_at FROM queue_table ORDER BY id'));
+        $envelopes = (new DoctrineReceiver(new PostgreSqlConnection(['table_name' => 'queue_table'], $this->driverConnection)))->get(3);
+        $this->assertSame(['second', 'third'], array_map(static fn (Envelope $envelope) => $envelope->getMessage()->getMessage(), $envelopes));
+    }
+
     public function testSkipLocked()
     {
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table', 'skip_locked' => true], $this->driverConnection);
@@ -118,6 +199,11 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $this->assertEquals(['type' => DummyMessage::class], $encoded[0]['headers']);
 
         $this->assertNull($connection->get());
+    }
+
+    private function getDeliveredAt(string $id): ?string
+    {
+        return $this->driverConnection->fetchOne('SELECT delivered_at FROM queue_table WHERE id = ?', [$id]);
     }
 
     private function terminateBackend(): void

@@ -21,8 +21,17 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
+use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Messenger\Worker;
 
 #[RequiresPhpExtension('pdo_sqlite')]
 class DoctrineIntegrationTest extends TestCase
@@ -54,28 +63,241 @@ class DoctrineIntegrationTest extends TestCase
         $this->assertEquals(['type' => DummyMessage::class], $encoded[0]['headers']);
     }
 
+    #[Group('time-sensitive')]
     public function testKeepaliveRenewsTheLease()
     {
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
         $encoded = $this->connection->get();
-        $this->driverConnection->executeStatement('UPDATE messenger_messages SET delivered_at = ? WHERE id = ?', ['2000-01-01 00:00:00', $encoded[0]['id']]);
+        $deliveredAt = $this->getDeliveredAt($encoded[0]['id']);
 
+        sleep(1);
         $this->connection->keepalive($encoded[0]['id']);
 
-        $this->assertNotSame('2000-01-01 00:00:00', $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$encoded[0]['id']]));
+        $this->assertGreaterThan($deliveredAt, $this->getDeliveredAt($encoded[0]['id']));
     }
 
+    #[Group('time-sensitive')]
     public function testKeepaliveWhileTheConnectionIsInATransaction()
     {
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
         $encoded = $this->connection->get();
-        $this->driverConnection->executeStatement('UPDATE messenger_messages SET delivered_at = ? WHERE id = ?', ['2000-01-01 00:00:00', $encoded[0]['id']]);
+        $deliveredAt = $this->getDeliveredAt($encoded[0]['id']);
 
+        sleep(1);
         $this->driverConnection->beginTransaction();
         $this->connection->keepalive($encoded[0]['id']);
         $this->driverConnection->commit();
 
-        $this->assertNotSame('2000-01-01 00:00:00', $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$encoded[0]['id']]));
+        $this->assertGreaterThan($deliveredAt, $this->getDeliveredAt($encoded[0]['id']));
+    }
+
+    #[Group('time-sensitive')]
+    public function testKeepaliveOfAMessageTheConnectionDidNotFetchRenewsTheLease()
+    {
+        $id = $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        (new Connection([], $this->driverConnection))->get();
+        $deliveredAt = $this->getDeliveredAt($id);
+
+        sleep(1);
+        $this->connection->keepalive($id);
+
+        $this->assertGreaterThan($deliveredAt, $this->getDeliveredAt($id));
+    }
+
+    #[Group('time-sensitive')]
+    public function testALateKeepaliveLeavesAMessageThatAnotherWorkerReceivedSince()
+    {
+        $connection = new Connection(['redeliver_timeout' => 10], $this->driverConnection);
+        $otherConnection = new Connection(['redeliver_timeout' => 10], $this->driverConnection);
+        $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $id = $connection->get()[0]['id'];
+
+        // the redeliver timeout passes without a keepalive: another worker receives the message
+        sleep(11);
+        $this->assertSame($id, $otherConnection->get()[0]['id']);
+        $deliveredAt = $this->getDeliveredAt($id);
+
+        sleep(1);
+        $connection->keepalive($id);
+        $this->assertSame($deliveredAt, $this->getDeliveredAt($id));
+
+        $connection->release($id);
+        $this->assertSame($deliveredAt, $this->getDeliveredAt($id));
+        $this->assertNull((new Connection(['redeliver_timeout' => 10], $this->driverConnection))->get());
+
+        // the message stays with the worker that received it last
+        $otherConnection->keepalive($id);
+        $this->assertGreaterThan($deliveredAt, $this->getDeliveredAt($id));
+        $otherConnection->release($id);
+        $this->assertNull($this->getDeliveredAt($id));
+    }
+
+    public function testReleaseMakesTheMessagesAvailableAgain()
+    {
+        foreach (['first', 'second', 'third'] as $message) {
+            $this->connection->send('{"message": "'.$message.'"}', ['type' => DummyMessage::class]);
+        }
+        $encoded = $this->connection->get(3);
+
+        $this->connection->release($encoded[1]['id']);
+        $this->connection->release($encoded[2]['id']);
+
+        $this->assertNotNull($this->getDeliveredAt($encoded[0]['id']));
+        $this->assertNull($this->getDeliveredAt($encoded[1]['id']));
+        $this->assertNull($this->getDeliveredAt($encoded[2]['id']));
+        // another worker gets them at once, without the message that was not released
+        $this->assertSame(['{"message": "second"}', '{"message": "third"}'], array_column((new Connection([], $this->driverConnection))->get(3), 'body'));
+    }
+
+    #[Group('time-sensitive')]
+    public function testReleaseLeavesAMessageThatAnotherWorkerReceivedSince()
+    {
+        $connection = new Connection(['redeliver_timeout' => 10], $this->driverConnection);
+        $otherConnection = new Connection(['redeliver_timeout' => 10], $this->driverConnection);
+        $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $id = $connection->get()[0]['id'];
+
+        sleep(11);
+        $this->assertSame($id, $otherConnection->get()[0]['id']);
+        $deliveredAt = $this->getDeliveredAt($id);
+
+        $connection->release($id);
+
+        $this->assertSame($deliveredAt, $this->getDeliveredAt($id));
+        $this->assertNull((new Connection(['redeliver_timeout' => 10], $this->driverConnection))->get());
+    }
+
+    #[Group('time-sensitive')]
+    public function testReleaseAfterAKeepalive()
+    {
+        $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $id = $this->connection->get()[0]['id'];
+        $deliveredAt = $this->getDeliveredAt($id);
+
+        sleep(1);
+        $this->connection->keepalive($id);
+        $this->assertGreaterThan($deliveredAt, $this->getDeliveredAt($id));
+
+        $this->connection->release($id);
+
+        $this->assertNull($this->getDeliveredAt($id));
+    }
+
+    #[Group('time-sensitive')]
+    public function testReleasingAMessageTwiceDoesNotReleaseItsNextDelivery()
+    {
+        $otherConnection = new Connection([], $this->driverConnection);
+        $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $id = $this->connection->get()[0]['id'];
+        $this->connection->release($id);
+
+        // another worker receives the message within the same second
+        $this->assertSame($id, $otherConnection->get()[0]['id']);
+        $deliveredAt = $this->getDeliveredAt($id);
+
+        $this->connection->release($id);
+
+        $this->assertSame($deliveredAt, $this->getDeliveredAt($id));
+    }
+
+    public function testReleaseDoesNothingForAMessageTheConnectionDidNotFetch()
+    {
+        $id = $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        (new Connection([], $this->driverConnection))->get();
+        $deliveredAt = $this->getDeliveredAt($id);
+
+        $this->connection->release($id);
+
+        $this->assertNotNull($deliveredAt);
+        $this->assertSame($deliveredAt, $this->getDeliveredAt($id));
+    }
+
+    public function testReleaseDoesNothingForAcknowledgedAndRejectedMessages()
+    {
+        foreach (['first', 'second', 'third'] as $message) {
+            $this->connection->send('{"message": "'.$message.'"}', ['type' => DummyMessage::class]);
+        }
+        $encoded = $this->connection->get(3);
+        $this->assertTrue($this->connection->ack($encoded[0]['id']));
+        $this->assertTrue($this->connection->reject($encoded[1]['id']));
+
+        foreach ($encoded as $doctrineEnvelope) {
+            $this->connection->release($doctrineEnvelope['id']);
+        }
+
+        $this->assertSame([['{"message": "third"}', null]], $this->driverConnection->fetchAllNumeric('SELECT body, delivered_at FROM messenger_messages'));
+    }
+
+    public function testAckAndRejectAfterARelease()
+    {
+        foreach (['first', 'second', 'third'] as $message) {
+            $this->connection->send('{"message": "'.$message.'"}', ['type' => DummyMessage::class]);
+        }
+        $encoded = $this->connection->get(3);
+        $this->connection->release($encoded[2]['id']);
+
+        $this->assertTrue($this->connection->ack($encoded[0]['id']));
+        $this->assertTrue($this->connection->reject($encoded[1]['id']));
+
+        $this->assertSame([['{"message": "third"}', null]], $this->driverConnection->fetchAllNumeric('SELECT body, delivered_at FROM messenger_messages'));
+    }
+
+    public function testReleaseThrowsATransportExceptionWhenTheDatabaseFails()
+    {
+        $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $id = $this->connection->get()[0]['id'];
+        $this->driverConnection->executeStatement('DROP TABLE messenger_messages');
+
+        $this->expectException(TransportException::class);
+
+        $this->connection->release($id);
+    }
+
+    public function testAWorkerThatStopsInTheMiddleOfABatchLeavesTheRestAvailable()
+    {
+        $transport = new DoctrineTransport($this->connection, new PhpSerializer());
+        foreach (['first', 'second', 'third'] as $message) {
+            $transport->send(new Envelope(new DummyMessage($message)));
+        }
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        // what "messenger:consume --fetch-size=3 --limit=1" does
+        (new Worker(['doctrine' => $transport], new MessageBus(), $dispatcher))->run(['sleep' => 0, 'fetch_size' => 3]);
+
+        $this->assertSame([null, null], $this->driverConnection->fetchFirstColumn('SELECT delivered_at FROM messenger_messages ORDER BY id'));
+        $envelopes = (new DoctrineTransport(new Connection([], $this->driverConnection), new PhpSerializer()))->get(3);
+        $this->assertSame(['second', 'third'], array_map(static fn (Envelope $envelope) => $envelope->getMessage()->getMessage(), $envelopes));
+    }
+
+    public function testAWorkerThatFailsInTheMiddleOfABatchKeepsTheMessageItFailedOnHidden()
+    {
+        $transport = new DoctrineTransport($this->connection, new PhpSerializer());
+        foreach (['first', 'second', 'third'] as $message) {
+            $transport->send(new Envelope(new DummyMessage($message)));
+        }
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerMessageHandledEvent::class, static function (WorkerMessageHandledEvent $event) {
+            if ('second' === $event->getEnvelope()->getMessage()->getMessage()) {
+                throw new \LogicException('A listener failed.');
+            }
+        });
+
+        try {
+            (new Worker(['doctrine' => $transport], new MessageBus(), $dispatcher))->run(['sleep' => 0, 'fetch_size' => 3]);
+            $this->fail('The worker should fail.');
+        } catch (\LogicException) {
+        }
+
+        $rows = $this->driverConnection->fetchAllNumeric('SELECT body, delivered_at FROM messenger_messages ORDER BY id');
+        $this->assertCount(2, $rows);
+        $this->assertStringContainsString('second', $rows[0][0]);
+        $this->assertNotNull($rows[0][1]);
+        $this->assertStringContainsString('third', $rows[1][0]);
+        $this->assertNull($rows[1][1]);
+        // a restarted worker gets the message the first one did not reach, and not the one it failed on
+        $envelopes = (new DoctrineTransport(new Connection([], $this->driverConnection), new PhpSerializer()))->get(3);
+        $this->assertSame(['third'], array_map(static fn (Envelope $envelope) => $envelope->getMessage()->getMessage(), $envelopes));
     }
 
     #[Group('time-sensitive')]
@@ -429,6 +651,11 @@ class DoctrineIntegrationTest extends TestCase
         sort($names);
 
         return $names;
+    }
+
+    private function getDeliveredAt(string $id): ?string
+    {
+        return $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$id]);
     }
 
     private function formatDateTime(\DateTimeImmutable $dateTime): string

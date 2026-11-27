@@ -736,6 +736,13 @@ class AbstractBrowserTest extends TestCase
             ['<html><head><meta http-equiv="refresh" content="0;URL= http://www.example.com/redirected  "/></head></html>', 'http://www.example.com/redirected'],
             ['<html><head><meta http-equiv="refresh" content="0;url=http://www.example.com/redirected  "/></head></html>', 'http://www.example.com/redirected'],
             ['<html><head><noscript><meta http-equiv="refresh" content="0;URL=http://www.example.com/redirected"/></noscript></head></head></html>', 'http://www.example.com/redirected'],
+            // The URL parser removes tabs and newlines, and trims C0 controls and spaces.
+            ["<html><head><meta http-equiv=\"refresh\" content=\"0;URL=http://www.example.com/redi\trected\"/></head></html>", 'http://www.example.com/redirected'],
+            ["<html><head><meta http-equiv=\"refresh\" content=\"0;URL=http://www.example.com/redi\nrected\"/></head></html>", 'http://www.example.com/redirected'],
+            ["<html><head><meta http-equiv=\"refresh\" content=\"0;URL='http://www.example.com/redi\nrected'\"/></head></html>", 'http://www.example.com/redirected'],
+            ["<html><head><meta http-equiv=\"refresh\" content=\"0;URL='http://www.example.com/\r\n\tredirected'\"/></head></html>", 'http://www.example.com/redirected'],
+            ["<html><head><meta http-equiv=\"refresh\" content=\"0;URL=' http://www.example.com/redirected'\"/></head></html>", 'http://www.example.com/redirected'],
+            ["<html><head><meta http-equiv=\"refresh\" content=\"0;URL=http://www.example.com/redirected\f\"/></head></html>", 'http://www.example.com/redirected'],
             // Non-zero timeout should not result in a redirect.
             ['<html><head><meta http-equiv="refresh" content="4; URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/foo/foobar'],
             ['<html><body></body></html>', 'http://www.example.com/foo/foobar'],

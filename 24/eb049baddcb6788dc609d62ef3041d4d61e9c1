@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-27T14:49:21Z
+
+Thanks for the PR. I changed the approach. Stopping propagation in `HtmlDumper` would hide these clicks from any other listener on the page. Instead, the toggle listeners now skip clicks on buttons and form fields, like they already do for links.

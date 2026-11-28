@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use Amp\DeferredFuture;
 use Amp\Dns;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -21,7 +22,9 @@ use Symfony\Component\HttpClient\Internal\AmpClientState;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
+use function Amp\async;
 use function Amp\delay;
+use function Amp\Socket\listen;
 
 #[Group('dns-sensitive')]
 class AmpHttpClientTest extends HttpClientTestCase
@@ -315,6 +318,58 @@ class AmpHttpClientTest extends HttpClientTestCase
         $client->request('GET', 'http://localhost:'.self::port().'/')->getContent();
 
         $this->assertFalse(@stream_socket_accept($server, 0.1));
+    }
+
+    public function testConcurrentStreamsWaitOnlyForTheirOwnResponses()
+    {
+        if (!class_exists(DeferredFuture::class)) {
+            $this->markTestSkipped('Concurrent streams need amphp/http-client 5.');
+        }
+
+        $server = listen('127.0.0.1:0');
+        $busyIsDone = new DeferredFuture();
+
+        async(static function () use ($server, $busyIsDone) {
+            while ($socket = $server->accept()) {
+                async(static function () use ($socket, $busyIsDone) {
+                    $request = '';
+                    while (!str_contains($request, "\r\n\r\n") && null !== $data = $socket->read()) {
+                        $request .= $data;
+                    }
+
+                    if (str_starts_with($request, 'GET /busy ')) {
+                        $socket->write("HTTP/1.1 200 OK\r\nContent-Length: 100\r\n\r\n");
+                        for ($i = 0; $i < 100; ++$i) {
+                            delay(0.001);
+                            $socket->write('-');
+                        }
+                        $busyIsDone->complete();
+                    } else {
+                        $busyIsDone->getFuture()->await();
+                        $socket->write("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
+                    }
+
+                    $socket->end();
+                });
+            }
+        });
+
+        $client = $this->getHttpClient(__FUNCTION__);
+        $url = 'http://'.$server->getAddress().'/';
+        $progressCalls = 0;
+        $idle = $client->request('GET', $url.'idle', ['on_progress' => static function () use (&$progressCalls) {
+            ++$progressCalls;
+        }]);
+        $busy = $client->request('GET', $url.'busy');
+
+        $idle = async($idle->getContent(...));
+        $busy = async($busy->getContent(...));
+
+        $this->assertSame(str_repeat('-', 100), $busy->await());
+        $this->assertSame('', $idle->await());
+        $server->close();
+
+        $this->assertLessThan(50, $progressCalls);
     }
 
     public function testProxyDoesNotReceiveTheFragment()

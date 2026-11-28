@@ -202,6 +202,9 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
                 }
             }
         }
+
+        // Set last, as an "on_progress" callback can stream other responses of the same client
+        $multi->streamingResponses = array_fill_keys(array_keys($responses ?? []), true);
     }
 
     /**
@@ -213,8 +216,11 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         $id = EventLoop::delay($timeout, $delay->complete(...));
         $futures = [$delay->getFuture()];
 
-        foreach ($multi->openHandles as $deferred) {
-            $futures[] = $deferred->getFuture();
+        // Waiting on every open response would wake each concurrent stream on any activity of the client
+        foreach ($multi->streamingResponses as $responseId => $_) {
+            if (isset($multi->openHandles[$responseId])) {
+                $futures[] = $multi->openHandles[$responseId]->getFuture();
+            }
         }
 
         awaitFirst($futures);

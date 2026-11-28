@@ -23,8 +23,10 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransport;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\BatchSendFailedException;
+use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
@@ -77,6 +79,40 @@ class AmazonSqsTransportTest extends TestCase
         $envelopes = [new Envelope(new \stdClass()), new Envelope(new \stdClass())];
         $receiver->expects($this->once())->method('get')->willReturn($envelopes);
         $this->assertSame($envelopes, $transport->get());
+    }
+
+    public function testTransportIsListable()
+    {
+        $this->assertInstanceOf(ListableReceiverInterface::class, $this->getTransport());
+    }
+
+    public function testItCanListMessagesViaTheReceiver()
+    {
+        $receiver = $this->createMock(AmazonSqsReceiver::class);
+        $transport = $this->getTransport(null, null, $receiver);
+        $envelopes = [new Envelope(new \stdClass()), new Envelope(new \stdClass())];
+        $receiver->expects($this->once())->method('all')->with(5)->willReturn($envelopes);
+        $this->assertSame($envelopes, $transport->all(5));
+    }
+
+    public function testItCanFindAMessageViaTheReceiver()
+    {
+        $receiver = $this->createMock(AmazonSqsReceiver::class);
+        $transport = $this->getTransport(null, null, $receiver);
+        $envelope = new Envelope(new \stdClass());
+        $receiver->expects($this->once())->method('find')->with('id')->willReturn($envelope);
+        $this->assertSame($envelope, $transport->find('id'));
+    }
+
+    public function testItCannotListMessagesWhenTheReceiverCannotList()
+    {
+        $receiver = $this->createStubForIntersectionOfInterfaces([ReceiverInterface::class, MessageCountAwareInterface::class]);
+        $transport = $this->getTransport(null, null, $receiver);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('receiver cannot list messages.');
+
+        $transport->all();
     }
 
     public function testItCanAcknowledgeAMessageViaTheReceiver()

@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -25,7 +26,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class AmazonSqsReceiver implements KeepaliveReceiverInterface, MessageCountAwareInterface
+class AmazonSqsReceiver implements KeepaliveReceiverInterface, ListableReceiverInterface, MessageCountAwareInterface
 {
     private SerializerInterface $serializer;
 
@@ -52,20 +53,38 @@ class AmazonSqsReceiver implements KeepaliveReceiverInterface, MessageCountAware
         }
 
         foreach ($sqsEnvelopes as $sqsEnvelope) {
-            $stamps = [
-                new AmazonSqsReceivedStamp($sqsEnvelope['id'], $sqsEnvelope['system_attributes'] ?? []),
-                new TransportMessageIdStamp($sqsEnvelope['id']),
-            ];
-
-            try {
-                yield $this->serializer->decode($sqsEnvelope = [
-                    'body' => $sqsEnvelope['body'],
-                    'headers' => $sqsEnvelope['headers'],
-                ])->withoutAll(TransportMessageIdStamp::class)->with(...$stamps);
-            } catch (MessageDecodingFailedException $e) {
-                yield MessageDecodingFailedException::wrap($sqsEnvelope, $e->getMessage(), $e->getCode(), $e)->with(...$stamps);
-            }
+            yield $this->createEnvelope($sqsEnvelope, $sqsEnvelope['id']);
         }
+    }
+
+    /**
+     * Receives every message of the queue, then makes them visible again.
+     *
+     * The messages are identified by their SQS message id, as their receipt handle changes each time they are received.
+     */
+    public function all(?int $limit = null): iterable
+    {
+        try {
+            foreach ($this->connection->findAll($limit) as $sqsEnvelope) {
+                yield $this->createEnvelope($sqsEnvelope, $sqsEnvelope['message_id']);
+            }
+        } catch (AsyncAwsException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * Receives the messages of the queue until the one with this SQS message id is found, then makes them visible again.
+     */
+    public function find(mixed $id): ?Envelope
+    {
+        try {
+            $sqsEnvelope = $this->connection->find((string) $id);
+        } catch (AsyncAwsException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        return null === $sqsEnvelope ? null : $this->createEnvelope($sqsEnvelope, $sqsEnvelope['message_id']);
     }
 
     public function ack(Envelope $envelope): void
@@ -101,6 +120,23 @@ class AmazonSqsReceiver implements KeepaliveReceiverInterface, MessageCountAware
             return $this->connection->getMessageCount();
         } catch (AsyncAwsException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
+        }
+    }
+
+    private function createEnvelope(array $sqsEnvelope, string $transportMessageId): Envelope
+    {
+        $stamps = [
+            new AmazonSqsReceivedStamp($sqsEnvelope['id'], $sqsEnvelope['system_attributes'] ?? []),
+            new TransportMessageIdStamp($transportMessageId),
+        ];
+
+        try {
+            return $this->serializer->decode($sqsEnvelope = [
+                'body' => $sqsEnvelope['body'],
+                'headers' => $sqsEnvelope['headers'],
+            ])->withoutAll(TransportMessageIdStamp::class)->with(...$stamps);
+        } catch (MessageDecodingFailedException $e) {
+            return MessageDecodingFailedException::wrap($sqsEnvelope, $e->getMessage(), $e->getCode(), $e)->with(...$stamps);
         }
     }
 

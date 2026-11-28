@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-28T09:33:38Z
+
+Thank you @jwage. I pushed a test that fails without the fix. In it, a stream waits for one response while another fiber streams a response in 100 chunks. Before the fix, the waiting stream ran its loop once per chunk (113 `on_progress` calls instead of 13).
+
+I also reverted the visibility change. We ignore Psalm's `OverriddenMethodAccess` here, since all response classes implement these methods as private.

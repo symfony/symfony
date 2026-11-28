@@ -7,6 +7,137 @@ in 8.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v8.2.0...v8.2.1
 
+## 8.2.0 (2026-11-28)
+
+### BrowserKit
+
+ * bug #68478 [BrowserKit] Fix meta refresh parsing to follow the HTML spec (nicolas-grekas)
+ * bug #68434 [BrowserKit] Strip tabs and newlines from meta refresh URLs (tandrezone)
+ * bug #68433 [BrowserKit] Make `CookieJar` match cookie domains case-insensitively (tandrezone)
+
+### Cache
+
+ * bug #68477 [Cache] Fix NullAdapter and commit() failing on an uninitialized lazy ghost (nicolas-grekas)
+ * bug #68456 [Cache] Fix ChainAdapter failing on an uninitialized lazy ghost (lazerg)
+ * minor #68475 [Cache] Use attributes to skip ChainAdapterLazyGhostTest before PHP 8.4 (nicolas-grekas)
+
+### DependencyInjection
+
+ * bug #68440 [DependencyInjection] Resolve class aliases when matching attribute autoconfigurators (dhrupo)
+ * bug #68415 [DependencyInjection] Compare service IDs strictly when resolving circular references (malekkadri)
+
+### ErrorHandler
+
+ * bug #68487 [ErrorHandler][WebProfilerBundle] Don't collapse a toggle when clicking a button or a field inside it (prateekbhujel)
+
+### ExpressionLanguage
+
+ * bug #68481 [ExpressionLanguage] Fix compiling an unknown name followed by `??` inside an operation (nicolas-grekas)
+ * bug #68476 [ExpressionLanguage] Fix dumping nodes that don't parse back to the same expression (nicolas-grekas)
+ * bug #68449 [ExpressionLanguage] Preserve hash keys when dumping array nodes (malekkadri)
+ * bug #68416 [ExpressionLanguage] Preserve numeric strings when dumping constants (malekkadri)
+
+### Filesystem
+
+ * bug #68460 [Filesystem] Match complete extensions in Path::getFilenameWithoutExtension() (ahbaqdadi)
+
+### Finder
+
+ * bug #68468 [Finder] Recognize missing PCRE pattern modifiers (malekkadri)
+
+### Form
+
+ * minor #68496 [Form][Validator] Review Armenian (hy) translations (dbuhonov)
+ * minor #68419 [Form][Security][Validator] Add Standard Moroccan Amazigh (zgh) translations (malekkadri)
+
+### FrameworkBundle
+
+ * bug #68469 [FrameworkBundle] Fix static analysis of the deprecated `AsRoutingConditionService` attribute (nicolas-grekas)
+
+### HtmlSanitizer
+
+ * bug #68441 [HtmlSanitizer] Reject relative URLs with a colon in the first path segment when parsing (vasikmansuri)
+
+### HttpClient
+
+ * bug #68493 [HttpClient] Fix CPU usage of AmpHttpClient with many concurrent streams (jwage)
+ * bug #68437 [HttpClient][KeyManagement][Mailer][Messenger][Notifier][Serializer][Translation][Validator][Workflow] Load profiler collectors regardless of kernel.debug (prateekbhujel)
+ * bug #68431 [HttpClient] Don't cache responses canceled before their body was received (Tiriel, nicolas-grekas)
+ * minor #68470 [HttpClient][RateLimiter] Don't run `RemoveMissingDependenciesPass` twice in the bundle tests (nicolas-grekas)
+
+### HttpFoundation
+
+ * bug #68472 [HttpFoundation] Match query parameter names regardless of order (malekkadri)
+ * bug #68453 [HttpFoundation] Reject non-integer CIDR netmasks in IpUtils (bsulyan)
+ * bug #68414 [HttpFoundation] Handle zero filter flags in InputBag and ParameterBag (malekkadri)
+ * bug #68424 [HttpFoundation] Clear cookies when replacing headers in ResponseHeaderBag (bsulyan)
+
+### HttpKernel
+
+ * minor #68494 [HttpKernel] Fix transient failure of FragmentHandlerTest::testRender (clfer)
+ * minor #68497 [HttpKernel] Move the cache and log dirs of KernelTest kernels out of the source tree (clfer)
+
+### JsonSchema
+
+ * bug #68462 [JsonSchema] Use the uri-reference format for protocol-relative URLs (Tong-bit-art)
+ * bug #68430 [JsonSchema] Ignore normalized Email, Url, Ip and Uuid constraints (Tong-bit-art)
+ * minor #68484 [JsonSchema] Fix JsonSchemaBundleTest when installed outside the monorepo (nicolas-grekas)
+
+### Mailer
+
+ * bug #68480 [Mailer][Mime] Encrypt each PGP recipient to the key from its own file (jack-worman)
+ * bug #68471 [Mailer] Fix inline images referenced by Content-ID in the MailPace, Infobip and Mailomat transports (nicolas-grekas)
+ * bug #68454 [Mailer][Mailgun] Fix rewriting cid references of inline parts with a Content-ID for Mailgun (jkabat)
+
+### Messenger
+
+ * bug #68479 [Messenger] Fix `--concurrency` stalls with batch handlers (nicolas-grekas)
+ * bug #68459 [Messenger] Don't send flushes to a parallel worker that is inside a handler (mattleads)
+
+### Notifier
+
+ * minor #68451 [Notifier][Mercure] Add support for Mercure 0.10 (dunglas)
+ * minor #68442 [Notifier][Bluesky] Remove duplicated `keywords` in the `composer.json` file (kevinonthebit)
+
+### PropertyAccess
+
+ * bug #68458 [PropertyAccess] Preserve escaped elements when resolving parent paths (malekkadri)
+
+### Security
+
+ * feature #68467 [Security] Keep SymfonyCasts as backers of the Security components v8.2 🤗 (nicolas-grekas)
+ * bug #68492 [Security][SecurityBundle] Check the binding and the size of a DPoP proof key before verifying its signature (jack-worman)
+
+### Serializer
+
+ * bug #68473 [Serializer] Fix denormalizing XML and CSV numbers into `int|float` and `int` properties (nicolas-grekas)
+ * bug #68448 [Serializer] Keep JSON integers as int when the union also accepts int (cestercian)
+ * bug #68428 [Serializer] Read the current value with deep_object_to_populate when there is no property type extractor (dhrupo)
+ * bug #68426 [Serializer] Fix denormalizing inherited private properties (Tong-bit-art)
+ * bug #68427 [Serializer] Validate target type before data in NumberNormalizer::denormalize() (bsulyan)
+
+### Stopwatch
+
+ * bug #68450 [Stopwatch] Preserve explicit zero section origin (malekkadri)
+
+### String
+
+ * bug #68432 [String] Fix quadratic running time in snake() on long uppercase runs (irfanm96)
+
+### WebProfilerBundle
+
+ * bug #68489 [WebProfilerBundle] Recognize button.toggle-button as toggleControl without open/close icons (prateekbhujel)
+
+### Yaml
+
+ * bug #68445 [Yaml] Dump floats without losing precision (bardrop)
+
+### Other
+
+ * feature #68466 Shopware is backing Symfony 8.2, thanks to them! (nicolas-grekas)
+ * feature #68465 Mailtrap is backing Symfony 8.2 and the Mailer component, thanks to them! (nicolas-grekas)
+ * feature #68464 TYPO3 is backing Symfony 8.2, thanks to them! (nicolas-grekas)
+
 ## 8.2.0-RC1 (2026-11-25)
 
 ### Asset

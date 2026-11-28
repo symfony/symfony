@@ -99,6 +99,10 @@ final class StreamerDumper
 
                 $classNames[$className] = $className;
 
+                if (is_a($className, \Traversable::class, true) && (new \ReflectionClass($className))->isInternal()) {
+                    continue;
+                }
+
                 foreach ($this->propertyMetadataLoader->load($className, [], $context) as $property) {
                     $classNames += $this->getResourceClassNames($property->getType(), $classNames, $context);
                 }

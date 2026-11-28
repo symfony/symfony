@@ -138,7 +138,7 @@ final class PhpGenerator
         }
 
         if ($node instanceof ObjectNode) {
-            if ($this->getValueObjectTransformerId($node->getType()->getClassName())) {
+            if ($this->getValueObjectTransformerId($node->getType()->getClassName()) || self::isEncodedNatively($node)) {
                 return [];
             }
 
@@ -248,6 +248,10 @@ final class PhpGenerator
                 $rawValue = '$transformers->get('.var_export($valueObjectTransformerId, true).")->transform({$dataModelNode->getAccessor()}, \$options)";
 
                 return $this->append($this->encode($rawValue, $context), $context);
+            }
+
+            if (self::isEncodedNatively($dataModelNode)) {
+                return $this->append($this->encode($accessor, $context), $context);
             }
 
             if (isset($context['generated_generators'][$dataModelNode->getIdentifier()]) || $dataModelNode->isMock()) {
@@ -614,5 +618,12 @@ final class PhpGenerator
         $keyType = $node->getType()->getCollectionKeyType();
 
         return $keyType instanceof BuiltinType && TypeIdentifier::STRING === $keyType->getTypeIdentifier();
+    }
+
+    private static function isEncodedNatively(ObjectNode $node): bool
+    {
+        $className = $node->getType()->getClassName();
+
+        return !$node->isMock() && !$node->getProperties() && (is_a($className, \JsonSerializable::class, true) || is_a($className, \stdClass::class, true));
     }
 }

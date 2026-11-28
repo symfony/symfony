@@ -11,6 +11,15 @@
 
 namespace Symfony\Component\JsonStreamer;
 
+use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\UnionType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
+
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
@@ -56,5 +65,24 @@ trait PhpGeneratorTrait
     private function line(string $line, array $context): string
     {
         return str_repeat('    ', $context['indentation_level']).$line."\n";
+    }
+
+    private static function createIterableType(ObjectType|GenericType $type): CollectionType
+    {
+        $variableTypes = $type instanceof GenericType ? $type->getVariableTypes() : [];
+        $iterableType = match (\count($variableTypes)) {
+            0 => Type::iterable(),
+            1 => Type::iterable($variableTypes[0]),
+            default => Type::iterable($variableTypes[1], $variableTypes[0]),
+        };
+
+        $keyType = $iterableType->getCollectionKeyType();
+        foreach ($keyType instanceof UnionType ? $keyType->getTypes() : [$keyType] as $t) {
+            if (!$t instanceof BuiltinType || !$t->isIdentifiedBy(TypeIdentifier::INT, TypeIdentifier::STRING)) {
+                throw new UnsupportedException(\sprintf('"%s" keys are not supported, only "int" and "string" keys are.', (string) $keyType));
+            }
+        }
+
+        return $iterableType;
     }
 }

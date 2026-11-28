@@ -23,6 +23,7 @@ use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
 use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
+use Symfony\Component\JsonStreamer\PhpGeneratorTrait;
 use Symfony\Component\JsonStreamer\StreamerDumper;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BackedEnumType;
@@ -43,6 +44,8 @@ use Symfony\Component\TypeInfo\Type\UnionType;
  */
 final class StreamWriterGenerator
 {
+    use PhpGeneratorTrait;
+
     private const MAX_GENERIC_DEPTH = 512;
     private const MAX_GENERIC_TYPE_LENGTH = 65536;
 
@@ -133,12 +136,30 @@ final class StreamWriterGenerator
             $typeString = (string) ($genericType ?? $type);
             $className = $type->getClassName();
 
+            $isIterable = is_a($className, \Traversable::class, true) && !is_a($className, \JsonSerializable::class, true) && !$this->getValueObjectTransformerId($className);
+
+            if ($isIterable && (new \ReflectionClass($className))->isInternal()) {
+                return $this->createIterableDataModel($genericType ?? $type, $accessor, $options, $context);
+            }
+
             if ($context['generated_classes'][$typeString] ??= false) {
                 return ObjectNode::createMock($accessor, $genericType ?? $type);
             }
 
             $context['generated_classes'][$typeString] = true;
             $propertiesMetadata = $this->propertyMetadataLoader->load($className, $options, $genericType ? ['original_type' => $genericType] + $context : $context);
+
+            if (!$propertiesMetadata && $isIterable) {
+                unset($context['generated_classes'][$typeString]);
+
+                return $this->createIterableDataModel($genericType ?? $type, $accessor, $options, $context);
+            }
+
+            if (!$propertiesMetadata && (is_a($className, \JsonSerializable::class, true) || is_a($className, \stdClass::class, true)) && !$this->getValueObjectTransformerId($className)) {
+                unset($context['generated_classes'][$typeString]);
+
+                return new ObjectNode($accessor, $genericType ?? $type, []);
+            }
 
             if ($genericType) {
                 $context['generic_depths'][$className] ??= 0;
@@ -215,5 +236,20 @@ final class StreamWriterGenerator
         }
 
         throw new UnsupportedException(\sprintf('"%s" type is not supported.', (string) $type));
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     * @param array<string, mixed> $context
+     */
+    private function createIterableDataModel(ObjectType|GenericType $type, string $accessor, array $options, array &$context): DataModelNodeInterface
+    {
+        $className = ($type instanceof GenericType ? $type->getWrappedType() : $type)->getClassName();
+
+        if (is_a($className, \WeakMap::class, true)) {
+            throw new UnsupportedException(\sprintf('"%s" objects are not supported, as their keys are objects.', $className));
+        }
+
+        return $this->createDataModel(self::createIterableType($type), $accessor, $options, $context);
     }
 }

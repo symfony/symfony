@@ -14,10 +14,16 @@ namespace Symfony\Component\JsonStreamer\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\JsonStreamer\Exception\NotEncodableValueException;
+use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
 use Symfony\Component\JsonStreamer\JsonStreamReader;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
+use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
+use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
+use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
+use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
 use Symfony\Component\JsonStreamer\StreamerDumper;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
@@ -48,11 +54,15 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSelfReferencing
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSpecialCharacterNamedProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithStaticProperty;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithTwoStdClassProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUids;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueObjects;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithVirtualProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\IteratorAggregateDummy;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\IteratorAggregateWithPropertiesDummy;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\JsonSerializableDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyDict;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyList;
@@ -67,6 +77,9 @@ use Symfony\Component\JsonStreamer\Transformer\PropertyValueTransformerInterface
 use Symfony\Component\JsonStreamer\Transformer\UuidValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\ValueObjectTransformerInterface;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
+use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV7;
@@ -351,6 +364,95 @@ class JsonStreamWriterTest extends TestCase
             [$dummyWithNestedList1, $dummyWithNestedList2],
             Type::list(Type::object(DummyWithNestedList::class)),
         );
+    }
+
+    public function testWriteTraversableObjectsAsIterables()
+    {
+        $generator = static function (): \Generator {
+            yield 'a' => new ClassicDummy();
+        };
+
+        $this->assertWritten('{"a":{"id":1,"name":"dummy"}}', $generator(), Type::object(\Generator::class));
+        $this->assertWritten('[{"id":1,"name":"dummy"}]', $generator(), Type::generic(Type::object(\Generator::class), Type::int(), Type::object(ClassicDummy::class)));
+        $this->assertWritten('{"a":{"id":1,"name":"dummy"}}', new \ArrayIterator(['a' => new ClassicDummy()]), Type::generic(Type::object(\Traversable::class), Type::object(ClassicDummy::class)));
+        $this->assertWritten('{"a":1}', new \ArrayObject(['a' => 1]), Type::object(\ArrayObject::class));
+        $this->assertWritten('{"0":1,"1":2}', new IteratorAggregateDummy(), Type::object(IteratorAggregateDummy::class));
+    }
+
+    public function testWriteTraversableObjectWithPropertyMetadataLoader()
+    {
+        $propertyMetadataLoader = new class implements PropertyMetadataLoaderInterface {
+            public function load(string $className, array $options = [], array $context = []): array
+            {
+                return ['key' => new PropertyMetadata(null, Type::nullable(Type::int()))];
+            }
+        };
+        $writer = new JsonStreamWriter(new Container(), $propertyMetadataLoader, $this->streamWritersDir);
+
+        $this->assertSame('{"key":null}', (string) $writer->write(new IteratorAggregateDummy(), Type::object(IteratorAggregateDummy::class), ['include_null_properties' => true]));
+    }
+
+    public function testThrowWhenWritingWeakMap()
+    {
+        $writer = JsonStreamWriter::create([], $this->streamWritersDir);
+
+        $this->expectException(UnsupportedException::class);
+        $this->expectExceptionMessage('"WeakMap" objects are not supported');
+
+        (string) $writer->write(new \WeakMap(), Type::object(\WeakMap::class));
+    }
+
+    public function testWriteTraversableObjectsAsIterablesWithConfigCache()
+    {
+        $writer = new JsonStreamWriter(new Container(), new GenericTypePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new TypeContextFactory(new StringTypeResolver())), $this->streamWritersDir, new ConfigCacheFactory(true));
+        $generator = static function (): \Generator {
+            yield new ClassicDummy();
+        };
+
+        $this->assertSame('[{"id":1,"name":"dummy"}]', (string) $writer->write($generator(), Type::generic(Type::object(\Generator::class), Type::int(), Type::object(ClassicDummy::class))));
+    }
+
+    public function testThrowWhenWritingTraversableObjectWithNonScalarKeys()
+    {
+        $writer = JsonStreamWriter::create([], $this->streamWritersDir);
+
+        $this->expectException(UnsupportedException::class);
+        $this->expectExceptionMessage(\sprintf('"%s" keys are not supported', ClassicDummy::class));
+
+        (string) $writer->write(new \ArrayIterator(), Type::generic(Type::object(\ArrayIterator::class), Type::object(ClassicDummy::class), Type::string()));
+    }
+
+    public function testWriteTraversableAndJsonSerializableObjectsWithPropertiesAsObjects()
+    {
+        $this->assertWritten('{"total":2}', new IteratorAggregateWithPropertiesDummy(), Type::object(IteratorAggregateWithPropertiesDummy::class));
+    }
+
+    public function testWriteJsonSerializableAndStdClassObjectsWithJsonEncode()
+    {
+        $this->assertWritten('{"serialized":true}', new JsonSerializableDummy(), Type::object(JsonSerializableDummy::class));
+        $this->assertWritten('{"a":1}', (object) ['a' => 1], Type::object(\stdClass::class));
+
+        $dummy = new DummyWithTwoStdClassProperties();
+        $dummy->a = (object) ['a' => 1];
+        $dummy->b = (object) [];
+        $this->assertWritten('{"a":{"a":1},"b":{}}', $dummy, Type::object(DummyWithTwoStdClassProperties::class));
+
+        $type = Type::union(Type::object(ClassicDummy::class), Type::object(\JsonSerializable::class));
+        $this->assertWritten('{"id":1,"name":"dummy"}', new ClassicDummy(), $type);
+        $this->assertWritten('{"serialized":true}', new JsonSerializableDummy(), $type);
+    }
+
+    public function testWriteStdClassWithPropertyMetadataLoader()
+    {
+        $propertyMetadataLoader = new class implements PropertyMetadataLoaderInterface {
+            public function load(string $className, array $options = [], array $context = []): array
+            {
+                return ['key' => new PropertyMetadata('a', Type::int())];
+            }
+        };
+        $writer = new JsonStreamWriter(new Container(), $propertyMetadataLoader, $this->streamWritersDir);
+
+        $this->assertSame('{"key":1}', (string) $writer->write((object) ['a' => 1, 'b' => 2], Type::object(\stdClass::class)));
     }
 
     public function testWriteObject()

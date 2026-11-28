@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ButtonBuilder;
+use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**
@@ -60,5 +61,13 @@ class ButtonBuilderTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Buttons cannot have empty names.');
         new ButtonBuilder($name);
+    }
+
+    public function testAddDynamicIsNotSupported()
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Buttons cannot have children.');
+
+        (new ButtonBuilder('foo'))->addDynamic('bar', 'baz', static fn () => null);
     }
 }

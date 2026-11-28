@@ -32,8 +32,10 @@ abstract class AbstractPipes implements PipesInterface
     /**
      * @param resource|string|\Iterator|null $input
      */
-    public function __construct($input)
-    {
+    public function __construct(
+        $input,
+        private bool $inputDisabled = false,
+    ) {
         $this->hasInput = null !== $input;
 
         if (\is_resource($input) || $input instanceof \Iterator) {
@@ -54,16 +56,25 @@ abstract class AbstractPipes implements PipesInterface
     }
 
     /**
-     * Returns the descriptors that make the process inherit the standard streams of the current process, except STDIN when an input is set.
+     * Returns the descriptors that make the process inherit the standard streams of the current process, except STDIN when an input is set or the input is disabled.
      */
     protected function getInheritedStdioDescriptors(): array
     {
         // Fresh streams start at the current offset of each file descriptor. The STDIN/STDOUT/STDERR constants would make proc_open() seek back to the offset PHP last saw for them.
         return [
-            $this->hasInput ? ['pipe', 'r'] : fopen('php://stdin', 'r'),
+            $this->hasInput || $this->inputDisabled ? $this->getInputDescriptor() : fopen('php://stdin', 'r'),
             fopen('php://stdout', 'w'),
             fopen('php://stderr', 'w'),
         ];
+    }
+
+    /**
+     * Returns the descriptor of the standard input: the null device when the input is disabled, a pipe otherwise.
+     */
+    protected function getInputDescriptor(): array
+    {
+        // proc_open() opens the null device itself (/dev/null, or NUL on Windows), outside of the open_basedir restriction
+        return $this->inputDisabled ? ['null'] : ['pipe', 'r'];
     }
 
     /**

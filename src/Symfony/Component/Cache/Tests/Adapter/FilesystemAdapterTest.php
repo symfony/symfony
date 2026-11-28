@@ -49,6 +49,7 @@ class FilesystemAdapterTest extends AdapterTestCase
         $this->assertSame('bar', (new FilesystemAdapter('ns', 0, $directory))->getItem('foo')->get());
     }
 
+    #[Group('not-root')]
     public function testDeleteItemsWhenUnlinkFails()
     {
         $cache = $this->createCachePool();

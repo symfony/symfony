@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use Opis\JsonSchema\Validator;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -424,6 +425,7 @@ class JsonSchemaConfigDumpPassTest extends TestCase
         $this->assertNotSame([], (new SchemaValidator())->validate($config, $schemaFile));
     }
 
+    #[Group('not-root')]
     public function testProcessIgnoresFileWriteErrors()
     {
         $container = new ContainerBuilder();

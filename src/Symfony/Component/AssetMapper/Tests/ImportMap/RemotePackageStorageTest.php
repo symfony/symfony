@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
@@ -42,6 +43,7 @@ class RemotePackageStorageTest extends TestCase
         $this->assertSame(realpath(self::$writableRoot.'/assets/vendor'), realpath($storage->getStorageDir()));
     }
 
+    #[Group('not-root')]
     public function testSaveThrowsWhenFailing()
     {
         $vendorDir = self::$writableRoot.'/assets/acme/vendor';

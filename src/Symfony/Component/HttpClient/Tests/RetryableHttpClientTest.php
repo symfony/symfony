@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\Exception\ServerException;
@@ -352,6 +353,7 @@ class RetryableHttpClientTest extends TestCase
         $this->assertSame(['payload'], $sentBodies);
     }
 
+    #[Group('network')]
     public function testRetryWithDnsIssue()
     {
         $client = new RetryableHttpClient(

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport\Smtp\Stream;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
@@ -27,6 +28,7 @@ class SocketStreamTest extends TestCase
         $s->initialize();
     }
 
+    #[Group('network')]
     public function testSocketErrorBeforeConnectError()
     {
         $this->expectException(TransportException::class);

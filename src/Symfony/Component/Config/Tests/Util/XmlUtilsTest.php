@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Tests\Util;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Util\Exception\InvalidXmlException;
 use Symfony\Component\Config\Util\Exception\XmlParsingException;
@@ -35,18 +36,6 @@ class XmlUtilsTest extends TestCase
             $this->fail();
         } catch (\InvalidArgumentException $e) {
             $this->assertStringContainsString('is not a file', $e->getMessage());
-        }
-
-        try {
-            if ('\\' === \DIRECTORY_SEPARATOR) {
-                $this->markTestSkipped('chmod is not supported on Windows');
-            }
-            chmod($fixtures.'not_readable.xml', 0o00);
-            XmlUtils::loadFile($fixtures.'not_readable.xml');
-            $this->fail();
-        } catch (\InvalidArgumentException $e) {
-            chmod($fixtures.'not_readable.xml', 0o644);
-            $this->assertStringContainsString('is not readable', $e->getMessage());
         }
 
         try {
@@ -90,6 +79,25 @@ class XmlUtilsTest extends TestCase
 
         $this->assertInstanceOf(\DOMDocument::class, XmlUtils::loadFile($fixtures.'valid.xml', [$mock, 'validate']));
         $this->assertSame([], libxml_get_errors());
+    }
+
+    #[Group('not-root')]
+    public function testLoadUnreadableFile()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('chmod is not supported on Windows');
+        }
+
+        $fixtures = __DIR__.'/../Fixtures/Util/';
+
+        try {
+            chmod($fixtures.'not_readable.xml', 0o00);
+            XmlUtils::loadFile($fixtures.'not_readable.xml');
+            $this->fail();
+        } catch (\InvalidArgumentException $e) {
+            chmod($fixtures.'not_readable.xml', 0o644);
+            $this->assertStringContainsString('is not readable', $e->getMessage());
+        }
     }
 
     public function testParseWithInvalidValidatorCallable()

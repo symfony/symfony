@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add `PolicyInterface`, `FixedWindowPolicy`, `SlidingWindowPolicy` and `TokenBucketPolicy` to configure a rate limiter that `RateLimiterBuilder` creates on the fly
+
 8.2
 ---
 

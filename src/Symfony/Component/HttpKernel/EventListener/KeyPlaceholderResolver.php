@@ -39,7 +39,7 @@ final class KeyPlaceholderResolver
             }
 
             $attribute = substr(strrchr('\\'.$event->attribute::class, '\\'), 1);
-            $controller = self::getControllerName($event->kernelEvent->getController());
+            $controller = self::getControllerName($event->kernelEvent->getControllerReflector());
 
             if (!$attributes->has($m[1])) {
                 throw new \LogicException(\sprintf('Cannot resolve the "%s" placeholder in the key of the "#[%s]" attribute of "%s()": the request has no "%s" attribute.', $m[0], $attribute, $controller, $m[1]));
@@ -49,10 +49,12 @@ final class KeyPlaceholderResolver
         }, $key);
     }
 
-    private static function getControllerName(callable $controller): string
+    public static function getControllerName(\ReflectionFunctionAbstract $controller): string
     {
-        $r = new \ReflectionFunction($controller(...));
+        if ($controller instanceof \ReflectionMethod) {
+            return $controller->class.'::'.$controller->name;
+        }
 
-        return !$r->isAnonymous() && ($class = $r->getClosureCalledClass()) ? $class->name.'::'.$r->name : $r->name;
+        return $controller instanceof \ReflectionFunction && !$controller->isAnonymous() && ($class = $controller->getClosureCalledClass()) ? $class->name.'::'.$controller->name : $controller->name;
     }
 }

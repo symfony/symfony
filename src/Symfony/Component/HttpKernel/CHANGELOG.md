@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Allow passing a `PolicyInterface` instead of a limiter name to `#[RateLimit]`, to configure a limiter that only its controller uses
+
 8.2
 ---
 

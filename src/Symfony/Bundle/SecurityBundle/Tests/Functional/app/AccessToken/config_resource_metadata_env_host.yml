@@ -21,7 +21,7 @@ security:
                     authorization_servers: ['https://accounts.example.com']
 
     access_control:
-        - { path: ^/foo, roles: ROLE_USER }
+        - { path: ^/foo, is_granted: ROLE_USER }
 
 services:
     access_token.access_token_handler:

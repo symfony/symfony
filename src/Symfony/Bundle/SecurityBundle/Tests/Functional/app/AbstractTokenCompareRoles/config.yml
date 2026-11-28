@@ -23,6 +23,6 @@ security:
       stateless: false
 
   access_control:
-    - { path: ^/admin$, roles: ROLE_ADMIN }
-    - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-    - { path: .*, roles: IS_AUTHENTICATED_FULLY }
+    - { path: ^/admin$, is_granted: ROLE_ADMIN }
+    - { path: ^/login$, is_granted: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: .*, is_granted: IS_AUTHENTICATED_FULLY }

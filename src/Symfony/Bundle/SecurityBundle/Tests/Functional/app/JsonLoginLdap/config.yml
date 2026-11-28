@@ -37,4 +37,4 @@ security:
                 password_path: user.password
 
     access_control:
-        - { path: ^/, roles: ROLE_USER }
+        - { path: ^/, is_granted: ROLE_USER }

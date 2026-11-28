@@ -42,6 +42,28 @@ class ProfilerTest extends TestCase
         $this->assertSame('bar', $profile->getCollector('request')->getRequestQuery()->all()['foo']->getValue());
     }
 
+    public function testCollectUsesTheReservedToken()
+    {
+        $profiler = new Profiler($this->storage);
+        $request = new Request();
+
+        $token = $profiler->reserveToken($request);
+
+        $this->assertSame($token, $profiler->reserveToken($request));
+        $this->assertNotSame($token, $profiler->reserveToken(new Request()));
+        $this->assertSame($token, $profiler->collect($request, new Response())->getToken());
+    }
+
+    public function testReserveTokenGivesTheTokenOfTheCollectedProfile()
+    {
+        $profiler = new Profiler($this->storage);
+        $request = new Request();
+
+        $profile = $profiler->collect($request, new Response());
+
+        $this->assertSame($profile->getToken(), $profiler->reserveToken($request));
+    }
+
     public function testReset()
     {
         $collector = $this->getMockBuilder(DataCollectorInterface::class)

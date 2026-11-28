@@ -74,6 +74,11 @@
                     Console Commands
                 </a>
             </button>
+            <button class="tab-control {{ 'worker_message' == profile_type ? 'active' }}" role="tab" {{ 'worker_message' == profile_type ? 'aria-selected="true"' : 'tabindex="-1"' }}>
+                <a href="{{ path('_profiler_search_results', {token: 'empty', limit: 10, type: 'worker_message'}) }}">
+                    Worker Messages
+                </a>
+            </button>
         </div>
     </div>
 
@@ -86,6 +91,8 @@
                     <th scope="col" class="text-center">
                         {% if 'command' == profile_type %}
                             Exit code
+                        {% elseif 'worker_message' == profile_type %}
+                            Result
                         {% else %}
                             Status
                         {% endif %}
@@ -93,6 +100,8 @@
                     <th scope="col">
                         {% if 'command' == profile_type %}
                             Application
+                        {% elseif 'worker_message' == profile_type %}
+                            Sent from
                         {% else %}
                             IP
                         {% endif %}
@@ -100,6 +109,8 @@
                     <th scope="col">
                         {% if 'command' == profile_type %}
                             Mode
+                        {% elseif 'worker_message' == profile_type %}
+                            Transport
                         {% else %}
                             Method
                         {% endif %}
@@ -107,6 +118,8 @@
                     <th scope="col">
                         {% if 'command' == profile_type %}
                             Command
+                        {% elseif 'worker_message' == profile_type %}
+                            Message
                         {% else %}
                             URL
                         {% endif %}
@@ -120,6 +133,10 @@
                     {% if 'command' == profile_type %}
                         {% set css_class = result.status_code == 113 ? 'status-warning' : result.status_code > 0 ? 'status-error' : 'status-success' %}
                         {% set has_errors = result.has_errors|default(false) and result.status_code == 0 %}
+                    {% elseif 'worker_message' == profile_type %}
+                        {% set css_class = result.status_code == 2 ? 'status-error' : result.status_code > 0 ? 'status-warning' : 'status-success' %}
+                        {# the label of retried and rejected messages already tells they failed #}
+                        {% set has_errors = result.has_errors|default(false) and result.status_code not in [1, 2] %}
                     {% else %}
                         {% set css_class = result.status_code|default(0) > 399 ? 'status-error' : result.status_code|default(0) > 299 ? 'status-warning' : 'status-success' %}
                         {% set has_errors = result.has_errors|default(false) and result.status_code < 400 %}
@@ -129,7 +146,11 @@
                     <tr>
                         <td class="text-left">
                             <span class="status-with-indicator">
-                                <span class="label {{ css_class }}">{{ result.status_code|default('n/a') }}</span>
+                                {% if 'worker_message' == profile_type %}
+                                    <span class="label {{ css_class }}">{{ ['handled', 'retried', 'rejected', 'pending'][result.status_code]|default('n/a') }}</span>
+                                {% else %}
+                                    <span class="label {{ css_class }}">{{ result.status_code|default('n/a') }}</span>
+                                {% endif %}
                                 <span class="indicators">
                                     {%- if has_errors -%}
                                         <a href="{{ path('_profiler', {token: result.token, panel: 'exception'}) }}">
@@ -145,7 +166,11 @@
                             </span>
                         </td>
                         <td>
-                            <span class="nowrap">{{ result.ip }} {{ _self.profile_search_filter(request, result, 'ip') }}</span>
+                            {% if 'worker_message' == profile_type and result.ip %}
+                                <span class="nowrap"><a href="{{ path('_profiler', {token: result.ip}) }}">{{ result.ip }}</a> {{ _self.profile_search_filter(request, result, 'ip') }}</span>
+                            {% else %}
+                                <span class="nowrap">{{ result.ip }} {{ _self.profile_search_filter(request, result, 'ip') }}</span>
+                            {% endif %}
                         </td>
                         <td>
                             <span class="nowrap">{{ result.method }} {{ _self.profile_search_filter(request, result, 'method') }}</span>

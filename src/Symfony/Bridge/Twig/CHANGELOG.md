@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Render the choice groups of expanded `ChoiceType` fields as `<fieldset>` elements with a `<legend>`, in all form themes
+
 8.2
 ---
 

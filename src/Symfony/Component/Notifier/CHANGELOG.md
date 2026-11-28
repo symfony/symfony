@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add a `$dispatcher` argument to `EmailChannel` to dispatch a queued Mailer `MessageEvent` before sending an email to the message bus
+
 8.2
 ---
 

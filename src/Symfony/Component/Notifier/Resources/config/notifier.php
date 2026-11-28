@@ -73,6 +73,9 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('mailer.transports'),
                 abstract_arg('message bus'),
+                null,
+                null,
+                service('event_dispatcher')->ignoreOnInvalid(),
             ])
             ->tag('notifier.channel', ['channel' => 'email'])
 

@@ -13,12 +13,13 @@ namespace Symfony\Component\JsonStreamer\DataModel\Write;
 
 use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 
 /**
  * Represents a "OR" node composition in the data model graph representation.
  *
- * Composing nodes are sorted by their precision (descending).
+ * Composing nodes are sorted by their precision (descending), then subtypes go before their supertypes.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
@@ -28,7 +29,7 @@ final class CompositeNode implements DataModelNodeInterface
 {
     private const NODE_PRECISION = [
         CollectionNode::class => 3,
-        ObjectNode::class => 2,
+        ObjectNode::class => 1,
         DateTimeNode::class => 1,
         BackedEnumNode::class => 1,
         ScalarNode::class => 0,
@@ -56,7 +57,7 @@ final class CompositeNode implements DataModelNodeInterface
             }
         }
 
-        usort($nodes, static fn (CollectionNode|ObjectNode|DateTimeNode|BackedEnumNode|ScalarNode $a, CollectionNode|ObjectNode|DateTimeNode|BackedEnumNode|ScalarNode $b): int => self::NODE_PRECISION[$b::class] <=> self::NODE_PRECISION[$a::class]);
+        usort($nodes, static fn (CollectionNode|ObjectNode|DateTimeNode|BackedEnumNode|ScalarNode $a, CollectionNode|ObjectNode|DateTimeNode|BackedEnumNode|ScalarNode $b): int => [self::NODE_PRECISION[$b::class], self::countAncestors($b)] <=> [self::NODE_PRECISION[$a::class], self::countAncestors($a)]);
         $this->nodes = $nodes;
     }
 
@@ -86,5 +87,16 @@ final class CompositeNode implements DataModelNodeInterface
     public function getNodes(): array
     {
         return $this->nodes;
+    }
+
+    private static function countAncestors(DataModelNodeInterface $node): int
+    {
+        if (!($type = $node->getType()) instanceof ObjectType) {
+            return 0;
+        }
+
+        $className = $type->getClassName();
+
+        return \count(class_parents($className)) + \count(class_implements($className));
     }
 }

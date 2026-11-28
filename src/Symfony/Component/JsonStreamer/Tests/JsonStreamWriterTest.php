@@ -19,8 +19,11 @@ use Symfony\Component\JsonStreamer\Exception\NotEncodableValueException;
 use Symfony\Component\JsonStreamer\JsonStreamReader;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnumWithInterface;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummyChild;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyInterface;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithArray;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithConcreteInheritedGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes;
@@ -186,6 +189,23 @@ class JsonStreamWriterTest extends TestCase
 
         $dummy->value = null;
         $this->assertWritten('{}', $dummy, Type::object(DummyWithUnionProperties::class));
+    }
+
+    public function testWriteUnionOfClassAndSubclass()
+    {
+        $type = Type::union(Type::object(ClassicDummy::class), Type::object(ClassicDummyChild::class), Type::int());
+
+        $this->assertWritten('{"child":true,"id":1,"name":"dummy"}', new ClassicDummyChild(), $type);
+        $this->assertWritten('{"id":1,"name":"dummy"}', new ClassicDummy(), $type);
+        $this->assertWritten('1', 1, $type);
+    }
+
+    public function testWriteUnionOfInterfaceAndImplementations()
+    {
+        $type = Type::union(Type::object(DummyInterface::class), Type::object(ClassicDummyChild::class), Type::enum(DummyBackedEnumWithInterface::class));
+
+        $this->assertWritten('{"child":true,"id":1,"name":"dummy"}', new ClassicDummyChild(), $type);
+        $this->assertWritten('"one"', DummyBackedEnumWithInterface::ONE, $type);
     }
 
     public function testWriteCollection()

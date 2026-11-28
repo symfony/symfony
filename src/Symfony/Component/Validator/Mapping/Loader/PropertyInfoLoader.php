@@ -219,7 +219,17 @@ final class PropertyInfoLoader implements LoaderInterface
         // BC layer for type-info < 7.2
         if (!interface_exists(CompositeTypeInterface::class)) {
             if ($type instanceof UnionType || $type instanceof IntersectionType) {
-                return ($type->isA(TypeIdentifier::INT) || $type->isA(TypeIdentifier::FLOAT) || $type->isA(TypeIdentifier::STRING) || $type->isA(TypeIdentifier::BOOL)) ? new Type(['type' => 'scalar']) : null;
+                foreach ($type->getTypes() as $composedType) {
+                    foreach ([TypeIdentifier::INT, TypeIdentifier::FLOAT, TypeIdentifier::STRING, TypeIdentifier::BOOL, TypeIdentifier::TRUE, TypeIdentifier::FALSE, TypeIdentifier::NULL] as $scalarIdentifier) {
+                        if ($composedType->isA($scalarIdentifier)) {
+                            continue 2;
+                        }
+                    }
+
+                    return null;
+                }
+
+                return new Type(['type' => 'scalar']);
             }
 
             $baseType = $type->getBaseType();
@@ -236,14 +246,21 @@ final class PropertyInfoLoader implements LoaderInterface
         }
 
         if ($type instanceof CompositeTypeInterface) {
-            return $type->isIdentifiedBy(
-                TypeIdentifier::INT,
-                TypeIdentifier::FLOAT,
-                TypeIdentifier::STRING,
-                TypeIdentifier::BOOL,
-                TypeIdentifier::TRUE,
-                TypeIdentifier::FALSE,
-            ) ? new Type(type: 'scalar') : null;
+            foreach ($type->getTypes() as $composedType) {
+                if (!$composedType->isIdentifiedBy(
+                    TypeIdentifier::INT,
+                    TypeIdentifier::FLOAT,
+                    TypeIdentifier::STRING,
+                    TypeIdentifier::BOOL,
+                    TypeIdentifier::TRUE,
+                    TypeIdentifier::FALSE,
+                    TypeIdentifier::NULL,
+                )) {
+                    return null;
+                }
+            }
+
+            return new Type(type: 'scalar');
         }
 
         while ($type instanceof WrappingTypeInterface) {

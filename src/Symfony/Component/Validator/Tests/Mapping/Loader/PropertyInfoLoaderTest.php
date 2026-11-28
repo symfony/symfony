@@ -458,4 +458,48 @@ class PropertyInfoLoaderTest extends TestCase
         $this->assertFalse($metadata->hasPropertyMetadata('writeOnlyChild'));
         $this->assertFalse($metadata->hasPropertyMetadata('writeOnlyString'));
     }
+
+    #[DataProvider('unionTypeProvider')]
+    public function testUnionType(Type $type, mixed $value, int $expectedViolationCount)
+    {
+        $propertyListExtractor = $this->createStub(PropertyListExtractorInterface::class);
+        $propertyListExtractor->method('getProperties')->willReturn(['scalar']);
+
+        $propertyTypeExtractor = new class($type) implements PropertyTypeExtractorInterface {
+            public function __construct(private Type $type)
+            {
+            }
+
+            public function getType(string $class, string $property, array $context = []): ?Type
+            {
+                return $this->type;
+            }
+
+            public function getTypes(string $class, string $property, array $context = []): ?array
+            {
+                return null;
+            }
+        };
+
+        $propertyAccessExtractor = $this->createStub(PropertyAccessExtractorInterface::class);
+        $propertyAccessExtractor->method('isWritable')->willReturn(true);
+
+        $validator = Validation::createValidatorBuilder()
+            ->addLoader(new PropertyInfoLoader($propertyListExtractor, $propertyTypeExtractor, $propertyAccessExtractor, '{.*}'))
+            ->getValidator()
+        ;
+
+        $this->assertCount($expectedViolationCount, $validator->validatePropertyValue(PropertyInfoLoaderEntity::class, 'scalar', $value));
+    }
+
+    public static function unionTypeProvider(): iterable
+    {
+        yield 'scalar and object' => [Type::union(Type::int(), Type::object(\DateTimeImmutable::class)), new \DateTimeImmutable(), 0];
+        yield 'scalar and array' => [Type::union(Type::string(), Type::array()), [], 0];
+        yield 'collection of scalar and object' => [Type::list(Type::union(Type::int(), Type::object(\DateTimeImmutable::class))), [new \DateTimeImmutable()], 0];
+        yield 'scalars with literal rejects object' => [Type::union(Type::int(), Type::true()), new \DateTimeImmutable(), 1];
+        yield 'collection of scalars rejects object' => [Type::list(Type::union(Type::int(), Type::string())), [new \DateTimeImmutable()], 1];
+        yield 'collection of nullable scalar accepts null' => [Type::list(Type::nullable(Type::int())), [1, null], 0];
+        yield 'collection of nullable scalar rejects object' => [Type::list(Type::nullable(Type::int())), [new \DateTimeImmutable()], 1];
+    }
 }

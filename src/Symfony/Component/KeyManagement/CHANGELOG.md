@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add an optional `$allowedKeyIds` argument to `EnvelopeEncrypter`
+
 8.2
 ---
 

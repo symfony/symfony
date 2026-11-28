@@ -12,7 +12,11 @@
 namespace Symfony\Component\KeyManagement;
 
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
+use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
+use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
+use Symfony\Component\KeyManagement\Exception\RuntimeException;
+use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 
 /**
  * High-level envelope encryption helper.
@@ -70,20 +74,51 @@ final class EnvelopeEncrypter implements EnvelopeEncrypterInterface, EnvelopeDec
 
     private readonly SelfContainedFormat $format;
 
+    /**
+     * @var list<string>|null
+     */
+    private readonly ?array $allowedKeyIds;
+
+    /**
+     * @param list<string>|null $allowedKeyIds Exact master key IDs to accept; null accepts any key
+     */
     public function __construct(
         private readonly DataKeyGeneratorInterface $kms,
+        ?array $allowedKeyIds = null,
     ) {
         if (!\extension_loaded('openssl')) {
             throw new LogicException('The "openssl" PHP extension is required for envelope encryption.');
         }
 
+        if (null !== $allowedKeyIds) {
+            foreach ($allowedKeyIds as $keyId) {
+                if (!\is_string($keyId) || '' === $keyId) {
+                    throw new InvalidArgumentException('Allowed key IDs must be non-empty strings.');
+                }
+            }
+
+            $allowedKeyIds = array_values(array_unique($allowedKeyIds));
+        }
+
+        $this->allowedKeyIds = $allowedKeyIds;
         $this->format = new SelfContainedFormat();
     }
 
+    /**
+     * @throws KeyNotFoundException          If `$key` is unknown to the underlying KMS
+     * @throws UnsupportedOperationException If the backend cannot generate data keys
+     * @throws RuntimeException              On any other backend failure
+     * @throws LogicException                If the KMS returns a key that is not in the allowed key IDs
+     */
     public function encrypt(string $key, #[\SensitiveParameter] string $plaintext, string $aad = ''): Envelope
     {
         $format = $this->format;
         $dataKey = $this->kms->generateDataKey($key, $format->keyBytes());
+
+        if (!$this->isKeyIdAllowed($dataKey->wrapped->keyId)) {
+            throw new LogicException(\sprintf('The KMS returned key "%s", which is not in the allowed key IDs.', $dataKey->wrapped->keyId));
+        }
+
         $iv = random_bytes($format->ivBytes());
 
         [$ciphertext, $tag] = $dataKey->use(static fn (#[\SensitiveParameter] string $dek): array => self::seal($format, $dek, $plaintext, $iv, $aad, $dataKey->wrapped->keyId, $dataKey->wrapped->blob));
@@ -93,7 +128,7 @@ final class EnvelopeEncrypter implements EnvelopeEncrypterInterface, EnvelopeDec
 
     /**
      * @throws LogicException            If the envelope refers to a stored data key, which this encrypter has no store to resolve
-     * @throws DecryptionFailedException If the payload is invalid, tampered, or `$aad` does not match
+     * @throws DecryptionFailedException If the payload is invalid, tampered, `$aad` does not match, or the envelope refers to a key that is not in the allowed key IDs
      */
     public function decrypt(Envelope $envelope, string $aad = ''): string
     {
@@ -101,8 +136,17 @@ final class EnvelopeEncrypter implements EnvelopeEncrypterInterface, EnvelopeDec
             throw new LogicException(\sprintf('The envelope refers to a stored data key, which "%s" cannot resolve.', self::class));
         }
 
+        if (!$this->isKeyIdAllowed($envelope->keyId)) {
+            throw new DecryptionFailedException();
+        }
+
         $dataKey = $this->kms->unwrapDataKey(new Ciphertext($envelope->wrappedDek, $envelope->keyId));
 
         return $dataKey->use(static fn (#[\SensitiveParameter] string $dek): string => self::open($envelope, $dek, $aad));
+    }
+
+    private function isKeyIdAllowed(?string $keyId): bool
+    {
+        return null === $this->allowedKeyIds || (\is_string($keyId) && \in_array($keyId, $this->allowedKeyIds, true));
     }
 }

@@ -15,6 +15,8 @@ namespace Symfony\Component\Form;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @extends \Traversable<string, FormBuilderInterface>
+ *
+ * @method FormBuilderInterface addDynamic(string $name, string|string[] $dependencies, callable $callback) Adds a field depending on the data of other fields. Not implementing it is deprecated since Symfony 8.3
  */
 interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuilderInterface
 {
@@ -29,6 +31,14 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * @param array<string, mixed>                 $options
      */
     public function add(string|self $child, ?string $type = null, array $options = []): static;
+
+    /**
+     * Adds a field that depends on the data of one or more other fields.
+     *
+     * The callback receives a DynamicField, then the data of each dependency. If it
+     * does not call DynamicField::add(), the field is not part of the form.
+     */
+    // public function addDynamic(string $name, string|array $dependencies, callable $callback): static;
 
     /**
      * Creates a form builder.

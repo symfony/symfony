@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Dynamic\DynamicHandler;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -36,6 +37,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      * The data of children who haven't been converted to form builders yet.
      */
     private array $unresolvedChildren = [];
+
+    private ?DynamicHandler $dynamicHandler = null;
 
     public function __construct(?string $name, ?string $dataClass, EventDispatcherInterface $dispatcher, FormFactoryInterface $factory, array $options = [])
     {
@@ -62,6 +65,17 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         // Add to "children" to maintain order
         $this->children[$child] = null;
         $this->unresolvedChildren[$child] = [$type, $options];
+
+        return $this;
+    }
+
+    public function addDynamic(string $name, string|array $dependencies, callable $callback): static
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
+        }
+
+        ($this->dynamicHandler ??= new DynamicHandler($this))->add($name, $dependencies, $callback);
 
         return $this;
     }

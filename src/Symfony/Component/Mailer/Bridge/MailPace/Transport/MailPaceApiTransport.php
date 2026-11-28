@@ -83,7 +83,7 @@ final class MailPaceApiTransport extends AbstractApiTransport
             throw new HttpTransportException($errorMessage, $response);
         }
 
-        $sentMessage->setMessageId($result['id']);
+        $sentMessage->setTransportMessageId($result['id']);
 
         return $response;
     }

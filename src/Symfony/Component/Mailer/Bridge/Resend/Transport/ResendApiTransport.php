@@ -70,7 +70,7 @@ final class ResendApiTransport extends AbstractApiTransport implements RemoteTem
             throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response);
         }
 
-        $sentMessage->setMessageId($result['id']);
+        $sentMessage->setTransportMessageId($result['id']);
 
         return $response;
     }

@@ -71,7 +71,7 @@ final class ScalewayApiTransport extends AbstractApiTransport
             throw new HttpTransportException('Unable to send an email: '.$result['message'].\sprintf(' (code %d).', $statusCode), $response);
         }
 
-        $sentMessage->setMessageId($result['emails'][0]['message_id']);
+        $sentMessage->setTransportMessageId($result['emails'][0]['message_id']);
 
         return $response;
     }

@@ -141,7 +141,7 @@ class MailjetApiTransportTest extends TestCase
 
         $sentMessage = $transport->send($email);
         $this->assertInstanceOf(SentMessage::class, $sentMessage);
-        $this->assertSame('576460756513665525', $sentMessage->getMessageId());
+        $this->assertSame('576460756513665525', $sentMessage->getTransportMessageId());
     }
 
     public function testSendWithDecodingException()

@@ -98,7 +98,7 @@ final class AhaSendApiTransport extends AbstractApiTransport
             }
         }
         if (null !== $messageId) {
-            $sentMessage->setMessageId($messageId);
+            $sentMessage->setTransportMessageId($messageId);
         }
 
         return $response;

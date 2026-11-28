@@ -76,7 +76,7 @@ final class MailKiteApiTransport extends AbstractApiTransport
         }
 
         if (isset($result['id'])) {
-            $sentMessage->setMessageId((string) $result['id']);
+            $sentMessage->setTransportMessageId((string) $result['id']);
         }
 
         return $response;

@@ -81,7 +81,7 @@ class MailgunApiTransport extends AbstractApiTransport implements RemoteTemplate
             throw new HttpTransportException('Unable to send an email: '.$result['message'].\sprintf(' (code %d).', $statusCode), $response);
         }
 
-        $sentMessage->setMessageId($result['id']);
+        $sentMessage->setTransportMessageId($result['id']);
 
         return $response;
     }

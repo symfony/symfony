@@ -167,7 +167,7 @@ class ResendApiTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        $this->assertSame('foobar', $message->getTransportMessageId());
     }
 
     /**
@@ -205,6 +205,6 @@ class ResendApiTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        $this->assertSame('foobar', $message->getTransportMessageId());
     }
 }

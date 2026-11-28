@@ -77,7 +77,7 @@ class SendgridApiTransport extends AbstractApiTransport implements RemoteTemplat
             }
         }
 
-        $sentMessage->setMessageId($response->getHeaders(false)['x-message-id'][0]);
+        $sentMessage->setTransportMessageId($response->getHeaders(false)['x-message-id'][0]);
 
         return $response;
     }

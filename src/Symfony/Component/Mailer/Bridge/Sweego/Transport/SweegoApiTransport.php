@@ -67,7 +67,7 @@ final class SweegoApiTransport extends AbstractApiTransport
             throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response);
         }
 
-        $sentMessage->setMessageId($result['transaction_id']);
+        $sentMessage->setTransportMessageId($result['transaction_id']);
 
         return $response;
     }

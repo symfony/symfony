@@ -94,7 +94,7 @@ final class InfobipApiTransport extends AbstractApiTransport
         }
 
         if (isset($result['messages'][0]['messageId'])) {
-            $sentMessage->setMessageId($result['messages'][0]['messageId']);
+            $sentMessage->setTransportMessageId($result['messages'][0]['messageId']);
         }
 
         return $response;

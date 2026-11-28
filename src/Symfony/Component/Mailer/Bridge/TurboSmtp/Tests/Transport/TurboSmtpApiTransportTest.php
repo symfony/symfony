@@ -83,7 +83,7 @@ class TurboSmtpApiTransportTest extends TestCase
         $transport = new TurboSmtpApiTransport('KEY', 'SECRET', $client);
         $message = $transport->send($email);
 
-        $this->assertSame('42', $message->getMessageId());
+        $this->assertSame('42', $message->getTransportMessageId());
     }
 
     public function testCustomHeader()

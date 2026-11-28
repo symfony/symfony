@@ -22,6 +22,7 @@ class SentMessage
     private RawMessage $original;
     private RawMessage $raw;
     private string $messageId;
+    private ?string $messageIdHeader = null;
     private string $debug = '';
 
     /**
@@ -41,7 +42,7 @@ class SentMessage
             if (!$headers->has('Message-ID')) {
                 $headers->addIdHeader('Message-ID', $message->generateMessageId());
             }
-            $this->messageId = $headers->get('Message-ID')->getId();
+            $this->messageIdHeader = $this->messageId = $headers->get('Message-ID')->getId();
             $this->raw = new RawMessage($message->toIterable());
         } else {
             $this->raw = $message;
@@ -64,21 +65,51 @@ class SentMessage
     }
 
     /**
-     * Sets the transport-level message ID.
+     * @deprecated since Symfony 8.3, use setTransportMessageId() instead
      */
     public function setMessageId(string $id): void
+    {
+        trigger_deprecation('symfony/mailer', '8.3', 'Method "%s()" is deprecated, use "setTransportMessageId()" instead.', __METHOD__);
+
+        $this->setTransportMessageId($id);
+    }
+
+    /**
+     * @deprecated since Symfony 8.3, use getTransportMessageId() or getMessageIdHeader() instead
+     */
+    public function getMessageId(): string
+    {
+        trigger_deprecation('symfony/mailer', '8.3', 'Method "%s()" is deprecated, use "getTransportMessageId()" or "getMessageIdHeader()" instead.', __METHOD__);
+
+        return $this->getTransportMessageId();
+    }
+
+    /**
+     * Sets the id that the transport gave to the message, e.g. the queue id of an SMTP server or the id returned by an API.
+     */
+    public function setTransportMessageId(string $id): void
     {
         $this->messageId = $id;
     }
 
     /**
-     * Gets the transport-level message ID.
+     * Gets the id that the transport gave to the message.
      *
-     * Not to be confused with the Message-ID header, which is available via getOriginalMessage()
+     * Until the transport sets it, this is the value of the Message-ID header.
      */
-    public function getMessageId(): string
+    public function getTransportMessageId(): string
     {
         return $this->messageId;
+    }
+
+    /**
+     * Gets the value of the Message-ID header that is sent, whether the message had one or it was generated.
+     *
+     * Returns null when the message is not a Message, e.g. a RawMessage.
+     */
+    public function getMessageIdHeader(): ?string
+    {
+        return $this->messageIdHeader;
     }
 
     public function getDebug(): string

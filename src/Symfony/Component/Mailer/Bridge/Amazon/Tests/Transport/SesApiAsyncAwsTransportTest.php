@@ -125,7 +125,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        $this->assertSame('foobar', $message->getTransportMessageId());
     }
 
     public function testSendWithTenant()
@@ -279,7 +279,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        $this->assertSame('foobar', $message->getTransportMessageId());
     }
 
     public function testSendRemoteTemplate()
@@ -312,7 +312,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        $this->assertSame('foobar', $message->getTransportMessageId());
     }
 
     public function testRemoteTemplateRejectsSubject()
@@ -392,6 +392,6 @@ class SesApiAsyncAwsTransportTest extends TestCase
         $envelope = new Envelope(new Address('fabpot@symfony.com'), [new Address('saif.gmati@symfony.com')]);
         $message = $transport->send(new RawMessage("Subject: Hello!\r\n\r\nHello There!"), $envelope);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        $this->assertSame('foobar', $message->getTransportMessageId());
     }
 }

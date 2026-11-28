@@ -41,12 +41,15 @@ use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\DnfTypeArgumentHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommand;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyHandlerWithCustomMethods;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyQuery;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler;
+use Symfony\Component\Messenger\Tests\Fixtures\IntersectionTypeArgumentHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
@@ -749,6 +752,32 @@ class MessengerPassTest extends TestCase
         $container = $this->getContainerBuilder();
         $container
             ->register(UnionBuiltinTypeArgumentHandler::class, UnionBuiltinTypeArgumentHandler::class)
+            ->addTag('messenger.message_handler')
+        ;
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testIntersectionTypeArgumentHandler()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Invalid handler service "%s": type-hint of argument "$message" in method "%s::__invoke()" cannot be or contain an intersection type, "%s" given. Use the "handles" tag attribute to define the handled message class instead.', IntersectionTypeArgumentHandler::class, IntersectionTypeArgumentHandler::class, DummyMessageInterface::class.'&Countable'));
+        $container = $this->getContainerBuilder();
+        $container
+            ->register(IntersectionTypeArgumentHandler::class, IntersectionTypeArgumentHandler::class)
+            ->addTag('messenger.message_handler')
+        ;
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testDnfTypeArgumentHandler()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Invalid handler service "%s": type-hint of argument "$message" in method "%s::__invoke()" cannot be or contain an intersection type, "(%s)|%s" given. Use the "handles" tag attribute to define the handled message class instead.', DnfTypeArgumentHandler::class, DnfTypeArgumentHandler::class, DummyMessageInterface::class.'&Countable', ChildDummyMessage::class));
+        $container = $this->getContainerBuilder();
+        $container
+            ->register(DnfTypeArgumentHandler::class, DnfTypeArgumentHandler::class)
             ->addTag('messenger.message_handler')
         ;
 

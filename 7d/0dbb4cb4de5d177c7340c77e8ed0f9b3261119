@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-28T09:30:00Z
+
+Thanks for the review! I moved this to 7.4, since 6.4 doesn't get bug fixes anymore.

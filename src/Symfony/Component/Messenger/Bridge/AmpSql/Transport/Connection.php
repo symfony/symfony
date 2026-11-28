@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmpSql\Transport;
 
+use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Mysql\MysqlConnectionPool;
 use Amp\Postgres\PostgresConnectionPool;
 use Amp\Sql\SqlConnection;
@@ -47,6 +49,7 @@ final class Connection
     private string $tableName;
     private bool $versionValidated = false;
     private ?SqlConnection $connection = null;
+    private ?Future $closing = null;
 
     /**
      * @param \Closure(): (SqlConnection|MysqlConnectionPool|PostgresConnectionPool|SqliteConnectionPool) $connectionFactory Creates the connection on first use and after close()
@@ -320,12 +323,25 @@ final class Connection
 
     public function close(): void
     {
-        $this->connection?->close();
+        if (!$connection = $this->connection) {
+            return;
+        }
+
         $this->connection = null;
+        $closed = new DeferredFuture();
+        $connection->onClose(static fn () => $closed->complete());
+        $connection->close();
+        $this->closing = $closed->getFuture();
     }
 
     private function getConnection(): SqlConnection
     {
+        if (!$this->connection && $this->closing) {
+            // a closed pool may still be closing its connections, e.g. an SQLite child process that holds the database file
+            $this->closing->await();
+            $this->closing = null;
+        }
+
         return $this->connection ??= ($this->connectionFactory)();
     }
 

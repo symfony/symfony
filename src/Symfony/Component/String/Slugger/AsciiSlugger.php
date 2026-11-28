@@ -89,6 +89,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
      *                           false will disable emoji,
      *                           and a string to use a specific locale
      */
+    #[\NoDiscard]
     public function withEmoji(bool|string $emoji = true): static
     {
         if (false !== $emoji && !class_exists(EmojiTransliterator::class)) {

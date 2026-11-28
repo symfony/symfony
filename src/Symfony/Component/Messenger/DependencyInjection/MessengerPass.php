@@ -251,11 +251,15 @@ class MessengerPass implements CompilerPassInterface
 
         $parameters = $method->getParameters();
 
-        /** @var \ReflectionNamedType|\ReflectionUnionType|null */
+        /** @var \ReflectionNamedType|\ReflectionUnionType|\ReflectionIntersectionType|null */
         $type = $parameters[0]->getType();
 
         if (!$type) {
             throw new RuntimeException(\sprintf('Invalid handler service "%s": argument "$%s" of method "%s::%s()" must have a type-hint corresponding to the message class it handles.', $serviceId, $parameters[0]->getName(), $handlerClass->getName(), $methodName));
+        }
+
+        if ($type instanceof \ReflectionIntersectionType || ($type instanceof \ReflectionUnionType && array_filter($type->getTypes(), static fn (\ReflectionType $t): bool => $t instanceof \ReflectionIntersectionType))) {
+            throw new RuntimeException(\sprintf('Invalid handler service "%s": type-hint of argument "$%s" in method "%s::%s()" cannot be or contain an intersection type, "%s" given. Use the "handles" tag attribute to define the handled message class instead.', $serviceId, $parameters[0]->getName(), $handlerClass->getName(), $methodName, $type));
         }
 
         if ($type instanceof \ReflectionUnionType) {

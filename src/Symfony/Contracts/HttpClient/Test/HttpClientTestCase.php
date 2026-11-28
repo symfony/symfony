@@ -883,10 +883,10 @@ abstract class HttpClientTestCase extends TestCase
         $start = microtime(true);
         $responses = [];
 
-        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8067).'/timeout-header', ['timeout' => 0.25]);
-        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8077).'/timeout-header', ['timeout' => 0.25]);
-        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8067).'/timeout-header', ['timeout' => 0.25]);
-        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8077).'/timeout-header', ['timeout' => 0.25]);
+        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8067).'/timeout-header-slow', ['timeout' => 0.25]);
+        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8077).'/timeout-header-slow', ['timeout' => 0.25]);
+        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8067).'/timeout-header-slow', ['timeout' => 0.25]);
+        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8077).'/timeout-header-slow', ['timeout' => 0.25]);
 
         try {
             foreach ($responses as $response) {
@@ -916,10 +916,10 @@ abstract class HttpClientTestCase extends TestCase
         $start = microtime(true);
         $responses = [];
 
-        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8067).'/timeout-header', ['timeout' => 0.25]);
-        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8077).'/timeout-header', ['timeout' => 0.25]);
-        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8067).'/timeout-header', ['timeout' => 0.25]);
-        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8077).'/timeout-header', ['timeout' => 0.25]);
+        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8067).'/timeout-header-slow', ['timeout' => 0.25]);
+        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8077).'/timeout-header-slow', ['timeout' => 0.25]);
+        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8067).'/timeout-header-slow', ['timeout' => 0.25]);
+        $responses[] = $client->request('GET', 'http://localhost:'.self::port(8077).'/timeout-header-slow', ['timeout' => 0.25]);
 
         try {
             while ($response = array_shift($responses)) {

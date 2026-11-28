@@ -146,6 +146,10 @@ switch (parse_url($vars['REQUEST_URI'], \PHP_URL_PATH)) {
         usleep(300000);
         break;
 
+    case '/timeout-header-slow':
+        sleep(2);
+        break;
+
     case '/timeout-body':
         echo '<1>';
         @ob_flush();

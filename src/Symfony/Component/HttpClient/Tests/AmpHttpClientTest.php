@@ -52,12 +52,6 @@ class AmpHttpClientTest extends HttpClientTestCase
     }
 
     #[Group('transient-on-windows')]
-    public function testTimeoutOnInitialize()
-    {
-        parent::testTimeoutOnInitialize();
-    }
-
-    #[Group('transient-on-windows')]
     public function testTimeoutOnDestruct()
     {
         parent::testTimeoutOnDestruct();

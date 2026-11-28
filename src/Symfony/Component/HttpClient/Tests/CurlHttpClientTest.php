@@ -85,12 +85,6 @@ class CurlHttpClientTest extends HttpClientTestCase
         parent::testTimeoutIsNotAFatalError();
     }
 
-    #[Group('transient-on-windows')]
-    public function testTimeoutOnDestruct()
-    {
-        parent::testTimeoutOnDestruct();
-    }
-
     public function testCancelFromOnProgressInStreamWritesNothingToStdout()
     {
         $process = new Process([\PHP_BINARY, __DIR__.'/Fixtures/cancel_from_on_progress_in_stream.php', self::port()]);

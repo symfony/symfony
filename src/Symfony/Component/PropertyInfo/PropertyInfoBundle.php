@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\PropertyInfo\DependencyInjection\PhpStanExtractorTypeInfoPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoConstructorPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\RemovePropertyInfoCachePass;
@@ -43,6 +44,7 @@ class PropertyInfoBundle extends AbstractBundle
         $container->addCompilerPass(new PropertyInfoPass());
         $container->addCompilerPass(new PropertyInfoConstructorPass());
         $container->addCompilerPass(new RemovePropertyInfoCachePass());
+        $container->addCompilerPass(new PhpStanExtractorTypeInfoPass());
     }
 
     public function configure(DefinitionConfigurator $definition): void

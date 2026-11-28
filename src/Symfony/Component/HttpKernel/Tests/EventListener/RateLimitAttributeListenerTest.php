@@ -1217,6 +1217,15 @@ class RateLimitAttributeListenerTest extends TestCase
         $this->assertSame(429, $this->handleThrough($kernel, new StackedPolicyController())->getStatusCode());
     }
 
+    public function testStackedIdenticalPoliciesDoNotShareABucket()
+    {
+        $kernel = $this->makePolicyKernel();
+
+        $this->assertSame(200, $this->handleThrough($kernel, new StackedIdenticalPolicyController())->getStatusCode());
+        $this->assertSame(200, $this->handleThrough($kernel, new StackedIdenticalPolicyController())->getStatusCode());
+        $this->assertSame(429, $this->handleThrough($kernel, new StackedIdenticalPolicyController())->getStatusCode());
+    }
+
     public function testRejectedPolicyDispatchesRateLimitExceededEventNamedAfterTheController()
     {
         if (!class_exists(RateLimitExceededEvent::class)) {
@@ -1235,7 +1244,7 @@ class RateLimitAttributeListenerTest extends TestCase
         }
 
         $this->assertCount(1, $limiterNames);
-        $this->assertMatchesRegularExpression('/^'.preg_quote(FixedWindowPolicyController::class.'::__invoke#', '/').'[0-9a-f]{32}$/', $limiterNames[0]);
+        $this->assertSame(FixedWindowPolicyController::class.'::__invoke#0', $limiterNames[0]);
     }
 
     public function testPolicyRequiresTheBuilder()
@@ -1417,6 +1426,16 @@ class StackedPolicyController
 {
     #[RateLimit(new SlidingWindowPolicy(2, '1 minute'), key: 'k', exposeHeaders: true)]
     #[RateLimit(new SlidingWindowPolicy(5, '1 minute'), key: 'k', exposeHeaders: true)]
+    public function __invoke(): Response
+    {
+        return new Response('ok');
+    }
+}
+
+class StackedIdenticalPolicyController
+{
+    #[RateLimit(new FixedWindowPolicy(2, '1 minute'), key: 'k')]
+    #[RateLimit(new FixedWindowPolicy(2, '1 minute'), key: 'k')]
     public function __invoke(): Response
     {
         return new Response('ok');

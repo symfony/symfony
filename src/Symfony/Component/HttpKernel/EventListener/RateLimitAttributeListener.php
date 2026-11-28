@@ -116,7 +116,7 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
         if (\is_string($name = $attribute->limiter)) {
             $factory = $this->limiters->get($name);
         } else {
-            $name = $this->getPolicyLimiterId($event->kernelEvent->getControllerReflector(), $attribute->limiter);
+            $name = $this->getPolicyLimiterId($event);
             $factory = $attribute->limiter->createFactory($this->builder ?? throw new \LogicException(\sprintf('Configuring "#[RateLimit]" with a policy requires a "%s"; is the RateLimiter component enabled?', RateLimiterBuilder::class)), $name);
         }
 
@@ -139,11 +139,16 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
     }
 
     /**
-     * Policies are keyed by their controller and configuration, so that each gets its own window or bucket.
+     * Policies are keyed by their controller and their position among its policies, so that changing
+     * a policy keeps its window or bucket, like changing the configuration of a named limiter does.
+     *
+     * @param ControllerAttributeEvent<RateLimit, ControllerEvent|ControllerArgumentsEvent> $event
      */
-    private function getPolicyLimiterId(\ReflectionFunctionAbstract $controller, PolicyInterface $policy): string
+    private function getPolicyLimiterId(ControllerAttributeEvent $event): string
     {
-        return KeyPlaceholderResolver::getControllerName($controller).'#'.hash('xxh128', serialize($policy));
+        $policies = array_values(array_filter($event->kernelEvent->getAttributes(RateLimit::class), static fn (RateLimit $attribute): bool => $attribute->limiter instanceof PolicyInterface));
+
+        return KeyPlaceholderResolver::getControllerName($event->kernelEvent->getControllerReflector()).'#'.(int) array_search($event->attribute, $policies, true);
     }
 
     /**

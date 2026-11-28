@@ -16,8 +16,6 @@ use Symfony\Component\Tui\Exception\InvalidArgumentException;
 /**
  * Shared scheduling lifecycle for runtime objects driven by WidgetContext ticks.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 trait ScheduledTickTrait

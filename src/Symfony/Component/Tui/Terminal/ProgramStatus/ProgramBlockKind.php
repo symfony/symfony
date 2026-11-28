@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Terminal\ProgramStatus;
 /**
  * What a blocked program waits for from the user (OSC 7501).
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 enum ProgramBlockKind: string

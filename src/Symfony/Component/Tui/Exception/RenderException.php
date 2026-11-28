@@ -16,8 +16,6 @@ namespace Symfony\Component\Tui\Exception;
  *
  * Typically thrown when a component renders a line that exceeds the terminal width.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RenderException extends RuntimeException

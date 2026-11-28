@@ -17,8 +17,6 @@ use Symfony\Component\Tui\Input\Key;
 /**
  * Loader that can be cancelled with Escape key.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class CancellableLoaderWidget extends LoaderWidget implements FocusableInterface

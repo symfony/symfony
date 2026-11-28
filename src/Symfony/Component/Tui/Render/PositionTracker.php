@@ -20,8 +20,6 @@ use Symfony\Component\Tui\Widget\ParentInterface;
  * Maintains a stack of absolute [row, col] offsets for the current rendering
  * context and records each widget's final position as a WidgetRect.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

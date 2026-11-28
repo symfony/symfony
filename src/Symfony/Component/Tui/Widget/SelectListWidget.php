@@ -36,8 +36,6 @@ use Symfony\Component\Tui\Style\Style;
  * contract: never pass untrusted bytes here; sanitize upstream via
  * {@see Util\StringUtils::stripControlBytes()}.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SelectListWidget extends AbstractWidget implements FocusableInterface, VerticallyExpandableInterface

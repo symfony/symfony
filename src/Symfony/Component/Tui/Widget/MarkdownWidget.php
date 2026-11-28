@@ -52,8 +52,6 @@ use Tempest\Highlight\Highlighter;
  *
  * Supports headings, bold, italic, code, lists, links, blockquotes, tables, and horizontal rules.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class MarkdownWidget extends AbstractWidget

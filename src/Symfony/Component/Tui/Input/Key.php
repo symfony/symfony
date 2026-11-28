@@ -16,8 +16,6 @@ namespace Symfony\Component\Tui\Input;
  *
  * Provides constants and factory methods for keyboard input matching.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class Key

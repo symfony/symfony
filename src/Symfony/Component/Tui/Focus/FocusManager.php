@@ -24,8 +24,6 @@ use Symfony\Component\Tui\Widget\FocusableInterface;
  *
  * Default bindings: F6 (next) and Shift+F6 (previous).
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class FocusManager

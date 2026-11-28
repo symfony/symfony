@@ -21,8 +21,6 @@ namespace Symfony\Component\Tui\Widget\Util;
  * Both InputWidget (single-line) and EditorWidget (multi-line, per-line)
  * delegate grapheme-level operations here.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

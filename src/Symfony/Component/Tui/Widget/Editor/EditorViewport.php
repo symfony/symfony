@@ -20,8 +20,6 @@ use Symfony\Component\Tui\Ansi\TextWrapper;
  * in the terminal viewport, accounting for word-wrap. Also handles
  * mouse cursor placement (display-row → logical line+col mapping).
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @internal

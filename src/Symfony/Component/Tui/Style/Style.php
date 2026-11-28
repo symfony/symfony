@@ -51,8 +51,6 @@ namespace Symfony\Component\Tui\Style;
  * Compare with Tui, which is a stateful service that returns $this from fluent
  * methods to maintain object identity across the application.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class Style

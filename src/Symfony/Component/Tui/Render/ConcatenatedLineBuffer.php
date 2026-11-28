@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Render;
 use Symfony\Component\Tui\Exception\OutOfBoundsException;
 
 /**
- * @experimental
- *
  * @internal
  */
 final class ConcatenatedLineBuffer implements LineBufferInterface

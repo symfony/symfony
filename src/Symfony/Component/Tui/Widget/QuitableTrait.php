@@ -20,8 +20,6 @@ use Symfony\Component\Tui\Event\QuitEvent;
  * If no listener is registered for QuitEvent (neither globally on the
  * Tui nor locally on the widget), the default behavior is to stop the TUI.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 trait QuitableTrait

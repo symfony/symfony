@@ -29,8 +29,6 @@ use Symfony\Component\Tui\Widget\TabsWidget;
  * These can be overridden by application or theme stylesheets
  * via the cascade mechanism.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

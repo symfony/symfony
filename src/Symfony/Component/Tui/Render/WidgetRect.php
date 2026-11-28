@@ -16,8 +16,6 @@ namespace Symfony\Component\Tui\Render;
  *
  * Coordinates are in terminal character cells, with (0, 0) at the top-left.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

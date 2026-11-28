@@ -31,8 +31,6 @@ use Symfony\Component\Tui\Ansi\AnsiUtils;
  *         new Layer($foregroundLines, transparent: true),
  *     );
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

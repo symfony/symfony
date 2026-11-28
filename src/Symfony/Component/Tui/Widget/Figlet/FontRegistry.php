@@ -28,8 +28,6 @@ use Symfony\Component\Tui\Exception\InvalidArgumentException;
  *     $stylesheet->addRule('.title', new Style(font: 'custom'));
  *     $widget->addStyleClass('font-custom');
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class FontRegistry

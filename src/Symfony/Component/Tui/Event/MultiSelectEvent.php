@@ -16,8 +16,6 @@ use Symfony\Component\Tui\Widget\SelectListWidget;
 /**
  * Event dispatched when items are selected in a multi-select SelectList.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class MultiSelectEvent extends AbstractEvent

@@ -17,8 +17,6 @@ use Symfony\Component\Tui\Terminal\ScreenBuffer;
 /**
  * Renders a ScreenBuffer to HTML with inline CSS styles.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class ScreenBufferHtmlRenderer

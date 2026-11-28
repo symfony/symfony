@@ -16,8 +16,6 @@ use Symfony\Component\Tui\Widget\SelectListWidget;
 /**
  * Event dispatched when an item is checked or unchecked in a multi-select SelectList.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SelectionToggleEvent extends AbstractEvent

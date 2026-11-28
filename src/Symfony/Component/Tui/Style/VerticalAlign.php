@@ -17,8 +17,6 @@ namespace Symfony\Component\Tui\Style;
  * Controls how child widget content is positioned vertically when it
  * renders shorter than the container's available height.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 enum VerticalAlign: string

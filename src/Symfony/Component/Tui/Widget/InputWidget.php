@@ -25,8 +25,6 @@ use Symfony\Component\Tui\Widget\Util\StringUtils;
 /**
  * Single-line text input with horizontal scrolling.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class InputWidget extends AbstractWidget implements FocusableInterface

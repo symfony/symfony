@@ -12,8 +12,6 @@
 namespace Symfony\Component\Tui\Render;
 
 /**
- * @experimental
- *
  * @internal
  */
 final class LineBufferDiffer

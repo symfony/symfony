@@ -17,8 +17,6 @@ namespace Symfony\Component\Tui\Event;
  * Unlike widget events, tick is a global application event
  * with no associated widget target.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TickEvent

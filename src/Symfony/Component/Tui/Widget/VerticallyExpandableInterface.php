@@ -19,8 +19,6 @@ namespace Symfony\Component\Tui\Widget;
  * In vertical layouts, multiple expanded siblings share the space equally.
  * In horizontal layouts, all children receive the full available height.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface VerticallyExpandableInterface

@@ -17,8 +17,6 @@ namespace Symfony\Component\Tui\Widget;
  * This is a read-only interface for tree traversal. Use WidgetContainerInterface
  * when you need to add or remove children.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface ParentInterface

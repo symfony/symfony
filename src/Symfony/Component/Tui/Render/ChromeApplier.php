@@ -24,8 +24,6 @@ use Symfony\Component\Tui\Widget\AbstractWidget;
  * padding adds space inside, borders draw a box, and background colors
  * fill the area. The result is cached for performance.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

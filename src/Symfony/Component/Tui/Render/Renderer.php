@@ -34,8 +34,6 @@ use Symfony\Component\Tui\Widget\Figlet\FontRegistry;
  * All widget types are rendered through the Renderer: containers via
  * renderContainer(), and leaf widgets by delegating to widget->render().
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

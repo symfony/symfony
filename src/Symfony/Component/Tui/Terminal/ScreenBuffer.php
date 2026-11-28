@@ -21,8 +21,6 @@ use Symfony\Component\Tui\Ansi\AnsiUtils;
  * This is used in tests to convert raw terminal output (with differential
  * updates, cursor movements, etc.) into the actual rendered screen state.
  * It preserves ANSI styling (colors, bold, etc.) for accurate visual comparison.
- *
- * @experimental
  */
 final class ScreenBuffer
 {

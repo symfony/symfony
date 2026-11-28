@@ -16,8 +16,6 @@ use Revolt\EventLoop;
 /**
  * Drives the main TUI tick interval using adaptive scheduling.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

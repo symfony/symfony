@@ -18,8 +18,6 @@ namespace Symfony\Component\Tui\Render;
  * background from the layer below. Fully unstyled spaces are completely
  * transparent (the entire cell below shows through).
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

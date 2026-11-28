@@ -22,8 +22,6 @@ use Symfony\Component\Tui\Exception\InvalidArgumentException;
  * - 3 values: top, left/right, bottom
  * - 4 values: top, right, bottom, left
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class Border

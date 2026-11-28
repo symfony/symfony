@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Ansi;
 /**
  * Tracks active ANSI SGR codes to preserve styling across line breaks.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

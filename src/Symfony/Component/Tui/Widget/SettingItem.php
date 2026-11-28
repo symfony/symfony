@@ -22,8 +22,6 @@ use Symfony\Component\Tui\Widget\Util\StringUtils;
  * for the raw-passthrough contract: sanitize untrusted label/description
  * upstream via {@see StringUtils::stripControlBytes()}.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @phpstan-type SubmenuFactory callable(string, callable(?string): void): (FocusableInterface&AbstractWidget)

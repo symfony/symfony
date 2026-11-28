@@ -17,8 +17,6 @@ namespace Symfony\Component\Tui\Widget;
  * Extends ParentInterface with mutation methods (add, remove, clear).
  * Use ParentInterface when you only need read-only tree traversal.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface WidgetContainerInterface extends ParentInterface

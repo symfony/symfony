@@ -20,8 +20,6 @@ use Symfony\Component\Tui\Widget\AbstractWidget;
  * Used by LayoutEngine and ChromeApplier to call back into the Renderer
  * without creating a circular class dependency.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

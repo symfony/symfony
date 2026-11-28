@@ -26,8 +26,6 @@ use Symfony\Component\Tui\Widget\VerticallyExpandableInterface;
  * The layout engine distributes available space among children, handles
  * fill-expanding children, and applies horizontal/vertical alignment.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

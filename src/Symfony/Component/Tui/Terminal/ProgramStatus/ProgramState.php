@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Terminal\ProgramStatus;
 /**
  * What a program tells the terminal it is doing (OSC 7501).
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 enum ProgramState: string

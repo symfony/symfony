@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Widget\Util;
 /**
  * General-purpose string utilities for terminal input handling.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

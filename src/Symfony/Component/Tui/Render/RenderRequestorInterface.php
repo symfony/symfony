@@ -18,8 +18,6 @@ namespace Symfony\Component\Tui\Render;
  * that need to trigger or flush a render pass without depending
  * on the full Tui API.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

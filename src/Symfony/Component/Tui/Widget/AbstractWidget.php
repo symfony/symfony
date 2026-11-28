@@ -23,8 +23,6 @@ use Symfony\Component\Tui\Tui;
 /**
  * Base widget class with lifecycle hooks and dirty tracking.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class AbstractWidget

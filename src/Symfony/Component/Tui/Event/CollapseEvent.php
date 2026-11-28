@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Event;
 /**
  * Event dispatched when a CollapsibleWidget is collapsed.
  *
- * @experimental
- *
  * @author Sylvain Blondeau <contact@sylvainblondeau.dev>
  */
 class CollapseEvent extends AbstractEvent

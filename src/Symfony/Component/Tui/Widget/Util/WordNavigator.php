@@ -20,8 +20,6 @@ use Symfony\Component\Tui\Ansi\AnsiUtils;
  * or a word run. Both InputWidget and EditorWidget delegate to this class for
  * within-line word navigation.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

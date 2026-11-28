@@ -26,8 +26,6 @@ use Symfony\Component\Tui\Exception\InvalidArgumentException;
  *
  * @see https://github.com/cmatsuoka/figlet/blob/master/figfont.txt
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

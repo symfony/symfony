@@ -16,8 +16,6 @@ use Symfony\Component\Tui\Widget\TabsWidget;
 /**
  * Event dispatched when the active tab changes in TabsWidget.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TabChangeEvent extends AbstractEvent

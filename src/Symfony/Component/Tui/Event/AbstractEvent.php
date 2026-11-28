@@ -21,8 +21,6 @@ use Symfony\Contracts\EventDispatcher\Event as BaseEvent;
  * Symfony's EventDispatcher. Carries the target widget that
  * originated the event.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class AbstractEvent extends BaseEvent

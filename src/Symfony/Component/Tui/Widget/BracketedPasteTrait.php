@@ -19,8 +19,6 @@ namespace Symfony\Component\Tui\Widget;
  * accumulates chunks until the end marker is received, then
  * returns the complete paste content.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 trait BracketedPasteTrait

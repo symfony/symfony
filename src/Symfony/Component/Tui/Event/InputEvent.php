@@ -20,8 +20,6 @@ use Symfony\Contracts\EventDispatcher\Event;
  * receives input. Call {@see stopPropagation()} to consume the input
  * and prevent further processing.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class InputEvent extends Event

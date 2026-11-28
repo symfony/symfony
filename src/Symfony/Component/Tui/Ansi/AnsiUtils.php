@@ -17,8 +17,6 @@ use Symfony\Component\Tui\Style\CursorShape;
 /**
  * ANSI escape code utilities for terminal rendering.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class AnsiUtils

@@ -29,8 +29,6 @@ use Symfony\Component\Tui\Widget\Figlet\FontRegistry;
  * - The TerminalInterface uses `getColumns()` and `getRows()`
  * - Standard tools like `stty`, `tput`, and env vars `COLUMNS`/`LINES` use this terminology
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class RenderContext

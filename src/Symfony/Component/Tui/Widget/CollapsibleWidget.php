@@ -44,8 +44,6 @@ use Symfony\Component\Tui\Render\RenderContext;
  *     $stylesheet->addRule(CollapsibleWidget::class.'::summary:focus', new Style(bold: true));
  *     $stylesheet->addRule(CollapsibleWidget::class.'::description', new Style(color: 'gray'));
  *
- * @experimental
- *
  * @author Sylvain Blondeau <contact@sylvainblondeau.dev>
  */
 class CollapsibleWidget extends AbstractWidget implements FocusableInterface, ParentInterface

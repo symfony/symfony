@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Style;
 /**
  * Represents the type of a terminal color.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

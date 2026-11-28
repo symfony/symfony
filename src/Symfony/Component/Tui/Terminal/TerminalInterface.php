@@ -20,8 +20,6 @@ use Symfony\Component\Tui\Terminal\ProgramStatus\ProgramStatus;
  * Provides abstraction over terminal I/O for the TUI framework.
  * Implementations handle raw mode, input reading, and output writing.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface TerminalInterface

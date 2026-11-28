@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Event;
 /**
  * Event dispatched when a widget action is cancelled (e.g., Escape pressed).
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class CancelEvent extends AbstractEvent

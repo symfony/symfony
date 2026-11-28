@@ -83,8 +83,6 @@ use Symfony\Component\Tui\Widget\AbstractWidget;
  * Breakpoint rules are applied after base rules and state selectors but
  * before instance styles in the cascade.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class StyleSheet

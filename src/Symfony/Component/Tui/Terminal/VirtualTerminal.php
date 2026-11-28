@@ -26,8 +26,6 @@ use Symfony\Component\Tui\Input\StdinBuffer;
  * queries (e.g. cell size). This is used by the rendering pipeline
  * to adjust its behavior accordingly.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class VirtualTerminal implements TerminalInterface

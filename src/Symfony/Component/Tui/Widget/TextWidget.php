@@ -62,8 +62,6 @@ use Symfony\Component\Tui\Widget\Figlet\FigletRenderer;
  * MarkdownWidget, SettingItem::$currentValue,
  * ProgressBarWidget::setMessage, LoaderWidget::setMessage.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TextWidget extends AbstractWidget

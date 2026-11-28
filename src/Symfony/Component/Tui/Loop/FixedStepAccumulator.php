@@ -16,8 +16,6 @@ use Symfony\Component\Tui\Exception\InvalidArgumentException;
 /**
  * Converts elapsed time into bounded fixed-step counts.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

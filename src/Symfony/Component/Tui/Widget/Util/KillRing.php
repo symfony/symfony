@@ -17,8 +17,6 @@ namespace Symfony\Component\Tui\Widget\Util;
  * Consecutive kill operations are appended to the same entry.
  * Yank/yank-pop cycles through the ring.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class KillRing

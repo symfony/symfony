@@ -16,8 +16,6 @@ use Symfony\Component\Tui\Widget\AbstractWidget;
 /**
  * Event dispatched when a widget's value changes.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ChangeEvent extends AbstractEvent

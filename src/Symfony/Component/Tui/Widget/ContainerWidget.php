@@ -34,8 +34,6 @@ use Symfony\Component\Tui\Render\RenderContext;
  *
  * Layout and chrome rendering is handled by the Renderer.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ContainerWidget extends AbstractWidget implements WidgetContainerInterface, VerticallyExpandableInterface

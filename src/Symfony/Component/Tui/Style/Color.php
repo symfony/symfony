@@ -21,8 +21,6 @@ use Symfony\Component\Tui\Exception\InvalidArgumentException;
  * - 256-color palette (integers 0-255)
  * - True color RGB (hex strings like '#ff5500' or '#f50')
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class Color

@@ -32,8 +32,6 @@ use Symfony\Component\Tui\Widget\Util\StringUtils;
  * - {@see EditorViewport}: scroll offset, viewport calculations
  * - {@see EditorRenderer}: line rendering with cursor and word-wrap
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class EditorWidget extends AbstractWidget implements FocusableInterface, VerticallyExpandableInterface

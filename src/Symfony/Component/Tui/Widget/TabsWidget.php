@@ -24,8 +24,6 @@ use Symfony\Component\Tui\Render\RenderContext;
  * Only the active tab content is attached to the widget tree; inactive tabs
  * are detached so they are fully disabled (focus, input hit-testing).
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetContainerInterface

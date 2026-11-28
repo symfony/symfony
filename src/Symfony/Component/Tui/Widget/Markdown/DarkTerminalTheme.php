@@ -19,8 +19,6 @@ use Tempest\Highlight\Tokens\TokenTypeEnum;
 /**
  * Dark terminal theme for syntax highlighting.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

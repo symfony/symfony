@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Exception;
 /**
  * Exception interface for all exceptions thrown by the component.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface ExceptionInterface extends \Throwable

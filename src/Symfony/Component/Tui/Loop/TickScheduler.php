@@ -16,8 +16,6 @@ use Symfony\Component\Tui\Exception\InvalidArgumentException;
 /**
  * Internal scheduler for repeat callbacks executed from the TUI tick.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

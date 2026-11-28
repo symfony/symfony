@@ -21,8 +21,6 @@ use Symfony\Component\Tui\Tui;
 /**
  * Internal widget tree manager.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

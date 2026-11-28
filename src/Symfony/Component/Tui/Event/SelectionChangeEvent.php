@@ -19,8 +19,6 @@ use Symfony\Component\Tui\Widget\SelectListWidget;
  * This fires when the user moves the cursor (arrow keys, scroll), not
  * when they confirm a selection (that's {@see SelectEvent}).
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SelectionChangeEvent extends AbstractEvent

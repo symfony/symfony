@@ -24,8 +24,6 @@ use Symfony\Component\Tui\Tui;
 /**
  * Runtime context provided to widgets when attached to the tree.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class WidgetContext

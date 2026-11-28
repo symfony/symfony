@@ -29,8 +29,6 @@ use Symfony\Component\Tui\Exception\InvalidArgumentException;
  *
  * @see https://www.superlogical.com/rex/docs/build/program-status
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class ProgramStatus

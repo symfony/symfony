@@ -17,8 +17,6 @@ namespace Symfony\Component\Tui\Widget;
  * Invalidates the widget when focus changes. Override setFocused()
  * for custom behavior (e.g. cursor blinker management).
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 trait FocusableTrait

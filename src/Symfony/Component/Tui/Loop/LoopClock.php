@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Loop;
 /**
  * Small monotonic-ish clock abstraction for game and animation loops.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class LoopClock

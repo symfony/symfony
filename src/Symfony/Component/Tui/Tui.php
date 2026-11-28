@@ -54,8 +54,6 @@ use Symfony\Component\Tui\Widget\WidgetTree;
  * - Renderer: widget tree → lines (content generation)
  * - ScreenWriter: lines → terminal (differential output)
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Tui implements RenderRequestorInterface, TickRuntimeInterface

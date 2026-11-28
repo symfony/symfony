@@ -4,11 +4,6 @@ TUI Component
 The TUI component provides a terminal UI framework for building rich,
 interactive CLI applications in PHP.
 
-**This Component is experimental**.
-[Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)
-are not covered by Symfony's
-[Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
-
 Sponsor
 -------
 

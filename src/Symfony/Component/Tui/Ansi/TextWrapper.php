@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Ansi;
 /**
  * Text wrapping with ANSI code preservation.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class TextWrapper

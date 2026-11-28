@@ -21,8 +21,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * This ensures components receive single key events, making key parsing work correctly.
  * Also handles bracketed paste mode.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

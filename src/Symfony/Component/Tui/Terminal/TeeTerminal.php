@@ -25,8 +25,6 @@ use Symfony\Component\Tui\Terminal\ProgramStatus\ProgramStatus;
  * The primary terminal is used for input handling and dimension queries.
  * All terminals receive write operations.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class TeeTerminal implements TerminalInterface

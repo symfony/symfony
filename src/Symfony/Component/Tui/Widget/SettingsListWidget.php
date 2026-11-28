@@ -22,8 +22,6 @@ use Symfony\Component\Tui\Render\RenderContext;
 /**
  * Settings panel with value cycling and submenus.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SettingsListWidget extends AbstractWidget implements FocusableInterface, ParentInterface

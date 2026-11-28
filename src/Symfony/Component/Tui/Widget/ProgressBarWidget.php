@@ -26,8 +26,6 @@ use Symfony\Component\Tui\Widget\Util\StringUtils;
  *
  * The bar animates via the event loop, like the LoaderWidget spinner.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ProgressBarWidget extends AbstractWidget

@@ -15,8 +15,6 @@ namespace Symfony\Component\Tui\Event;
  * Dispatched when the terminal stops receiving a bracketed paste, whether
  * the content was forwarded, truncated on overflow, or discarded on stop.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class PasteCompletedEvent

@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Event;
 /**
  * Event dispatched when user requests to quit.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class QuitEvent extends AbstractEvent

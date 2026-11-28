@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Style;
 /**
  * Text alignment within a widget's content area.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 enum TextAlign: string

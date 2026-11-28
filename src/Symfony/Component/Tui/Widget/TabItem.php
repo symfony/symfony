@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Widget;
 /**
  * Represents a single tab entry for TabsWidget.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class TabItem

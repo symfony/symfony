@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Widget;
 /**
  * Position of tab headers relative to their content.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 enum TabPosition: string

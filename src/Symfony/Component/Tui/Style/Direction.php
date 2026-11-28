@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Style;
 /**
  * Layout direction for container widgets.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 enum Direction: string

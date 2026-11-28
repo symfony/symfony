@@ -16,8 +16,6 @@ use Symfony\Component\Tui\Widget\AbstractWidget;
 /**
  * Event dispatched when content is submitted (e.g., Enter pressed in Input/Editor).
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SubmitEvent extends AbstractEvent

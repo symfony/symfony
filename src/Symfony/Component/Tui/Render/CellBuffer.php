@@ -26,8 +26,6 @@ use Symfony\Component\Tui\Exception\InvalidArgumentException;
  * Create a buffer, write ANSI-styled lines into regions, then serialize
  * back to ANSI strings.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

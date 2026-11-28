@@ -15,8 +15,6 @@ use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Exception\OutOfBoundsException;
 
 /**
- * @experimental
- *
  * @internal
  */
 final class ArrayLineBuffer implements LineBufferInterface

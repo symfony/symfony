@@ -23,8 +23,6 @@ use Symfony\Component\Tui\Exception\InvalidArgumentException;
  * - 2: reverse video border/outer — filled part shows outer bg, empty part shows border color
  * - 3: reverse video border/inner — filled part shows inner bg, empty part shows border color
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class BorderPattern

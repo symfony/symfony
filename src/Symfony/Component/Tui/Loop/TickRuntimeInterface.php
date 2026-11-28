@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Loop;
 /**
  * Runtime contract used by the adaptive ticker driver.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

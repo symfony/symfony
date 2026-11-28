@@ -22,8 +22,6 @@ use Symfony\Component\Tui\Style\Style;
  * This is a stateless helper: all state (document content, cursor position,
  * scroll offset) is passed in from the EditorWidget.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @internal

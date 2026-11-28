@@ -18,8 +18,6 @@ use Symfony\Component\Tui\Exception\InvalidArgumentException;
  *
  * Maps action names to key identifiers, allowing customizable keybindings.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class Keybindings

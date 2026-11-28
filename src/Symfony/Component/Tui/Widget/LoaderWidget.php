@@ -24,8 +24,6 @@ use Symfony\Component\Tui\Widget\Util\StringUtils;
  * the animation. Attaching a stopped loader to the widget tree does not
  * schedule any ticks until start() is called.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class LoaderWidget extends AbstractWidget

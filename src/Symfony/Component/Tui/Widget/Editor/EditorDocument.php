@@ -21,8 +21,6 @@ use Symfony\Component\Tui\Widget\Util\StringUtils;
  * Pure model: no rendering, no terminal I/O, no scroll/viewport logic.
  * The EditorWidget orchestrates input → document → viewport → render.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @internal

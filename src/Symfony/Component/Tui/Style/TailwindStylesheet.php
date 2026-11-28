@@ -112,8 +112,6 @@ use Symfony\Component\Tui\Widget\AbstractWidget;
  * a single Border object. When the same property is set twice,
  * the last class wins (e.g., `p-2 p-4` results in padding 4).
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TailwindStylesheet extends StyleSheet

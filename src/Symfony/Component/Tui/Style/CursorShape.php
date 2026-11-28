@@ -20,8 +20,6 @@ namespace Symfony\Component\Tui\Style;
  * variants so the terminal provides native cursor animation at
  * zero CPU cost.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 enum CursorShape: int

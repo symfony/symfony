@@ -30,8 +30,6 @@ use Symfony\Component\Tui\Render\RenderContext;
  * - ::global-key: the key badge for global bindings
  * - ::global-action: the action label for global bindings
  *
- * @experimental
- *
  * @author Sylvain Blondeau <contact@sylvainblondeau.dev>
  */
 class KeyBindingWidget extends AbstractWidget

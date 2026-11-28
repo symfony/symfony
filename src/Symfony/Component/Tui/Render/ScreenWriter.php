@@ -28,8 +28,6 @@ use Symfony\Component\Tui\Terminal\TerminalInterface;
  * - Writing ANSI sequences to the terminal
  * - Managing cursor position for differential rendering
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

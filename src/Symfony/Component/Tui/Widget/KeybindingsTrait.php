@@ -21,8 +21,6 @@ use Symfony\Component\Tui\Input\Keybindings;
  * 2. Global keybindings from the TUI (via WidgetContext)
  * 3. Explicit keybindings set on this widget (via setKeybindings())
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 trait KeybindingsTrait

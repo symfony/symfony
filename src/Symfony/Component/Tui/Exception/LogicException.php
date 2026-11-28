@@ -12,8 +12,6 @@
 namespace Symfony\Component\Tui\Exception;
 
 /**
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class LogicException extends \LogicException implements ExceptionInterface

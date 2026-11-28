@@ -17,8 +17,6 @@ namespace Symfony\Component\Tui\Style;
  * Controls how a child widget's block is positioned when it renders
  * narrower than the container's available width (e.g. due to maxColumns).
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 enum Align: string

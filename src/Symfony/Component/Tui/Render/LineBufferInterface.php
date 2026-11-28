@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Render;
 /**
  * @extends \IteratorAggregate<int, string>
  *
- * @experimental
- *
  * @internal
  */
 interface LineBufferInterface extends \Countable, \IteratorAggregate

@@ -18,8 +18,6 @@ use Symfony\Component\Tui\Exception\InvalidArgumentException;
  *
  * Supports both legacy terminal sequences and Kitty keyboard protocol.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class KeyParser

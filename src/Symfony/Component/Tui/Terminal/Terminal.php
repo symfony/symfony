@@ -19,8 +19,6 @@ use Symfony\Component\Tui\Input\StdinBuffer;
 /**
  * Real terminal implementation using stdin/stdout.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class Terminal implements TerminalInterface

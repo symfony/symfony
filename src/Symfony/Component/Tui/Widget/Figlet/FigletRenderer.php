@@ -26,8 +26,6 @@ use Symfony\Component\Tui\Style\Color;
  * in transparent mode: spaces at the end of lines won't carry styling that
  * would prevent lower layers from showing through.
  *
- * @experimental
- *
  * @internal
  *
  * @author Fabien Potencier <fabien@symfony.com>

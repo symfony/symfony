@@ -25,8 +25,6 @@ use Symfony\Component\Tui\Input\Keybindings;
  * so the terminal's hardware cursor handles blinking natively and IME
  * candidate windows appear at the right spot.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface FocusableInterface

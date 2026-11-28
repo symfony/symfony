@@ -14,8 +14,6 @@ namespace Symfony\Component\Tui\Event;
 /**
  * Dispatched when the terminal starts receiving a bracketed paste.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class PasteStartedEvent

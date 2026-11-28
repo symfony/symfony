@@ -16,8 +16,6 @@ use Symfony\Component\Tui\Widget\SettingsListWidget;
 /**
  * Event dispatched when a setting value changes in SettingsList.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SettingChangeEvent extends AbstractEvent

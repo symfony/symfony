@@ -22,8 +22,6 @@ use Symfony\Component\Tui\Widget\FocusableInterface;
  * track the previous focus via {@see getPrevious()} on subsequent
  * focus-change events.
  *
- * @experimental
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class FocusEvent extends AbstractEvent

@@ -85,6 +85,9 @@ The KMS client decrypts with that key.
 A database writer can create such an envelope under any master key that your KMS credentials can use.
 On AWS, this includes keys of other accounts when your IAM policy allows `kms:Decrypt` on `"Resource": "*"`.
 List your own key ARNs instead.
+Pass them to `EnvelopeEncrypter` as its `$allowedKeyIds` argument to reject envelopes from any other key.
+Include the exact key IDs that appear in existing envelopes, including historical versions that must remain readable during rotation.
+An exact key ID can include the provider version when the provider exposes it; AWS KMS keeps the version inside the ciphertext, so only the key can be restricted there.
 On Google Cloud, the owner of a key can allow your service account to use it without any change on your side.
 Authenticate the value separately, as described above, when this matters.
 Envelopes that refer to a data key store don't have this problem, because the store checks every stored key with a secret.

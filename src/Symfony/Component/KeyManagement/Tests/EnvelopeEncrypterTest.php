@@ -20,6 +20,7 @@ use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\EnvelopeEncrypter;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
+use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
@@ -324,5 +325,113 @@ class EnvelopeEncrypterTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The data key must be 32 bytes long for "aes-256-gcm", 16 given.');
         $decrypter->decrypt($envelope);
+    }
+
+    public function testAllowedKeyIdsRoundTrip()
+    {
+        $encrypter = new EnvelopeEncrypter($this->kms, ['app-key', 'historical-key']);
+
+        $envelope = $encrypter->encrypt('app-key', 'hello');
+
+        $this->assertSame('hello', $encrypter->decrypt($envelope));
+    }
+
+    public function testEncryptRejectsKeyIdOutsideAllowedList()
+    {
+        $encrypter = new EnvelopeEncrypter($this->kms, ['other-key']);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The KMS returned key "app-key", which is not in the allowed key IDs.');
+        $encrypter->encrypt('app-key', 'hello');
+    }
+
+    public function testDecryptRejectsKeyIdOutsideAllowedListWithoutCallingTheKms()
+    {
+        $envelope = $this->encrypter->encrypt('app-key', 'hello');
+        $calls = $this->kms->calls;
+        $encrypter = new EnvelopeEncrypter($this->kms, ['other-key']);
+
+        try {
+            $encrypter->decrypt($envelope);
+            $this->fail('A disallowed key ID must be rejected.');
+        } catch (DecryptionFailedException) {
+        }
+
+        $this->assertSame($calls, $this->kms->calls, 'The KMS must not be called for a disallowed key ID.');
+    }
+
+    public function testEmptyAllowedKeyIdsRejectsAllKeys()
+    {
+        $envelope = $this->encrypter->encrypt('app-key', 'hello');
+        $encrypter = new EnvelopeEncrypter($this->kms, []);
+
+        $this->expectException(DecryptionFailedException::class);
+        $encrypter->decrypt($envelope);
+    }
+
+    public function testAllowedKeyIdReportedByTheKmsCanDifferFromTheRequestedAlias()
+    {
+        $kms = new class implements DataKeyGeneratorInterface {
+            public const string REPORTED_KEY_ID = 'arn:aws:kms:eu-west-1:111122223333:key/1234abcd';
+
+            private InMemoryKms $inner;
+
+            public function __construct()
+            {
+                $this->inner = new InMemoryKms();
+            }
+
+            public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey
+            {
+                $dataKey = $this->inner->generateDataKey($keyId, $length, $aad);
+
+                return new DataKey($dataKey->use(static fn (#[\SensitiveParameter] string $plaintext): string => $plaintext), new Ciphertext($dataKey->wrapped->blob, self::REPORTED_KEY_ID));
+            }
+
+            public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+            {
+                return new Ciphertext($this->inner->wrapDataKey($keyId, $dataKey, $aad)->blob, self::REPORTED_KEY_ID);
+            }
+
+            public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
+            {
+                return $this->inner->unwrapDataKey(new Ciphertext($wrapped->blob, 'alias/app-key'), $aad);
+            }
+        };
+
+        $encrypter = new EnvelopeEncrypter($kms, [$kms::REPORTED_KEY_ID]);
+        $envelope = $encrypter->encrypt('alias/app-key', 'hello');
+
+        $this->assertSame($kms::REPORTED_KEY_ID, $envelope->keyId);
+        $this->assertSame('hello', $encrypter->decrypt($envelope));
+
+        $aliasOnly = new EnvelopeEncrypter($kms, ['alias/app-key']);
+        $this->expectException(DecryptionFailedException::class);
+        $aliasOnly->decrypt($envelope);
+    }
+
+    public function testAllowedKeyIdsAreComparedStrictly()
+    {
+        $encrypter = new EnvelopeEncrypter($this->kms, ['01']);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The KMS returned key "1", which is not in the allowed key IDs.');
+        $encrypter->encrypt('1', 'hello');
+    }
+
+    #[DataProvider('provideInvalidAllowedKeyIds')]
+    public function testInvalidAllowedKeyIdsAreRejected(array $allowedKeyIds)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Allowed key IDs must be non-empty strings.');
+        new EnvelopeEncrypter($this->kms, $allowedKeyIds);
+    }
+
+    public static function provideInvalidAllowedKeyIds(): iterable
+    {
+        yield 'integer' => [[123]];
+        yield 'empty string' => [['']];
+        yield 'null' => [[null]];
+        yield 'array' => [[[]]];
     }
 }

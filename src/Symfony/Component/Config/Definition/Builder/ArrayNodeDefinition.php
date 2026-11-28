@@ -508,6 +508,10 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
             $node->setAddIfNotSet($this->addDefaults);
 
+            if ($this->default) {
+                $this->setDefaultValueOn($node);
+            }
+
             foreach ($this->children as $child) {
                 $child->parent = $node;
                 $node->addChild($child->getNode());
@@ -526,13 +530,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             }
 
             if ($this->default) {
-                if (null === $this->defaultValue) {
-                    $node->setNullAsDefault();
-                } elseif (!\is_array($this->defaultValue)) {
-                    throw new \InvalidArgumentException($node->getPath().': the default value of an array node has to be an array or null.');
-                } else {
-                    $node->setDefaultValue($this->defaultValue);
-                }
+                $this->setDefaultValueOn($node);
             }
 
             if (false !== $this->addDefaultChildren) {
@@ -597,6 +595,17 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         return $node;
     }
 
+    private function setDefaultValueOn(ArrayNode $node): void
+    {
+        if (null === $this->defaultValue) {
+            $node->setNullAsDefault();
+        } elseif (!\is_array($this->defaultValue)) {
+            throw new \InvalidArgumentException($node->getPath().': the default value of an array node has to be an array or null.');
+        } else {
+            $node->setDefaultValue($this->defaultValue);
+        }
+    }
+
     /**
      * Validate the configuration of a concrete node.
      *
@@ -618,8 +627,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             throw new InvalidDefinitionException(\sprintf('->requiresAtLeastOneElement() is not applicable to concrete nodes at path "%s".', $path));
         }
 
-        if ($this->default) {
-            throw new InvalidDefinitionException(\sprintf('->defaultValue() is not applicable to concrete nodes at path "%s".', $path));
+        if ($this->default && $this->addDefaults) {
+            throw new InvalidDefinitionException(\sprintf('->defaultValue() and ->addDefaultsIfNotSet() cannot be used together at path "%s".', $path));
         }
 
         if (false !== $this->addDefaultChildren) {

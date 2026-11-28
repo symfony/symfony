@@ -1863,6 +1863,60 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileExists($filename);
     }
 
+    public function testTempDir()
+    {
+        $dirname = $this->filesystem->tempDir($this->workspace, 'foo');
+
+        $this->assertDirectoryExists($dirname);
+        $this->assertStringStartsWith('foo', basename($dirname));
+        $this->assertSame([], array_values(array_diff(scandir($dirname), ['.', '..'])));
+    }
+
+    public function testTempDirIsUnique()
+    {
+        $dirname = $this->filesystem->tempDir($this->workspace, 'foo');
+        $otherDirname = $this->filesystem->tempDir($this->workspace, 'foo');
+
+        $this->assertNotSame($dirname, $otherDirname);
+    }
+
+    public function testTempDirIsPrivate()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test cannot run on Windows.');
+        }
+
+        // a umask carrying owner bits would leave the directory unusable
+        $oldUmask = umask(0o177);
+        try {
+            $dirname = $this->filesystem->tempDir($this->workspace, 'foo');
+
+            $this->assertSame(0o700, fileperms($dirname) & 0o777);
+            $this->assertSame(0o177, umask());
+        } finally {
+            umask($oldUmask);
+        }
+    }
+
+    public function testTempDirWithFileScheme()
+    {
+        $scheme = 'file://';
+
+        $dirname = $this->filesystem->tempDir($scheme.$this->workspace, 'foo');
+
+        $this->assertStringStartsWith($scheme, $dirname);
+        $this->assertDirectoryExists($dirname);
+        $this->assertDirectoryExists($this->workspace.'/'.basename($dirname));
+    }
+
+    public function testTempDirFailsIfTheParentDirectoryDoesNotExist()
+    {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessageMatches('/^A temporary directory could not be created/');
+
+        $this->filesystem->tempDir($this->workspace.'/does-not-exist', 'foo');
+    }
+
     public function testTempnamWithSuffixIsPrivate()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `Filesystem::tempDir()` to create a unique temporary directory
  * Deprecate passing an empty string as the base path to `Path::isBasePath()`, pass `"/"` instead
 
 8.1

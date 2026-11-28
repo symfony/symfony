@@ -669,6 +669,44 @@ class Filesystem
     }
 
     /**
+     * Creates a temporary directory with support for custom stream wrappers.
+     *
+     * The directory is created private, as PHP's tempnam() does for files.
+     *
+     * @param string $dir    The directory in which the temporary directory is created
+     * @param string $prefix The prefix of the generated temporary directory name
+     *
+     * @return string The new temporary directory path, or throw an exception on failure
+     *
+     * @throws IOException on failure
+     */
+    public function tempDir(string $dir, string $prefix): string
+    {
+        // Loop until we create a valid temp directory or have reached 10 attempts
+        for ($i = 0; $i < 10; ++$i) {
+            // Create a unique directory name
+            $tmpDir = $dir.'/'.$prefix.bin2hex(random_bytes(4));
+
+            // mkdir() fails when the path already exists, so existence is checked and the
+            // directory created in one step, avoiding a TOCTOU vulnerability
+            // Force the umask so that the directory is created private and usable,
+            // as PHP's tempnam() does for files
+            $umask = umask(0o077);
+            try {
+                $created = self::box('mkdir', $tmpDir, 0o700);
+            } finally {
+                umask($umask);
+            }
+
+            if ($created) {
+                return $tmpDir;
+            }
+        }
+
+        throw new IOException('A temporary directory could not be created: '.self::$lastError);
+    }
+
+    /**
      * Atomically dumps content into a file.
      *
      * @param string|resource $content The data to write into the file

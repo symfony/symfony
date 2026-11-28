@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Throw an `InvalidArgumentException` when several properties have the same streamed name
+
 8.2
 ---
 

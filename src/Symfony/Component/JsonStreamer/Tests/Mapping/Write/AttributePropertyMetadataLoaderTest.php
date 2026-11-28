@@ -17,6 +17,7 @@ use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\Write\AttributePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithStreamedNameCollision;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueObjectTransformerAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\BooleanToStringValueTransformer;
@@ -35,6 +36,16 @@ class AttributePropertyMetadataLoaderTest extends TestCase
         $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), TypeResolver::create());
 
         $this->assertSame(['@id', 'name'], array_keys($loader->load(DummyWithNameAttributes::class)));
+    }
+
+    public function testThrowWhenStreamedNamesCollide()
+    {
+        $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), TypeResolver::create());
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('The "id" and "name" properties of "%s" have the same "id" streamed name.', DummyWithStreamedNameCollision::class));
+
+        $loader->load(DummyWithStreamedNameCollision::class);
     }
 
     public function testRetrieveValueTransformer()

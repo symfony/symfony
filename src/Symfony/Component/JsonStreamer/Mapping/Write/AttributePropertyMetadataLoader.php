@@ -56,6 +56,10 @@ final class AttributePropertyMetadataLoader implements PropertyMetadataLoaderInt
             $attributesMetadata = $this->getPropertyAttributesMetadata($propertyReflection);
             $streamedName = $attributesMetadata['name'] ?? $initialStreamedName;
 
+            if (isset($result[$streamedName])) {
+                throw new InvalidArgumentException(\sprintf('The "%s" and "%s" properties of "%s" have the same "%s" streamed name.', $result[$streamedName]->getName(), $initialName, $className, $streamedName));
+            }
+
             if (null === $valueTransformer = $attributesMetadata['nativeToStreamValueTransformer'] ?? null) {
                 $result[$streamedName] = $initialMetadata;
 

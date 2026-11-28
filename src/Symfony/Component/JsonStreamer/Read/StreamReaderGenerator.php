@@ -23,6 +23,7 @@ use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
 use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
+use Symfony\Component\JsonStreamer\PhpGeneratorTrait;
 use Symfony\Component\JsonStreamer\StreamerDumper;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BackedEnumType;
@@ -43,6 +44,8 @@ use Symfony\Component\TypeInfo\Type\UnionType;
  */
 final class StreamReaderGenerator
 {
+    use PhpGeneratorTrait;
+
     private const MAX_GENERIC_DEPTH = 512;
     private const MAX_GENERIC_TYPE_LENGTH = 65536;
 
@@ -133,6 +136,14 @@ final class StreamReaderGenerator
             $typeString = (string) ($genericType ?? $type);
             $className = $type->getClassName();
 
+            if (is_a(\Generator::class, $className, true) && !$this->getValueObjectTransformerId($className)) {
+                return $this->createDataModel(self::createIterableType($genericType ?? $type), $options, $context);
+            }
+
+            if (is_a($className, \Traversable::class, true) && (new \ReflectionClass($className))->isInternal() && !$this->getValueObjectTransformerId($className)) {
+                throw new UnsupportedException(\sprintf('"%s" objects cannot be read, use an "iterable" type or a class with public properties instead.', (string) ($genericType ?? $type)));
+            }
+
             if ($context['generated_classes'][$typeString] ??= false) {
                 return ObjectNode::createMock($genericType ?? $type);
             }
@@ -141,6 +152,10 @@ final class StreamReaderGenerator
             $context['generated_classes'][$typeString] = true;
 
             $propertiesMetadata = $this->propertyMetadataLoader->load($className, $options, $genericType ? ['original_type' => $genericType] + $context : $context);
+
+            if (!$propertiesMetadata && (is_a($className, \Traversable::class, true) || is_a($className, \JsonSerializable::class, true) || is_a($className, \stdClass::class, true)) && !$this->getValueObjectTransformerId($className)) {
+                throw new UnsupportedException(\sprintf('"%s" objects cannot be read, use an "iterable" type or a class with public properties instead.', (string) ($genericType ?? $type)));
+            }
 
             if ($genericType) {
                 $context['generic_depths'][$className] ??= 0;

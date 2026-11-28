@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Write `\Traversable` objects without property metadata as iterables, and `\JsonSerializable` and `\stdClass` objects without property metadata with `json_encode()`
+ * Read `\Generator`, `\Iterator` and `\Traversable` types as iterables
+ * Throw an `UnsupportedException` when reading other `\Traversable` objects, or `\JsonSerializable` and `\stdClass` objects, without property metadata
+
 8.2
 ---
 

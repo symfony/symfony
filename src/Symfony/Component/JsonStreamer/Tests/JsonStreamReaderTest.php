@@ -14,11 +14,15 @@ namespace Symfony\Component\JsonStreamer\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\JsonStreamer\Exception\InvalidStreamException;
 use Symfony\Component\JsonStreamer\Exception\UnexpectedValueException;
+use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
 use Symfony\Component\JsonStreamer\JsonStreamReader;
+use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
+use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
 use Symfony\Component\JsonStreamer\StreamerDumper;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
@@ -57,13 +61,19 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUids;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueObjects;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithVirtualProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\IteratorAggregateDummy;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\IteratorAggregateWithPropertiesDummy;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\JsonSerializableDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyList;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\DivideStringAndCastToIntValueTransformer;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\HeightValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\StringToBooleanValueTransformer;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueObject\Height;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV7;
@@ -584,6 +594,74 @@ class JsonStreamReaderTest extends TestCase
         yield [Type::list(Type::int())];
         yield [Type::object(ClassicDummy::class)];
         yield [Type::object(\DateTimeImmutable::class)];
+    }
+
+    #[DataProvider('throwWhenReadingNativeObjectDataProvider')]
+    public function testThrowWhenReadingNativeObject(Type $type)
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $this->expectException(UnsupportedException::class);
+        $this->expectExceptionMessage(\sprintf('"%s" objects cannot be read', (string) $type));
+
+        $reader->read('{}', $type);
+    }
+
+    /**
+     * @return iterable<array{0: Type}>
+     */
+    public static function throwWhenReadingNativeObjectDataProvider(): iterable
+    {
+        yield [Type::object(\ArrayObject::class)];
+        yield [Type::object(\ArrayIterator::class)];
+        yield [Type::object(\IteratorAggregate::class)];
+        yield [Type::object(\stdClass::class)];
+        yield [Type::object(JsonSerializableDummy::class)];
+        yield [Type::object(IteratorAggregateDummy::class)];
+    }
+
+    #[DataProvider('readTraversableTypeAsIterableDataProvider')]
+    public function testReadTraversableTypeAsIterable(Type $type)
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+        $json = '[{"id":1,"name":"a"},{"id":2,"name":"b"}]';
+
+        $resource = fopen('php://temp', 'w');
+        fwrite($resource, $json);
+        rewind($resource);
+
+        foreach ([$json, $resource] as $input) {
+            $read = $reader->read($input, $type);
+
+            $this->assertInstanceOf(\Generator::class, $read);
+            $this->assertSame([1, 2], array_map(static fn (ClassicDummy $d): int => $d->id, iterator_to_array($read)));
+        }
+    }
+
+    /**
+     * @return iterable<array{0: Type}>
+     */
+    public static function readTraversableTypeAsIterableDataProvider(): iterable
+    {
+        yield [Type::generic(Type::object(\Generator::class), Type::int(), Type::object(ClassicDummy::class))];
+        yield [Type::generic(Type::object(\Iterator::class), Type::int(), Type::object(ClassicDummy::class))];
+        yield [Type::generic(Type::object(\Traversable::class), Type::object(ClassicDummy::class))];
+    }
+
+    public function testReadGeneratorWithConfigCache()
+    {
+        $reader = new JsonStreamReader(new Container(), new GenericTypePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new TypeContextFactory(new StringTypeResolver())), $this->streamReadersDir, new ConfigCacheFactory(true));
+
+        $read = $reader->read('[{"id":1,"name":"a"}]', Type::generic(Type::object(\Generator::class), Type::int(), Type::object(ClassicDummy::class)));
+
+        $this->assertSame(1, iterator_to_array($read)[0]->id);
+    }
+
+    public function testReadTraversableAndJsonSerializableObjectsWithProperties()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $this->assertSame(3, $reader->read('{"total":3}', Type::object(IteratorAggregateWithPropertiesDummy::class))->total);
     }
 
     public function testThrowWhenReadingObjectFromNonArrayString()

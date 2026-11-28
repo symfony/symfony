@@ -222,6 +222,13 @@
                         if (iconClose) { toggleControl.appendChild(iconClose); }
                         if (iconOpen) { toggleControl.appendChild(iconOpen); }
                     }
+                } else {
+                    const existingButton = Array.from(toggle.querySelectorAll('button.toggle-button')).find((b) => b.closest('.sf-toggle') === toggle);
+                    if (existingButton) {
+                        toggleControl = existingButton;
+                    }
+                }
+                if (toggleControl !== toggle && !toggleControl.hasAttribute('aria-label')) {
                     /* fixed label: the toggle's own text is read again right after as normal */
                     /* content, so reusing it as the button's name would repeat it twice */
                     toggleControl.setAttribute('aria-label', toggle.getAttribute('data-toggle-label') || 'Toggle details');

@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\Fixtures;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\Tests\KernelTest;
 
 class KernelWithoutBundles extends Kernel
 {
@@ -29,6 +30,16 @@ class KernelWithoutBundles extends Kernel
     public function getProjectDir(): string
     {
         return __DIR__;
+    }
+
+    public function getCacheDir(): string
+    {
+        return KernelTest::getVarDir().'/cache/'.$this->environment;
+    }
+
+    public function getLogDir(): string
+    {
+        return KernelTest::getVarDir().'/log';
     }
 
     protected function build(ContainerBuilder $container): void

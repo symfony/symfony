@@ -742,6 +742,19 @@ class MessengerPassTest extends TestCase
         $this->assertHandlerDescriptor($container, $handlersMapping, DummyMessage::class, [UnionTypeArgumentHandler::class]);
     }
 
+    public function testUnionBuiltinArgumentTypeHandlerWithCustomMethod()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Invalid handler service "%s": type-hint of argument "$message" in method "%s::handle()" must be a class , "string|int" given.', UnionBuiltinTypeArgumentMethodHandler::class, UnionBuiltinTypeArgumentMethodHandler::class));
+        $container = $this->getContainerBuilder();
+        $container
+            ->register(UnionBuiltinTypeArgumentMethodHandler::class, UnionBuiltinTypeArgumentMethodHandler::class)
+            ->addTag('messenger.message_handler', ['method' => 'handle'])
+        ;
+
+        (new MessengerPass())->process($container);
+    }
+
     public function testUnionBuiltinArgumentTypeHandler()
     {
         $this->expectException(RuntimeException::class);
@@ -1161,6 +1174,13 @@ class DummyReceiver implements ReceiverInterface
 class UndefinedMessageHandler
 {
     public function __invoke(UndefinedMessage $message)
+    {
+    }
+}
+
+class UnionBuiltinTypeArgumentMethodHandler
+{
+    public function handle(string|int $message): void
     {
     }
 }

@@ -24,6 +24,8 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Webhook\Client\RequestParser;
@@ -53,6 +55,27 @@ class WebhookBundleTest extends TestCase
     protected function tearDown(): void
     {
         new Filesystem()->remove($this->varDir);
+    }
+
+    public function testIncomingWebhooksUseTheRoutingBusOrTheConfiguredDefault()
+    {
+        $kernel = new TestWebhookKernel('routing_buses', true, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        $controller = $container->get('webhook.controller');
+
+        foreach (['priority', 'default'] as $type) {
+            $request = Request::create('/webhook/'.$type, 'POST', [], [], [], ['HTTP_X_SECRET' => 'the-secret'], '{"foo":"bar"}');
+            $this->assertSame(202, $controller->handle($type, $request)->getStatusCode());
+        }
+
+        $priorityMessages = $container->get('test.priority_bus')->messages;
+        $defaultMessages = $container->get('test.fallback_bus')->messages;
+        $this->assertCount(1, $priorityMessages);
+        $this->assertCount(1, $defaultMessages);
+        $this->assertSame('priority', $priorityMessages[0]->getType());
+        $this->assertSame('default', $defaultMessages[0]->getType());
+        $this->assertSame(['foo' => 'bar'], $priorityMessages[0]->getEvent()->getPayload());
     }
 
     public function testIncomingWebhooksReachTheirConsumer()
@@ -205,6 +228,18 @@ class TestWebhookKernel extends AbstractKernel
                 ->set('test.service_container', \stdClass::class)
                 ->alias('test.webhook.traceable_transport', 'webhook.transport.traceable')->public()
             ;
+        } elseif ('routing_buses' === $this->environment) {
+            $container->extension('webhook', [
+                'message_bus' => 'test.fallback_bus',
+                'routing' => [
+                    'priority' => ['service' => 'test.request_parser', 'secret' => 'the-secret', 'message_bus' => 'test.priority_bus'],
+                    'default' => ['service' => 'test.request_parser', 'secret' => 'the-secret'],
+                ],
+            ]);
+            $container->services()
+                ->set('test.priority_bus', RecordingWebhookBus::class)->public()
+                ->set('test.fallback_bus', RecordingWebhookBus::class)->public()
+            ;
         } else {
             $container->extension('webhook', [
                 'routing' => [
@@ -228,5 +263,15 @@ class WebhookConsumer
     public function __construct(
         #[Target('webhook')] public RequestParserInterface $parser,
     ) {
+    }
+}
+
+class RecordingWebhookBus implements MessageBusInterface
+{
+    public array $messages = [];
+
+    public function dispatch(object $message, array $stamps = []): Envelope
+    {
+        return new Envelope($this->messages[] = $message, $stamps);
     }
 }

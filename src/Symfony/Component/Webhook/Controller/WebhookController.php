@@ -27,7 +27,7 @@ use Symfony\Component\Webhook\Client\RequestParserInterface;
 final class WebhookController
 {
     public function __construct(
-        /** @var array<string, array{parser: RequestParserInterface, secret: string}> $parsers */
+        /** @var array<string, array{parser: RequestParserInterface, secret: string, bus?: MessageBusInterface}> $parsers */
         private readonly array $parsers,
         private readonly MessageBusInterface $bus,
     ) {
@@ -48,8 +48,10 @@ final class WebhookController
 
         $events = \is_array($events) ? $events : [$events];
 
+        $bus = $this->parsers[$type]['bus'] ?? $this->bus;
+
         foreach ($events as $event) {
-            $this->bus->dispatch(new ConsumeRemoteEventMessage($type, $event));
+            $bus->dispatch(new ConsumeRemoteEventMessage($type, $event));
         }
 
         return $parser->createSuccessfulResponse($request);

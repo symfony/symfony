@@ -94,6 +94,10 @@ class WebhookBundle extends AbstractBundle
                             ->defaultValue('webhook.request_parser')
                             ->cannotBeEmpty()
                         ->end()
+                        ->scalarNode('message_bus')
+                            ->cannotBeEmpty()
+                            ->info('The message bus to dispatch the remote events to; defaults to the bus configured in "webhook.message_bus".')
+                        ->end()
                         ->scalarNode('secret')
                             ->defaultValue('')
                             ->info('The secret used to verify incoming request signatures. It must be set in production: with an empty value, depending on the parser, requests from any sender are accepted or every request is rejected.')
@@ -120,6 +124,10 @@ class WebhookBundle extends AbstractBundle
                 'parser' => new Reference($cfg['service']),
                 'secret' => $cfg['secret'],
             ];
+
+            if (isset($cfg['message_bus'])) {
+                $parsers[$type]['bus'] = new Reference($cfg['message_bus']);
+            }
 
             if ('webhook.request_parser' === $cfg['service']) {
                 $secrets[$type] = $cfg['secret'];

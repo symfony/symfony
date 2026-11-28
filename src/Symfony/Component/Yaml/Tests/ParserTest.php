@@ -4223,6 +4223,95 @@ class ParserTest extends TestCase
         $this->assertLessThan(10 * 1024 * 1024, MemoryUsageRecorder::$memoryUsage - $memoryUsage);
     }
 
+    public function testParseDeeplyNestedCompactSequenceAndMappings()
+    {
+        $yaml = "root:\n";
+        for ($i = 0; $i < 60; ++$i) {
+            $indent = str_repeat('  ', $i + 1);
+            $yaml .= $indent."-\n".$indent."  level: $i\n".$indent."  child:\n";
+        }
+        $leafIndent = str_repeat('  ', 62);
+        for ($i = 0; $i < 1000; ++$i) {
+            $yaml .= $leafIndent."item_$i: value_$i\n";
+        }
+
+        $data = (new Parser(128))->parse($yaml);
+        $cursor = $data['root'];
+        for ($i = 0; $i < 60; ++$i) {
+            $this->assertSame($i, $cursor[0]['level']);
+            $cursor = $cursor[0]['child'];
+        }
+
+        $this->assertSame('value_999', $cursor['item_999']);
+    }
+
+    public function testCommentAtAncestorIndentationDoesNotLeakIntoNestedBlockScalar()
+    {
+        $yaml = <<<'YAML'
+            root:
+              - nested:
+                  - item:
+                      scalar: |
+                          line1
+                          line2
+                # comment at ancestor indent
+                      next_key: ok
+            YAML;
+
+        $this->assertSame([
+            'root' => [
+                [
+                    'nested' => [
+                        [
+                            'item' => [
+                                'scalar' => "line1\nline2\n",
+                                'next_key' => 'ok',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], $this->parser->parse($yaml));
+    }
+
+    public function testDedentToIntermediateAncestorAndTrailingSiblings()
+    {
+        $yaml = <<<'YAML'
+            a:
+              b:
+                - k1: 1
+                  k2:
+                    c: 2
+                - k1: 3
+              sibling: 4
+            YAML;
+
+        $this->assertSame([
+            'a' => [
+                'b' => [
+                    ['k1' => 1, 'k2' => ['c' => 2]],
+                    ['k1' => 3],
+                ],
+                'sibling' => 4,
+            ],
+        ], $this->parser->parse($yaml));
+    }
+
+    public function testInvalidIntermediateDedentThrowsIndentationProblem()
+    {
+        $yaml = <<<'YAML'
+            a:
+                b:
+                    c: 1
+                  bad: 2
+            YAML;
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Indentation problem at line 4 (near "  bad: 2").');
+
+        $this->parser->parse($yaml);
+    }
+
     public function testParseHandlesTrailingNewlinesAfterDocumentEndMarker()
     {
         $yaml = "---\nfoo: bar\n...\n\n";
@@ -4332,6 +4421,110 @@ class ParserTest extends TestCase
         $this->assertSame(['foo' => 'bar', 'bar' => 'baz', 'map' => ['bar' => 'qux']], $this->parser->parse($yaml));
     }
 
+    #[DataProvider('getUnterminatedFlowCollectionBeforeDedent')]
+    public function testUnterminatedFlowCollectionBeforeDedentThrows(string $yaml, string $message)
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage($message);
+
+        $this->parser->parse($yaml);
+    }
+
+    public static function getUnterminatedFlowCollectionBeforeDedent(): array
+    {
+        return [
+            'sequence in mapping' => [
+                "a:\n  b: 1\n  c: [x,\n   \nd: 2",
+                'Malformed inline YAML string at line 4 (near " ").',
+            ],
+            'sequence as mapping value block' => [
+                "m:\n [\n  \nt",
+                'Malformed inline YAML string at line 3 (near " ").',
+            ],
+            'sequence in sequence' => [
+                "-\n [\n -\n-",
+                'Malformed inline YAML string at line 3 (near "-").',
+            ],
+            'mapping in sequence' => [
+                "-\n {\n-",
+                'Malformed inline YAML string at line 2 (near "{").',
+            ],
+        ];
+    }
+
+    /**
+     * A line made only of spaces and tabs is an empty line, wherever the tab is.
+     */
+    #[DataProvider('getWhitespaceOnlyLineContainingTab')]
+    public function testWhitespaceOnlyLineContainingTabIsIgnored(string $yaml, mixed $expected)
+    {
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public static function getWhitespaceOnlyLineContainingTab(): array
+    {
+        return [
+            'after a key without value' => ["a:\n  \t\n", ['a' => null]],
+            'after a key without value, spaces after the tab' => ["a:\n   \t  \n", ['a' => null]],
+            'after a top-level scalar' => ["x\n \t", 'x'],
+        ];
+    }
+
+    public function testBlankLineBetweenUnindentedSequenceAndSiblingKey()
+    {
+        $yaml = <<<'YAML'
+            collections:
+
+            - pages
+            title: Main
+            YAML;
+
+        $this->assertSame([
+            'collections' => ['pages'],
+            'title' => 'Main',
+        ], $this->parser->parse($yaml));
+    }
+
+    /**
+     * A comment that is less indented than the block scalar's parent is not part of the block.
+     */
+    public function testLessIndentedCommentEndsEmptyLiteralBlock()
+    {
+        $this->assertSame(['a' => ['text' => '']], $this->parser->parse("a:\n  text: |\n # comment\n"));
+        $this->assertSame([['k' => '']], $this->parser->parse("- k: |\n #"));
+    }
+
+    /**
+     * A blank line must not change whether an unindented scalar belongs to the sequence item
+     * above it: "-\n~" is rejected, so "-\n\n~" must be too.
+     */
+    public function testBlankLineDoesNotAttachUnindentedScalarToSequenceItem()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Indentation problem at line 3 (near "~").');
+
+        $this->parser->parse("-\n\n~");
+    }
+
+    #[DataProvider('getParseErrorsWithLine')]
+    public function testParseErrorReportsOffendingLine(string $yaml, string $message)
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage($message);
+
+        $this->parser->parse($yaml);
+    }
+
+    public static function getParseErrorsWithLine(): array
+    {
+        return [
+            'duplicate key' => ["k:\nk:\n ''", 'Duplicate key "k" detected at line 2 (near "k:").'],
+            'mapping item after sequence, with document start' => ["---\n- x\na:", 'You cannot define a mapping item when in a sequence at line 3 (near "a:").'],
+            'mapping item after nested sequence' => ["-\n - c\n k:", 'You cannot define a mapping item when in a sequence at line 3 (near "k:").'],
+            'missing reference in nested mapping' => ["s:\n d: *", 'Reference "" does not exist at line 2 (near "d: *").'],
+        ];
+    }
+
     private function assertSameData($expected, $actual)
     {
         $this->assertEquals($expected, $actual);
@@ -4346,7 +4539,7 @@ class MemoryUsageRecorder
 {
     public static int $memoryUsage;
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
         self::$memoryUsage = memory_get_usage();
     }

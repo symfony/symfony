@@ -613,6 +613,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertCount(1, new \FilesystemIterator($this->workspace));
     }
 
+    #[Group('not-root')]
     public function testRemoveThrowsExceptionOnPermissionDenied()
     {
         $this->markAsSkippedIfChmodIsMissing();
@@ -635,6 +636,7 @@ class FilesystemTest extends FilesystemTestCase
         }
     }
 
+    #[Group('not-root')]
     public function testRemoveRestoresDirectoryWhenNestedRemovalFails()
     {
         $this->markAsSkippedIfChmodIsMissing();
@@ -658,6 +660,7 @@ class FilesystemTest extends FilesystemTestCase
         }
     }
 
+    #[Group('not-root')]
     public function testRemoveThrowsExceptionOnUnreadableDirectory()
     {
         $this->markAsSkippedIfChmodIsMissing();
@@ -2284,6 +2287,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->readFile(__DIR__);
     }
 
+    #[Group('not-root')]
     public function testReadUnreadableFile()
     {
         $this->markAsSkippedIfChmodIsMissing();

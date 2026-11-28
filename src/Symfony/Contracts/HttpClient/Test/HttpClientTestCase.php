@@ -1175,6 +1175,7 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertSame(200, $response->getStatusCode());
     }
 
+    #[Group('network')]
     public function testMaxConnectDuration()
     {
         $client = $this->getHttpClient(__FUNCTION__);

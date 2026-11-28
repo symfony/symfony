@@ -67,14 +67,14 @@ Less important but in scope: `Cache` (key validation, the SQL of `PdoAdapter` an
 
 The image has PHP 8.4 with the extensions and ini values of the unit-tests workflow, the dependencies of the root `composer.json` in `vendor/`, and PHPUnit in `.phpunit/`. Run the tests with the `phpunit` script at the root of the repository, which runs the PHPUnit version the CI runs. Give it one package at a time, since it starts the suites of all the packages under a directory at once:
 
-    ./phpunit --exclude-group integration --exclude-group network --exclude-group transient --exclude-group tty --exclude-group benchmark --exclude-group intl-data src/Symfony/Component/HttpFoundation
+    ./phpunit --exclude-group integration --exclude-group network --exclude-group not-root --exclude-group transient --exclude-group tty --exclude-group benchmark --exclude-group intl-data src/Symfony/Component/HttpFoundation
     ./phpunit src/Symfony/Component/Security/Http --filter OidcLoginAuthenticatorTest
 
 - Each package has its tests in its `Tests` directory. A reproducer for a class goes in the test case of that class.
 - `src/Symfony/Bundle/SecurityBundle/Tests/Functional` and `src/Symfony/Bundle/FrameworkBundle/Tests/Functional` boot kernels configured in their `app` directories and send requests through the test client. `FormLoginTest.php`, `AccessTokenTest.php` and `OidcBackChannelLogoutTest.php` show it end to end. A reproducer that needs the router, the firewall and the kernel together goes there.
 - A webhook request parser is tested by a test case that extends `Symfony\Component\Webhook\Test\AbstractRequestParserTestCase`, with the request bodies in `Tests/Webhook/Fixtures`. `php .github/sa-tools/check-hardening-tests.php` fails when a parser has no test rejecting a forged request, or when an `__unserialize()` has no test against a `__toString()` gadget.
 - The `integration` group needs servers (Redis, Memcached, MongoDB, RabbitMQ, LDAP, databases) and the `network` group needs the Internet: none of them is available in the scan. The `transient` group holds timing-sensitive tests that the CI skips too. Each group takes its own `--exclude-group`: PHPUnit 13 does not split a comma-separated list.
-- The scan runs as root, so the tests that expect a permission to be denied fail, in `Cache`, `Config`, `Console`, `DependencyInjection`, `Filesystem`, `AssetMapper` and `FrameworkBundle`. So do a few tests outside the `network` group that resolve a host or wait for a connection to time out (`testMaxConnectDuration` and `testRetryWithDnsIssue` in `HttpClient`, `SocketStreamTest` in `Mailer`). These failures are expected.
+- The scan runs as root, and root bypasses file permissions: the `not-root` group holds the tests that expect a permission to be denied.
 
 ## How we rate severity
 

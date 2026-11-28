@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
@@ -86,6 +87,7 @@ class PhpConfigReferenceDumpPassTest extends TestCase
         $this->assertEquals([new FileResource(realpath($this->tempDir).'/reference.php')], $container->getResources());
     }
 
+    #[Group('not-root')]
     public function testProcessIgnoresFileWriteErrors()
     {
         $container = new ContainerBuilder();

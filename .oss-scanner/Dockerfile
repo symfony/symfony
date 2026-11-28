@@ -33,7 +33,7 @@ RUN mkdir -p "$(composer config --global home)" \
     && ./phpunit install
 
 RUN for c in Component/HttpFoundation Component/Routing Component/Security/Http Component/HtmlSanitizer; do \
-        ./phpunit --exclude-group tty --exclude-group benchmark --exclude-group intl-data \
-            --exclude-group integration --exclude-group transient --exclude-group network src/Symfony/$c \
+        ./phpunit --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group integration \
+            --exclude-group transient --exclude-group network --exclude-group not-root src/Symfony/$c \
             || echo "WARNING: PHPUnit reported failures in $c"; \
     done

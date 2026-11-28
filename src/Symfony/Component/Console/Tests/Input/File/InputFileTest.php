@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Input\File;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Exception\InvalidFileException;
@@ -340,6 +341,7 @@ class InputFileTest extends TestCase
         $this->assertFileExists($destination.'/file.txt');
     }
 
+    #[Group('not-root')]
     public function testMoveToNonWritableDirectory()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {

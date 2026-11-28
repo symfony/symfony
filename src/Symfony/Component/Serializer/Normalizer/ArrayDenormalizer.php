@@ -79,14 +79,6 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
         if ($valueType instanceof CollectionType) {
             $context['key_type'] = $valueType->getCollectionKeyType();
             $context['value_type'] = $valueType->getCollectionValueType();
-        } elseif ($valueType instanceof LegacyType && $valueType->isCollection()) {
-            if ($collectionKeyTypes = $valueType->getCollectionKeyTypes()) {
-                $context['key_type'] = \count($collectionKeyTypes) > 1 ? $collectionKeyTypes : $collectionKeyTypes[0];
-            }
-
-            if ($collectionValueTypes = $valueType->getCollectionValueTypes()) {
-                $context['value_type'] = $collectionValueTypes[0];
-            }
         }
 
         if (\is_array($objectsToPopulate = $context[AbstractNormalizer::OBJECT_TO_POPULATE] ?? null)) {

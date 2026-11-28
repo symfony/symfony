@@ -1127,7 +1127,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertSame($senderConstraintId, (string) $container->getDefinition('security.authenticator.access_token.firewall1')->getArgument(7));
 
         $senderConstraint = $container->getDefinition($senderConstraintId);
-        $this->assertSame(['ES256', 'PS256', 'RS256'], $senderConstraint->getArgument(0)->getArgument(0));
+        $this->assertSame(['ES256', 'RS256'], $senderConstraint->getArgument(0)->getArgument(0));
         $this->assertSame('cache.security', (string) $senderConstraint->getArgument(1));
         $this->assertSame(60, $senderConstraint->getArgument(3));
         $this->assertSame(5, $senderConstraint->getArgument(4));

@@ -14,7 +14,9 @@ namespace Symfony\Component\Security\Http\Tests\AccessToken\Dpop;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
 use Jose\Component\Signature\Algorithm\ES256;
+use Jose\Component\Signature\Algorithm\PS256;
 use Jose\Component\Signature\Algorithm\RS256;
+use Jose\Component\Signature\Algorithm\SignatureAlgorithm;
 use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -57,6 +59,18 @@ class DpopSenderConstraintTest extends TestCase
         'x' => 'N1aUu8Pd2WdClkpCQ4QCPnGjYe_bTmDgEaSoxy5LhTw',
         'y' => 'Yr1v-tCNxE8QgAGlartrJAi343bI8VlAaNvgCOp8Azs',
         'd' => 'lLB9Zb0-ZBKkqfBiS0-XzRqTZ2Nl_SN7-Wd1oA5dLzM',
+    ];
+
+    private const RSA_PRIVATE_JWK = [
+        'kty' => 'RSA',
+        'n' => 'urwfndKKeSPAVRghWFQXfjtHdNm9CkCe7i8-52ct0VT8qqfIenKnblV_wUfUO2YA2PoBh6NUgCnd5GXJA0FY28F6HAH-T6OTJwdlo8D3aA4BCFa9B1Bl0Me4hGMAXTMYA3VPygPriTL8QHg6A8YwN2vtod-LwHKAOP9MVVLDTmbYKmeztZ7UKv0U5l1ZTFe4F0Z5D5copLylwA9HIj7qyUvSh0cEnw8MrkX5oMnYBgJ2i4l88wcQm8lyTWi7_Qtc51gX9jVuHpJPSJleuNPbU2B62HKnfjBjuXrHMujrqrjXe8izthojO3K0Q5-zQNdLtThmPDUZKZcby77VcBibpQ',
+        'e' => 'AQAB',
+        'd' => 'DZzQKzeha5JNH4bqS1-Z9NRKcby7uKccTt231rOhVey9nI0toquABB2MeiEL2ial8itLeEFSVCN5LwCyhh-55A83IRqOGO0iOYqjAKx8_KNktOBp2EImofElRNVYvfKPEhV3sxDVF0PVurdo90R32FpwUMgUjntqWH1X6bJmVW0u7twgiSBQcUxIYxf_W58S_l413cW7OFpEhJArDW3lneI-rmerjKw2SpUWdzBKWPW5l7DRv-YtxJI7lL8TIp5t_Q8M2szQioaGExriTvho8ZQ3kCtwSGKkaoGw-R08_hfQv5hiIv8j4Cq1vLIjH4TrAMK_44fzBwIqarjrsNRUUw',
+        'p' => '6ApcDo3YS09omIIHSRUZtDVC7tMshguQHv8mIKpnRzoYr5zogBbTDeuBnhudOdeBHDX3pgZ-HI0WeljxuR6GZKHiP3L0XIc6kqAEATXgfCuqcyMI-yZ_dhy1_E6--fFxogBoRTtYjXw5l12AfnjSEoyLH_LnExiH6a5blCx6DBs',
+        'q' => 'zgQtpm2GGHVNSfm8aY_EerWpZfXQT-m2TJHhX9M7wlQhV8TCxtn2qKJ9JCA1FRKA5QP3FzazJGdvXRHtksKSVVkmi5mkt7Y0NH5Ot_8stjQpLPS5CM_inJWpu8OZlPOCDZ6ui5vv3K0pGKTc2flXvgMZv5YuMP12wHfR_fLW8z8',
+        'dp' => 'WE9JBcj6Hn9UQWaLO0cqhykWFiqMcV-JNCLK8feoYrU7m-pNmiIVpOCSbgf4aIEaBBCN9cPWzyrq-RlMtbVmVHo_zwIC-gwFQLRhkcxdaSR9NGCLFHpsXBlFMYcOq7U2F_-rr12MsBwtFuxg8MEuwhx2_mvFgcD-SPMwq03aDS0',
+        'dq' => 'bdWUcPJbV5bSSeo3JSBc4_8N_Sn8kV5Mrq3ntirr5ULtM9nW7iUud-GJTkVNh5qB1ZczmNC02We726a_Pks1sQMCpdKYGsmtM39TgI0uzUUp3qnqLGSIsGqqP0ydCOh6IcDD1fKhAsne6yCaDiv9N3R3ucjbf4riUOKQtg9Nwgk',
+        'qi' => 'IyXxQu7ddl4KYpCgZPNLJ6Vqde9JfwJELomIBD36stNUdPdGCn2vWZ_oHHPsk1cqHrPuMsMhg-PoMl15KvyYmUiSGWRejwQrZfVEV0qtC_wYi6ugctnUHNum5PuD2WBx__i1Efc3WZIcOXaDPlzt3MSUFCr184JjZy_5_FYgo9c',
     ];
 
     private MockClock $clock;
@@ -365,6 +379,135 @@ class DpopSenderConstraintTest extends TestCase
         $this->createConstraint()->check($this->createRequest($this->createProof()), self::ACCESS_TOKEN, $this->claimsBoundTo(self::FOREIGN_PRIVATE_JWK));
     }
 
+    #[DataProvider('provideTokensNotBoundToTheKeyOfTheProof')]
+    public function testItVerifiesNoSignatureWithAKeyTheTokenIsNotBoundTo(array $claims, string $message)
+    {
+        $algorithm = new class implements SignatureAlgorithm {
+            public int $verifications = 0;
+
+            public function name(): string
+            {
+                return 'ES256';
+            }
+
+            public function allowedKeyTypes(): array
+            {
+                return ['EC'];
+            }
+
+            public function sign(JWK $key, string $input): string
+            {
+                return (new ES256())->sign($key, $input);
+            }
+
+            public function verify(JWK $key, string $input, string $signature): bool
+            {
+                ++$this->verifications;
+
+                return (new ES256())->verify($key, $input, $signature);
+            }
+        };
+        $constraint = new DpopSenderConstraint(new AlgorithmManager([$algorithm]), $this->cache, $this->clock);
+
+        try {
+            $constraint->check($this->createRequest($this->createProof()), self::ACCESS_TOKEN, $claims);
+            $this->fail('The proof should have been refused.');
+        } catch (BadCredentialsException $e) {
+            $this->assertStringContainsString($message, $e->getMessage());
+        }
+
+        $this->assertSame(0, $algorithm->verifications);
+    }
+
+    public static function provideTokensNotBoundToTheKeyOfTheProof(): iterable
+    {
+        yield 'a token bound to nothing' => [['sub' => 'user-42'], 'not bound to a key'];
+        yield 'a token bound to another key' => [self::claimsBoundTo(self::FOREIGN_PRIVATE_JWK), 'bound to another key'];
+    }
+
+    public function testItAcceptsAProofSignedWithAnRsaKeyOfTheSizeClientsGenerate()
+    {
+        $this->createRsaConstraint()->check($this->createRequest($this->createProof(header: ['alg' => 'RS256'], key: self::RSA_PRIVATE_JWK)), self::ACCESS_TOKEN, self::claimsBoundTo(self::RSA_PRIVATE_JWK));
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    /**
+     * The proof carries no valid signature: an RSA key of an accepted size gets as far as having it checked.
+     */
+    #[DataProvider('provideRsaKeysOfAnAcceptedSize')]
+    public function testItVerifiesTheSignatureWithAnRsaKeyOfAnAcceptedSize(string $modulus, string $exponent)
+    {
+        $key = ['kty' => 'RSA', 'n' => self::base64UrlEncode($modulus), 'e' => self::base64UrlEncode($exponent)];
+
+        $this->expectException(InvalidDpopProofException::class);
+        $this->expectExceptionMessage('not signed by the key it carries');
+
+        $this->createRsaConstraint()->check($this->createRequest($this->createUnsignedProof($key)), self::ACCESS_TOKEN, self::claimsBoundTo($key));
+    }
+
+    public static function provideRsaKeysOfAnAcceptedSize(): iterable
+    {
+        yield '2048 bits, the smallest modulus' => ["\x80".str_repeat("\xa5", 254)."\x01", "\x01\x00\x01"];
+        yield '4096 bits, the largest modulus' => ["\xff".str_repeat("\xa5", 510)."\x01", "\x01\x00\x01"];
+        yield 'a leading zero byte' => ["\x00\x80".str_repeat("\xa5", 254)."\x01", "\x00\x01\x00\x01"];
+        yield 'an exponent of 3' => ["\x80".str_repeat("\xa5", 254)."\x01", "\x03"];
+        yield 'an exponent of 65535' => ["\x80".str_repeat("\xa5", 254)."\x01", "\xff\xff"];
+        yield 'an exponent of 33 bits, the largest' => ["\x80".str_repeat("\xa5", 254)."\x01", "\x01\xff\xff\xff\xff"];
+    }
+
+    /**
+     * The key is checked whatever the algorithm, RSASSA-PSS verifying in PHP at a cost the size of the key sets.
+     */
+    #[DataProvider('provideRsaKeysClientsDoNotGenerate')]
+    public function testItRefusesAProofCarryingAnRsaKeyClientsDoNotGenerate(array $key, string $message)
+    {
+        $this->expectException(InvalidDpopProofException::class);
+        $this->expectExceptionMessage($message);
+
+        $this->createRsaConstraint()->check($this->createRequest($this->createUnsignedProof($key)), self::ACCESS_TOKEN, self::claimsBoundTo($key));
+    }
+
+    public static function provideRsaKeysClientsDoNotGenerate(): iterable
+    {
+        $modulus = self::base64UrlEncode("\x80".str_repeat("\xa5", 254)."\x01");
+
+        yield 'a modulus of 2047 bits' => [['kty' => 'RSA', 'n' => self::base64UrlEncode("\x7f".str_repeat("\xa5", 254)."\x01"), 'e' => 'AQAB'], 'has a modulus of 2047 bits'];
+        yield 'a modulus of 4097 bits' => [['kty' => 'RSA', 'n' => self::base64UrlEncode("\x01".str_repeat("\xa5", 511)."\x01"), 'e' => 'AQAB'], 'has a modulus of 4097 bits'];
+        yield 'a modulus of 16384 bits' => [['kty' => 'RSA', 'n' => self::base64UrlEncode("\xff".str_repeat("\xa5", 2046)."\x01"), 'e' => 'AQAB'], 'has a modulus of 16384 bits'];
+        yield 'an exponent of 34 bits' => [['kty' => 'RSA', 'n' => $modulus, 'e' => self::base64UrlEncode("\x02\x00\x00\x00\x01")], 'must be odd, greater than 1 and at most 33 bits long'];
+        yield 'an exponent of 64 bits' => [['kty' => 'RSA', 'n' => $modulus, 'e' => self::base64UrlEncode(str_repeat("\xff", 8))], 'must be odd, greater than 1 and at most 33 bits long'];
+        yield 'an even exponent' => [['kty' => 'RSA', 'n' => $modulus, 'e' => self::base64UrlEncode("\x01\x00\x00")], 'must be odd, greater than 1 and at most 33 bits long'];
+        yield 'an exponent of 1' => [['kty' => 'RSA', 'n' => $modulus, 'e' => self::base64UrlEncode("\x01")], 'must be odd, greater than 1 and at most 33 bits long'];
+        yield 'no modulus' => [['kty' => 'RSA', 'e' => 'AQAB'], 'cannot be read'];
+        yield 'a modulus that is not base64url' => [['kty' => 'RSA', 'n' => '!'.$modulus, 'e' => 'AQAB'], 'cannot be read'];
+        yield 'a modulus of zeros' => [['kty' => 'RSA', 'n' => 'AAAA', 'e' => 'AQAB'], 'cannot be read'];
+        yield 'no exponent' => [['kty' => 'RSA', 'n' => $modulus], 'cannot be read'];
+    }
+
+    public function testItAcceptsRsassaPssWithGmpOrBcMath()
+    {
+        if (!\extension_loaded('gmp') && !\extension_loaded('bcmath')) {
+            $this->markTestSkipped('Neither the GMP nor the BCMath extension is loaded.');
+        }
+
+        $constraint = new DpopSenderConstraint(new AlgorithmManager([new ES256(), new PS256()]), $this->cache, $this->clock);
+
+        $this->assertSame(['DPoP', ['algs' => 'ES256 PS256']], $constraint->getChallenge(null));
+    }
+
+    public function testItRefusesRsassaPssWithoutGmpOrBcMath()
+    {
+        if (\extension_loaded('gmp') || \extension_loaded('bcmath')) {
+            $this->markTestSkipped('The GMP or the BCMath extension is loaded.');
+        }
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The "PS256" algorithm verifies a DPoP proof in PHP, which takes seconds per request without the GMP or BCMath extension.');
+
+        new DpopSenderConstraint(new AlgorithmManager([new ES256(), new PS256()]), $this->cache, $this->clock);
+    }
+
     public function testTheChallengeNamesTheSchemeAndTheAlgorithmsAProofMayBeSignedWith()
     {
         $this->assertSame(['DPoP', ['algs' => 'ES256 RS256']], (new DpopSenderConstraint(new AlgorithmManager([new ES256(), new RS256()]), $this->cache, $this->clock))->getChallenge(null));
@@ -383,6 +526,11 @@ class DpopSenderConstraintTest extends TestCase
         return new DpopSenderConstraint(new AlgorithmManager([new ES256()]), $this->cache, $this->clock);
     }
 
+    private function createRsaConstraint(): DpopSenderConstraint
+    {
+        return new DpopSenderConstraint(new AlgorithmManager([new RS256()]), $this->cache, $this->clock);
+    }
+
     private function createRequest(string $proof): Request
     {
         $request = Request::create('https://api.example.com/me');
@@ -397,14 +545,7 @@ class DpopSenderConstraintTest extends TestCase
      */
     private function createProof(array $claims = [], array $header = [], array $key = self::PRIVATE_JWK): string
     {
-        $claims = array_filter([
-            'jti' => bin2hex(random_bytes(16)),
-            'htm' => 'GET',
-            'htu' => 'https://api.example.com/me',
-            'iat' => $this->clock->now()->getTimestamp(),
-            'ath' => $this->hashOf(self::ACCESS_TOKEN),
-            ...$claims,
-        ], static fn ($value) => null !== $value);
+        $claims = $this->createClaims($claims);
 
         $header = array_filter([
             'typ' => 'dpop+jwt',
@@ -414,11 +555,40 @@ class DpopSenderConstraintTest extends TestCase
         ], static fn ($value) => null !== $value);
 
         return (new CompactSerializer())->serialize(
-            (new JWSBuilder(new AlgorithmManager([new ES256()])))
+            (new JWSBuilder(new AlgorithmManager([new ES256(), new RS256()])))
                 ->withPayload(json_encode($claims))
                 ->addSignature(new JWK($key), $header)
                 ->build()
         );
+    }
+
+    /**
+     * A proof carrying the given public key, under an RS256 signature no private key made.
+     *
+     * @param array<string, mixed> $key
+     */
+    private function createUnsignedProof(array $key): string
+    {
+        $header = ['typ' => 'dpop+jwt', 'alg' => 'RS256', 'jwk' => $key];
+
+        return self::base64UrlEncode(json_encode($header)).'.'.self::base64UrlEncode(json_encode($this->createClaims())).'.'.self::base64UrlEncode(random_bytes(256));
+    }
+
+    /**
+     * @param array<string, mixed> $claims the claims replacing those of a proof made for the request above
+     *
+     * @return array<string, mixed>
+     */
+    private function createClaims(array $claims = []): array
+    {
+        return array_filter([
+            'jti' => bin2hex(random_bytes(16)),
+            'htm' => 'GET',
+            'htu' => 'https://api.example.com/me',
+            'iat' => $this->clock->now()->getTimestamp(),
+            'ath' => $this->hashOf(self::ACCESS_TOKEN),
+            ...$claims,
+        ], static fn ($value) => null !== $value);
     }
 
     /**
@@ -434,13 +604,18 @@ class DpopSenderConstraintTest extends TestCase
      *
      * @return array<string, mixed>
      */
-    private function claimsBoundTo(array $key): array
+    private static function claimsBoundTo(array $key): array
     {
         return ['sub' => 'user-42', 'cnf' => ['jkt' => (new JWK($key))->toPublic()->thumbprint('sha256')]];
     }
 
     private function hashOf(string $accessToken): string
     {
-        return rtrim(strtr(base64_encode(hash('sha256', $accessToken, true)), '+/', '-_'), '=');
+        return self::base64UrlEncode(hash('sha256', $accessToken, true));
+    }
+
+    private static function base64UrlEncode(string $value): string
+    {
+        return rtrim(strtr(base64_encode($value), '+/', '-_'), '=');
     }
 }

@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\AccessToken\Dpop;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
 use Jose\Component\Core\JWKSet;
+use Jose\Component\Signature\Algorithm\RSAPSS;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
@@ -44,6 +45,10 @@ use Symfony\Component\Security\Http\AccessToken\SenderConstraintInterface;
  * This resource server issues no nonce (Section 8), so a request is never answered with "use_dpop_nonce":
  * the freshness of a proof is what its "iat" and the replay cache make of it.
  *
+ * The signature is verified with a key the request brings, at a cost that key sets.
+ * It is therefore verified only once the token is known to be bound to that key, and an RSA key is accepted only with a modulus of 2048 to 4096 bits and an odd public exponent of at most 33 bits, the keys clients generate.
+ * RSASSA-PSS verifies in PHP, which takes seconds per request without the GMP or BCMath extension, so it is refused unless one of them is loaded.
+ *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
  * @see https://datatracker.ietf.org/doc/html/rfc9449
@@ -68,6 +73,22 @@ final class DpopSenderConstraint implements SenderConstraintInterface
      * RFC 7518, Section 6: what the private half of a key holds, the other primes of a multi-prime RSA key among them, the single member of a symmetric key, and the private half of an AKP key.
      */
     private const PRIVATE_MEMBERS = ['d', 'p', 'q', 'dp', 'dq', 'qi', 'oth', 'k', 'priv'];
+
+    /**
+     * RFC 7518, Section 3.3 and Section 3.5: the smallest RSA modulus a signature may be made with, and the largest this resource server verifies one with.
+     *
+     * The cost of verifying a signature grows with the length of the modulus and of the exponent, so a key a request brings is held to the sizes clients generate.
+     */
+    private const MIN_RSA_MODULUS_BITS = 2048;
+
+    private const MAX_RSA_MODULUS_BITS = 4096;
+
+    /**
+     * RFC 7518 sets no bound on the public exponent, and this one is BoringSSL's.
+     *
+     * It holds a signature to about three times what it costs to verify with 65537, the exponent of nearly every RSA key.
+     */
+    private const MAX_RSA_PUBLIC_EXPONENT_BITS = 33;
 
     /**
      * @param AlgorithmManager       $algorithms       The signature algorithms a proof may be signed with, all
@@ -96,6 +117,14 @@ final class DpopSenderConstraint implements SenderConstraintInterface
         if ($allowedTimeDrift < 0) {
             throw new \InvalidArgumentException(\sprintf('The "$allowedTimeDrift" argument of "%s()" cannot be negative.', __METHOD__));
         }
+
+        if (!\extension_loaded('gmp') && !\extension_loaded('bcmath')) {
+            foreach ($algorithms->all() as $algorithm) {
+                if ($algorithm instanceof RSAPSS) {
+                    throw new \LogicException(\sprintf('The "%1$s" algorithm verifies a DPoP proof in PHP, which takes seconds per request without the GMP or BCMath extension. Install one of them, or remove "%1$s" from the algorithms a proof may be signed with.', $algorithm->name()));
+                }
+            }
+        }
     }
 
     public function check(Request $request, #[\SensitiveParameter] string $accessToken, array $claims): void
@@ -105,25 +134,11 @@ final class DpopSenderConstraint implements SenderConstraintInterface
         }
 
         try {
-            $jkt = $this->checkProof($request, $accessToken);
-        } catch (AuthenticationException $e) {
+            $this->checkProof($request, $accessToken, $claims);
+        } catch (InvalidDpopProofException $e) {
             $this->logger?->debug('The DPoP proof of the request was refused.', ['error' => $e->getMessage()]);
 
             throw $e;
-        }
-
-        // RFC 9449, Section 7.1: a resource server protecting a DPoP-bound resource refuses a token bound to
-        // nothing, whoever holds it. The claim is read exactly as RFC 7800, Section 3.1 writes it, a "cnf"
-        // object holding the thumbprint of the key, because a "cnf" shaped otherwise is not one this token
-        // was issued with
-        $confirmation = $claims['cnf'] ?? null;
-        $bound = \is_array($confirmation) ? $confirmation['jkt'] ?? null : null;
-        if (!\is_string($bound) || '' === $bound) {
-            throw new BadCredentialsException('The access token is not bound to a key (RFC 9449, Section 7.1).');
-        }
-
-        if (!hash_equals($bound, $jkt)) {
-            throw new BadCredentialsException('The access token is bound to another key than the one the DPoP proof was signed with (RFC 9449, Section 7.1).');
         }
     }
 
@@ -141,12 +156,14 @@ final class DpopSenderConstraint implements SenderConstraintInterface
     }
 
     /**
-     * The thumbprint of the key the proof of this request was signed with, everything the proof says of
-     * itself having been checked against the request that carried it.
+     * Checks that the proof of this request is signed by the key the access token is bound to, and that everything the proof says of itself holds for the request that carried it.
+     *
+     * @param array<string, mixed> $claims The claims of the access token
      *
      * @throws InvalidDpopProofException
+     * @throws BadCredentialsException   When the access token is not bound to the key the proof carries
      */
-    private function checkProof(Request $request, #[\SensitiveParameter] string $accessToken): string
+    private function checkProof(Request $request, #[\SensitiveParameter] string $accessToken, array $claims): void
     {
         // RFC 9449, Section 4.3: a request carries one proof. Several of them are not a proof of anything,
         // whichever one would be picked
@@ -178,6 +195,16 @@ final class DpopSenderConstraint implements SenderConstraintInterface
         // never trusted to be well formed
         try {
             $key = new JWK($values);
+            $jkt = $key->thumbprint('sha256');
+        } catch (\Exception $e) {
+            throw new InvalidDpopProofException('The key the DPoP proof carries cannot be read (RFC 9449, Section 4.2).', 0, $e);
+        }
+
+        // the binding is checked before the signature, whose cost is set by a key the request brings:
+        // a signature is only worth verifying with the key the access token is bound to
+        $this->checkBinding($claims, $jkt);
+
+        try {
             $verifier = new JWSVerifier($this->algorithms);
             $keyset = new JWKSet([$key]);
             if (method_exists($verifier, 'verify')) { // web-token/jwt-library >= 4.3
@@ -185,7 +212,6 @@ final class DpopSenderConstraint implements SenderConstraintInterface
             } else {
                 $verified = $verifier->verifyWithKeySet($jws, $keyset, 0);
             }
-            $jkt = $key->thumbprint('sha256');
         } catch (\Exception $e) {
             throw new InvalidDpopProofException('The key the DPoP proof carries cannot be read (RFC 9449, Section 4.2).', 0, $e);
         }
@@ -204,8 +230,28 @@ final class DpopSenderConstraint implements SenderConstraintInterface
         $this->checkAccessTokenHash($payload, $accessToken);
 
         $this->rememberProof($jkt, $payload, $lifetime);
+    }
 
-        return $jkt;
+    /**
+     * RFC 9449, Section 7.1: a resource server protecting a DPoP-bound resource refuses a token bound to nothing, whoever holds it, and a token bound to another key than the one the proof carries.
+     *
+     * The claim is read exactly as RFC 7800, Section 3.1 writes it, a "cnf" object holding the thumbprint of the key, because a "cnf" shaped otherwise is not one this token was issued with.
+     *
+     * @param array<string, mixed> $claims
+     *
+     * @throws BadCredentialsException
+     */
+    private function checkBinding(array $claims, string $jkt): void
+    {
+        $confirmation = $claims['cnf'] ?? null;
+        $bound = \is_array($confirmation) ? $confirmation['jkt'] ?? null : null;
+        if (!\is_string($bound) || '' === $bound) {
+            throw new BadCredentialsException('The access token is not bound to a key (RFC 9449, Section 7.1).');
+        }
+
+        if (!hash_equals($bound, $jkt)) {
+            throw new BadCredentialsException('The access token is bound to another key than the one the DPoP proof was signed with (RFC 9449, Section 7.1).');
+        }
     }
 
     /**
@@ -333,7 +379,47 @@ final class DpopSenderConstraint implements SenderConstraintInterface
             }
         }
 
+        if ('RSA' === ($key['kty'] ?? null)) {
+            $this->checkRsaKeySize($key);
+        }
+
         return $key;
+    }
+
+    /**
+     * Refuses an RSA key of another size than the ones clients generate, before anything is computed with it.
+     *
+     * The key comes from the request, so the time a signature takes to verify with it would come from the request too.
+     *
+     * @param array<string, mixed> $key
+     *
+     * @throws InvalidDpopProofException
+     */
+    private function checkRsaKeySize(array $key): void
+    {
+        $modulus = ltrim(self::base64UrlDecode($key['n'] ?? null), "\0");
+        $exponent = ltrim(self::base64UrlDecode($key['e'] ?? null), "\0");
+        if ('' === $modulus || '' === $exponent) {
+            throw new InvalidDpopProofException('The key the DPoP proof carries cannot be read (RFC 9449, Section 4.2).');
+        }
+
+        $bits = self::bitLength($modulus);
+        if ($bits < self::MIN_RSA_MODULUS_BITS || $bits > self::MAX_RSA_MODULUS_BITS) {
+            throw new InvalidDpopProofException(\sprintf('The RSA key the DPoP proof carries has a modulus of %d bits, and this resource server accepts %d to %d (RFC 7518, Section 3.3).', $bits, self::MIN_RSA_MODULUS_BITS, self::MAX_RSA_MODULUS_BITS));
+        }
+
+        // an even exponent or 1 makes no RSA key
+        if (self::bitLength($exponent) > self::MAX_RSA_PUBLIC_EXPONENT_BITS || 0 === (\ord($exponent[-1]) & 1) || "\x01" === $exponent) {
+            throw new InvalidDpopProofException(\sprintf('The public exponent of the RSA key the DPoP proof carries must be odd, greater than 1 and at most %d bits long.', self::MAX_RSA_PUBLIC_EXPONENT_BITS));
+        }
+    }
+
+    /**
+     * @param non-empty-string $number A big-endian number without leading zero bytes
+     */
+    private static function bitLength(string $number): int
+    {
+        return 8 * \strlen($number) - 8 + \strlen(decbin(\ord($number[0])));
     }
 
     /**
@@ -362,5 +448,15 @@ final class DpopSenderConstraint implements SenderConstraintInterface
     private static function base64UrlEncode(string $value): string
     {
         return rtrim(strtr(base64_encode($value), '+/', '-_'), '=');
+    }
+
+    /**
+     * @return string The decoded bytes, or an empty string when the value is not base64url
+     */
+    private static function base64UrlDecode(mixed $value): string
+    {
+        $decoded = \is_string($value) ? base64_decode(strtr($value, '-_', '+/'), true) : false;
+
+        return false === $decoded ? '' : $decoded;
     }
 }

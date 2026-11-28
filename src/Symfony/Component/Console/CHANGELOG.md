@@ -22,6 +22,7 @@ CHANGELOG
  * Add `InputOption::HIDDEN` and `InputOption::DEPRECATED` modes
  * Allow a callable for the `description` and `help` options of `#[AsCommand]`, and for the `description` option of `#[Argument]` and `#[Option]`
  * Add `GitlabCiReporter` to emit reports in the GitLab Code Quality format
+ * Add `JunitReporter` to emit reports in the JUnit XML format
  * Wrap the descriptions in `TextDescriptor` output to the terminal width; pass the `terminal_width` describe option to control it
  * Allow union and intersection type-hints when autowiring arguments of invokable commands
  * Add the `$ttl` parameter to `LockableTrait::lock()`

@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\CI\GithubActionReporter;
+use Symfony\Component\Console\CI\JunitReporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -181,6 +182,7 @@ class LintCommand extends Command
             'txt' => $this->displayTxt($output, $io, $files),
             'json' => $this->displayJson($output, $files),
             'github' => $this->displayTxt($output, $io, $files, true),
+            'junit' => $this->displayJunit($output, $files),
             default => throw new InvalidArgumentException(\sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
         };
     }
@@ -230,6 +232,30 @@ class LintCommand extends Command
         $output->writeln(json_encode($filesInfo, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_INVALID_UTF8_SUBSTITUTE), OutputInterface::OUTPUT_RAW);
 
         return min($errors, 1);
+    }
+
+    private function displayJunit(OutputInterface $output, array $filesInfo): int
+    {
+        $failures = 0;
+        $reporter = new JunitReporter($output, 'lint:twig');
+
+        foreach ($filesInfo as $info) {
+            $file = (string) $info['file'];
+
+            if (!$info['valid']) {
+                ++$failures;
+                $reporter->fail($file, $info['exception']->getRawMessage(), $info['exception']->getMessage());
+            } elseif ($info['deprecations']) {
+                ++$failures;
+                $reporter->fail($file, \sprintf('%d deprecation(s) found', \count($info['deprecations'])), implode("\n", array_map(static fn (array $deprecation) => \sprintf('Line %d: %s', $deprecation['line'], $deprecation['message']), $info['deprecations'])), 'deprecation');
+            } else {
+                $reporter->pass($file);
+            }
+        }
+
+        $reporter->write();
+
+        return min($failures, 1);
     }
 
     private function renderDeprecation(SymfonyStyle $output, int $line, string $message, string $file, ?GithubActionReporter $githubReporter): void
@@ -306,6 +332,6 @@ class LintCommand extends Command
     /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
-        return ['txt', 'json', 'github'];
+        return ['txt', 'json', 'github', 'junit'];
     }
 }

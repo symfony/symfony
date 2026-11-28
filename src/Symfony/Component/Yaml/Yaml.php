@@ -39,6 +39,7 @@ class Yaml
     public const DUMP_COMPACT_NESTED_MAPPING = 16384;
     public const DUMP_FORCE_DOUBLE_QUOTES_ON_VALUES = 32768;
     public const PARSE_EXCEPTION_ON_ALIAS = 65536;
+    public const PARSE_DATETIME_AS_STRING = 131072;
 
     /**
      * Parses a YAML file into a PHP value.

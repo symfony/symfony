@@ -27,6 +27,64 @@ use Twig\Loader\FilesystemLoader;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 {
+    public function testExpandedEmptyChoicesMessageWithArabicText()
+    {
+        $this->skipWhenEmptyChoicesMessageIsUnsupported();
+
+        $form = $this->factory->createNamed('languages', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
+            'choices' => [],
+            'multiple' => true,
+            'expanded' => true,
+            'choice_translation_domain' => false,
+            'empty_choices_message' => 'لا توجد خيارات <متاحة>',
+        ]);
+
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertStringContainsString('لا توجد خيارات &lt;متاحة&gt;', $html);
+        $this->assertStringNotContainsString('<input', $html);
+    }
+
+    public function testExpandedEmptyChoicesMessageCanBeTranslated()
+    {
+        $this->skipWhenEmptyChoicesMessageIsUnsupported();
+
+        $form = $this->factory->createNamed('languages', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
+            'choices' => [],
+            'multiple' => true,
+            'expanded' => true,
+            'empty_choices_message' => 'form.no_choices',
+        ]);
+
+        $this->assertStringContainsString('[trans]form.no_choices[/trans]', $this->renderWidget($form->createView()));
+    }
+
+    public function testExpandedEmptyChoicesMessageDoesNotReplaceAvailableOptions()
+    {
+        $this->skipWhenEmptyChoicesMessageIsUnsupported();
+
+        $form = $this->factory->createNamed('languages', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
+            'choices' => ['العربية' => 'ar'],
+            'multiple' => true,
+            'expanded' => true,
+            'empty_choices_message' => 'لا توجد خيارات متاحة',
+        ]);
+
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertStringContainsString('<input', $html);
+        $this->assertStringNotContainsString('لا توجد خيارات متاحة', $html);
+    }
+
+    private function skipWhenEmptyChoicesMessageIsUnsupported(): void
+    {
+        $form = $this->factory->create('Symfony\\Component\\Form\\Extension\\Core\\Type\\ChoiceType');
+
+        if (!\\array_key_exists('empty_choices_message', $form->getConfig()->getOptions())) {
+            $this->markTestSkipped('Requires the Form component with empty_choices_message support.');
+        }
+    }
+
     public function testThemeBlockInheritanceUsingUse()
     {
         $view = $this->factory

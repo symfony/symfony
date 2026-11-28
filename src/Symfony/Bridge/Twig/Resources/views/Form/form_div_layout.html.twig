@@ -58,6 +58,9 @@
 {%- endblock choice_widget -%}
 
 {%- block choice_widget_expanded -%}
+    {%- if empty_choices_message is defined and empty_choices_message is not null -%}
+        {{- block('choice_widget_empty') -}}
+    {%- else -%}
     <div {{ block('widget_container_attributes') }}>
     {%- for child in form %}
         {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
@@ -66,7 +69,14 @@
         {{- form_help(child) -}}
     {% endfor -%}
     </div>
+    {%- endif -%}
 {%- endblock choice_widget_expanded -%}
+
+{%- block choice_widget_empty -%}
+    <div {{ block('widget_container_attributes') }}>
+        <span>{{ choice_translation_domain is same as(false) ? empty_choices_message : empty_choices_message|trans({}, choice_translation_domain) }}</span>
+    </div>
+{%- endblock choice_widget_empty -%}
 
 {%- block choice_widget_collapsed -%}
     {%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <= 1) -%}

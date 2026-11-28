@@ -15,6 +15,7 @@
             "choice_value",
             "choices",
             "duplicate_preferred_choices",
+            "empty_choices_message",
             "expanded",
             "group_by",
             "multiple",

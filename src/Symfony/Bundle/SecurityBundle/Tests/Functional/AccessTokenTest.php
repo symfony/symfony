@@ -160,6 +160,63 @@ class AccessTokenTest extends AbstractWebTestCase
         ], json_decode($client->getResponse()->getContent(), true));
     }
 
+    #[RequiresPhpExtension('openssl')]
+    public function testTwoProtectedResourcesShareANamedTokenHandlerAndRejectEachOthersTokens()
+    {
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_shared_token_handler.yml', 'debug' => true]);
+
+        $fooToken = self::createJws([
+            'iat' => time() - 1,
+            'nbf' => time() - 1,
+            'exp' => time() + 3600,
+            'iss' => 'https://www.example.com',
+            'aud' => 'showcase-api',
+            'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
+            'username' => 'dunglas',
+        ]);
+        $barToken = self::createJws([
+            'iat' => time() - 1,
+            'nbf' => time() - 1,
+            'exp' => time() + 3600,
+            'iss' => 'https://www.example.com',
+            'aud' => 'http://localhost/bar',
+            'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
+            'username' => 'dunglas',
+        ]);
+
+        $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => 'Bearer '.$fooToken]);
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+
+        $client->request('GET', '/bar', [], [], ['HTTP_AUTHORIZATION' => 'Bearer '.$fooToken]);
+        $this->assertSame(401, $client->getResponse()->getStatusCode());
+        $this->assertSame('Bearer error="invalid_token",error_description="Invalid credentials.",resource_metadata="http://localhost/.well-known/oauth-protected-resource/bar"', $client->getResponse()->headers->get('WWW-Authenticate'));
+
+        $client->request('GET', '/bar', [], [], ['HTTP_AUTHORIZATION' => 'Bearer '.$barToken]);
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+
+        $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => 'Bearer '.$barToken]);
+        $this->assertSame(401, $client->getResponse()->getStatusCode());
+        $this->assertSame('Bearer error="invalid_token",error_description="Invalid credentials.",resource_metadata="http://localhost/.well-known/oauth-protected-resource"', $client->getResponse()->headers->get('WWW-Authenticate'));
+
+        $client->request('GET', '/.well-known/oauth-protected-resource');
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame([
+            'resource' => 'http://localhost',
+            'authorization_servers' => ['https://www.example.com'],
+            'scopes_supported' => ['proposals:write'],
+            'bearer_methods_supported' => ['header'],
+        ], json_decode($client->getResponse()->getContent(), true));
+
+        $client->request('GET', '/.well-known/oauth-protected-resource/bar');
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame([
+            'resource' => 'http://localhost/bar',
+            'authorization_servers' => ['https://www.example.com'],
+            'scopes_supported' => ['proposals:write', 'proposals:review'],
+            'bearer_methods_supported' => ['header'],
+        ], json_decode($client->getResponse()->getContent(), true));
+    }
+
     public function testAccessControlGrantedOnTheScopesTheTokenCarries()
     {
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_scope.yml']);

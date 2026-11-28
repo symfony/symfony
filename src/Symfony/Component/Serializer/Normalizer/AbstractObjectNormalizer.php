@@ -897,8 +897,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         static $parameterTypeResolver;
         static $parameterTypeContextFactory;
 
-        if (null !== $parameterType && $parameterTypeResolver ??= class_exists(ReflectionTypeResolver::class) ? new ReflectionTypeResolver() : false) {
-            $resolvedParameterType = $parameterTypeResolver->resolve($parameterType, ($parameterTypeContextFactory ??= new TypeContextFactory())->createFromClassName($class->name, $parameter->getDeclaringClass()?->name));
+        if (null !== $parameterType) {
+            $resolvedParameterType = ($parameterTypeResolver ??= new ReflectionTypeResolver())->resolve($parameterType, ($parameterTypeContextFactory ??= new TypeContextFactory())->createFromClassName($class->name, $parameter->getDeclaringClass()?->name));
             if ($resolvedParameterType->isSatisfiedBy(static fn (Type $t) => match (true) {
                 $t instanceof BuiltinType && \in_array($t->getTypeIdentifier(), [TypeIdentifier::ARRAY, TypeIdentifier::ITERABLE], true) => !$type->isIdentifiedBy(TypeIdentifier::ARRAY) && !$type->isIdentifiedBy(TypeIdentifier::ITERABLE) && !$type->isSatisfiedBy(static fn (Type $c) => $c instanceof CollectionType),
                 $t instanceof BuiltinType && !\in_array($t->getTypeIdentifier(), [TypeIdentifier::NULL, TypeIdentifier::MIXED], true) => !$type->isIdentifiedBy($t->getTypeIdentifier()),
@@ -906,19 +906,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 default => false,
             })) {
                 $type = $resolvedParameterType;
-            }
-        } elseif ($parameterType instanceof \ReflectionNamedType) {
-            if ($parameterType->isBuiltin()) {
-                $typeIdentifier = TypeIdentifier::tryFrom($parameterType->getName());
-
-                if (null !== $typeIdentifier && TypeIdentifier::MIXED !== $typeIdentifier && !$type->isIdentifiedBy($typeIdentifier)) {
-                    $type = Type::builtin($typeIdentifier);
-                }
-            } elseif (!$type->isIdentifiedBy($parameterType->getName())) {
-                $type = Type::object($parameterType->getName());
-            }
-            if ($parameter->allowsNull()) {
-                $type = Type::nullable($type);
             }
         }
 

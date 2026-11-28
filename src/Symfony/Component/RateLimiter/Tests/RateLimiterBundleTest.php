@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Lock\LockFactory;
@@ -73,13 +74,13 @@ class RateLimiterBundleTest extends TestCase
 
     public function testTheCachePoolGoesWithTheAppPool()
     {
-        $container = new ContainerBuilder();
+        $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => true]));
         new RateLimiterBundle()->getContainerExtension()->load([[]], $container);
 
         new RemoveMissingDependenciesPass()->process($container);
         $this->assertFalse($container->hasDefinition('cache.rate_limiter'), 'dropped without "cache.app"');
 
-        $container = new ContainerBuilder();
+        $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => true]));
         $container->register('cache.app');
         new RateLimiterBundle()->getContainerExtension()->load([[]], $container);
 
@@ -87,9 +88,22 @@ class RateLimiterBundleTest extends TestCase
         $this->assertTrue($container->hasDefinition('cache.rate_limiter'));
     }
 
+    public function testTheDataCollectorGoesWithTheProfiler()
+    {
+        $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => true]));
+        new RateLimiterBundle()->getContainerExtension()->load([[]], $container);
+
+        $this->assertSame([['service' => 'profiler']], $container->getDefinition('rate_limiter.data_collector')->getTag('container.remove_if_missing'));
+
+        $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => false]));
+        new RateLimiterBundle()->getContainerExtension()->load([[]], $container);
+
+        $this->assertFalse($container->hasDefinition('rate_limiter.data_collector'));
+    }
+
     public function testNothingIsRegisteredWhenDisabled()
     {
-        $container = new ContainerBuilder();
+        $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => true]));
         new RateLimiterBundle()->getContainerExtension()->load([['enabled' => false]], $container);
 
         $this->assertFalse($container->hasDefinition('limiter'));

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add the `#[AsVoter]` attribute, to turn a method or an invokable class into a voter
+
 8.2
 ---
 

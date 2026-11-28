@@ -1,0 +1,31 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+services:
+    _defaults:
+        autoconfigure: true
+
+    Symfony\Bundle\SecurityBundle\Tests\Functional\CallableVoterTestPostRules: ~
+
+    functional_test.security.helper:
+        alias: security.helper
+        public: true
+
+    functional_test.security.token_storage:
+        alias: security.token_storage
+        public: true
+
+security:
+    access_decision_manager:
+        strategy: unanimous
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    alice: { password: test, roles: ['ROLE_USER'] }
+
+    firewalls:
+        main:
+            pattern: ^/
+            http_basic: ~

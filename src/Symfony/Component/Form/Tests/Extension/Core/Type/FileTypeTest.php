@@ -331,6 +331,76 @@ class FileTypeTest extends BaseTypeTestCase
         }
     }
 
+    /**
+     * @param array<string, string> $options
+     */
+    #[DataProvider('customUploadErrorMessages')]
+    public function testCustomUploadErrorMessages(int $errorCode, array $options, string $expectedTemplate)
+    {
+        $requestHandler = new HttpFoundationRequestHandler();
+        $form = $this->factory
+            ->createBuilder(static::TESTED_TYPE, null, $options)
+            ->setRequestHandler($requestHandler)
+            ->getForm();
+
+        $form->submit($this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo.txt', $errorCode));
+
+        $this->assertFalse($form->isValid());
+        $this->assertCount(1, $form->getErrors());
+
+        $error = $form->getErrors()[0];
+        $this->assertSame($expectedTemplate, $error->getMessageTemplate());
+        $this->assertSame(strtr($expectedTemplate, $error->getMessageParameters()), $error->getMessage());
+
+        if (\UPLOAD_ERR_INI_SIZE === $errorCode) {
+            $this->assertArrayHasKey('{{ limit }}', $error->getMessageParameters());
+            $this->assertArrayHasKey('{{ suffix }}', $error->getMessageParameters());
+        }
+    }
+
+    public static function customUploadErrorMessages(): iterable
+    {
+        yield 'Arabic ini size message with placeholders' => [
+            \UPLOAD_ERR_INI_SIZE,
+            ['upload_ini_size_message' => 'حجم الملف يتجاوز {{ limit }} {{ suffix }}.'],
+            'حجم الملف يتجاوز {{ limit }} {{ suffix }}.',
+        ];
+        yield 'Custom form size translation key' => [
+            \UPLOAD_ERR_FORM_SIZE,
+            ['upload_form_size_message' => 'upload.form.size_exceeded'],
+            'upload.form.size_exceeded',
+        ];
+        yield 'Arabic generic upload error' => [
+            \UPLOAD_ERR_PARTIAL,
+            ['upload_error_message' => 'تعذّر رفع الملف.'],
+            'تعذّر رفع الملف.',
+        ];
+    }
+
+    public function testCustomUploadErrorMessagesForMultipleFiles()
+    {
+        $requestHandler = new HttpFoundationRequestHandler();
+        $form = $this->factory
+            ->createBuilder(static::TESTED_TYPE, null, [
+                'multiple' => true,
+                'upload_error_message' => 'تعذّر رفع الملف.',
+            ])
+            ->setRequestHandler($requestHandler)
+            ->getForm();
+
+        $form->submit([
+            $this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo.txt', \UPLOAD_ERR_PARTIAL),
+            $this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo', 'bar.txt', \UPLOAD_ERR_CANT_WRITE),
+        ]);
+
+        $this->assertCount(2, $form->getErrors());
+
+        foreach ($form->getErrors() as $error) {
+            $this->assertSame('تعذّر رفع الملف.', $error->getMessage());
+            $this->assertSame('تعذّر رفع الملف.', $error->getMessageTemplate());
+        }
+    }
+
     public static function uploadFileErrorCodes()
     {
         return [

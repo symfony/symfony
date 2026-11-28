@@ -38,6 +38,7 @@ use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchOnFailureMiddleware;
+use Symfony\Component\Messenger\Middleware\ExpirationMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\FlowContextMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
@@ -159,6 +160,13 @@ return static function (ContainerConfigurator $container) {
                 service('lock.factory'),
             ])
             ->tag('container.remove_if_missing', ['service' => 'lock.factory'])
+
+        ->set('messenger.middleware.expiration', ExpirationMiddleware::class)
+            ->args([
+                service('clock')->nullOnInvalid(),
+                service('logger')->ignoreOnInvalid(),
+            ])
+            ->tag('monolog.logger', ['channel' => 'messenger'])
 
         ->set('messenger.middleware.add_default_stamps_middleware', AddDefaultStampsMiddleware::class)
 

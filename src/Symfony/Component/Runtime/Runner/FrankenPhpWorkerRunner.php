@@ -27,6 +27,9 @@ use Symfony\Component\Runtime\RunnerInterface;
  * the kernel is shut down and cloned after each request to mitigate cross-request state leaks;
  * subclasses keeping non-resettable state should override __clone accordingly.
  *
+ * When the application is a KernelInterface, it is booted before waiting for each request,
+ * so that booting and resetting services happen outside of the request.
+ *
  * "APP_RUNTIME_MODE" is set to "web=1&worker=1", or "web=1&worker=2" when FRANKENPHP_RESET_KERNEL
  * is active.
  *
@@ -82,6 +85,12 @@ class FrankenPhpWorkerRunner implements RunnerInterface
 
         $loops = 0;
         do {
+            if ($this->application instanceof KernelInterface) {
+                // Code running while booting must see the same environment as during requests
+                $_SERVER += $server;
+                $this->application->boot();
+            }
+
             $ret = frankenphp_handle_request($handler);
 
             if (null !== $terminationException) {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader\Configurator\Traits;
 
+use Symfony\Component\Routing\Attribute\RouteDeprecation;
 use Symfony\Component\Routing\Controller\RedirectController;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -227,6 +228,18 @@ trait RouteTrait
     final public function firewall(string $firewall): static
     {
         $this->route->addDefaults(['_firewall' => $firewall]);
+
+        return $this;
+    }
+
+    /**
+     * Adds the "_deprecation" entry to defaults.
+     *
+     * @return $this
+     */
+    final public function deprecation(\DateTimeInterface|string $since, \DateTimeInterface|string|null $sunset = null, ?string $link = null): static
+    {
+        $this->route->addDefaults(['_deprecation' => new RouteDeprecation($since, $sunset, $link)->toArray()]);
 
         return $this;
     }

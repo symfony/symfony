@@ -112,6 +112,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
         $this->assertTrue($route->getDefault('_stateless'));
         $this->assertSame('api', $route->getDefault('_firewall'));
+        $this->assertSame(['since' => '2026-10-01T00:00:00+00:00', 'sunset' => '2027-06-30T00:00:00+00:00', 'link' => 'https://example.com/deprecation'], $route->getDefault('_deprecation'));
     }
 
     public function testLoadWithResource()
@@ -198,6 +199,26 @@ class YamlFileLoaderTest extends TestCase
         ], $routeCollection->get('doc_debug_mode')->getDefaults());
         $this->assertSame(['_controller' => RedirectController::class.'::urlRedirectAction', 'path' => '/doc/current/{page}'], $routeCollection->get('doc_index')->getDefaults());
         $this->assertSame(['_controller' => RedirectController::class.'::urlRedirectAction', 'path' => 'https://example.com/some/path'], $routeCollection->get('external')->getDefaults());
+    }
+
+    public function testLoadThrowsExceptionWithDeprecationKeyAndDeprecationDefault()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('must not specify both the "deprecation" key and the defaults key "_deprecation" for "orders_v1".');
+
+        $loader->load('deprecation_with_deprecation_default.yml');
+    }
+
+    public function testLoadThrowsExceptionWithInvalidDeprecation()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/^The "deprecation" key for "orders_v1" in ".+invalid_deprecation\.yml" is invalid: "The "sunset" date of a route deprecation cannot be earlier than its "since" date\."$/');
+
+        $loader->load('invalid_deprecation.yml');
     }
 
     #[DataProvider('provideInvalidControllerShortcuts')]

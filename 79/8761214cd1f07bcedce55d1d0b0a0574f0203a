@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-28T09:33:26Z
+
+Thank you @jack-worman. I pushed two small changes. The RSA test now signs with a fixed key, because `openssl_pkey_new()` fails on the Windows CI. And the `info()` of `dpop.algorithms` is shorter.

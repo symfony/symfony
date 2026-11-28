@@ -68,7 +68,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
      * @param list<string>|null $accessorPrefixes
      * @param list<string>|null $arrayMutatorPrefixes
      */
-    public function __construct(?array $mutatorPrefixes = null, ?array $accessorPrefixes = null, ?array $arrayMutatorPrefixes = null, private bool $allowPrivateAccess = true)
+    public function __construct(?array $mutatorPrefixes = null, ?array $accessorPrefixes = null, ?array $arrayMutatorPrefixes = null, private bool $allowPrivateAccess = true, ?StringTypeResolver $stringTypeResolver = null, ?TypeContextFactory $typeContextFactory = null)
     {
         if (!class_exists(ContextFactory::class)) {
             throw new \LogicException(\sprintf('Unable to use the "%s" class as the "phpdocumentor/type-resolver" package is not installed. Try running composer require "phpdocumentor/type-resolver".', __CLASS__));
@@ -90,8 +90,8 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
             $this->phpDocParser = new PhpDocParser(new TypeParser($constExprParser = new ConstExprParser(true, true), true), $constExprParser);
             $this->lexer = new Lexer();
         }
-        $this->stringTypeResolver = new StringTypeResolver();
-        $this->typeContextFactory = new TypeContextFactory($this->stringTypeResolver);
+        $this->stringTypeResolver = $stringTypeResolver ?? new StringTypeResolver();
+        $this->typeContextFactory = $typeContextFactory ?? new TypeContextFactory($this->stringTypeResolver);
     }
 
     public function getType(string $class, string $property, array $context = []): ?Type

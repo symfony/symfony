@@ -61,10 +61,13 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingConcreteG
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingGenericTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingGenericTraitWithSameTemplate;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TypeAliasDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\VoidNeverReturnTypeDummy;
 use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContext;
+use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
+use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 
 require_once __DIR__.'/../Fixtures/Extractor/DummyNamespace.php';
 require_once __DIR__.'/../Fixtures/InheritedTemplates.php';
@@ -893,6 +896,16 @@ class PhpStanExtractorTest extends TestCase
         yield 'parameter at another position' => [PhpDocInheritance\ChildReordered::class, 'items'];
         yield 'abstract parent constructor' => [PhpDocInheritance\ImplementsAbstractConstructor::class, 'items'];
         yield 'interface constructor' => [PhpDocInheritance\ImplementsConstructorInterface::class, 'items'];
+    }
+
+    public function testExtraTypeAliases()
+    {
+        $extraTypeAliases = ['Email' => 'non-empty-string'];
+        $stringTypeResolver = new StringTypeResolver(null, null, $extraTypeAliases);
+        $extractor = new PhpStanExtractor(null, null, null, true, $stringTypeResolver, new TypeContextFactory($stringTypeResolver, $extraTypeAliases));
+
+        $this->assertEquals(Type::string(), $extractor->getType(TypeAliasDummy::class, 'email'));
+        $this->assertEquals(Type::list(Type::string()), $extractor->getType(TypeAliasDummy::class, 'emails'));
     }
 }
 

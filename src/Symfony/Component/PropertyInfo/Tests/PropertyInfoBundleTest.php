@@ -23,7 +23,9 @@ use Symfony\Component\PropertyInfo\PropertyInfoBundle;
 use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TypeAliasDummy;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeInfoBundle;
 
 class PropertyInfoBundleTest extends TestCase
 {
@@ -101,6 +103,20 @@ class PropertyInfoBundleTest extends TestCase
         $this->assertSame(['foo', 'bar'], $kernel->getContainer()->get('test.property_info')->getProperties(PropertyInfoBundleSubject::class));
     }
 
+    public function testTheTypeAliasesOfTypeInfoAreResolved()
+    {
+        if (!class_exists(TypeInfoBundle::class)) {
+            $this->markTestSkipped('symfony/type-info 8.2 or higher is required for this test.');
+        }
+
+        $kernel = new TestPropertyInfoKernel('type_info', false, $this->varDir, false, ['Email' => 'non-empty-string']);
+        $kernel->boot();
+        $propertyInfo = $kernel->getContainer()->get('test.property_info');
+
+        $this->assertEquals(Type::string(), $propertyInfo->getType(TypeAliasDummy::class, 'email'));
+        $this->assertEquals(Type::list(Type::string()), $propertyInfo->getType(TypeAliasDummy::class, 'emails'));
+    }
+
     public function testNothingIsRegisteredWhenDisabled()
     {
         $container = new ContainerBuilder();
@@ -142,7 +158,7 @@ class TestPropertyInfoKernel extends AbstractKernel
 {
     use KernelTrait;
 
-    public function __construct(string $env, bool $debug, private string $dir, private bool $withCacheSystem = false)
+    public function __construct(string $env, bool $debug, private string $dir, private bool $withCacheSystem = false, private ?array $typeInfoAliases = null)
     {
         parent::__construct($env, $debug);
     }
@@ -155,10 +171,18 @@ class TestPropertyInfoKernel extends AbstractKernel
     public function registerBundles(): iterable
     {
         yield new PropertyInfoBundle();
+
+        if (null !== $this->typeInfoAliases) {
+            yield new TypeInfoBundle();
+        }
     }
 
     private function configureContainer(ContainerConfigurator $container): void
     {
+        if (null !== $this->typeInfoAliases) {
+            $container->extension('type_info', ['aliases' => $this->typeInfoAliases]);
+        }
+
         $services = $container->services();
         $services
             ->set(PropertyInfoBundleListExtractor::class)->autoconfigure()

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add the `$stringTypeResolver` and `$typeContextFactory` arguments to `PhpStanExtractor`
+ * Make `PropertyInfoBundle` honor the `type_info.aliases` configuration when extracting PHPDoc types
+
 8.2
 ---
 

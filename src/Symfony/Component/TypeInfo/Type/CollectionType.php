@@ -197,7 +197,8 @@ class CollectionType extends Type implements WrappingTypeInterface
         $keyType = $this->getCollectionKeyType();
         $valueType = $this->getCollectionValueType();
 
-        if (is_iterable($value)) {
+        // only iterate values that can be traversed again, other iterators may be one-shot (e.g. generators) or destructive (e.g. heaps)
+        if (\is_array($value) || $value instanceof \IteratorAggregate || $value instanceof \ArrayIterator) {
             foreach ($value as $k => $v) {
                 // key or value do not match
                 if (!$keyType->accepts($k) || !$valueType->accepts($v)) {

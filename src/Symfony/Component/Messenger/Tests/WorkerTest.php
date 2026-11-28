@@ -33,6 +33,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Event\WorkerMessagesCompletedEvent;
 use Symfony\Component\Messenger\Event\WorkerRateLimitedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
@@ -49,6 +50,7 @@ use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Execution\DeferredBatchMessageQueue;
+use Symfony\Component\Messenger\Execution\InFlightMessageCountAwareInterface;
 use Symfony\Component\Messenger\Execution\Message\DeferredEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\Message\HandledEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\MessageExecutionStrategyInterface;
@@ -519,6 +521,61 @@ class WorkerTest extends TestCase
         $worker->run(['fetch_size' => 2]);
 
         $this->assertSame(4, $receiver->getAcknowledgeCount());
+    }
+
+    public function testWorkerReportsTheMessagesInFlightAndWhenTheyCompleteToItsListeners()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('first')), new Envelope(new DummyMessage('second'))],
+            [],
+        ]);
+
+        $running = [];
+        $completed = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnIdleListener());
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) use (&$running) {
+            if (!$event->isWorkerIdle()) {
+                $running[] = $event->getWorker()->getInFlightMessageCount();
+            }
+        });
+        $dispatcher->addListener(WorkerMessagesCompletedEvent::class, static function (WorkerMessagesCompletedEvent $event) use (&$completed) {
+            $completed[] = $event->getWorker()->getInFlightMessageCount();
+        });
+
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, new MockClock(), new InFlightCountingExecutionStrategy());
+        $worker->run(['fetch_size' => 2]);
+
+        // each message is in flight when the worker reports it as received, and nothing is when the strategy completed it
+        $this->assertSame([1, 1], $running);
+        $this->assertSame([0, 0], $completed);
+    }
+
+    public function testWorkerDoesNotReportCompletedMessagesWithoutAnInFlightAwareStrategy()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('first')), new Envelope(new DummyMessage('second'))],
+            [],
+        ]);
+
+        $completed = 0;
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnIdleListener());
+        $dispatcher->addListener(WorkerMessagesCompletedEvent::class, static function () use (&$completed) {
+            ++$completed;
+        });
+
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, new MockClock(), new PausingExecutionStrategy());
+        $worker->run(['fetch_size' => 2]);
+
+        $this->assertSame(0, $completed);
+    }
+
+    public function testWorkerWithoutAnInFlightAwareStrategyHasNoMessageInFlight()
+    {
+        $worker = new Worker([], new MessageBus());
+
+        $this->assertSame(0, $worker->getInFlightMessageCount());
     }
 
     public function testDrainedBufferedEnvelopesDoNotDelayHigherPriorityReceivers()
@@ -3897,7 +3954,7 @@ class WorkerTest extends TestCase
 class PausingExecutionStrategy implements MessageExecutionStrategyInterface
 {
     public array $executed = [];
-    private array $inFlight = [];
+    protected array $inFlight = [];
 
     public function execute(Envelope $envelope, string $transportName, callable $onHandled): void
     {
@@ -3932,6 +3989,14 @@ class PausingExecutionStrategy implements MessageExecutionStrategyInterface
 
     public function shutdown(): void
     {
+    }
+}
+
+class InFlightCountingExecutionStrategy extends PausingExecutionStrategy implements InFlightMessageCountAwareInterface
+{
+    public function getInFlightMessageCount(): int
+    {
+        return \count($this->inFlight);
     }
 }
 

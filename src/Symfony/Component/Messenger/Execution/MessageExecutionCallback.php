@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger\Execution;
 use Symfony\Component\Messenger\Envelope;
 
 /**
- * @internal
+ * The $onHandled callable that the worker passes to the execution strategies.
  */
 final class MessageExecutionCallback
 {

@@ -40,6 +40,7 @@ class ConfigurationTest extends TestCase
             'deduplication' => ['lock_factory' => null],
             'identity_stamps' => false,
             'default_bus' => null,
+            'execution_strategy_factory' => null,
             'buses' => ['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => [], 'messages' => [], 'unwrap_exceptions' => false]],
         ], $this->process([]));
     }

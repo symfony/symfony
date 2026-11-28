@@ -219,6 +219,27 @@ class MessengerBundleExtensionTest extends TestCase
         $this->assertTrue($listener->hasTag('kernel.event_subscriber'));
     }
 
+    public function testExecutionStrategyFactoryIsNotConfiguredByDefault()
+    {
+        $container = $this->createContainerFromFile('messenger');
+
+        $this->assertFalse($container->hasAlias('messenger.execution_strategy_factory'));
+    }
+
+    public function testExecutionStrategyFactoryAliasIsRegistered()
+    {
+        $container = $this->createContainer();
+        $container->register('app.execution_strategy_factory', \stdClass::class)->setPublic(true);
+        new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures'))->load('messenger_execution_strategy_factory.php');
+        $container->compile();
+
+        $this->assertSame('app.execution_strategy_factory', (string) $container->getAlias('messenger.execution_strategy_factory'));
+        $this->assertSame(
+            'messenger.execution_strategy_factory',
+            (string) $container->getDefinition('console.command.messenger_consume_messages')->getArgument(11)
+        );
+    }
+
     public function testMessengerRejectRedeliveredMessagesEnabledByDefault()
     {
         $container = $this->createContainerFromFile('messenger', false);

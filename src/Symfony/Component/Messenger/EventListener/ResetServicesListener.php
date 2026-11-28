@@ -14,8 +14,10 @@ namespace Symfony\Component\Messenger\EventListener;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ServicesResetterInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Messenger\Event\WorkerMessagesCompletedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
+use Symfony\Component\Messenger\Worker;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -25,6 +27,7 @@ class ResetServicesListener implements EventSubscriberInterface
 {
     private int $interval = 1;
     private int $count = 0;
+    private bool $resetPending = false;
 
     public function __construct(
         #[Autowire(service: ServicesResetterInterface::class)]
@@ -40,8 +43,15 @@ class ResetServicesListener implements EventSubscriberInterface
     public function resetServices(WorkerRunningEvent $event): void
     {
         if (!$event->isWorkerIdle() && 0 === ++$this->count % $this->interval) {
-            $this->servicesResetter->reset();
+            $this->resetPending = true;
         }
+
+        $this->resetIfNoMessageIsInFlight($event->getWorker());
+    }
+
+    public function resetServicesWhenMessagesCompleted(WorkerMessagesCompletedEvent $event): void
+    {
+        $this->resetIfNoMessageIsInFlight($event->getWorker());
     }
 
     public function resetServicesAtStop(WorkerStoppedEvent $event): void
@@ -49,10 +59,20 @@ class ResetServicesListener implements EventSubscriberInterface
         $this->servicesResetter->reset();
     }
 
+    private function resetIfNoMessageIsInFlight(Worker $worker): void
+    {
+        // the services are shared by the messages in flight: wait until the last one is handled
+        if ($this->resetPending && 0 === $worker->getInFlightMessageCount()) {
+            $this->resetPending = false;
+            $this->servicesResetter->reset();
+        }
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
             WorkerRunningEvent::class => ['resetServices', -1024],
+            WorkerMessagesCompletedEvent::class => ['resetServicesWhenMessagesCompleted', -1024],
             WorkerStoppedEvent::class => ['resetServicesAtStop', -1024],
         ];
     }

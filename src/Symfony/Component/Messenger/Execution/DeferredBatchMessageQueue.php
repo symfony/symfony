@@ -22,7 +22,14 @@ use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
  */
 final class DeferredBatchMessageQueue
 {
-    /** @var \SplObjectStorage<object, DeferredBatchMessage>|null */
+    /**
+     * The messages that wait for their batch handler, in the order the strategy reported them.
+     *
+     * A strategy running messages concurrently may report them out of order, e.g. the message that flushed
+     * the batch after the ones that came next: the batch handler is then flushed with a message still pending.
+     *
+     * @var \SplObjectStorage<object, non-empty-list<DeferredBatchMessage>>|null
+     */
     private ?\SplObjectStorage $messages = null;
 
     public function hasPending(): bool
@@ -32,9 +39,13 @@ final class DeferredBatchMessageQueue
 
     public function add(object $batchHandler, mixed $context, Envelope $envelope, bool &$acked, float $queuedAt): void
     {
-        /** @var \SplObjectStorage<object, DeferredBatchMessage> $messages */
+        /** @var \SplObjectStorage<object, non-empty-list<DeferredBatchMessage>> $messages */
         $messages = $this->messages ??= new \SplObjectStorage();
-        $messages[$batchHandler] = new DeferredBatchMessage($context, $envelope, $acked, $queuedAt);
+
+        // forget the messages that got their outcome meanwhile
+        $pending = isset($messages[$batchHandler]) ? array_values(array_filter($messages[$batchHandler], static fn (DeferredBatchMessage $message) => !$message->acked)) : [];
+        $pending[] = new DeferredBatchMessage($context, $envelope, $acked, $queuedAt);
+        $messages[$batchHandler] = $pending;
     }
 
     /**
@@ -46,29 +57,52 @@ final class DeferredBatchMessageQueue
             return new \SplObjectStorage();
         }
 
-        if (\is_bool($force)) {
-            $messages = $this->messages;
-            $this->messages = null;
-
-            return $messages;
-        }
-
-        /** @var \SplObjectStorage<object, DeferredBatchMessage> $remaining */
-        $remaining = new \SplObjectStorage();
         /** @var \SplObjectStorage<object, DeferredBatchMessage> $flushable */
         $flushable = new \SplObjectStorage();
 
+        if (\is_bool($force)) {
+            foreach ($this->messages as $handler) {
+                $flushable[$handler] = self::messageToFlushWith($this->messages[$handler]);
+            }
+
+            $this->messages = null;
+
+            return $flushable;
+        }
+
+        /** @var \SplObjectStorage<object, non-empty-list<DeferredBatchMessage>> $remaining */
+        $remaining = new \SplObjectStorage();
+
         foreach ($this->messages as $handler) {
-            if ($force <= $now - $this->messages[$handler]->queuedAt) {
-                $flushable[$handler] = $this->messages[$handler];
+            $messages = $this->messages[$handler];
+
+            if ($force <= $now - end($messages)->queuedAt) {
+                $flushable[$handler] = self::messageToFlushWith($messages);
             } else {
-                $remaining[$handler] = $this->messages[$handler];
+                $remaining[$handler] = $messages;
             }
         }
 
         $this->messages = $remaining->count() ? $remaining : null;
 
         return $flushable;
+    }
+
+    /**
+     * Returns the message that the flush of a batch handler is dispatched with: the last one still pending,
+     * since the flush is skipped for a message that has its outcome already.
+     *
+     * @param non-empty-list<DeferredBatchMessage> $messages
+     */
+    private static function messageToFlushWith(array $messages): DeferredBatchMessage
+    {
+        foreach (array_reverse($messages) as $message) {
+            if (!$message->acked) {
+                return $message;
+            }
+        }
+
+        return end($messages);
     }
 
     /**

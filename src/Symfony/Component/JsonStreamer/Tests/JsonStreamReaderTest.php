@@ -812,6 +812,16 @@ class JsonStreamReaderTest extends TestCase
         $this->assertCount(1, glob($this->streamReadersDir.'/*'));
     }
 
+    public function testReadAfterStreamReaderFileIsDeleted()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+        $this->assertTrue($reader->read('true', Type::bool()));
+
+        array_map('unlink', glob($this->streamReadersDir.'/*'));
+
+        $this->assertTrue($reader->read('true', Type::bool()));
+    }
+
     public function testCreateStreamReaderFileOnlyIfNotExists()
     {
         $reader = JsonStreamReader::create([], $this->streamReadersDir);

@@ -24,6 +24,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithArray;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithConcreteInheritedGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDictValueTransformer;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDollarNamedProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithList;
@@ -141,9 +142,38 @@ class JsonStreamWriterTest extends TestCase
     {
         $this->assertWritten('{"a":[1,2],"b":[]}', ['a' => [1, 2], 'b' => []], Type::dict(Type::list(Type::int())));
         $this->assertWritten('{"a":[1,2],"b":[]}', ['a' => [1, 2], 'b' => []], Type::dict());
-        $this->assertWritten('[{"a":1},[]]', [['a' => 1], []], Type::list(Type::dict()));
+        $this->assertWritten('[{"a":1},{}]', [['a' => 1], []], Type::list(Type::dict()));
         $this->assertWritten('[{"a":1}]', [['a' => 1]], Type::array(Type::dict(Type::int())));
         $this->assertWritten('[[{"a":1}]]', [[['a' => 1]]], Type::array(Type::list(Type::dict(Type::int()))));
+    }
+
+    public function testWriteEmptyOrNumericKeyedDictionaryOfCollectionsOrMixedValuesAsObject()
+    {
+        $this->assertWritten('{}', [], Type::dict(Type::list(Type::int())));
+        $this->assertWritten('{"0":[1],"1":[]}', ['0' => [1], '1' => []], Type::dict(Type::list(Type::int())));
+        $this->assertWritten('{}', [], Type::dict());
+        $this->assertWritten('{"0":1,"1":[2]}', ['0' => 1, '1' => [2]], Type::dict());
+        $this->assertWritten('{"a":{},"b":{"0":[1]}}', ['a' => [], 'b' => ['0' => [1]]], Type::dict(Type::dict(Type::list(Type::int()))));
+        $this->assertWritten('{}', [], Type::nullable(Type::dict(Type::list(Type::int()))));
+        $this->assertWritten('[{},null,{"0":1}]', [[], null, ['0' => 1]], Type::list(Type::nullable(Type::dict())));
+        $this->assertWritten('{}', [], Type::iterable(Type::list(Type::int()), Type::string()));
+        $this->assertWritten('{"\u0000a":1}', ["\0a" => 1], Type::dict());
+    }
+
+    public function testWriteUnionOfListAndDictionaryOfMixedValues()
+    {
+        $this->assertWritten('[1,2]', [1, 2], Type::union(Type::list(Type::int()), Type::dict()));
+        $this->assertWritten('{"a":1}', ['a' => 1], Type::union(Type::list(Type::int()), Type::dict()));
+        $this->assertWritten('[1,2]', [1, 2], Type::nullable(Type::union(Type::list(Type::int()), Type::dict(Type::list(Type::int())))));
+        $this->assertWritten('[1,2]', [1, 2], Type::union(Type::list(Type::int()), Type::dict(Type::list(Type::dict()))));
+    }
+
+    public function testWriteDictionaryOfMixedValuesFromValueTransformerOnce()
+    {
+        DummyWithDictValueTransformer::$calls = 0;
+
+        $this->assertWritten('{"id":{"0":1}}', new DummyWithDictValueTransformer(), Type::object(DummyWithDictValueTransformer::class));
+        $this->assertSame(1, DummyWithDictValueTransformer::$calls);
     }
 
     public function testWrittenEmptyDictionaryCanBeReadFromStream()

@@ -273,7 +273,7 @@ class MessengerPass implements CompilerPassInterface
                 return ('__invoke' === $methodName) ? $types : array_fill_keys($types, $methodName);
             }
 
-            throw new RuntimeException(\sprintf('Invalid handler service "%s": type-hint of argument "$%s" in method "%s::__invoke()" must be a class , "%s" given.', $serviceId, $parameters[0]->getName(), $handlerClass->getName(), implode('|', $invalidTypes)));
+            throw new RuntimeException(\sprintf('Invalid handler service "%s": type-hint of argument "$%s" in method "%s::%s()" must be a class , "%s" given.', $serviceId, $parameters[0]->getName(), $handlerClass->getName(), $methodName, implode('|', $invalidTypes)));
         }
 
         if ($type->isBuiltin()) {

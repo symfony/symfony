@@ -130,6 +130,44 @@ class CollectionTypeTest extends TestCase
         $this->assertFalse($type->accepts(new \ArrayObject(['foo' => true])));
         $this->assertTrue($type->accepts(new \ArrayObject([0 => true, 1 => false])));
         $this->assertFalse($type->accepts(new \ArrayObject([0 => true, 1 => 'string'])));
+        $this->assertTrue($type->accepts(new \ArrayIterator([1 => true])));
+        $this->assertFalse($type->accepts(new \ArrayIterator([1 => 'string'])));
+
+        $iteratorAggregate = new class implements \IteratorAggregate {
+            public function getIterator(): \Generator
+            {
+                yield 1 => 'string';
+            }
+        };
+
+        $this->assertFalse($type->accepts($iteratorAggregate));
+        $this->assertSame([1 => 'string'], iterator_to_array($iteratorAggregate));
+    }
+
+    public function testAcceptsDoesNotConsumeIterators()
+    {
+        $type = Type::iterable(Type::bool(), Type::int());
+
+        $generator = (static function (): \Generator {
+            yield 1 => true;
+            yield 2 => 'string';
+        })();
+
+        // the invalid value is accepted on purpose: only the outer type of such iterators is checked
+        $this->assertTrue($type->accepts($generator));
+        $this->assertSame([1 => true, 2 => 'string'], iterator_to_array($generator));
+
+        $noRewindIterator = new \NoRewindIterator(new \ArrayIterator([1 => true, 2 => 'string']));
+
+        $this->assertTrue($type->accepts($noRewindIterator));
+        $this->assertSame([1 => true, 2 => 'string'], iterator_to_array($noRewindIterator));
+
+        $heap = new \SplMinHeap();
+        $heap->insert(true);
+        $heap->insert(true);
+
+        $this->assertTrue($type->accepts($heap));
+        $this->assertCount(2, $heap);
     }
 
     #[IgnoreDeprecations]

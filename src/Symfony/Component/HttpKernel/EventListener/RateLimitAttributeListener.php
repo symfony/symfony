@@ -143,14 +143,7 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
      */
     private function getPolicyLimiterId(\ReflectionFunctionAbstract $controller, PolicyInterface $policy): string
     {
-        $class = $controller instanceof \ReflectionFunction && !$controller->isAnonymous() ? $controller->getClosureCalledClass() : null;
-        $name = match (true) {
-            $controller instanceof \ReflectionMethod => $controller->class.'::'.$controller->name,
-            null !== $class => $class->name.'::'.$controller->name,
-            default => $controller->name,
-        };
-
-        return $name.'#'.hash('xxh128', serialize($policy));
+        return KeyPlaceholderResolver::getControllerName($controller).'#'.hash('xxh128', serialize($policy));
     }
 
     /**

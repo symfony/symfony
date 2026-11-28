@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Allow passing a `PolicyInterface` instead of a limiter name to `#[RateLimit]`, to configure a limiter that only its controller uses
+ * Add `RateLimiterFactoryValueResolver` to resolve the `RateLimiterFactoryInterface` controller arguments that carry a policy attribute, such as `#[SlidingWindowPolicy]`, combining several into a compound limiter
+
 8.2
 ---
 

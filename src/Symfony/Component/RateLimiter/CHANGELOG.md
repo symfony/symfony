@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add the `#[FixedWindowPolicy]`, `#[SlidingWindowPolicy]` and `#[TokenBucketPolicy]` attributes, implementing `PolicyInterface`, to configure a rate limiter that `RateLimiterBuilder` creates on the fly
+
 8.2
 ---
 
